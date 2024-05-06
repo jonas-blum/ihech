@@ -6,9 +6,13 @@ from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import StandardScaler
 from helpers import drop_columns, extract_columns
 from clustering_functions import cluster_documents_recursively
-from umap import UMAP
 from heatmap_types import HeatmapJSON, HeatmapSettings
 from sklearn.manifold import TSNE
+
+import warnings
+
+warnings.filterwarnings("ignore", message=".*The 'nopython' keyword.*")
+from umap import UMAP
 
 
 def sort_columns(
@@ -241,7 +245,6 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
             [],
         )
 
-    # TODO: Add "row_id"
     column_names = [
         "row_index",
         "parent_index",

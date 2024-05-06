@@ -1,20 +1,22 @@
-import time
 from typing import List, Union
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 
+from helpers import drop_columns
+
 
 data_index_map = {
     "row_index": 0,
     "parent_index": 1,
-    "row_name": 2,
-    "amount_of_data_points": 3,
-    "dim_reduction_x": 4,
-    "dim_reduction_y": 5,
+    "row_id": 2,
+    "row_name": 3,
+    "amount_of_data_points": 4,
+    "dim_reduction_x": 5,
+    "dim_reduction_y": 6,
 }
 
-# row_index: number, parent_index: number, row_name: string, amount_of_data_points: number, dim_reduction_x: number, dim_reduction_y: number, ...tags: number[]
+# row_index: number, parent_index: number, row_id: string, row_name: string, amount_of_data_points: number, dim_reduction_x: number, dim_reduction_y: number, ...tags: number[]
 
 
 def all_rows_same(df):
@@ -28,6 +30,8 @@ def cluster_documents_recursively(
     data: List[List[Union[float, str]]],
     cluster_size: int,
     parent_index: int,
+    ids_column_name: str,
+    row_names_column_name: str,
     cluster_by_collections: bool = False,
     collection_column_names: List[str] = None,
 ) -> None:
@@ -45,13 +49,25 @@ def cluster_documents_recursively(
             trans_temp_df = trans_group_df.drop(collection_column_name, axis=1)
             dim_red_temp_df = dim_red_temp_df.drop(collection_column_name, axis=1)
 
-            tag_data_aggregated = orig_temp_df.mean().tolist()
+            remaining_collection_column_names = collection_column_names[1:]
+
+            tag_data_aggregated = (
+                drop_columns(
+                    orig_temp_df,
+                    row_names_column_name,
+                    remaining_collection_column_names,
+                )
+                .mean()
+                .tolist()
+            )
             dim_reduction_aggregated = dim_red_temp_df.mean().tolist()
 
+            new_row_name = collection_column_name + " " + str(orig_group_df.shape[0])
             new_data_aggregated = [
                 index_aggregated,
                 parent_index,
-                f"{collection} {orig_group_df.shape[0]}",
+                np.nan,
+                f"{new_row_name}",
                 orig_group_df.shape[0],
                 dim_reduction_aggregated[0],
                 dim_reduction_aggregated[1],
@@ -66,6 +82,8 @@ def cluster_documents_recursively(
                 data,
                 cluster_size,
                 index_aggregated,
+                ids_column_name,
+                row_names_column_name,
                 cluster_by_collections,
                 collection_column_names[1:],
             )
@@ -76,26 +94,40 @@ def cluster_documents_recursively(
         if original_df.shape[0] == 0:
             return None
         if original_df.shape[0] == 1:
-            tag_data = original_df.iloc[0].tolist()
+            tag_data = (
+                drop_columns(original_df, row_names_column_name, []).iloc[0].tolist()
+            )
             dim_reduction = dim_red_df.iloc[0].tolist()
+
+            new_row_name = str(original_df.iloc[0][row_names_column_name])
+
+            new_row_id = original_df.index[0]
+
             new_data = [
                 parent_index + 1,
                 parent_index,
-                f"{original_df.index[0]}",
+                new_row_id,
+                f"{new_row_name}",
+                original_df,
                 1,
                 dim_reduction[0],
                 dim_reduction[1],
             ] + tag_data
+
             data.append(new_data)
 
-        tag_data_aggregated = original_df.mean().tolist()
+        tag_data_aggregated = (
+            drop_columns(original_df, row_names_column_name, []).mean().tolist()
+        )
         dim_reduction_aggregated = dim_red_df.mean().tolist()
         index_aggregated = parent_index + 1
 
+        new_row_name = str(original_df.shape[0])
         new_data_aggregated = [
             index_aggregated,
             parent_index,
-            f"{original_df.shape[0]}",
+            np.nan,
+            f"{new_row_name}",
             original_df.shape[0],
             dim_reduction_aggregated[0],
             dim_reduction_aggregated[1],
@@ -104,12 +136,20 @@ def cluster_documents_recursively(
         data.append(new_data_aggregated)
 
         for i in range(original_df.shape[0]):
-            tag_data = original_df.iloc[i].tolist()
+            tag_data = (
+                drop_columns(original_df, row_names_column_name, []).iloc[i].tolist()
+            )
             dim_reduction = dim_red_df.iloc[i].tolist()
+
+            new_row_name = str(original_df.iloc[i][row_names_column_name])
+
+            new_row_id = original_df.index[i]
+
             new_data = [
-                index_aggregated + i,
+                index_aggregated + i + 1,
                 index_aggregated,
-                f"{original_df.index[i]}",
+                new_row_id,
+                f"{new_row_name}",
                 1,
                 dim_reduction[0],
                 dim_reduction[1],
@@ -146,13 +186,19 @@ def cluster_documents_recursively(
                 print("Skipping cluster with 0 or all documents")
                 continue
 
-            tag_data_aggregated = original_cluster_df.mean().tolist()
+            tag_data_aggregated = (
+                drop_columns(original_cluster_df, row_names_column_name, [])
+                .mean()
+                .tolist()
+            )
             dim_reduction_aggregated = dim_red_cluster_df.mean().tolist()
 
+            new_row_name = str(original_cluster_df.shape[0])
             new_data_aggregated = [
                 index_aggregated,
                 parent_index,
-                f"{original_cluster_df.shape[0]}",
+                np.nan,
+                f"{new_row_name}",
                 original_cluster_df.shape[0],
                 dim_reduction_aggregated[0],
                 dim_reduction_aggregated[1],
@@ -167,6 +213,8 @@ def cluster_documents_recursively(
                 data,
                 cluster_size,
                 index_aggregated,
+                ids_column_name,
+                row_names_column_name,
             )
 
             index_aggregated += original_cluster_df.shape[0]

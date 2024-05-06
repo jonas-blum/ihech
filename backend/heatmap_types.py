@@ -14,7 +14,10 @@ SortOrderColumns = Literal[
 
 
 class HeatmapSettings:
-    csv_file: str
+    csvFile: str
+    idsColumnName: str
+    rowNamesColumnName: str
+    collectionColumnNames: List[str]
 
     selectedRowIds: List[str]
     selectedColumns: List[str]
@@ -27,7 +30,6 @@ class HeatmapSettings:
     clusterRowsBasedOnStickyColumns: bool
 
     clusterByCollections: bool
-    collectionColumnNames: List[str]
 
     clusterSize: int
     dimReductionAlgo: DimReductionAlgoType
@@ -36,7 +38,10 @@ class HeatmapSettings:
     absRelLog: AbsRelLogType
 
     def __init__(self, dict):
-        self.csv_file = dict["csv_file"]
+        self.csvFile = dict["csvFile"]
+        self.idsColumnName = dict["idsColumnName"]
+        self.rowNamesColumnName = dict["rowNamesColumnName"]
+        self.collectionColumnNames = dict["collectionColumnNames"]
 
         self.selectedRowIds = dict["selectedRowIds"]
         self.selectedColumns = dict["selectedColumns"]
@@ -49,7 +54,6 @@ class HeatmapSettings:
         self.clusterRowsBasedOnStickyColumns = dict["clusterRowsBasedOnStickyColumns"]
 
         self.clusterByCollections = dict["clusterByCollections"]
-        self.collectionColumnNames = dict["collectionColumnNames"]
 
         self.clusterSize = int(dict["clusterSize"])
         self.dimReductionAlgo = dict["dimReductionAlgo"]
@@ -60,8 +64,8 @@ class HeatmapSettings:
 
 class HeatmapJSON:
     def __init__(self):
-        self.heatmap_csv: str = ""
-        self.col_dissimilarities: List[float] = []
+        self.heatmapCSV: str = ""
+        self.colDissimilarities: List[float] = []
 
     def generate_json(self):
         return json.dumps(self, default=lambda o: o.__dict__, indent=4)

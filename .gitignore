@@ -1,0 +1,29 @@
+# exclude virtual environment stuff
+bin/
+include/
+local/
+share/
+lib/
+lib64
+pyvenv.cfg
+etc/
+
+# exclude editions folder content
+editions/*
+
+backend/projectenv
+
+
+.env
+.pyc
+
+
+
+# exclude flask stuff
+__pycache__
+
+# exclude IDE settings
+.vscode/
+
+
+

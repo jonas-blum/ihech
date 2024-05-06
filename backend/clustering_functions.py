@@ -108,7 +108,6 @@ def cluster_documents_recursively(
                 parent_index,
                 new_row_id,
                 f"{new_row_name}",
-                original_df,
                 1,
                 dim_reduction[0],
                 dim_reduction[1],
@@ -154,6 +153,7 @@ def cluster_documents_recursively(
                 dim_reduction[0],
                 dim_reduction[1],
             ] + tag_data
+
             data.append(new_data)
 
         return None

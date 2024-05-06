@@ -1,5 +1,4 @@
 import time
-
 import pandas as pd
 from heatmap import createHeatmap
 from heatmap_types import HeatmapSettings
@@ -18,7 +17,9 @@ def index():
 
 @app.route("/api/heatmap", methods=["POST"])
 def get_heatmap():
+
     start = time.perf_counter()
+
     heatmap_settings = HeatmapSettings(request.json["settings"])
     csv_file = StringIO(heatmap_settings.csvFile)
     original_df = pd.read_csv(csv_file)
@@ -29,7 +30,8 @@ def get_heatmap():
         heatmap_settings.rowNamesColumnName += "_added_string"
         original_df[heatmap_settings.rowNamesColumnName] = original_df.index
 
-    print(original_df.head())
+    original_df = original_df.loc[heatmap_settings.selectedRowIds]
+
     return_JSON = createHeatmap(original_df, heatmap_settings)
     print(f"Time to generate entire heatmap: {time.perf_counter() - start}\n")
     return return_JSON

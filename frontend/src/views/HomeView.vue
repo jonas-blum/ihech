@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import ExpandableHeatmap from '@/components/ExpandableHeatmap.vue'
+import Heatmap from '@/components/Heatmap.vue'
 </script>
 
 <template>
-  <ExpandableHeatmap />
+  <main style="display: flex; flex-direction: column; align-items: center">
+    <Heatmap />
+  </main>
 </template>

@@ -4,8 +4,6 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 
-from heatmap.types import RowNamesAndData
-
 
 data_index_map = {
     "row_index": 0,

@@ -1,5 +1,7 @@
+import json
 from typing import List, Literal
 
+AbsRelLogType = Literal["ABS", "REL", "LOG"]
 
 DimReductionAlgoType = Literal["PCA", "TSNE", "UMAP"]
 
@@ -12,6 +14,8 @@ SortOrderColumns = Literal[
 
 
 class HeatmapSettings:
+    csv_file: str
+
     selectedRowIds: List[str]
     selectedColumns: List[str]
 
@@ -29,7 +33,11 @@ class HeatmapSettings:
     dimReductionAlgo: DimReductionAlgoType
     clusterAfterDimRed: bool
 
+    absRelLog: AbsRelLogType
+
     def __init__(self, dict):
+        self.csv_file = dict["csv_file"]
+
         self.selectedRowIds = dict["selectedRowIds"]
         self.selectedColumns = dict["selectedColumns"]
 
@@ -46,3 +54,14 @@ class HeatmapSettings:
         self.clusterSize = int(dict["clusterSize"])
         self.dimReductionAlgo = dict["dimReductionAlgo"]
         self.clusterAfterDimRed = dict["clusterAfterDimRed"]
+
+        self.absRelLog = dict["absRelLog"]
+
+
+class HeatmapJSON:
+    def __init__(self):
+        self.heatmap_csv: str = ""
+        self.col_dissimilarities: List[float] = []
+
+    def generate_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__, indent=4)

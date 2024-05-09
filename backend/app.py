@@ -32,6 +32,8 @@ def get_heatmap():
 
     original_df = original_df.loc[heatmap_settings.selectedRowIds]
 
+    original_df = original_df.loc[:, (original_df != 0).any(axis=0)]
+
     return_JSON = createHeatmap(original_df, heatmap_settings)
     print(f"Time to generate entire heatmap: {time.perf_counter() - start}\n")
     return return_JSON

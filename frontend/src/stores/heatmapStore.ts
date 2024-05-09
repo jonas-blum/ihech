@@ -188,19 +188,26 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return
       }
       const startTime2 = new Date().getTime()
+
+      let startTimeTemp = new Date().getTime()
       let heatmapDF: dataForge.IDataFrame<any, any> = dataForge
         .fromCSV(receivedHeatmap.heatmapCSV, { dynamicTyping: true })
         .setIndex('row_index')
         .bake()
+      console.log('Done reading csv', new Date().getTime() - startTimeTemp, 'ms.')
 
       console.log('Done Fetching Heatmap CSV', new Date().getTime() - startTime2, 'ms.')
       const startTime3 = new Date().getTime()
+
+      startTimeTemp = new Date().getTime()
       heatmapDF = heatmapDF
         .generateSeries({
           is_open: (row) => row.parent_index === 0
         })
         .bake()
+      console.log('Done generating is_open', new Date().getTime() - startTimeTemp, 'ms.')
 
+      startTimeTemp = new Date().getTime()
       heatmapDF = heatmapDF
         .generateSeries({
           children_indexes: (row) => {
@@ -216,7 +223,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           }
         })
         .bake()
+      console.log('Done generating children_indexes', new Date().getTime() - startTimeTemp, 'ms.')
 
+      startTimeTemp = new Date().getTime()
       heatmapDF = heatmapDF
         .generateSeries({
           is_visible: (row) => {
@@ -231,18 +240,49 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           }
         })
         .bake()
+      console.log('Done generating is_visible', new Date().getTime() - startTimeTemp, 'ms.')
 
+      startTimeTemp = new Date().getTime()
       this.initialColumnsOrder = heatmapDF.dropSeries(NON_ATTRIBUTE_COLUMNS).bake().getColumnNames()
+      console.log('Done getting initialColumnsOrder', new Date().getTime() - startTimeTemp, 'ms.')
 
       this.initial_col_dissimilarities = receivedHeatmap.col_dissimilarities
       this.col_dissimilarities = receivedHeatmap.col_dissimilarities
 
-      this.heatmap = heatmapDF
+      this.heatmap = heatmapDF.bake()
 
       this.updateMaxMinValues()
       console.log('Done doing transformations', new Date().getTime() - startTime3, 'ms.')
       console.log('Done Fetching Heatmap', new Date().getTime() - startTime, 'ms.')
 
+      startTimeTemp = new Date().getTime()
+      heatmapDF = heatmapDF
+        .generateSeries({
+          is_visible: (row) => {
+            if (row.is_open) {
+              return true
+            }
+            if (row.parent_index === 0) {
+              return true
+            }
+            const parentRow = heatmapDF.at(row.parent_index)
+            return parentRow?.is_open
+          }
+        })
+        .bake()
+      console.log('Done generating is_visible 2', new Date().getTime() - startTimeTemp, 'ms.')
+
+      startTimeTemp = new Date().getTime()
+      const yeet = heatmapDF.dropSeries(NON_ATTRIBUTE_COLUMNS).toRows()
+
+      console.log(
+        'Done baking visibleHeatmap',
+        new Date().getTime() - startTimeTemp,
+        'ms.',
+        yeet.length
+      )
+
+      console.log('Row count', heatmapDF.count())
       this.changeHeatmap()
       this.loading = false
     },

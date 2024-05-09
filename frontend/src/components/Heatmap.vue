@@ -67,6 +67,8 @@ function updateRowLabelsWidth() {
 
 function updateHeatmapWidth() {
   let minWidth = Math.round(window.innerWidth - MIN_ROW_LABELS_WIDTH - DIM_REDUCTION_WIDTH)
+  console.log('Min width', minWidth)
+  console.log('col names value', colNames.value.length)
   minWidth += stickyColumnsGap.value
   const remainderMin = minWidth % colNames.value.length
   minWidth -= remainderMin
@@ -107,8 +109,10 @@ function drawEverything() {
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
 
   nextTick(() => {
-    const rawHeatmap = heatmapStore.getVisibleHeatmapOnlyAttributes.bake()
-    const rawHeatmapData = rawHeatmap.toRows()
+    const time = performance.now()
+    const rawHeatmapData = heatmapStore.getVisibleHeatmapOnlyAttributes.toRows()
+    console.log('Time to get raw heatmap data', performance.now() - time)
+    console.log('Drawing heatmap', rawHeatmapData.length, cellHeight.value, cellWidth.value)
 
     rawHeatmapData.forEach((row, rowIndex) => {
       row.forEach((value, colIndex) => {
@@ -129,12 +133,13 @@ function drawEverything() {
         if (rowIndex >= heatmapStore.getStickyRowsIndexes.length) {
           y += stickyRowsGap.value
         }
-
-        ctx.fillStyle = getHeatmapColor(
+        const color = getHeatmapColor(
           adjustedValue,
           heatmapStore.getMinHeatmapValue,
           heatmapStore.getHeatmapColorMaxValue
         )
+        ctx.fillStyle = color
+
         ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
       })
     })

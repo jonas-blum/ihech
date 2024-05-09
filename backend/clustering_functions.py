@@ -1,10 +1,13 @@
 from typing import List, Union
+import warnings
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
+from sklearn.exceptions import ConvergenceWarning
 
 from helpers import drop_columns
 
+warnings.simplefilter("ignore", ConvergenceWarning)
 
 data_index_map = {
     "row_index": 0,

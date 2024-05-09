@@ -24,6 +24,7 @@ export const NON_ATTRIBUTE_COLUMNS = [
   'row_index',
   'parent_index',
   'children_indexes',
+  'row_id',
   'row_name',
   'amount_of_data_points',
   'dim_reduction_1',
@@ -33,7 +34,7 @@ export const NON_ATTRIBUTE_COLUMNS = [
 ]
 
 export interface HeatmapJSON {
-  heatmap_csv: string
+  heatmapCSV: string
   col_dissimilarities: number[]
 }
 
@@ -70,6 +71,7 @@ export interface HeatmapStoreState {
   selectedRowIds: string[]
   selectedColumns: string[]
   heatmap: dataForge.IDataFrame<any, any>
+  visibleHeatmap: dataForge.IDataFrame<any, any>
   initialColumnsOrder: string[]
 
   col_dissimilarities: number[]
@@ -80,6 +82,10 @@ export interface HeatmapStoreState {
   stickyRowsIndexes: string[]
   stickyColumns: string[]
   loading: boolean
+
+  minHeatmapValue: number
+  maxHeatmapValue: number
+  heatmapColorMaxValue: number
 
   selectedAbsRel: AbsRelEnum
   clusterByCollections: boolean
@@ -101,6 +107,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     selectedRowIds: [],
     selectedColumns: [],
     heatmap: new dataForge.DataFrame<any, any>(),
+    visibleHeatmap: new dataForge.DataFrame<any, any>(),
     initialColumnsOrder: [],
 
     col_dissimilarities: [],
@@ -112,7 +119,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     stickyColumns: [],
     loading: false,
 
-    selectedAbsRel: AbsRelEnum.REL,
+    minHeatmapValue: 0,
+    maxHeatmapValue: 100,
+    heatmapColorMaxValue: 100,
+
+    selectedAbsRel: AbsRelEnum.ABS,
     clusterByCollections: false,
     sortOrderColumns: SortOrderColumns.STDEV,
     sortColumnsBasedOnStickyRows: false,
@@ -124,12 +135,28 @@ export const useHeatmapStore = defineStore('heatmapStore', {
   }),
   getters: {
     getHeatmap: (state) => state.heatmap,
+    getHeatmapOnlyAttributes: (state) => state.heatmap.dropSeries(NON_ATTRIBUTE_COLUMNS),
+    getVisibleHeatmap: (state) => state.visibleHeatmap,
+    getVisibleHeatmapOnlyAttributes: (state) =>
+      state.visibleHeatmap.dropSeries(NON_ATTRIBUTE_COLUMNS),
 
-    getDataChanging: (state) => state.dataChanging,
+    getNumberOfVisibleRows: (state) => state.visibleHeatmap.count(),
+
+    isDataChanging: (state) => state.dataChanging,
     getHighlightedRowIndex: (state) => state.highlightedRowIndex,
     getStickyRowsIndexes: (state) => state.stickyRowsIndexes,
     getStickyColumns: (state) => state.stickyColumns,
     isLoading: (state) => state.loading,
+
+    getColDissimilarities: (state) => state.col_dissimilarities,
+
+    isStickyRowsGapVisible: (state) => state.stickyRowsIndexes.length > 0,
+
+    isStickyColumnsGapVisible: (state) => state.stickyColumns.length > 0,
+
+    getMinHeatmapValue: (state) => state.minHeatmapValue,
+    getMaxHeatmapValue: (state) => state.maxHeatmapValue,
+    getHeatmapColorMaxValue: (state) => state.heatmapColorMaxValue,
 
     getSelectedAbsRel: (state) => state.selectedAbsRel,
     isClusterByCollections: (state) => state.clusterByCollections,
@@ -137,6 +164,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getClusterSize: (state) => state.clusterSize,
     getDimReductionAlgo: (state) => state.dimReductionAlgoEnum,
     isClusterRowsBasedOnStickyColumns: (state) => state.clusterRowsBasedOnStickyColumns,
+    isSortColumnsBasedOnStickyRows: (state) => state.sortColumnsBasedOnStickyRows,
     isOnlyStickyRowsShownInDimReduction: (state) => state.showOnlyStickyRowsInDimReduction
   },
   actions: {
@@ -147,14 +175,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.loading = true
 
       const settings: HeatmapSettings = this.getCurrentHeatmapSettings()
-      console.log(settings)
-      const requestInit: RequestInit = {
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ settings })
-      }
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, requestInit)
+      })
 
       const receivedHeatmap: HeatmapJSON = await response.json()
       if (!receivedHeatmap) {
@@ -163,16 +189,18 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
 
       let heatmapDF: dataForge.IDataFrame<any, any> = dataForge
-        .fromCSV(receivedHeatmap.heatmap_csv, { dynamicTyping: true })
+        .fromCSV(receivedHeatmap.heatmapCSV, { dynamicTyping: true })
         .setIndex('row_index')
 
-      let heatmapDFCopy: dataForge.IDataFrame<any, any> = dataForge
-        .fromCSV(receivedHeatmap.heatmap_csv, { dynamicTyping: true })
+      const heatmapDFCopy: dataForge.IDataFrame<any, any> = dataForge
+        .fromCSV(receivedHeatmap.heatmapCSV, { dynamicTyping: true })
         .setIndex('row_index')
 
       heatmapDF = heatmapDF.generateSeries({
         is_open: (row) => (row.parent_index === 0 ? true : false)
       })
+
+      const heatmapDFCopy2 = heatmapDF
 
       heatmapDF = heatmapDF.generateSeries({
         children_indexes: (row) => {
@@ -188,8 +216,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         }
       })
 
-      heatmapDFCopy = heatmapDF
-
       heatmapDF = heatmapDF.generateSeries({
         is_visible: (row) => {
           if (row.is_open) {
@@ -198,7 +224,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           if (row.parent_index === 0) {
             return true
           }
-          const parentRows = heatmapDFCopy.where(
+          const parentRows = heatmapDFCopy2.where(
             (searchRow) => searchRow.row_index === row.parent_index
           )
           if (parentRows.first().is_open) {
@@ -214,6 +240,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.col_dissimilarities = receivedHeatmap.col_dissimilarities
 
       this.heatmap = heatmapDF
+
+      this.updateMaxMinValues()
 
       console.log('Done Fetching Heatmap', new Date().getTime() - startTime, 'ms.')
 
@@ -231,7 +259,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         .setIndex(this.idsColumnName)
 
       this.selectedRowIds = heatmapDF.getIndex().toArray()
-      this.selectedColumns = heatmapDF.getColumnNames()
+      this.selectedColumns = heatmapDF.dropSeries(['row_ids', 'edition']).getColumnNames()
 
       this.fetchHeatmap()
     },
@@ -284,15 +312,16 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         (this.clusterAfterDimRed = false)
     },
     changeHeatmap() {
+      this.visibleHeatmap = this.heatmap.where((row) => row.is_visible)
       this.dataChanging += 1
       console.log('Data changing', this.dataChanging)
     },
     getCurrentHeatmapSettings(): HeatmapSettings {
       return {
         csvFile: this.csvFile,
-        idsColumnName: 'row_index',
-        rowNamesColumnName: 'row_ids',
-        collectionColumnNames: ['edition'],
+        idsColumnName: this.idsColumnName,
+        rowNamesColumnName: this.rowNamesColumnName,
+        collectionColumnNames: this.collectionColumnNames,
         selectedRowIds: this.selectedRowIds,
         selectedColumns: this.selectedColumns,
 
@@ -309,6 +338,18 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         clusterAfterDimRed: this.clusterAfterDimRed,
         absRelLog: this.selectedAbsRel
       }
+    },
+    updateMaxMinValues() {
+      this.minHeatmapValue = 0
+      this.maxHeatmapValue = 100
+      if (this.getSelectedAbsRel === AbsRelEnum.REL) {
+        this.heatmapColorMaxValue = 1
+      } else if (this.getSelectedAbsRel === AbsRelEnum.LOG) {
+        this.heatmapColorMaxValue = Math.log(this.maxHeatmapValue + 1)
+      } else if (this.getSelectedAbsRel === AbsRelEnum.ABS) {
+        this.heatmapColorMaxValue = this.maxHeatmapValue
+      }
+      this.heatmapColorMaxValue = this.maxHeatmapValue
     }
   }
 })

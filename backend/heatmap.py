@@ -212,12 +212,17 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
     heatmap_json.colDissimilarities = normalized_dissimilarities.tolist()
 
     data = []
+    collection_columns = [
+        col
+        for col in settings.collectionColumnNames
+        if col in original_filtered_df.columns
+    ]
+
+    column_names_attributes = drop_columns(
+        original_filtered_df, settings.rowNamesColumnName, collection_columns
+    ).columns
+
     if settings.clusterByCollections:
-        collection_columns = [
-            col
-            for col in settings.collectionColumnNames
-            if col in original_filtered_df.columns
-        ]
 
         cluster_documents_recursively(
             original_filtered_df,
@@ -233,7 +238,7 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
         )
     else:
         cluster_documents_recursively(
-            original_filtered_df,
+            original_filtered_df.drop(collection_columns, axis=1),
             clustering_transformed_df,
             transformed_filtered_dim_red_df,
             data,
@@ -253,9 +258,15 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
         "amount_of_data_points",
         "dim_reduction_1",
         "dim_reduction_2",
-    ] + list(clustering_transformed_df.columns)
+    ] + list(column_names_attributes)
+
+    print("Length column names", len(column_names))
+    print("Length data", len(data[0]))
+
+    for row in data:
+        if len(row) == 28:
+            print(row)
 
     final_df = pd.DataFrame(data, columns=column_names)
     heatmap_json.heatmapCSV = final_df.to_csv(index=False)
-    print(heatmap_json.heatmapCSV)
     return heatmap_json.generate_json()

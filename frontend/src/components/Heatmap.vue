@@ -109,16 +109,17 @@ function drawEverything() {
   ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
 
   nextTick(() => {
-    const time = performance.now()
     const rawHeatmapData = heatmapStore.getVisibleHeatmapOnlyAttributes.toRows()
-    console.log('Time to get raw heatmap data', performance.now() - time)
-    console.log('Drawing heatmap', rawHeatmapData.length, cellHeight.value, cellWidth.value)
+    console.log('Time to get raw heatmap data', new Date().getTime() - heatmapStore.getTimer)
 
     rawHeatmapData.forEach((row, rowIndex) => {
+      let maxRowValue = 1
+      if (heatmapStore.getSelectedAbsRel === AbsRelEnum.REL) {
+        maxRowValue = Math.max(...row)
+      }
       row.forEach((value, colIndex) => {
         let adjustedValue = value
         if (heatmapStore.getSelectedAbsRel === AbsRelEnum.REL) {
-          const maxRowValue = Math.max(...row)
           adjustedValue = value / maxRowValue
         } else if (heatmapStore.getSelectedAbsRel === AbsRelEnum.LOG) {
           adjustedValue = Math.log(value + 1)
@@ -159,7 +160,7 @@ function updateEntireHeatmap() {
 watch(() => heatmapStore.isDataChanging, updateEntireHeatmap)
 
 onMounted(async () => {
-  const response = await fetch('/assets/data/abs_amount_different_attributes.csv')
+  const response = await fetch('/assets/data/tag_depth.csv')
   const csvData = await response.text()
   heatmapStore.uploadCsvFile(csvData)
 })
@@ -168,7 +169,18 @@ onMounted(async () => {
 <template>
   <div style="height: 50px">
     <h1 v-if="!heatmapStore.isLoading">IHECH</h1>
+
     <span v-else class="loading loading-spinner loading-lg"></span>
+    <button
+      @click="heatmapStore.openRow(Math.floor(Math.random() * heatmapStore.getHeatmap.count()))"
+    >
+      Yeet
+    </button>
+    <button
+      @click="heatmapStore.closeRow(Math.floor(Math.random() * heatmapStore.getHeatmap.count()))"
+    >
+      Yeet close
+    </button>
   </div>
   <div ref="tooltip" class="tooltip">
     <div class="flex-tooltip">

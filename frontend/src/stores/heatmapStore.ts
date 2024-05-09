@@ -96,6 +96,8 @@ export interface HeatmapStoreState {
   clusterRowsBasedOnStickyColumns: boolean
   showOnlyStickyRowsInDimReduction: boolean
   clusterAfterDimRed: boolean
+
+  timer: number
 }
 
 export const useHeatmapStore = defineStore('heatmapStore', {
@@ -131,14 +133,16 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     dimReductionAlgoEnum: DimReductionAlgoEnum.PCA,
     clusterRowsBasedOnStickyColumns: false,
     showOnlyStickyRowsInDimReduction: true,
-    clusterAfterDimRed: false
+    clusterAfterDimRed: false,
+
+    timer: 0
   }),
   getters: {
     getHeatmap: (state) => state.heatmap,
     getHeatmapOnlyAttributes: (state) => state.heatmap.dropSeries(NON_ATTRIBUTE_COLUMNS),
-    getVisibleHeatmap: (state) => state.visibleHeatmap,
+    getVisibleHeatmap: (state) => state.heatmap.where((row) => row.is_visible),
     getVisibleHeatmapOnlyAttributes: (state) =>
-      state.visibleHeatmap.dropSeries(NON_ATTRIBUTE_COLUMNS),
+      state.heatmap.where((row) => row.is_visible).dropSeries(NON_ATTRIBUTE_COLUMNS),
 
     getNumberOfVisibleRows: (state) => state.visibleHeatmap.count(),
 
@@ -165,9 +169,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getDimReductionAlgo: (state) => state.dimReductionAlgoEnum,
     isClusterRowsBasedOnStickyColumns: (state) => state.clusterRowsBasedOnStickyColumns,
     isSortColumnsBasedOnStickyRows: (state) => state.sortColumnsBasedOnStickyRows,
-    isOnlyStickyRowsShownInDimReduction: (state) => state.showOnlyStickyRowsInDimReduction
+    isOnlyStickyRowsShownInDimReduction: (state) => state.showOnlyStickyRowsInDimReduction,
+
+    getTimer: (state) => state.timer
   },
   actions: {
+    setTimer(timer: number) {
+      this.timer = timer
+    },
     async fetchHeatmap() {
       const startTime = new Date().getTime()
 
@@ -194,18 +203,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         .fromCSV(receivedHeatmap.heatmapCSV, { dynamicTyping: true })
         .setIndex('row_index')
         .bake()
+
       console.log('Done reading csv', new Date().getTime() - startTimeTemp, 'ms.')
 
       console.log('Done Fetching Heatmap CSV', new Date().getTime() - startTime2, 'ms.')
-      const startTime3 = new Date().getTime()
-
-      startTimeTemp = new Date().getTime()
-      heatmapDF = heatmapDF
-        .generateSeries({
-          is_open: (row) => row.parent_index === 0
-        })
-        .bake()
-      console.log('Done generating is_open', new Date().getTime() - startTimeTemp, 'ms.')
 
       startTimeTemp = new Date().getTime()
       heatmapDF = heatmapDF
@@ -225,6 +226,16 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         .bake()
       console.log('Done generating children_indexes', new Date().getTime() - startTimeTemp, 'ms.')
 
+      const startTime3 = new Date().getTime()
+
+      startTimeTemp = new Date().getTime()
+      heatmapDF = heatmapDF
+        .generateSeries({
+          is_open: (row) => row.parent_index === 0
+        })
+        .bake()
+      console.log('Done generating is_open', new Date().getTime() - startTimeTemp, 'ms.')
+
       startTimeTemp = new Date().getTime()
       heatmapDF = heatmapDF
         .generateSeries({
@@ -240,6 +251,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           }
         })
         .bake()
+
       console.log('Done generating is_visible', new Date().getTime() - startTimeTemp, 'ms.')
 
       startTimeTemp = new Date().getTime()
@@ -257,20 +269,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
       startTimeTemp = new Date().getTime()
       heatmapDF = heatmapDF
-        .generateSeries({
-          is_visible: (row) => {
-            if (row.is_open) {
-              return true
-            }
-            if (row.parent_index === 0) {
-              return true
-            }
-            const parentRow = heatmapDF.at(row.parent_index)
-            return parentRow?.is_open
+        .select((row) => {
+          if (row.parent_index === 0) {
+            row.is_open = true
           }
+          return row
         })
         .bake()
-      console.log('Done generating is_visible 2', new Date().getTime() - startTimeTemp, 'ms.')
+      console.log('Done transforming is_visible 2', new Date().getTime() - startTimeTemp, 'ms.')
 
       startTimeTemp = new Date().getTime()
       const yeet = heatmapDF.dropSeries(NON_ATTRIBUTE_COLUMNS).toRows()
@@ -287,8 +293,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.loading = false
     },
     uploadCsvFile(csvFile: string) {
-      this.idsColumnName = 'row_ids'
-      this.rowNamesColumnName = 'row_ids'
+      this.idsColumnName = 'row_id'
+      this.rowNamesColumnName = 'row_id'
       this.collectionColumnNames = ['edition']
 
       this.csvFile = csvFile
@@ -297,7 +303,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         .setIndex(this.idsColumnName)
 
       this.selectedRowIds = heatmapDF.getIndex().toArray()
-      this.selectedColumns = heatmapDF.dropSeries(['row_ids', 'edition']).getColumnNames()
+      this.selectedColumns = heatmapDF.dropSeries(['row_id', 'edition']).getColumnNames()
 
       this.fetchHeatmap()
     },
@@ -388,6 +394,73 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.heatmapColorMaxValue = this.maxHeatmapValue
       }
       this.heatmapColorMaxValue = this.maxHeatmapValue
+    },
+    openRow(rowIndex: number) {
+      const startTime = new Date().getTime()
+      this.timer = new Date().getTime()
+      this.heatmap = this.heatmap
+        .select((row) => {
+          if (row.row_index === rowIndex) {
+            row.is_open = true
+            row.is_visible = true
+            row.children_indexes.forEach((childIndex) => {
+              const childRow = this.heatmap.at(childIndex)
+              if (childRow) {
+                childRow.is_visible = true
+              }
+            })
+          }
+          return row
+        })
+        .bake()
+
+      console.log('Done opening row', rowIndex, new Date().getTime() - startTime, 'ms.')
+      this.changeHeatmap()
+    },
+    closeRow(rowIndex: number) {
+      const startTime = new Date().getTime()
+      this.timer = new Date().getTime()
+      this.heatmap = this.heatmap
+        .select((row) => {
+          if (row.row_index === rowIndex) {
+            row.is_open = false
+            const parentRow = this.heatmap.at(row.parent_index)
+
+            if (parentRow && !parentRow.is_open) {
+              row.is_visible = false
+            }
+            row.children_indexes.forEach((childIndex) => {
+              const childRow = this.heatmap.at(childIndex)
+              if (childRow) {
+                childRow.is_visible = false
+              }
+            })
+          }
+          return row
+        })
+        .bake()
+
+      console.log('Done closing row', rowIndex, new Date().getTime() - startTime, 'ms.')
+      this.changeHeatmap()
+    },
+    updateIsVisible() {
+      this.heatmap = this.heatmap
+        .select((row) => {
+          let isRowVisible = false
+          if (row.is_open) {
+            isRowVisible = true
+          }
+
+          const parentRow = this.heatmap.at(row.parent_index)
+          if (parentRow?.is_open) {
+            isRowVisible = true
+          }
+          row.is_visible = isRowVisible
+          return row
+        })
+        .bake()
+
+      this.changeHeatmap()
     }
   }
 })

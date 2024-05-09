@@ -111,8 +111,7 @@ function drawEverything() {
   nextTick(() => {
     const time = performance.now()
     const rawHeatmapData = heatmapStore.getVisibleHeatmapOnlyAttributes.toRows()
-    console.log('Time to get raw heatmap data', performance.now() - time)
-    console.log('Drawing heatmap', rawHeatmapData.length, cellHeight.value, cellWidth.value)
+    console.log('Time to get raw heatmap data', performance.now() - time, rawHeatmapData.length)
 
     rawHeatmapData.forEach((row, rowIndex) => {
       row.forEach((value, colIndex) => {
@@ -168,7 +167,13 @@ onMounted(async () => {
 <template>
   <div style="height: 50px">
     <h1 v-if="!heatmapStore.isLoading">IHECH</h1>
+
     <span v-else class="loading loading-spinner loading-lg"></span>
+    <button
+      @click="heatmapStore.openRow(Math.floor(Math.random() * heatmapStore.getHeatmap.count()))"
+    >
+      Yeet
+    </button>
   </div>
   <div ref="tooltip" class="tooltip">
     <div class="flex-tooltip">

@@ -1,5 +1,4 @@
 import time
-
 import pandas as pd
 from heatmap import createHeatmap
 from heatmap_types import HeatmapSettings

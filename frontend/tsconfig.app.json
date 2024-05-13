@@ -9,7 +9,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"]
+      "@components/*": ["./src/components/*"],
+      "@helpers/*": ["./src/helpers/*"],
+      "@router/*": ["./src/router/*"],
+      "@stores/*": ["./src/stores/*"],
+      "@views/*": ["./src/views/*"],
+      "@assets/*": ["./public/assets/*"]
     }
   }
 }

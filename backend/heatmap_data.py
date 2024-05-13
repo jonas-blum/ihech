@@ -20,7 +20,8 @@ from scipy.spatial.distance import pdist, squareform
 AGGREGATION_COLUMN = "aggregation_column"
 
 
-EXTENDED_VECTORS = "../data/extended_vectors.csv"
+# EXTENDED_VECTORS = "../data/extended_vectors.csv"
+
 
 warnings.simplefilter("ignore", ConvergenceWarning)
 

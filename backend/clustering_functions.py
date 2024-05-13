@@ -27,8 +27,7 @@ def cluster_items_recursively(
     )
 
     is_open = False
-    if level == 0:
-        is_open = True
+ 
 
     if cluster_by_collections and len(collection_column_names) > 0:
         new_item_names_and_data: List[ItemNameAndData] = []

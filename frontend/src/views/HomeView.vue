@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Heatmap from '@/components/Heatmap.vue'
+import Heatmap from '@/components/ExpandableHeatmap.vue'
 </script>
 
 <template>

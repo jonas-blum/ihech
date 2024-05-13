@@ -18,7 +18,6 @@ def index():
 @app.route("/api/heatmap", methods=["POST"])
 def get_heatmap():
 
-    start = time.perf_counter()
 
     heatmap_settings = HeatmapSettings(request.json["settings"])
     csv_file = StringIO(heatmap_settings.csvFile)
@@ -26,14 +25,12 @@ def get_heatmap():
 
     original_df = original_df.set_index(heatmap_settings.idsColumnName)
 
-    if heatmap_settings.rowNamesColumnName == heatmap_settings.idsColumnName:
-        heatmap_settings.rowNamesColumnName += "_added_string"
-        original_df[heatmap_settings.rowNamesColumnName] = original_df.index
+    if heatmap_settings.itemNamesColumnName == heatmap_settings.idsColumnName:
+        heatmap_settings.itemNamesColumnName += "_added_string"
+        original_df[heatmap_settings.itemNamesColumnName] = original_df.index
 
-    original_df = original_df.loc[heatmap_settings.selectedRowIds]
-
-    original_df = original_df.loc[:, (original_df != 0).any(axis=0)]
-
+    start = time.perf_counter()
     return_string = create_heatmap(original_df, heatmap_settings)
     print(f"Time to generate entire heatmap: {time.perf_counter() - start}\n")
+    
     return return_string

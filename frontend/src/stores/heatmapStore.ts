@@ -96,6 +96,8 @@ export interface HeatmapStoreState {
   clusterRowsBasedOnStickyColumns: boolean
   showOnlyStickyRowsInDimReduction: boolean
   clusterAfterDimRed: boolean
+
+  timer: number
 }
 
 export const useHeatmapStore = defineStore('heatmapStore', {
@@ -131,7 +133,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     dimReductionAlgoEnum: DimReductionAlgoEnum.PCA,
     clusterRowsBasedOnStickyColumns: false,
     showOnlyStickyRowsInDimReduction: true,
-    clusterAfterDimRed: false
+    clusterAfterDimRed: false,
+
+    timer: 0
   }),
   getters: {
     getHeatmap: (state) => state.heatmap,
@@ -165,9 +169,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getDimReductionAlgo: (state) => state.dimReductionAlgoEnum,
     isClusterRowsBasedOnStickyColumns: (state) => state.clusterRowsBasedOnStickyColumns,
     isSortColumnsBasedOnStickyRows: (state) => state.sortColumnsBasedOnStickyRows,
-    isOnlyStickyRowsShownInDimReduction: (state) => state.showOnlyStickyRowsInDimReduction
+    isOnlyStickyRowsShownInDimReduction: (state) => state.showOnlyStickyRowsInDimReduction,
+
+    getTimer: (state) => state.timer
   },
   actions: {
+    setTimer(timer: number) {
+      this.timer = timer
+    },
     async fetchHeatmap() {
       const startTime = new Date().getTime()
 
@@ -284,8 +293,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.loading = false
     },
     uploadCsvFile(csvFile: string) {
-      this.idsColumnName = 'row_ids'
-      this.rowNamesColumnName = 'row_ids'
+      this.idsColumnName = 'row_id'
+      this.rowNamesColumnName = 'row_id'
       this.collectionColumnNames = ['edition']
 
       this.csvFile = csvFile
@@ -294,7 +303,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         .setIndex(this.idsColumnName)
 
       this.selectedRowIds = heatmapDF.getIndex().toArray()
-      this.selectedColumns = heatmapDF.dropSeries(['row_ids', 'edition']).getColumnNames()
+      this.selectedColumns = heatmapDF.dropSeries(['row_id', 'edition']).getColumnNames()
 
       this.fetchHeatmap()
     },
@@ -388,30 +397,69 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     },
     openRow(rowIndex: number) {
       const startTime = new Date().getTime()
+      this.timer = new Date().getTime()
       this.heatmap = this.heatmap
         .select((row) => {
           if (row.row_index === rowIndex) {
             row.is_open = true
+            row.is_visible = true
+            row.children_indexes.forEach((childIndex) => {
+              const childRow = this.heatmap.at(childIndex)
+              if (childRow) {
+                childRow.is_visible = true
+              }
+            })
           }
           return row
         })
         .bake()
 
-      this.heatmap = this.heatmap.select((row) => {
-        let isRowVisible = false
-        if (row.is_open) {
-          isRowVisible = true
-        }
-
-        const parentRow = this.heatmap.at(row.parent_index)
-        if (parentRow?.is_open) {
-          isRowVisible = true
-        }
-        row.is_visible = isRowVisible
-        return row
-      })
-
       console.log('Done opening row', rowIndex, new Date().getTime() - startTime, 'ms.')
+      this.changeHeatmap()
+    },
+    closeRow(rowIndex: number) {
+      const startTime = new Date().getTime()
+      this.timer = new Date().getTime()
+      this.heatmap = this.heatmap
+        .select((row) => {
+          if (row.row_index === rowIndex) {
+            row.is_open = false
+            const parentRow = this.heatmap.at(row.parent_index)
+
+            if (parentRow && !parentRow.is_open) {
+              row.is_visible = false
+            }
+            row.children_indexes.forEach((childIndex) => {
+              const childRow = this.heatmap.at(childIndex)
+              if (childRow) {
+                childRow.is_visible = false
+              }
+            })
+          }
+          return row
+        })
+        .bake()
+
+      console.log('Done closing row', rowIndex, new Date().getTime() - startTime, 'ms.')
+      this.changeHeatmap()
+    },
+    updateIsVisible() {
+      this.heatmap = this.heatmap
+        .select((row) => {
+          let isRowVisible = false
+          if (row.is_open) {
+            isRowVisible = true
+          }
+
+          const parentRow = this.heatmap.at(row.parent_index)
+          if (parentRow?.is_open) {
+            isRowVisible = true
+          }
+          row.is_visible = isRowVisible
+          return row
+        })
+        .bake()
+
       this.changeHeatmap()
     }
   }

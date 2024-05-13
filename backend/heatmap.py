@@ -222,6 +222,10 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
         original_filtered_df, settings.rowNamesColumnName, collection_columns
     ).columns
 
+    print(f"Number of original filtered rows: {original_filtered_df.shape[0]}")
+
+    print(f"Number of transformed filtered columns: {transformed_filtered_df.shape[1]}")
+
     if settings.clusterByCollections:
 
         cluster_documents_recursively(
@@ -261,7 +265,7 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
     ] + list(column_names_attributes)
 
     print("Length column names", len(column_names))
-    print("Length data", len(data[0]))
+    print("Length data", len(data))
 
     for row in data:
         if len(row) == 28:

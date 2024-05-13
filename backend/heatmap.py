@@ -1,21 +1,21 @@
-import time
-from typing import Tuple
+from typing import Tuple, List
 import numpy as np
 import pandas as pd
+import time
 from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import StandardScaler
-from helpers import drop_columns, extract_columns
-from clustering_functions import cluster_documents_recursively
-from heatmap_types import HeatmapJSON, HeatmapSettings
 from sklearn.manifold import TSNE
+from umap import UMAP
+from helpers import drop_columns, extract_columns
+from heatmap_types import HeatmapJSON, HeatmapSettings, ItemNameAndData
+from clustering_functions import cluster_items_recursively
 
 import warnings
 
 warnings.filterwarnings("ignore", message=".*The 'nopython' keyword.*")
-from umap import UMAP
 
 
-def sort_columns(
+def sort_attributes(
     original_df: pd.DataFrame,
     transformed_df: pd.DataFrame,
     settings: HeatmapSettings,
@@ -23,51 +23,30 @@ def sort_columns(
     transformed_df_to_sort = transformed_df
 
     additional_columns = [
-        settings.rowNamesColumnName,
+        settings.itemNamesColumnName,
     ] + settings.collectionColumnNames
 
-    if settings.sortColumnsBasedOnStickyRows:
-        sticky_df = transformed_df.loc[settings.selectedRowIds,]
+    if settings.sortAttributesBasedOnStickyItems:
+        sticky_df = transformed_df.loc[settings.stickyItemIds]
         if sticky_df.shape[0] > 0:
             transformed_df_to_sort = sticky_df
-    if settings.sortOrderColumns == "ASC":
+    if settings.sortOrderAttributes == "ASC":
         column_means = transformed_df_to_sort.mean()
         sorted_columns = column_means.sort_values().index
 
         transformed_df = transformed_df[sorted_columns]
-        original_df = original_df[sorted_columns + additional_columns]
-    elif settings.sortOrderColumns == "DESC":
+        original_df = original_df[list(sorted_columns) + additional_columns]
+    elif settings.sortOrderAttributes == "DESC":
         column_means = transformed_df_to_sort.mean()
         sorted_columns = column_means.sort_values(ascending=False).index
 
         transformed_df = transformed_df[sorted_columns]
-        original_df = original_df[sorted_columns + additional_columns]
-    # elif settings.sortOrderColumns == "CLUSTER":
-    #     column_means = transformed_df_to_sort.mean().values.reshape(-1, 1)
-    #     n_clusters = max(1, len(transformed_df_to_sort.columns) // 10)
-    #     kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(column_means)
-    #     clusters = kmeans.labels_
-    #     cluster_means = transformed_df_to_sort.mean()
-    #     cluster_df = pd.DataFrame(
-    #         {"column": transformed_df_to_sort.columns, "cluster": clusters}
-    #     )
-    #     cluster_df["cluster_mean"] = cluster_df["column"].apply(
-    #         lambda x: cluster_means[x]
-    #     )
-    #     aggregated_cluster_means = cluster_df.groupby("cluster")["cluster_mean"].mean()
-    #     sorted_clusters = aggregated_cluster_means.sort_values(ascending=False).index
-    #     sorted_columns = (
-    #         cluster_df.set_index("cluster")
-    #         .loc[sorted_clusters]
-    #         .sort_values("cluster_mean", ascending=False)["column"]
-    #     )
+        original_df = original_df[list(sorted_columns) + additional_columns]
 
-    #     original_df = original_df[sorted_columns]
-    #     transformed_df = transformed_df[sorted_columns]
-    elif settings.sortOrderColumns == "ALPHABETICAL":
+    elif settings.sortOrderAttributes == "ALPHABETICAL":
         transformed_df = transformed_df.sort_index(axis=1)
         original_df = original_df.sort_index(axis=1)
-    elif settings.sortOrderColumns == "STDEV":
+    elif settings.sortOrderAttributes == "STDEV":
         if transformed_df_to_sort.shape[0] < 2:
             transformed_df_to_sort = transformed_df
         std_devs = transformed_df_to_sort.std()
@@ -78,51 +57,31 @@ def sort_columns(
         sorted_columns = sorted(col_std_map, key=col_std_map.get, reverse=True)
 
         transformed_df = transformed_df[sorted_columns]
-        original_df = original_df[sorted_columns + additional_columns]
+        original_df = original_df[list(sorted_columns) + additional_columns]
     else:
         raise ValueError(
-            "SortOrderColumns not implemented: " + str(settings.sortOrderColumns)
+            "SortOrderColumns not implemented: " + str(settings.sortOrderAttributes)
         )
     return original_df, transformed_df
 
 
-def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
+def filter_items(original_df: pd.DataFrame, settings: HeatmapSettings) -> pd.DataFrame:
+    original_df = original_df.reindex(settings.selectedItemIds).dropna(axis=0)
+    original_df = original_df.loc[:, (original_df != 0).any(axis=0)]
+    return original_df
 
-    if settings.absRelLog == "REL":
-        row_maxes = drop_columns(
-            original_df,
-            settings.rowNamesColumnName,
-            settings.collectionColumnNames,
-        ).max(axis=1)
-        transformed_df = drop_columns(
-            original_df,
-            settings.rowNamesColumnName,
-            settings.collectionColumnNames,
-        ).div(row_maxes, axis=0)
-    elif settings.absRelLog == "LOG":
-        transformed_df = np.log(
-            drop_columns(
-                original_df,
-                settings.rowNamesColumnName,
-                settings.collectionColumnNames,
-            )
-            + 1
-        )
-    elif settings.absRelLog == "ABS":
-        transformed_df = drop_columns(
-            original_df,
-            settings.rowNamesColumnName,
-            settings.collectionColumnNames,
-        )
-    else:
-        raise ValueError("Invalid absRelLog value")
+
+def filter_attributes(
+    original_df: pd.DataFrame, transformed_df: pd.DataFrame, settings: HeatmapSettings
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
 
     valid_columns = [
-        col for col in settings.selectedColumns if col in original_df.columns
+        col for col in settings.selectedAttributes if col in original_df.columns
     ]
+
     extracted_columns = extract_columns(
         original_df,
-        settings.rowNamesColumnName,
+        settings.itemNamesColumnName,
         settings.collectionColumnNames,
     )
     if len(valid_columns) == 1:
@@ -136,20 +95,63 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
         transformed_df = transformed_df[valid_columns]
         original_df = pd.concat([extracted_columns, original_df], axis=1)
     else:
-        print("Not enough columns to display")
+        print("Not enough attributes")
 
-    original_df, transformed_df = sort_columns(original_df, transformed_df, settings)
+    return original_df, transformed_df
 
-    # original_filtered_df = original_df.loc[:, (original_df != 0).any(axis=0)]
-    # transformed_filtered_df = transformed_df.loc[:, (transformed_df != 0).any(axis=0)]
 
-    original_filtered_df = original_df
-    transformed_filtered_df = transformed_df
+def create_transformed_df(
+    original_df: pd.DataFrame, settings: HeatmapSettings
+) -> pd.DataFrame:
+    if settings.absRelLog == "REL":
+        row_maxes = drop_columns(
+            original_df,
+            settings.itemNamesColumnName,
+            settings.collectionColumnNames,
+        ).max(axis=1)
+        transformed_df = drop_columns(
+            original_df,
+            settings.itemNamesColumnName,
+            settings.collectionColumnNames,
+        ).div(row_maxes, axis=0)
+    elif settings.absRelLog == "LOG":
+        transformed_df = np.log(
+            drop_columns(
+                original_df,
+                settings.itemNamesColumnName,
+                settings.collectionColumnNames,
+            )
+            + 1
+        )
+    elif settings.absRelLog == "ABS":
+        transformed_df = drop_columns(
+            original_df,
+            settings.itemNamesColumnName,
+            settings.collectionColumnNames,
+        )
+    else:
+        raise ValueError("Invalid absRelLog value")
+    return transformed_df
 
-    if settings.clusterRowsBasedOnStickyColumns:
+
+def create_heatmap(
+    original_df: pd.DataFrame,
+    settings: HeatmapSettings,
+) -> str:
+    original_filtered_df = filter_items(original_df, settings)
+    transformed_filtered_df = create_transformed_df(original_filtered_df, settings)
+    original_filtered_df, transformed_filtered_df = filter_attributes(
+        original_filtered_df, transformed_filtered_df, settings
+    )
+
+    original_filtered_df, transformed_filtered_df = sort_attributes(
+        original_filtered_df, transformed_filtered_df, settings
+    )
+
+    if settings.clusterItemsBasedOnStickyAttributes:
         sticky_columns = [
             col
-            for col in settings.stickyColumns
+            for col in settings.stickyAttributes
             if col in transformed_filtered_df.columns
         ]
         if len(sticky_columns) == 1:
@@ -168,20 +170,24 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
         dim_reduction = PCA(n_components=2, random_state=42)
     else:
         raise ValueError("Invalid dim reduction algorithm")
-
     scaler = StandardScaler()
 
     transformed_filtered_dim_red_df = scaler.fit_transform(transformed_filtered_df)
     transformed_filtered_dim_red_df = dim_reduction.fit_transform(
         transformed_filtered_dim_red_df
     )
-    transformed_filtered_dim_red_df = pd.DataFrame(transformed_filtered_dim_red_df)
+    transformed_filtered_dim_red_df = pd.DataFrame(
+        transformed_filtered_dim_red_df, index=original_filtered_df.index
+    )
 
-    transformed_sticky_df = transformed_df.loc[settings.selectedRowIds,]
-    if transformed_sticky_df.shape[0] >= 2 and settings.sortColumnsBasedOnStickyRows:
+    transformed_sticky_df = transformed_filtered_df.loc[settings.stickyItemIds,]
+    if (
+        transformed_sticky_df.shape[0] >= 2
+        and settings.sortAttributesBasedOnStickyItems
+    ):
         std_devs = transformed_sticky_df.std()
     else:
-        std_devs = transformed_df.std()
+        std_devs = transformed_filtered_df.std()
 
     min_dissimilarity = std_devs.min()
     max_dissimilarity = std_devs.max()
@@ -208,69 +214,49 @@ def createHeatmap(original_df: pd.DataFrame, settings: HeatmapSettings) -> str:
     else:
         clustering_transformed_df = transformed_filtered_df
 
-    heatmap_json = HeatmapJSON()
-    heatmap_json.colDissimilarities = normalized_dissimilarities.tolist()
+    original_filtered_df_dropped = drop_columns(
+        original_filtered_df,
+        settings.itemNamesColumnName,
+        settings.collectionColumnNames,
+    )
 
-    data = []
-    collection_columns = [
+    heatmap_json = HeatmapJSON()
+    heatmap_json.attributeDissimilarities = normalized_dissimilarities.tolist()
+    heatmap_json.attributeNames = list(original_filtered_df_dropped.columns)
+
+    heatmap_json.maxHeatmapValue = original_filtered_df_dropped.max().max()
+    heatmap_json.minHeatmapValue = original_filtered_df_dropped.min().min()
+    heatmap_json.maxDimRedXValue = transformed_filtered_dim_red_df[0].max()
+    heatmap_json.minDimRedXValue = transformed_filtered_dim_red_df[0].min().min()
+    heatmap_json.maxDimRedYValue = transformed_filtered_dim_red_df[1].max()
+    heatmap_json.minDimRedYValue = transformed_filtered_dim_red_df[1].min().min()
+
+    filtered_collection_column_names = [
         col
         for col in settings.collectionColumnNames
         if col in original_filtered_df.columns
     ]
+    if not settings.clusterByCollections:
 
-    column_names_attributes = drop_columns(
-        original_filtered_df, settings.rowNamesColumnName, collection_columns
-    ).columns
-
-    print(f"Number of original filtered rows: {original_filtered_df.shape[0]}")
-
-    print(f"Number of transformed filtered columns: {transformed_filtered_df.shape[1]}")
-
-    if settings.clusterByCollections:
-
-        cluster_documents_recursively(
-            original_filtered_df,
-            clustering_transformed_df,
-            transformed_filtered_dim_red_df,
-            data,
-            settings.clusterSize,
-            0,
-            settings.idsColumnName,
-            settings.rowNamesColumnName,
-            True,
-            collection_columns,
+        original_filtered_df = original_filtered_df.drop(
+            filtered_collection_column_names, axis=1
         )
-    else:
-        cluster_documents_recursively(
-            original_filtered_df.drop(collection_columns, axis=1),
-            clustering_transformed_df,
-            transformed_filtered_dim_red_df,
-            data,
-            settings.clusterSize,
-            0,
-            settings.idsColumnName,
-            settings.rowNamesColumnName,
-            False,
-            [],
-        )
+        filtered_collection_column_names = []
 
-    column_names = [
-        "row_index",
-        "parent_index",
-        "row_id",
-        "row_name",
-        "amount_of_data_points",
-        "dim_reduction_1",
-        "dim_reduction_2",
-    ] + list(column_names_attributes)
+    item_names_and_data: List[ItemNameAndData] = cluster_items_recursively(
+        original_filtered_df,
+        clustering_transformed_df,
+        transformed_filtered_dim_red_df,
+        settings.clusterSize,
+        settings.itemNamesColumnName,
+        settings.clusterByCollections,
+        filtered_collection_column_names,
+        level=0,
+    )
 
-    print("Length column names", len(column_names))
-    print("Length data", len(data))
+    heatmap_json.itemNamesAndData = item_names_and_data
 
-    for row in data:
-        if len(row) == 28:
-            print(row)
-
-    final_df = pd.DataFrame(data, columns=column_names)
-    heatmap_json.heatmapCSV = final_df.to_csv(index=False)
-    return heatmap_json.generate_json()
+    start = time.perf_counter()
+    heatmap_json_str = heatmap_json.generate_json()
+    print(f"Time to generate json: {time.perf_counter() - start}")
+    return heatmap_json_str

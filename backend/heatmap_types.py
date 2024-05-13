@@ -1,33 +1,161 @@
 import json
-from typing import List, Literal
+from typing import List, Literal, Union
+import numpy as np
+
 
 AbsRelLogType = Literal["ABS", "REL", "LOG"]
 
+MedianMaxMinType = Literal["MEDIAN", "MIN", "MAX"]
+
 DimReductionAlgoType = Literal["PCA", "TSNE", "UMAP"]
 
-SortOrderColumns = Literal[
+StructuralFeatureType = Literal[
+    "AMOUNT_OF_TAGS",
+    "BINARY_TAG_EXISTS",
+    "AMOUNT_OF_DIFFERENT_ATTRIBUTES",
+    "AMOUNT_OF_ATTRIBUTES",
+    "AMOUNT_OF_SIBLING_TAGS",
+    "AMOUNT_OF_DIRECT_CHILDREN_TAGS",
+    "AMOUNT_OF_INDIRECT_CHILDREN_TAGS",
+    "LENGTH_OF_CONTENT_INSIDE_TAG",
+    "LENGTH_OF_CONTENT_ALL_CHILDREN",
+    "DEPTH_OF_TAG",
+]
+
+SortOrderAttributes = Literal[
     "STDEV",
     "ASC",
     "DESC",
+    "CLUSTER",
     "ALPHABETICAL",
 ]
 
 
+class ExtendedVectorRepresentation:
+    __slots__ = [
+        "tag",
+        "vector",
+        "attributes",
+        "tag_depth",
+        "amount_of_attributes",
+        "character_amount_inside_of_tag",
+        "character_amount_all_children",
+        "tag_amount_parent_tag",
+        "tag_amount_directly_inside_tag",
+        "tag_amount_all_children",
+        "document_id",
+        "file_name",
+        "edition",
+    ]
+
+    def __init__(self):
+        self.tag: str = ""
+        self.vector: List[str] = []
+        self.attributes: List[str] = []
+        self.tag_depth: int = 0
+        self.amount_of_attributes: int = 0
+        self.character_amount_inside_of_tag: int = 0
+        self.character_amount_all_children: int = 0
+        self.tag_amount_parent_tag: int = 0
+        self.tag_amount_directly_inside_tag: int = 0
+        self.tag_amount_all_children: int = 0
+        self.document_id: str = ""
+        self.file_name: str = ""
+        self.edition: str = ""
+
+
+class ItemNameAndData:
+    itemName: str
+    isOpen: bool
+    data: List[float]
+    amountOfDataPoints: int
+    dimReductionX: float
+    dimReductionY: float
+    children: Union["List[ItemNameAndData]", None]
+
+    def __init__(
+        self,
+        itemName: str,
+        isOpen: bool,
+        data: List[float],
+        amountOfDataPoints: int,
+        dimReductionX: float,
+        dimReductionY: float,
+        children: Union["List[ItemNameAndData]", None],
+    ):
+        self.itemName: str = itemName
+        self.isOpen: bool = isOpen
+        self.data: List[float] = data
+        self.amountOfDataPoints: int = amountOfDataPoints
+        self.dimReductionX: float = dimReductionX
+        self.dimReductionY: float = dimReductionY
+        self.children: Union[List[ItemNameAndData], None] = children
+
+
+def custom_encoder(obj):
+    if isinstance(obj, np.float32):
+        return float(obj)
+    elif isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, HeatmapJSON):
+        return obj.__dict__
+    elif isinstance(obj, ItemNameAndData):
+
+        return {
+            "itemName": obj.itemName,
+            "isOpen": obj.isOpen,
+            "data": obj.data,
+            "amountOfDataPoints": obj.amountOfDataPoints,
+            "dimReductionX": obj.dimReductionX,
+            "dimReductionY": obj.dimReductionY,
+            "children": (
+                [custom_encoder(child) for child in obj.children]
+                if obj.children
+                else None
+            ),
+        }
+    elif hasattr(obj, "__dict__"):
+        return obj.__dict__
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
+
+
+class HeatmapJSON:
+    def __init__(self):
+        self.attributeNames: List[str] = []
+        self.attributeDissimilarities: List[List[float]] = []
+        self.itemNamesAndData: List[ItemNameAndData] = []
+        self.maxHeatmapValue: float = 0
+        self.minHeatmapValue: float = 0
+        self.maxDimRedXValue: float = 0
+        self.minDimRedXValue: float = 0
+        self.maxDimRedYValue: float = 0
+        self.minDimRedYValue: float = 0
+
+    def add_cluster(self, cluster: ItemNameAndData):
+        self.itemNamesAndData.append(cluster)
+
+    def generate_json(self):
+        return json.dumps(self, default=custom_encoder, indent=4)
+
+
 class HeatmapSettings:
     csvFile: str
+
     idsColumnName: str
-    rowNamesColumnName: str
+    itemNamesColumnName: str
     collectionColumnNames: List[str]
 
-    selectedRowIds: List[str]
-    selectedColumns: List[str]
+    selectedItemIds: List[str]
+    selectedAttributes: List[str]
 
-    stickyColumns: List[str]
-    sortColumnsBasedOnStickyRows: bool
-    sortOrderColumns: SortOrderColumns
+    stickyAttributes: List[str]
+    sortAttributesBasedOnStickyItems: bool
+    sortOrderAttributes: SortOrderAttributes
 
-    stickyRowIds: List[str]
-    clusterRowsBasedOnStickyColumns: bool
+    stickyItemIds: List[str]
+    clusterItemsBasedOnStickyAttributes: bool
 
     clusterByCollections: bool
 
@@ -37,35 +165,35 @@ class HeatmapSettings:
 
     absRelLog: AbsRelLogType
 
+    medianMaxMin: MedianMaxMinType
+    structuralFeature: StructuralFeatureType
+
     def __init__(self, dict):
         self.csvFile = dict["csvFile"]
+
         self.idsColumnName = dict["idsColumnName"]
-        self.rowNamesColumnName = dict["rowNamesColumnName"]
+        self.itemNamesColumnName = dict["itemNamesColumnName"]
         self.collectionColumnNames = dict["collectionColumnNames"]
 
-        self.selectedRowIds = dict["selectedRowIds"]
-        self.selectedColumns = dict["selectedColumns"]
+        self.selectedItemIds = dict["selectedItemIds"]
+        self.selectedAttributes = dict["selectedAttributes"]
 
-        self.stickyColumns = dict["stickyColumns"]
-        self.sortColumnsBasedOnStickyRows = dict["sortColumnsBasedOnStickyRows"]
-        self.sortOrderColumns = dict["sortOrderColumns"]
+        self.stickyAttributes = dict["stickyAttributes"]
+        self.sortAttributesBasedOnStickyItems = dict["sortAttributesBasedOnStickyItems"]
+        self.sortOrderAttributes = dict["sortOrderAttributes"]
 
-        self.stickyRowIds = dict["stickyRowIds"]
-        self.clusterRowsBasedOnStickyColumns = dict["clusterRowsBasedOnStickyColumns"]
+        self.stickyItemIds = dict["stickyItemIds"]
+        self.clusterItemsBasedOnStickyAttributes = dict[
+            "clusterItemsBasedOnStickyAttributes"
+        ]
 
         self.clusterByCollections = dict["clusterByCollections"]
 
-        self.clusterSize = int(dict["clusterSize"])
+        self.clusterSize = dict["clusterSize"]
         self.dimReductionAlgo = dict["dimReductionAlgo"]
         self.clusterAfterDimRed = dict["clusterAfterDimRed"]
 
         self.absRelLog = dict["absRelLog"]
 
-
-class HeatmapJSON:
-    def __init__(self):
-        self.heatmapCSV: str = ""
-        self.colDissimilarities: List[float] = []
-
-    def generate_json(self):
-        return json.dumps(self, default=lambda o: o.__dict__, indent=4)
+        self.medianMaxMin = dict["medianMaxMin"]
+        self.structuralFeature = dict["structuralFeature"]

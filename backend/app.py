@@ -1,8 +1,8 @@
 import time
 import pandas as pd
-from heatmap import createHeatmap
+from heatmap import create_heatmap
 from heatmap_types import HeatmapSettings
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from flask_cors import CORS
 from io import StringIO
 
@@ -34,6 +34,6 @@ def get_heatmap():
 
     original_df = original_df.loc[:, (original_df != 0).any(axis=0)]
 
-    return_JSON = createHeatmap(original_df, heatmap_settings)
+    return_string = create_heatmap(original_df, heatmap_settings)
     print(f"Time to generate entire heatmap: {time.perf_counter() - start}\n")
-    return return_JSON
+    return return_string

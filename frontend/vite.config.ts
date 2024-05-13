@@ -5,6 +5,9 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    port: 8000
+  },
   plugins: [vue()],
   resolve: {
     alias: {
@@ -14,7 +17,7 @@ export default defineConfig({
       '@router': fileURLToPath(new URL('./src/router', import.meta.url)),
       '@stores': fileURLToPath(new URL('./src/stores', import.meta.url)),
       '@views': fileURLToPath(new URL('./src/views', import.meta.url)),
-      '@assets/*': fileURLToPath(new URL('./public/assets', import.meta.url))
+      '@assets': fileURLToPath(new URL('./public/assets', import.meta.url))
     }
   }
 })

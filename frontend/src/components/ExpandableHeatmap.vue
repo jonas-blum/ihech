@@ -624,7 +624,7 @@ onMounted(async () => {
     <div class="settings-container">
       <div style="z-index: 99999" class="dropdown dropdown-bottom">
         <div tabindex="0" role="button" class="btn m-1">
-          <img style="height: 20px; width: 20px" src="../../assets/settings.svg" />
+          <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
           <p>Dim Reduction</p>
         </div>
         <ul
@@ -667,7 +667,7 @@ onMounted(async () => {
       </div>
       <div style="z-index: 99999" class="dropdown dropdown-bottom">
         <div tabindex="0" role="button" class="btn m-1">
-          <img style="height: 20px; width: 20px" src="../../assets/settings.svg" />
+          <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
           <p>Clustering</p>
         </div>
         <ul
@@ -726,7 +726,7 @@ onMounted(async () => {
 
       <div style="z-index: 99999" class="dropdown dropdown-bottom">
         <div tabindex="0" role="button" class="btn m-1">
-          <img style="height: 20px; width: 20px" src="../../assets/settings.svg" />
+          <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
           <p>Columns</p>
         </div>
         <ul
@@ -769,7 +769,7 @@ onMounted(async () => {
 
       <div style="z-index: 99999" class="dropdown dropdown-bottom">
         <div tabindex="0" role="button" class="btn m-1">
-          <img style="height: 20px; width: 20px" src="../../assets/settings.svg" />
+          <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
           <p>Tag Metrics</p>
         </div>
         <ul

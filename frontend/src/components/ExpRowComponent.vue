@@ -168,7 +168,7 @@ watch(
         <div class="symbol-container">
           <img
             :style="{ transform: props.row.isOpen ? 'rotate(90deg)' : '' }"
-            src="../../assets/chevron-right.svg"
+            src="@assets/chevron-right.svg"
           />
         </div>
       </button>

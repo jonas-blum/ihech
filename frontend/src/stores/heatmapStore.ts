@@ -153,6 +153,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
   }),
   getters: {
     getAllDataTables: (state) => state.dataTables,
+    getAllDataTableNames: (state) => state.dataTables.map((table) => table.tableName),
     getActiveDataTable: (state) => state.activeDataTable,
     getHeatmap: (state) => state.heatmap,
     getHeatmapMaxValue: (state) => state.heatmap.maxHeatmapValue,
@@ -189,7 +190,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getTimer: (state) => state.timer
   },
   actions: {
-    addDataTable(dataTable: CsvDataTable) {
+    saveDataTable(dataTable: CsvDataTable) {
       if (
         dataTable.tableName === null ||
         dataTable.df === null ||
@@ -197,7 +198,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       ) {
         console.error('Error during adding data table to heatmap store')
       }
-      this.dataTables.push(dataTable)
+      if (this.getAllDataTableNames.includes(dataTable.tableName)) {
+        const index = this.dataTables.findIndex((table) => table.tableName === dataTable.tableName)
+        this.dataTables[index] = dataTable
+      } else {
+        this.dataTables.push(dataTable)
+      }
     },
     setActiveDataTable(dataTable: CsvDataTable) {
       this.activeDataTable = dataTable

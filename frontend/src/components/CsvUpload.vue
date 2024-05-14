@@ -8,7 +8,10 @@ const heatmapStore = useHeatmapStore()
 
 const isOpen = ref(true)
 
+const hierarchyLayers: ('None' | number)[] = ['None', 1, 2, 3, 4]
+
 const temporaryDataTable = ref<CsvDataTable | null>(null)
+const naNColumns = ref<string[]>([])
 
 function toggleAccordion() {
   isOpen.value = !isOpen.value
@@ -25,9 +28,14 @@ function uploadCsvFile(event: Event) {
   const reader = new FileReader()
   reader.onload = (e) => {
     const contents = e.target?.result as string
-    const df = dataForge.fromCSV(contents)
+    const df = dataForge.fromCSV(contents, { dynamicTyping: true, skipEmptyLines: true }).bake()
+    let fileNameNoExtension = file.name.split('.').slice(0, -1).join('.')
+    while (heatmapStore.getAllDataTableNames.includes(fileNameNoExtension)) {
+      fileNameNoExtension += '_'
+    }
+
     const newDataTable: CsvDataTable = {
-      tableName: file.name,
+      tableName: fileNameNoExtension,
       df: df,
       selectedAttributes: [],
       selectedItemNameColumn: null,
@@ -36,13 +44,98 @@ function uploadCsvFile(event: Event) {
     }
     console.log(newDataTable)
     temporaryDataTable.value = newDataTable
+    setNanColumns()
+    const nonNanColumns = df.getColumnNames().filter((columnName) => !isColumnNaN(columnName))
+    temporaryDataTable.value.selectedAttributes = nonNanColumns
+    if (naNColumns.value.length > 0) {
+      temporaryDataTable.value.selectedItemNameColumn = naNColumns.value[0]
+    }
   }
   reader.readAsText(file)
 }
 
 function saveDataTable() {
+  if (temporaryDataTable.value === null) {
+    return
+  }
+  heatmapStore.saveDataTable(temporaryDataTable.value)
+}
+
+function toggleAttribute(attribute: string) {
   if (temporaryDataTable.value === null) return
-  heatmapStore.addDataTable(temporaryDataTable.value)
+  if (temporaryDataTable.value.selectedAttributes.includes(attribute)) {
+    temporaryDataTable.value.selectedAttributes =
+      temporaryDataTable.value.selectedAttributes.filter((attr) => attr !== attribute)
+  } else {
+    temporaryDataTable.value.selectedAttributes.push(attribute)
+  }
+}
+
+function isColumnNaN(columnName: string): boolean {
+  return naNColumns.value.includes(columnName)
+}
+
+function setNanColumns(): void {
+  if (temporaryDataTable.value === null) {
+    return
+  }
+  const typeFrequencies = temporaryDataTable.value.df.detectTypes().bake()
+
+  const nanTypeColumns = typeFrequencies.where((row) => row.Type !== 'number' && row.Frequency > 0)
+  const columnsWithNaN = nanTypeColumns
+    .distinct((row) => row.Column)
+    .select((row) => row.Column)
+    .toArray()
+
+  naNColumns.value = columnsWithNaN
+}
+
+function getColumnCollectionHierarchy(columnName: string): 'None' | number {
+  if (temporaryDataTable.value === null) {
+    return 'None'
+  }
+  const foundIndex = temporaryDataTable.value.collectionColumnNames.indexOf(columnName)
+  if (foundIndex === -1) {
+    return 'None'
+  } else {
+    return foundIndex + 1
+  }
+}
+
+function updateHierarchyLayer(event: Event, columnName: string) {
+  if (!(event.target instanceof HTMLSelectElement)) {
+    console.error('Event target is not an HTMLSelectElement:', event.target)
+    return
+  }
+  const selectedHierarchyLayer = event.target.value
+
+  if (selectedHierarchyLayer === 'None') {
+    //Remove the column name from the collectionColumnNames array
+    const foundIndex = temporaryDataTable.value?.collectionColumnNames.indexOf(columnName)
+    if (foundIndex !== undefined && foundIndex !== -1) {
+      temporaryDataTable.value?.collectionColumnNames.splice(foundIndex, 1)
+    }
+  } else {
+    // Insert the column name at the selected hierarchy layer
+    const hierarchyLayer = parseInt(selectedHierarchyLayer)
+    const foundIndex = temporaryDataTable.value?.collectionColumnNames.indexOf(columnName)
+    if (foundIndex !== undefined && foundIndex !== -1) {
+      temporaryDataTable.value?.collectionColumnNames.splice(foundIndex, 1)
+    }
+    temporaryDataTable.value?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
+  }
+  console.log(temporaryDataTable.value?.collectionColumnNames)
+}
+
+function updateItemNamesColumn(columName: string) {
+  if (temporaryDataTable.value === null) {
+    return
+  }
+  temporaryDataTable.value.selectedItemNameColumn = columName
+}
+
+function discardChanges() {
+  temporaryDataTable.value = heatmapStore.getActiveDataTable
 }
 
 watch(
@@ -50,6 +143,7 @@ watch(
   () => {
     if (heatmapStore.getActiveDataTable === null) {
       temporaryDataTable.value = null
+      naNColumns.value = []
     } else {
       temporaryDataTable.value = {
         tableName: heatmapStore.getActiveDataTable.tableName,
@@ -59,6 +153,7 @@ watch(
         collectionColumnNames: [...heatmapStore.getActiveDataTable.collectionColumnNames],
         collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap }
       }
+      setNanColumns()
     }
   }
 )
@@ -70,29 +165,64 @@ watch(
     <div class="collapse-title text-xl font-medium">Stored Data Tables</div>
     <div class="collapse-content content-grid" v-if="isOpen">
       <div style="display: flex; flex-direction: column">
-        Upload new CSV <input type="file" @change="uploadCsvFile($event)" />
+        Upload new CSV <input type="file" @click.stop @change="uploadCsvFile($event)" />
         <ul>
           <li :key="index" v-for="(dataTable, index) in heatmapStore.getAllDataTables">
-            <button @click="selectDataTable(dataTable)">
+            <button @click.stop="selectDataTable(dataTable)">
               {{ dataTable.tableName }}
             </button>
           </li>
         </ul>
       </div>
-      <table class="data-table" :style="{ display: temporaryDataTable ? 'block' : 'block' }">
-        <thead>
-          <th :key="index" v-for="(columnName, index) in temporaryDataTable?.df.getColumnNames()">
-            {{ columnName }}
-          </th>
-        </thead>
-        <tbody>
-          <tr :key="index" v-for="(row, index) in temporaryDataTable?.df.head(5).toArray()">
-            <td :key="index" v-for="(value, index) in row">
-              {{ value }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div :style="{ display: temporaryDataTable ? 'flex' : 'none', flexDirection: 'column' }">
+        <div :style="{ display: 'flex', gap: '10px' }">
+          <button class="btn-success" @click.stop="saveDataTable">Save Data Table</button>
+          <button class="btn-warning" @click.stop="discardChanges">Discard Changes</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <th :key="index" v-for="(columnName, index) in temporaryDataTable?.df.getColumnNames()">
+              <div :style="{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }">
+                <input
+                  @click.stop="updateItemNamesColumn(columnName)"
+                  type="checkbox"
+                  class="toggle"
+                  :checked="temporaryDataTable?.selectedItemNameColumn === columnName"
+                />
+                <select
+                  @change="updateHierarchyLayer($event, columnName)"
+                  @click.stop
+                  class="select select-primary max-w-xs"
+                >
+                  <option
+                    :selected="getColumnCollectionHierarchy(columnName) === hierarchyLayer"
+                    v-for="hierarchyLayer in hierarchyLayers"
+                    :key="hierarchyLayer"
+                  >
+                    {{ hierarchyLayer }}
+                  </option>
+                </select>
+                <div>
+                  {{ columnName }}
+                </div>
+                <input
+                  :disabled="isColumnNaN(columnName)"
+                  @click.stop="toggleAttribute(columnName)"
+                  type="checkbox"
+                  :checked="temporaryDataTable?.selectedAttributes.includes(columnName)"
+                />
+              </div>
+            </th>
+          </thead>
+          <tbody>
+            <tr :key="index" v-for="(row, index) in temporaryDataTable?.df.head(5).toArray()">
+              <td :key="index" v-for="(value, index) in row">
+                {{ value }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>

@@ -57,10 +57,6 @@ function uploadCsvFile(event: Event) {
     }
   }
   reader.readAsText(file)
-
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
 }
 
 function saveDataTable() {
@@ -68,6 +64,7 @@ function saveDataTable() {
     return
   }
   heatmapStore.saveDataTable(temporaryDataTable.value)
+  setActiveTableAsTemporary()
 }
 
 function toggleAttribute(attribute: string) {
@@ -144,26 +141,30 @@ function updateItemNamesColumn(columName: string) {
 }
 
 function discardChanges() {
-  temporaryDataTable.value = heatmapStore.getActiveDataTable
+  setActiveTableAsTemporary()
+}
+
+function setActiveTableAsTemporary() {
+  if (heatmapStore.getActiveDataTable === null) {
+    temporaryDataTable.value = null
+    naNColumns.value = []
+  } else {
+    temporaryDataTable.value = {
+      tableName: heatmapStore.getActiveDataTable.tableName,
+      df: heatmapStore.getActiveDataTable.df,
+      selectedAttributes: [...heatmapStore.getActiveDataTable.selectedAttributes],
+      selectedItemNameColumn: heatmapStore.getActiveDataTable.selectedItemNameColumn,
+      collectionColumnNames: [...heatmapStore.getActiveDataTable.collectionColumnNames],
+      collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap }
+    }
+    setNanColumns()
+  }
 }
 
 watch(
   () => heatmapStore.getActiveDataTable,
   () => {
-    if (heatmapStore.getActiveDataTable === null) {
-      temporaryDataTable.value = null
-      naNColumns.value = []
-    } else {
-      temporaryDataTable.value = {
-        tableName: heatmapStore.getActiveDataTable.tableName,
-        df: heatmapStore.getActiveDataTable.df,
-        selectedAttributes: [...heatmapStore.getActiveDataTable.selectedAttributes],
-        selectedItemNameColumn: heatmapStore.getActiveDataTable.selectedItemNameColumn,
-        collectionColumnNames: [...heatmapStore.getActiveDataTable.collectionColumnNames],
-        collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap }
-      }
-      setNanColumns()
-    }
+    setActiveTableAsTemporary()
   }
 )
 </script>
@@ -173,11 +174,11 @@ watch(
     <input type="checkbox" class="hidden" v-model="isOpen" />
     <div class="collapse-title text-xl font-medium">Stored Data Tables</div>
     <div class="collapse-content content-grid" v-if="isOpen">
-      <div style="display: flex; flex-direction: column">
+      <div style="display: flex; flex-direction: column; width: 200px">
         <div class="file-input-container" @click="triggerFileInput">
           <button type="button">Upload Csv File</button>
         </div>
-        <!-- Actual file input, hidden but functional -->
+
         <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />
         <ul
           :style="{
@@ -189,9 +190,19 @@ watch(
           }"
         >
           <li :key="index" v-for="(dataTable, index) in heatmapStore.getAllDataTables">
-            <button @click.stop="selectDataTable(dataTable)">
+            <button
+              :style="{
+                fontWeight:
+                  temporaryDataTable?.tableName === dataTable.tableName ? 'bold' : 'normal'
+              }"
+              @click.stop="selectDataTable(dataTable)"
+            >
               {{ dataTable.tableName }}
             </button>
+          </li>
+
+          <li v-if="heatmapStore.getAllDataTables.length === 0">
+            You don't have any saved data tables
           </li>
         </ul>
       </div>
@@ -263,7 +274,7 @@ watch(
 <style scoped>
 .content-grid {
   display: grid;
-  grid-template-columns: 3fr 9fr;
+  grid-template-columns: 1fr auto;
   gap: 10px;
   overflow: auto;
 }

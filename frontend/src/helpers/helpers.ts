@@ -1,3 +1,5 @@
+import * as dataForge from 'data-forge'
+
 const COLORS_DISTINCT = ['darkGreen', 'purple']
 
 export function getHeatmapColor(value: number, min: number, max: number) {
@@ -16,14 +18,6 @@ export function colorFromRangeDistinct(
 
   return selectedColor
 }
-
-// export interface DimReductionDataPoint {
-//     name: string
-//     edition: string[]
-//     x: number
-//     y: number
-//     size: number
-// }
 
 export interface ItemNameAndData {
   itemName: string
@@ -48,6 +42,15 @@ export interface HeatmapJSON {
   minDimRedXValue: number
   maxDimRedYValue: number
   minDimRedYValue: number
+}
+
+export interface CsvDataTable {
+  tableName: string | null
+  df: dataForge.IDataFrame<any, any>
+  selectedAttributes: string[]
+  selectedItemNameColumn: string | null
+  collectionColumnNames: string[]
+  collectionColorMap: Record<string, string>
 }
 
 export function getDistinctEditionsOfRow(row: ItemNameAndData): Set<string> {

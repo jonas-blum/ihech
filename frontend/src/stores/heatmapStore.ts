@@ -1,5 +1,10 @@
 import { defineStore } from 'pinia'
-import { type HeatmapJSON, type ItemNameAndData, findRowByName } from '../helpers/helpers'
+import {
+  type HeatmapJSON,
+  type ItemNameAndData,
+  findRowByName,
+  type CsvDataTable
+} from '../helpers/helpers'
 
 import * as dataForge from 'data-forge'
 
@@ -71,6 +76,9 @@ export interface HeatmapSettings {
 }
 
 export interface HeatmapStoreState {
+  dataTables: CsvDataTable[]
+  activeDataTable: CsvDataTable | null
+
   csvFile: string
 
   idsColumnName: string
@@ -104,6 +112,8 @@ export interface HeatmapStoreState {
 
 export const useHeatmapStore = defineStore('heatmapStore', {
   state: (): HeatmapStoreState => ({
+    dataTables: [],
+    activeDataTable: null,
     csvFile: '',
     idsColumnName: 'document_id',
     itemNamesColumnName: 'document_id',
@@ -142,6 +152,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     timer: 0
   }),
   getters: {
+    getAllDataTables: (state) => state.dataTables,
+    getActiveDataTable: (state) => state.activeDataTable,
     getHeatmap: (state) => state.heatmap,
     getHeatmapMaxValue: (state) => state.heatmap.maxHeatmapValue,
     getHeatmapMinValue: (state) => state.heatmap.minHeatmapValue,
@@ -177,6 +189,19 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getTimer: (state) => state.timer
   },
   actions: {
+    addDataTable(dataTable: CsvDataTable) {
+      if (
+        dataTable.tableName === null ||
+        dataTable.df === null ||
+        dataTable.selectedItemNameColumn === null
+      ) {
+        console.error('Error during adding data table to heatmap store')
+      }
+      this.dataTables.push(dataTable)
+    },
+    setActiveDataTable(dataTable: CsvDataTable) {
+      this.activeDataTable = dataTable
+    },
     async fetchHeatmap() {
       console.log('fetchingHeatmap....')
       this.loading = true

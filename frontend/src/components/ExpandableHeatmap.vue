@@ -10,6 +10,7 @@ import { AbsRelLogEnum } from '@stores/heatmapStore'
 import DimReductionVisual from './DimReductionVisual.vue'
 
 import HeatmapSettings from './HeatmapSettings.vue'
+import CsvUpload from './CsvUpload.vue'
 
 const heatmapStore = useHeatmapStore()
 
@@ -467,10 +468,6 @@ onMounted(async () => {
 
 <template>
   <main class="box-content">
-    <div class="ihech-heading">
-      <h1 v-if="!heatmapStore.isLoading">IHECH</h1>
-      <span v-else class="loading loading-spinner loading-lg"></span>
-    </div>
     <div ref="tooltip" class="tooltip">
       <div class="flex-tooltip">
         <div style="font-weight: bold" class="rows-tooltip">
@@ -488,6 +485,13 @@ onMounted(async () => {
       </div>
     </div>
     <div ref="highlightOverlay" class="highlight-overlay"></div>
+
+    <div class="ihech-heading">
+      <h1 v-if="!heatmapStore.isLoading">IHECH</h1>
+      <span v-else class="loading loading-spinner loading-lg"></span>
+    </div>
+
+    <CsvUpload />
 
     <HeatmapSettings />
 
@@ -676,6 +680,8 @@ onMounted(async () => {
 <style scoped>
 main {
   margin-top: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
   box-sizing: content-box;
   font-family: 'Roboto Condensed';
 

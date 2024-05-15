@@ -13,7 +13,6 @@ const hierarchyLayers: ('None' | number)[] = ['None', 1, 2, 3, 4]
 const fileInput = ref<HTMLInputElement | null>(null)
 
 const temporaryDataTable = ref<CsvDataTable | null>(null)
-const naNColumns = ref<string[]>([])
 
 function toggleAccordion() {
   isOpen.value = !isOpen.value
@@ -26,6 +25,18 @@ function triggerFileInput() {
   fileInput.value?.click()
 }
 
+function getNanColumns(df: dataForge.IDataFrame): string[] {
+  const typeFrequencies = df.detectTypes().bake()
+
+  const nanTypeColumns = typeFrequencies.where((row) => row.Type !== 'number' && row.Frequency > 0)
+  const columnsWithNaN = nanTypeColumns
+    .distinct((row) => row.Column)
+    .select((row) => row.Column)
+    .toArray()
+
+  return columnsWithNaN
+}
+
 function uploadCsvFile(event: Event) {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
@@ -33,28 +44,38 @@ function uploadCsvFile(event: Event) {
   const reader = new FileReader()
   reader.onload = (e) => {
     const contents = e.target?.result as string
-    const df = dataForge.fromCSV(contents, { dynamicTyping: true, skipEmptyLines: true }).bake()
+    const df: dataForge.IDataFrame = dataForge
+      .fromCSV(contents, { dynamicTyping: true, skipEmptyLines: true })
+      .resetIndex()
+      .bake()
+
+    const csvFile = df.toCSV()
     let fileNameNoExtension = file.name.split('.').slice(0, -1).join('.')
     while (heatmapStore.getAllDataTableNames.includes(fileNameNoExtension)) {
       fileNameNoExtension += '_1'
     }
 
+    const naNColumns = getNanColumns(df)
+    const nonNanColumns = df
+      .getColumnNames()
+      .filter((columnName) => !naNColumns.includes(columnName))
+
+    const selectedItemNameColumn = naNColumns.length > 0 ? naNColumns[0] : nonNanColumns[0]
+
     const newDataTable: CsvDataTable = {
       tableName: fileNameNoExtension,
       df: df,
-      selectedAttributes: [],
-      selectedItemNameColumn: null,
+      csvFile: csvFile,
+      nanColumns: naNColumns,
+      nonNanColumns: nonNanColumns,
+      selectedAttributes: nonNanColumns,
+      selectedItemIndexes: df.getIndex().toArray(),
+      selectedItemNameColumn: selectedItemNameColumn,
       collectionColumnNames: [],
       collectionColorMap: {}
     }
     console.log(newDataTable)
     temporaryDataTable.value = newDataTable
-    setNanColumns()
-    const nonNanColumns = df.getColumnNames().filter((columnName) => !isColumnNaN(columnName))
-    temporaryDataTable.value.selectedAttributes = nonNanColumns
-    if (naNColumns.value.length > 0) {
-      temporaryDataTable.value.selectedItemNameColumn = naNColumns.value[0]
-    }
   }
   reader.readAsText(file)
 }
@@ -75,25 +96,6 @@ function toggleAttribute(attribute: string) {
   } else {
     temporaryDataTable.value.selectedAttributes.push(attribute)
   }
-}
-
-function isColumnNaN(columnName: string): boolean {
-  return naNColumns.value.includes(columnName)
-}
-
-function setNanColumns(): void {
-  if (temporaryDataTable.value === null) {
-    return
-  }
-  const typeFrequencies = temporaryDataTable.value.df.detectTypes().bake()
-
-  const nanTypeColumns = typeFrequencies.where((row) => row.Type !== 'number' && row.Frequency > 0)
-  const columnsWithNaN = nanTypeColumns
-    .distinct((row) => row.Column)
-    .select((row) => row.Column)
-    .toArray()
-
-  naNColumns.value = columnsWithNaN
 }
 
 function getColumnCollectionHierarchy(columnName: string): 'None' | number {
@@ -147,17 +149,19 @@ function discardChanges() {
 function setActiveTableAsTemporary() {
   if (heatmapStore.getActiveDataTable === null) {
     temporaryDataTable.value = null
-    naNColumns.value = []
   } else {
     temporaryDataTable.value = {
       tableName: heatmapStore.getActiveDataTable.tableName,
       df: heatmapStore.getActiveDataTable.df,
+      csvFile: heatmapStore.getActiveDataTable.csvFile,
+      nanColumns: [...heatmapStore.getActiveDataTable.nanColumns],
+      nonNanColumns: [...heatmapStore.getActiveDataTable.nonNanColumns],
       selectedAttributes: [...heatmapStore.getActiveDataTable.selectedAttributes],
+      selectedItemIndexes: [...heatmapStore.getActiveDataTable.selectedItemIndexes],
       selectedItemNameColumn: heatmapStore.getActiveDataTable.selectedItemNameColumn,
       collectionColumnNames: [...heatmapStore.getActiveDataTable.collectionColumnNames],
       collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap }
     }
-    setNanColumns()
   }
 }
 
@@ -250,7 +254,7 @@ watch(
                   {{ columnName }}
                 </div>
                 <input
-                  :disabled="isColumnNaN(columnName)"
+                  :disabled="temporaryDataTable?.nanColumns.includes(columnName)"
                   @click.stop="toggleAttribute(columnName)"
                   type="checkbox"
                   :checked="temporaryDataTable?.selectedAttributes.includes(columnName)"

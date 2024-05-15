@@ -19,6 +19,25 @@ export function colorFromRangeDistinct(
   return selectedColor
 }
 
+export enum SortOrderAttributes {
+  STDEV = 'STDEV',
+  ASC = 'ASC',
+  DESC = 'DESC',
+  ALPHABETICAL = 'ALPHABETICAL'
+}
+
+export enum AbsRelLogEnum {
+  REL = 'REL',
+  ABS = 'ABS',
+  LOG = 'LOG'
+}
+
+export enum DimReductionAlgoEnum {
+  PCA = 'PCA',
+  UMAP = 'UMAP',
+  TSNE = 'TSNE'
+}
+
 export interface ItemNameAndData {
   itemName: string
   isOpen: boolean
@@ -44,13 +63,67 @@ export interface HeatmapJSON {
   minDimRedYValue: number
 }
 
-export interface CsvDataTable {
+export interface HeatmapSettings {
+  csvFile: string
+
+  itemNamesColumnName: string
+  collectionColumnNames: string[]
+
+  selectedItemIndexes: number[]
+  selectedAttributes: string[]
+
+  stickyAttributes: string[]
+  sortAttributesBasedOnStickyItems: boolean
+  sortOrderAttributes: SortOrderAttributes
+
+  stickyItemIndexes: string[]
+  clusterItemsBasedOnStickyAttributes: boolean
+
+  clusterByCollections: boolean
+
+  clusterSize: number
+  dimReductionAlgo: DimReductionAlgoEnum
+  clusterAfterDimRed: boolean
+
+  absRelLog: AbsRelLogEnum
+}
+
+export interface CsvDataTableProfile {
   tableName: string | null
   df: dataForge.IDataFrame<any, any>
-  selectedAttributes: string[]
-  selectedItemNameColumn: string | null
-  collectionColumnNames: string[]
+
+  nanColumns: string[]
+  nonNanColumns: string[]
+
   collectionColorMap: Record<string, string>
+
+  amountOfStickyItems: number
+
+  showOnlyStickyItemsInDimReduction: boolean
+
+  //Settings for the backend
+  csvFile: string
+
+  itemNamesColumnName: string
+  collectionColumnNames: string[]
+
+  selectedItemIndexes: number[]
+  selectedAttributes: string[]
+
+  stickyAttributes: string[]
+  sortAttributesBasedOnStickyItems: boolean
+  sortOrderAttributes: SortOrderAttributes
+
+  stickyItemIndexes: string[]
+  clusterItemsBasedOnStickyAttributes: boolean
+
+  clusterByCollections: boolean
+
+  clusterSize: number
+  dimReductionAlgo: DimReductionAlgoEnum
+  clusterAfterDimRed: boolean
+
+  absRelLog: AbsRelLogEnum
 }
 
 export function getDistinctEditionsOfRow(row: ItemNameAndData): Set<string> {

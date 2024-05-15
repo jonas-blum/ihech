@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import type { ItemNameAndData } from '@/helpers/helpers'
-import { getHeatmapColor } from '@/helpers/helpers'
-import {
-  StructuralFeatureEnum,
+import type {
   AbsRelLogEnum,
-  MedianMaxMinEnum,
-  SortOrderAttributes,
   DimReductionAlgoEnum,
-  useHeatmapStore
-} from '@stores/heatmapStore'
+  ItemNameAndData,
+  SortOrderAttributes
+} from '@/helpers/helpers'
+import { getHeatmapColor } from '@/helpers/helpers'
+import { useHeatmapStore } from '@/stores/heatmapStore'
 
 const heatmapStore = useHeatmapStore()
 
@@ -52,49 +50,31 @@ function findRowAndOpenIt(event: Event) {
   }
 }
 
-async function updateStructuralFeature(event: Event) {
-  if (!(event.target instanceof HTMLSelectElement)) {
-    console.error('Event target is not an HTMLSelectElement:', event.target)
-    return
-  }
-  const selectedFeature = event.target.value
-  heatmapStore.setStructuralFeature(selectedFeature as StructuralFeatureEnum)
+async function updateAbsRelLog(selectedAbsRelLog: AbsRelLogEnum) {
+  heatmapStore.setAbsRelLog(selectedAbsRelLog)
   await heatmapStore.fetchHeatmap()
 }
 
-async function updateAbsRel(selectedAbsRel: AbsRelLogEnum) {
-  heatmapStore.setAbsRel(selectedAbsRel)
-  await heatmapStore.fetchHeatmap()
-}
-
-async function updateMedianMaxMin(selectedMedianMaxMin: MedianMaxMinEnum) {
-  if (heatmapStore.isMedianMaxMinDisabled) {
-    return
-  }
-  heatmapStore.setMedianMaxMin(selectedMedianMaxMin)
-  await heatmapStore.fetchHeatmap()
-}
-
-async function updateClusterByEditions(event: Event) {
+async function updateClusterByCollections(event: Event) {
   if (!(event.target instanceof HTMLInputElement)) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterByEditions(event.target.checked)
+  heatmapStore.setClusterByCollections(event.target.checked)
   await heatmapStore.fetchHeatmap()
 }
 
-async function updateSortOrderColumns(sortOrder: SortOrderAttributes) {
-  heatmapStore.setSortOrderColumns(sortOrder)
+async function updateSortOrderAttributes(sortOrder: SortOrderAttributes) {
+  heatmapStore.setSortOrderAttributes(sortOrder)
   await heatmapStore.fetchHeatmap()
 }
 
-async function updateSortOrderBasedOnStickyItems(event: Event) {
+async function updateSortAttributesBasedOnStickyItems(event: Event) {
   if (!(event.target instanceof HTMLInputElement)) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setSortColumnsBasedOnStickyItems(event.target.checked)
+  heatmapStore.setSortAttributesBasedOnStickyItems(event.target.checked)
   await heatmapStore.fetchHeatmap()
 }
 
@@ -112,7 +92,7 @@ async function updateClusterAfterDimRed(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setIsClusterAfterDimRed(event.target.checked)
+  heatmapStore.setClusterAfterDimRed(event.target.checked)
   await heatmapStore.fetchHeatmap()
 }
 
@@ -156,7 +136,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
               @click="updateOnlyDimReductionBasedOnStickyItems($event)"
               type="checkbox"
               class="toggle"
-              :checked="heatmapStore.isOnlyStickyItemsShownInDimReduction"
+              :checked="heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
             />
           </div>
         </li>
@@ -172,7 +152,8 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
                 <a
                   @click="updateDimReductionAlgo(dimReductionAlgo)"
                   :class="{
-                    'bg-green-700 text-white': heatmapStore.getDimReductionAlgo === dimReductionAlgo
+                    'bg-green-700 text-white':
+                      heatmapStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo
                   }"
                   >{{ dimReductionAlgo }}</a
                 >
@@ -194,7 +175,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
             <select @change="updateClusterSize($event)" class="select select-primary max-w-xs">
               <option
                 :key="i"
-                :selected="heatmapStore.getClusterSize === i"
+                :selected="heatmapStore.getActiveDataTable?.clusterSize === i"
                 v-for="i in Array.from({ length: 29 }, (_, i) => i + 2)"
               >
                 {{ i }}
@@ -204,12 +185,12 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
         </li>
         <li>
           <div class="toggle-container">
-            <p>By editions?</p>
+            <p>By Collections?</p>
             <input
-              @click="updateClusterByEditions"
+              @click="updateClusterByCollections"
               type="checkbox"
               class="toggle"
-              :checked="heatmapStore.isClusteredByEditions"
+              :checked="heatmapStore.getActiveDataTable?.clusterByCollections"
             />
           </div>
         </li>
@@ -220,7 +201,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
               @click="updateClusterAfterDimRed($event)"
               type="checkbox"
               class="toggle"
-              :checked="heatmapStore.isClusterAfterDimRed"
+              :checked="heatmapStore.getActiveDataTable?.clusterAfterDimRed"
             />
           </div>
         </li>
@@ -231,9 +212,24 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
               @click="updateClusterBasedOnStickyAttributes($event)"
               type="checkbox"
               class="toggle"
-              :checked="heatmapStore.isClusterItemsBasedOnStickyAttributes"
+              :checked="heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
             />
           </div>
+        </li>
+      </ul>
+      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+        <li>
+          <ul class="menu menu-vertical bg-base-200">
+            <li :key="absRel" style="border: none" v-for="absRel in Object.values(AbsRelLogEnum)">
+              <a
+                @click="updateAbsRelLog(absRel)"
+                :class="{
+                  'bg-green-700 text-white': heatmapStore.getActiveDataTable?.absRelLog === absRel
+                }"
+                >{{ absRel }}</a
+              >
+            </li>
+          </ul>
         </li>
       </ul>
     </div>
@@ -241,17 +237,17 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
     <div style="z-index: 99999" class="dropdown dropdown-bottom">
       <div tabindex="0" role="button" class="btn m-1">
         <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
-        <p>Columns</p>
+        <p>Attributes</p>
       </div>
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
         <li>
           <div class="toggle-container">
             <p>Sort based on sticky items?</p>
             <input
-              @click="updateSortOrderBasedOnStickyItems"
+              @click="updateSortAttributesBasedOnStickyItems"
               type="checkbox"
               class="toggle"
-              :checked="heatmapStore.isSortColumnsBasedOnStickyItems"
+              :checked="heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems"
             />
           </div>
         </li>
@@ -265,66 +261,16 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
                 v-for="sortOrder in Object.values(SortOrderAttributes)"
               >
                 <a
-                  @click="updateSortOrderColumns(sortOrder)"
+                  @click="updateSortOrderAttributes(sortOrder)"
                   :class="{
-                    'bg-green-700 text-white': heatmapStore.getSortOrderColumns === sortOrder
+                    'bg-green-700 text-white':
+                      heatmapStore.getActiveDataTable?.sortOrderAttributes === sortOrder
                   }"
                   >{{ sortOrder }}</a
                 >
               </li>
             </ul>
           </div>
-        </li>
-      </ul>
-    </div>
-
-    <div style="z-index: 99999" class="dropdown dropdown-bottom">
-      <div tabindex="0" role="button" class="btn m-1">
-        <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
-        <p>Tag Metrics</p>
-      </div>
-      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-        <li>
-          <ul class="menu menu-vertical bg-base-200">
-            <li :key="absRel" style="border: none" v-for="absRel in Object.values(AbsRelLogEnum)">
-              <a
-                @click="updateAbsRel(absRel)"
-                :class="{
-                  'bg-green-700 text-white': heatmapStore.getSelectedAbsRel === absRel
-                }"
-                >{{ absRel }}</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li>
-          <ul class="menu menu-vertical bg-base-200">
-            <li
-              :key="medianMaxMin"
-              style="border: none"
-              :class="{ disabled: heatmapStore.isMedianMaxMinDisabled }"
-              v-for="medianMaxMin in Object.values(MedianMaxMinEnum)"
-            >
-              <a
-                @click="updateMedianMaxMin(medianMaxMin)"
-                :class="{
-                  'bg-green-700 text-white': heatmapStore.getSelectedMedianMaxMin === medianMaxMin
-                }"
-                >{{ medianMaxMin }}</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li>
-          <select @change="updateStructuralFeature($event)" class="select select-primary max-w-xs">
-            <option
-              :key="structuralFeature"
-              :selected="heatmapStore.getSelectedFeature === structuralFeature"
-              v-for="structuralFeature in Object.values(StructuralFeatureEnum)"
-            >
-              {{ structuralFeature }}
-            </option>
-          </select>
         </li>
       </ul>
     </div>

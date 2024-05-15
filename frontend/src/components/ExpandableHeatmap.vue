@@ -458,11 +458,6 @@ onMounted(async () => {
   canvas.value.addEventListener('click', (event) => {
     clickCanvas(event, true)
   })
-
-  const response = await fetch('/assets/data/abs_amount_different_attributes.csv')
-  const csvData = await response.text()
-  console.log('csvData', csvData)
-  heatmapStore.uploadCsvFile(csvData)
 })
 </script>
 
@@ -512,7 +507,7 @@ onMounted(async () => {
             alignItems: 'center'
           }"
         >
-          <p style="height: 25px">{{ heatmapStore.getDimReductionAlgo }}</p>
+          <p style="height: 25px">{{ heatmapStore.getActiveDataTable?.dimReductionAlgo }}</p>
           <DimReductionVisual style="border: 1px solid black" :width="dimReductionWidth" />
         </div>
       </div>
@@ -612,14 +607,16 @@ onMounted(async () => {
                 textAlign: 'center',
                 cursor: 'pointer',
                 marginLeft:
-                  index === heatmapStore.getStickyAttributes.length ? stickyAttributesGap + 'px' : 0
+                  index === heatmapStore.getActiveDataTable?.stickyAttributes.length
+                    ? stickyAttributesGap + 'px'
+                    : 0
               }"
             >
               <div
                 :style="{
                   position: 'absolute',
                   width: '100%',
-                  height: heatmapStore.getColDissimilarities[index] * 100 + '%',
+                  height: heatmapStore.getHeatmap.attributeDissimilarities[index] * 100 + '%',
                   backgroundColor: '#ccc',
                   top: '10px',
                   left: 0,
@@ -643,7 +640,9 @@ onMounted(async () => {
                     alignItems: 'center'
                   }"
                 >
-                  {{ heatmapStore.getStickyAttributes.includes(colName) ? '-' : '+' }}
+                  {{
+                    heatmapStore.getActiveDataTable?.stickyAttributes.includes(colName) ? '-' : '+'
+                  }}
                 </div>
               </div>
               <div

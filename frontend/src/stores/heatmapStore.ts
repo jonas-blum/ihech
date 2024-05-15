@@ -3,110 +3,25 @@ import {
   type HeatmapJSON,
   type ItemNameAndData,
   findRowByName,
-  type CsvDataTable
+  type CsvDataTableProfile,
+  AbsRelLogEnum,
+  DimReductionAlgoEnum,
+  SortOrderAttributes,
+  type HeatmapSettings
 } from '../helpers/helpers'
 
-import * as dataForge from 'data-forge'
-
-export enum AbsRelLogEnum {
-  REL = 'REL',
-  ABS = 'ABS',
-  LOG = 'LOG'
-}
-
-export enum MedianMaxMinEnum {
-  MEDIAN = 'MEDIAN',
-  MIN = 'MIN',
-  MAX = 'MAX'
-}
-
-export enum DimReductionAlgoEnum {
-  PCA = 'PCA',
-  UMAP = 'UMAP',
-  TSNE = 'TSNE'
-}
-
-export enum StructuralFeatureEnum {
-  BINARY_TAG_EXISTS = 'BINARY_TAG_EXISTS',
-  AMOUNT_OF_ATTRIBUTES = 'AMOUNT_OF_ATTRIBUTES',
-  AMOUNT_OF_DIFFERENT_ATTRIBUTES = 'AMOUNT_OF_DIFFERENT_ATTRIBUTES',
-  AMOUNT_OF_TAGS = 'AMOUNT_OF_TAGS',
-  AMOUNT_OF_SIBLING_TAGS = 'AMOUNT_OF_SIBLING_TAGS',
-  AMOUNT_OF_DIRECT_CHILDREN_TAGS = 'AMOUNT_OF_DIRECT_CHILDREN_TAGS',
-  AMOUNT_OF_INDIRECT_CHILDREN_TAGS = 'AMOUNT_OF_INDIRECT_CHILDREN_TAGS',
-  LENGTH_OF_CONTENT_INSIDE_TAG = 'LENGTH_OF_CONTENT_INSIDE_TAG',
-  LENGTH_OF_CONTENT_ALL_CHILDREN = 'LENGTH_OF_CONTENT_ALL_CHILDREN',
-  DEPTH_OF_TAG = 'DEPTH_OF_TAG'
-}
-
-export enum SortOrderAttributes {
-  STDEV = 'STDEV',
-  ASC = 'ASC',
-  DESC = 'DESC',
-  ALPHABETICAL = 'ALPHABETICAL'
-}
-
-export interface HeatmapSettings {
-  csvFile: string
-
-  idsColumnName: string
-  itemNamesColumnName: string
-  collectionColumnNames: string[]
-
-  selectedItemIds: string[]
-  selectedAttributes: string[]
-
-  stickyAttributes: string[]
-  sortAttributesBasedOnStickyItems: boolean
-  sortOrderAttributes: SortOrderAttributes
-
-  stickyItemIds: string[]
-  clusterItemsBasedOnStickyAttributes: boolean
-
-  clusterByCollections: boolean
-
-  clusterSize: number
-  dimReductionAlgo: DimReductionAlgoEnum
-  clusterAfterDimRed: boolean
-
-  absRelLog: AbsRelLogEnum
-
-  medianMaxMin: MedianMaxMinEnum
-  structuralFeature: StructuralFeatureEnum
-}
-
 export interface HeatmapStoreState {
-  dataTables: CsvDataTable[]
-  activeDataTable: CsvDataTable | null
-
-  csvFile: string
-
-  idsColumnName: string
-  itemNamesColumnName: string
-  collectionColumnNames: string[]
-
-  selectedItemIds: string[]
-  selectedAttributes: string[]
+  dataTables: CsvDataTableProfile[]
+  activeDataTable: CsvDataTableProfile | null
 
   heatmap: HeatmapJSON
-  initialAttributeOrder: string[]
-  initialColDissimilarities: number[]
-  selectedFeature: StructuralFeatureEnum
-  selectedAbsRel: AbsRelLogEnum
-  selectedMedianMaxMin: MedianMaxMinEnum
-  clusterByEditions: boolean
-  sortOrderColumns: SortOrderAttributes
-  sortColumnsBasedOnStickyItems: boolean
-  clusterSize: number
-  dimReductionAlgoEnum: DimReductionAlgoEnum
-  dataChanging: number
   highlightedRow: ItemNameAndData | null
-  amountOfStickyItems: number
+
+  initialAttributeOrder: string[]
+  initialAttributeDissimilarities: number[]
+
+  dataChanging: number
   loading: boolean
-  stickyAttributes: string[]
-  clusterItemsBasedOnStickyAttributes: boolean
-  showOnlyStickyItemsInDimReduction: boolean
-  clusterAfterDimRed: boolean
   timer: number
 }
 
@@ -114,12 +29,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
   state: (): HeatmapStoreState => ({
     dataTables: [],
     activeDataTable: null,
-    csvFile: '',
-    idsColumnName: 'document_id',
-    itemNamesColumnName: 'document_id',
-    collectionColumnNames: ['tei-edition-label'],
-    selectedItemIds: [],
-    selectedAttributes: [],
+
     heatmap: {
       attributeNames: [],
       attributeDissimilarities: [],
@@ -131,30 +41,20 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       minDimRedXValue: 0,
       minDimRedYValue: 100
     },
-    initialAttributeOrder: [],
-    initialColDissimilarities: [],
-    selectedFeature: StructuralFeatureEnum.BINARY_TAG_EXISTS,
-    selectedAbsRel: AbsRelLogEnum.REL,
-    selectedMedianMaxMin: MedianMaxMinEnum.MEDIAN,
-    clusterByEditions: false,
-    sortOrderColumns: SortOrderAttributes.STDEV,
-    sortColumnsBasedOnStickyItems: false,
-    clusterSize: 6,
-    dimReductionAlgoEnum: DimReductionAlgoEnum.PCA,
-    dataChanging: 1,
     highlightedRow: null,
-    amountOfStickyItems: 0,
+
+    initialAttributeOrder: [],
+    initialAttributeDissimilarities: [],
+
+    dataChanging: 1,
     loading: false,
-    stickyAttributes: [],
-    clusterItemsBasedOnStickyAttributes: false,
-    showOnlyStickyItemsInDimReduction: false,
-    clusterAfterDimRed: false,
     timer: 0
   }),
   getters: {
     getAllDataTables: (state) => state.dataTables,
     getAllDataTableNames: (state) => state.dataTables.map((table) => table.tableName),
     getActiveDataTable: (state) => state.activeDataTable,
+
     getHeatmap: (state) => state.heatmap,
     getHeatmapMaxValue: (state) => state.heatmap.maxHeatmapValue,
     getHeatmapMinValue: (state) => state.heatmap.minHeatmapValue,
@@ -162,39 +62,18 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getDimRedMinXValue: (state) => state.heatmap.minDimRedXValue,
     getDimRedMaxYValue: (state) => state.heatmap.maxDimRedYValue,
     getDimRedMinYValue: (state) => state.heatmap.minDimRedYValue,
-    getSelectedFeature: (state) => state.selectedFeature,
-    getSelectedAbsRel: (state) => state.selectedAbsRel,
-    getSelectedMedianMaxMin: (state) => state.selectedMedianMaxMin,
-    getSortOrderColumns: (state) => state.sortOrderColumns,
-    isSortColumnsBasedOnStickyItems: (state) => state.sortColumnsBasedOnStickyItems,
-    getClusterSize: (state) => state.clusterSize,
-    getDimReductionAlgo: (state) => state.dimReductionAlgoEnum,
-    getDataChanging: (state) => state.dataChanging,
     getHighlightedRow: (state) => state.highlightedRow,
-    getAmountOfStickyItems: (state) => state.amountOfStickyItems,
-    getStickyItems: (state) =>
-      state.heatmap?.itemNamesAndData?.slice(0, state.amountOfStickyItems) || [],
-    getStickyAttributes: (state) => state.stickyAttributes,
-    getColDissimilarities: (state) => state.heatmap.attributeDissimilarities,
-    isMedianMaxMinDisabled: (state) =>
-      state.selectedFeature === StructuralFeatureEnum.AMOUNT_OF_TAGS ||
-      state.selectedFeature === StructuralFeatureEnum.AMOUNT_OF_DIFFERENT_ATTRIBUTES ||
-      state.selectedFeature === StructuralFeatureEnum.BINARY_TAG_EXISTS,
-    isClusteredByEditions: (state) => state.clusterByEditions,
+
+    getDataChanging: (state) => state.dataChanging,
     isLoading: (state) => state.loading,
-    isClusterItemsBasedOnStickyAttributes: (state) => state.clusterItemsBasedOnStickyAttributes,
-    isOnlyStickyItemsShownInDimReduction: (state) => state.showOnlyStickyItemsInDimReduction,
-    isClusterAfterDimRed: (state) => state.clusterAfterDimRed,
-    isStickyAttributesGapVisible: (state) => state.stickyAttributes.length > 0,
-    isStickyItemsGapVisible: (state) => state.amountOfStickyItems > 0,
     getTimer: (state) => state.timer
   },
   actions: {
-    saveDataTable(dataTable: CsvDataTable) {
+    saveDataTable(dataTable: CsvDataTableProfile) {
       if (
         dataTable.tableName === null ||
         dataTable.df === null ||
-        dataTable.selectedItemNameColumn === null
+        dataTable.itemNamesColumnName === null
       ) {
         console.error('Error during adding data table to heatmap store')
       }
@@ -205,10 +84,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.dataTables.push(dataTable)
       }
     },
-    setActiveDataTable(dataTable: CsvDataTable) {
+    setActiveDataTable(dataTable: CsvDataTableProfile) {
       this.activeDataTable = dataTable
     },
     async fetchHeatmap() {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
       console.log('fetchingHeatmap....')
       this.loading = true
       const startTime = new Date().getTime()
@@ -234,12 +117,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         recursivelyCopyData(row)
       })
 
-      this.initialAttributeOrder = [...receivedHeatmap.attributeNames]
-      this.initialColDissimilarities = [...receivedHeatmap.attributeDissimilarities]
+      this.activeDataTable.initialAttributeOrder = [...receivedHeatmap.attributeNames]
+      this.activeDataTable.initialColDissimilarities = [...receivedHeatmap.attributeDissimilarities]
 
       const stickyRows: ItemNameAndData[] = []
 
-      for (const stickyRow of settings.stickyItemIds) {
+      for (const stickyRow of settings.stickyItemIndexes) {
         receivedHeatmap.itemNamesAndData.forEach((row) => {
           const foundRow = findRowByName(row, stickyRow)
           if (foundRow) {
@@ -247,14 +130,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           }
         })
       }
-      this.amountOfStickyItems = stickyRows.length
+      this.activeDataTable.amountOfStickyItems = stickyRows.length
 
       receivedHeatmap.itemNamesAndData = [...stickyRows, ...receivedHeatmap.itemNamesAndData]
       // await usePCAStore().updatePCA()
       this.heatmap = receivedHeatmap
 
-      this.toggleStickyAttribute(this.initialAttributeOrder[0])
-      this.toggleStickyAttribute(this.initialAttributeOrder[0])
+      this.toggleStickyAttribute(this.activeDataTable.initialAttributeOrder[0])
+      this.toggleStickyAttribute(this.activeDataTable.initialAttributeOrder[0])
       this.reorderAllDataBasedOnNewAttributeOrder()
       console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
       this.changeHeatmap()
@@ -263,51 +146,59 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     setTimer(timer: number) {
       this.timer = timer
     },
-    setStructuralFeature(structuralFeature: StructuralFeatureEnum) {
-      this.selectedFeature = structuralFeature
+    setAbsRelLog(absRelLog: AbsRelLogEnum) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.absRelLog = absRelLog
     },
-    setAbsRel(absRel: AbsRelLogEnum) {
-      this.selectedAbsRel = absRel
+    setClusterByCollections(clusterByCollections: boolean) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.clusterByCollections = clusterByCollections
     },
-    setMedianMaxMin(medianMaxMin: MedianMaxMinEnum) {
-      this.selectedMedianMaxMin = medianMaxMin
+    setSortOrderAttributes(sortOrderAttributes: SortOrderAttributes) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.sortOrderAttributes = sortOrderAttributes
     },
-    setClusterByEditions(clusterByEditions: boolean) {
-      this.clusterByEditions = clusterByEditions
-    },
-    setSortOrderColumns(sortOrderColumns: SortOrderAttributes) {
-      this.sortOrderColumns = sortOrderColumns
-    },
-    setSortColumnsBasedOnStickyItems(sortColumnsBasedOnStickyItems: boolean) {
-      this.sortColumnsBasedOnStickyItems = sortColumnsBasedOnStickyItems
+    setSortAttributesBasedOnStickyItems(sortAttributesBasedOnStickyItems: boolean) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.sortAttributesBasedOnStickyItems = sortAttributesBasedOnStickyItems
     },
     setClusterSize(clusterSize: number) {
-      this.clusterSize = clusterSize
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.clusterSize = clusterSize
     },
     setDimReductionAlgo(dimReductionAlgo: DimReductionAlgoEnum) {
-      this.dimReductionAlgoEnum = dimReductionAlgo
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.dimReductionAlgo = dimReductionAlgo
     },
     setHighlightedRow(row: ItemNameAndData | null) {
       this.highlightedRow = row
     },
-    setIsClusterAfterDimRed(clusterAfterDim: boolean) {
-      this.clusterAfterDimRed = clusterAfterDim
+    setClusterAfterDimRed(clusterAfterDim: boolean) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.clusterAfterDimRed = clusterAfterDim
     },
-    async uploadCsvFile(csvFile: string) {
-      this.idsColumnName = 'row_id'
-      this.itemNamesColumnName = 'row_id'
-      this.collectionColumnNames = ['edition']
 
-      this.csvFile = csvFile
-      const heatmapDF: dataForge.IDataFrame<any, any> = dataForge
-        .fromCSV(csvFile, { dynamicTyping: true })
-        .setIndex(this.idsColumnName)
-
-      this.selectedItemIds = heatmapDF.getIndex().toArray()
-      this.selectedAttributes = heatmapDF.dropSeries(['row_id', 'edition']).getColumnNames()
-
-      await this.fetchHeatmap()
-    },
     resetSettings() {
       // ;(this.heatmap = {
       //   attributeNames: [],
@@ -340,33 +231,34 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       //   (this.clusterAfterDimRed = false)
     },
     getCurrentHeatmapSettings(): HeatmapSettings {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        throw new Error('No active data table')
+      }
       return {
-        csvFile: this.csvFile,
+        csvFile: this.activeDataTable.csvFile,
 
-        idsColumnName: this.idsColumnName,
-        itemNamesColumnName: this.itemNamesColumnName,
-        collectionColumnNames: this.collectionColumnNames,
+        itemNamesColumnName: this.activeDataTable.itemNamesColumnName,
+        collectionColumnNames: this.activeDataTable.collectionColumnNames,
 
-        selectedItemIds: this.selectedItemIds,
-        selectedAttributes: this.selectedAttributes,
+        selectedItemIndexes: this.activeDataTable.selectedItemIndexes,
+        selectedAttributes: this.activeDataTable.selectedAttributes,
 
-        stickyAttributes: this.stickyAttributes,
-        sortAttributesBasedOnStickyItems: this.sortColumnsBasedOnStickyItems,
-        sortOrderAttributes: this.sortOrderColumns,
+        stickyAttributes: this.activeDataTable.stickyAttributes,
+        sortAttributesBasedOnStickyItems: this.activeDataTable.sortAttributesBasedOnStickyItems,
+        sortOrderAttributes: this.activeDataTable.sortOrderAttributes,
 
-        stickyItemIds: this.getStickyItems.map((item: ItemNameAndData) => item.itemName),
-        clusterItemsBasedOnStickyAttributes: this.clusterItemsBasedOnStickyAttributes,
+        stickyItemIndexes: this.activeDataTable.stickyItemIndexes,
+        clusterItemsBasedOnStickyAttributes:
+          this.activeDataTable.clusterItemsBasedOnStickyAttributes,
 
-        clusterByCollections: this.clusterByEditions,
+        clusterByCollections: this.activeDataTable.clusterByCollections,
 
-        clusterSize: this.clusterSize,
-        dimReductionAlgo: this.dimReductionAlgoEnum,
-        clusterAfterDimRed: this.clusterAfterDimRed,
+        clusterSize: this.activeDataTable.clusterSize,
+        dimReductionAlgo: this.activeDataTable.dimReductionAlgo,
+        clusterAfterDimRed: this.activeDataTable.clusterAfterDimRed,
 
-        absRelLog: this.selectedAbsRel,
-
-        medianMaxMin: this.selectedMedianMaxMin,
-        structuralFeature: this.selectedFeature
+        absRelLog: this.activeDataTable.absRelLog
       }
     },
     changeHeatmap(): void {
@@ -374,51 +266,108 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       console.log('changing heatmap', this.dataChanging)
     },
     reorderColDissimilarities(): void {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
       const indexMap = new Map<string, number>()
-      this.initialAttributeOrder.forEach((attribute, index) => {
+      this.activeDataTable.initialAttributeOrder.forEach((attribute, index) => {
         indexMap.set(attribute, index)
       })
 
       const indexNumbers = this.heatmap.attributeNames.map((colName) => indexMap.get(colName))
-      const newColDissimilarities = new Array(this.initialColDissimilarities.length)
+      const newColDissimilarities = new Array(this.activeDataTable.initialColDissimilarities.length)
+
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+
       indexNumbers.forEach((originalIndex, newIndex) => {
         if (originalIndex) {
-          newColDissimilarities[newIndex] = this.initialColDissimilarities[originalIndex]
+          if (!this.activeDataTable) {
+            console.error('No active data table')
+            return
+          }
+
+          newColDissimilarities[newIndex] =
+            this.activeDataTable.initialColDissimilarities[originalIndex]
         }
       })
       this.heatmap.attributeDissimilarities = newColDissimilarities
     },
     toggleShowOnlyStickyItemsInDimReduction(showOnlyStickyItemsInDimRed: boolean) {
-      this.showOnlyStickyItemsInDimReduction = showOnlyStickyItemsInDimRed
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+
+      this.activeDataTable.showOnlyStickyItemsInDimReduction = showOnlyStickyItemsInDimRed
     },
     toggleStickyAttribute(attribute: string) {
-      this.stickyAttributes = this.stickyAttributes.filter((attr) =>
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+
+      this.activeDataTable.stickyAttributes = this.activeDataTable.stickyAttributes.filter((attr) =>
         this.heatmap.attributeNames.includes(attr)
       )
-      if (this.stickyAttributes.includes(attribute)) {
-        this.stickyAttributes = this.stickyAttributes.filter((attr) => attr !== attribute)
-        this.heatmap.attributeNames = this.heatmap.attributeNames.sort((a, b) => {
-          if (!this.stickyAttributes.includes(a) && !this.stickyAttributes.includes(b)) {
-            return this.initialAttributeOrder.indexOf(a) - this.initialAttributeOrder.indexOf(b)
+      if (this.activeDataTable.stickyAttributes.includes(attribute)) {
+        this.activeDataTable.stickyAttributes = this.activeDataTable.stickyAttributes.filter(
+          (attr) => attr !== attribute
+        )
+
+        if (!this.activeDataTable) {
+          console.error('No active data table')
+          return
+        }
+
+        this.heatmap.attributeNames.sort((a, b) => {
+          if (
+            !this.activeDataTable.stickyAttributes.includes(a) &&
+            !this.activeDataTable.stickyAttributes.includes(b)
+          ) {
+            return (
+              this.activeDataTable.initialAttributeOrder.indexOf(a) -
+              this.activeDataTable.initialAttributeOrder.indexOf(b)
+            )
           }
-          if (this.stickyAttributes.includes(a) && !this.stickyAttributes.includes(b)) {
+          if (
+            this.activeDataTable.stickyAttributes.includes(a) &&
+            !this.activeDataTable.stickyAttributes.includes(b)
+          ) {
             return -1
           }
-          if (this.stickyAttributes.includes(b) && !this.stickyAttributes.includes(a)) {
+          if (
+            this.activeDataTable.stickyAttributes.includes(b) &&
+            !this.activeDataTable.stickyAttributes.includes(a)
+          ) {
             return 1
           }
           return 0
         })
       } else {
-        this.stickyAttributes.push(attribute)
-        this.heatmap.attributeNames = this.heatmap.attributeNames.sort((a, b) => {
+        if (!this.activeDataTable) {
+          console.error('No active data table')
+          return
+        }
+
+        this.activeDataTable.stickyAttributes.push(attribute)
+        this.heatmap.attributeNames.sort((a, b) => {
           if (a === attribute) {
             return -2
           }
-          if (this.stickyAttributes.includes(a) && !this.stickyAttributes.includes(b)) {
+          if (
+            this.activeDataTable.stickyAttributes.includes(a) &&
+            !this.activeDataTable.stickyAttributes.includes(b)
+          ) {
             return -1
           }
-          if (this.stickyAttributes.includes(b) && !this.stickyAttributes.includes(a)) {
+          if (
+            this.activeDataTable.stickyAttributes.includes(b) &&
+            !this.activeDataTable.stickyAttributes.includes(a)
+          ) {
             return 1
           }
           return 0
@@ -429,8 +378,13 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.changeHeatmap()
     },
     createIndexMap(): number[] {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        throw new Error('No active data table')
+      }
+
       const map = new Map<string, number>()
-      this.initialAttributeOrder.forEach((attribute, index) => {
+      this.activeDataTable.initialAttributeOrder.forEach((attribute, index) => {
         map.set(attribute, index)
       })
 
@@ -464,14 +418,26 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       })
     },
     setClusterItemsBasedOnStickyAttributes(clusterItemsBasedOnStickyAttributes: boolean) {
-      this.clusterItemsBasedOnStickyAttributes = clusterItemsBasedOnStickyAttributes
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        throw new Error('No active data table')
+      }
+      this.activeDataTable.clusterItemsBasedOnStickyAttributes = clusterItemsBasedOnStickyAttributes
     },
     toggleStickyItem(row: ItemNameAndData) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        throw new Error('No active data table')
+      }
+
       if (row.children) {
         return
       }
       let removing = false
-      let stickyItems = this.heatmap.itemNamesAndData.slice(0, this.amountOfStickyItems)
+      let stickyItems = this.heatmap.itemNamesAndData.slice(
+        0,
+        this.activeDataTable.amountOfStickyItems
+      )
       if (stickyItems.includes(row)) {
         stickyItems = stickyItems.filter((item) => item !== row)
         removing = true
@@ -481,12 +447,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       this.heatmap.itemNamesAndData = [
         ...stickyItems,
-        ...this.heatmap.itemNamesAndData.slice(this.amountOfStickyItems)
+        ...this.heatmap.itemNamesAndData.slice(this.activeDataTable.amountOfStickyItems)
       ]
       if (removing) {
-        this.amountOfStickyItems--
+        this.activeDataTable.amountOfStickyItems--
       } else {
-        this.amountOfStickyItems++
+        this.activeDataTable.amountOfStickyItems++
       }
       this.changeHeatmap()
     },

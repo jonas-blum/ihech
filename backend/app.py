@@ -23,11 +23,7 @@ def get_heatmap():
     csv_file = StringIO(heatmap_settings.csvFile)
     original_df = pd.read_csv(csv_file)
 
-    original_df = original_df.set_index(heatmap_settings.idsColumnName)
-
-    if heatmap_settings.itemNamesColumnName == heatmap_settings.idsColumnName:
-        heatmap_settings.itemNamesColumnName += "_added_string"
-        original_df[heatmap_settings.itemNamesColumnName] = original_df.index
+    
 
     start = time.perf_counter()
     return_string = create_heatmap(original_df, heatmap_settings)

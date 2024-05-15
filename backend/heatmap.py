@@ -22,9 +22,9 @@ def sort_attributes(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     transformed_df_to_sort = transformed_df
 
-    additional_columns = [
+    additional_columns = list(set([
         settings.itemNamesColumnName,
-    ] + settings.collectionColumnNames
+    ] + settings.collectionColumnNames))
 
     if settings.sortAttributesBasedOnStickyItems:
         sticky_df = transformed_df.loc[settings.stickyItemIndexes]
@@ -84,11 +84,13 @@ def filter_attributes(
         settings.collectionColumnNames,
     )
     if len(valid_columns) == 1:
+        original_df = original_df[valid_columns]
         transformed_df = transformed_df[valid_columns]
         transformed_df["null_col"] = 1
         original_df["null_col"] = 1
         original_df = pd.concat([extracted_columns, original_df], axis=1)
     elif len(valid_columns) >= 2:
+        original_df = original_df[valid_columns]
         transformed_df = transformed_df[valid_columns]
         original_df = pd.concat([extracted_columns, original_df], axis=1)
     else:
@@ -118,6 +120,8 @@ def create_heatmap(
     original_df: pd.DataFrame,
     settings: HeatmapSettings,
 ) -> str:
+    
+    
 
     original_filtered_df = filter_items(original_df, settings)
     
@@ -126,12 +130,14 @@ def create_heatmap(
     original_filtered_df, transformed_filtered_df = filter_attributes(
         original_filtered_df, transformed_filtered_df, settings
     )
-    
+
     transformed_filtered_df = set_abs_rel_log(transformed_filtered_df, settings)
     
     original_filtered_df, transformed_filtered_df = sort_attributes(
         original_filtered_df, transformed_filtered_df, settings
     )
+    
+    
 
     if settings.clusterItemsBasedOnStickyAttributes:
         sticky_columns = [
@@ -228,6 +234,7 @@ def create_heatmap(
         )
         filtered_collection_column_names = []
 
+    
     item_names_and_data = cluster_items_recursively(
         original_filtered_df,
         clustering_transformed_df,

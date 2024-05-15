@@ -11,4 +11,5 @@ def drop_columns(
 def extract_columns(
     df: pd.DataFrame, row_names_column_name: str, collection_column_names: List[str]
 ) -> pd.DataFrame:
-    return df[[row_names_column_name] + collection_column_names]
+    unique_columns = list(set([row_names_column_name] + collection_column_names))
+    return df[unique_columns]

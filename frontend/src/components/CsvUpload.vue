@@ -146,6 +146,10 @@ function updateHierarchyLayer(event: Event, columnName: string) {
   }
   const selectedHierarchyLayer = event.target.value
 
+  if (temporaryDataTable.value === null) {
+    return
+  }
+
   if (selectedHierarchyLayer === 'None') {
     //Remove the column name from the collectionColumnNames array
     const foundIndex = temporaryDataTable.value?.collectionColumnNames.indexOf(columnName)
@@ -160,6 +164,10 @@ function updateHierarchyLayer(event: Event, columnName: string) {
       temporaryDataTable.value?.collectionColumnNames.splice(foundIndex, 1)
     }
     temporaryDataTable.value?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
+  }
+  if (temporaryDataTable.value.collectionColumnNames.length > 4) {
+    temporaryDataTable.value.collectionColumnNames =
+      temporaryDataTable.value.collectionColumnNames.slice(0, 4)
   }
 }
 
@@ -298,6 +306,7 @@ watch(
                   @change="updateHierarchyLayer($event, columnName)"
                   @click.stop
                   class="select select-primary max-w-xs"
+                  :disabled="temporaryDataTable?.selectedAttributes.includes(columnName)"
                 >
                   <option
                     :selected="getColumnCollectionHierarchy(columnName) === hierarchyLayer"

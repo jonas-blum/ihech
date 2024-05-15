@@ -39,6 +39,8 @@ def cluster_items_recursively(
             collection_column_name
         ):
             remaining_collection_column_names = collection_column_names[1:]
+            
+
 
             transformed_temp_df = transformed_df.loc[original_group_df.index]
             dim_red_temp_df = dim_red_df.loc[original_group_df.index]
@@ -49,17 +51,31 @@ def cluster_items_recursively(
 
             dim_reduction_aggregated = dim_red_temp_df.mean().tolist()
             new_item_name = str(collection) + " " + str(original_group_df.shape[0])
-
-            new_children = cluster_items_recursively(
-                original_temp_df,
-                transformed_temp_df,
-                dim_red_temp_df,
-                cluster_size,
-                item_names_column_name,
-                cluster_by_collections,
-                remaining_collection_column_names,
-                level + 1,
-            )
+            
+            if original_group_df.shape[0] == 1 and len(remaining_collection_column_names) == 0:
+                solo_child_name = str(original_group_df.iloc[0][item_names_column_name])
+                solo_child_data = original_group_df.drop(collection_column_name, axis=1).iloc[0].tolist()
+                new_children = [ItemNameAndData(
+                    index = original_group_df.index[0],
+                    itemName=solo_child_name,
+                    isOpen=is_open,
+                    data=solo_child_data,
+                    amountOfDataPoints=1,
+                    dimReductionX=dim_red_df.loc[original_group_df.index].iloc[0][0],
+                    dimReductionY=dim_red_df.loc[original_group_df.index].iloc[0][1],
+                    children=None,
+                )]
+            else:
+                new_children = cluster_items_recursively(
+                    original_temp_df,
+                    transformed_temp_df,
+                    dim_red_temp_df,
+                    cluster_size,
+                    item_names_column_name,
+                    cluster_by_collections,
+                    remaining_collection_column_names,
+                    level + 1,
+                )
 
             new_item_name_and_data = ItemNameAndData(
                 index=None,

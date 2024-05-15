@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import {
   type HeatmapJSON,
   type ItemNameAndData,
-  findRowByName,
+  findRowByIndex,
   type CsvDataTableProfile,
   AbsRelLogEnum,
   DimReductionAlgoEnum,
@@ -64,6 +64,30 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getDimRedMinYValue: (state) => state.heatmap.minDimRedYValue,
     getHighlightedRow: (state) => state.highlightedRow,
 
+    getAmountOfStickyItems: (state) =>
+      state.activeDataTable ? state.activeDataTable.stickyItemIndexes.length : 0,
+    getAmountOfStickyAttributes: (state) =>
+      state.activeDataTable ? state.activeDataTable.stickyAttributes.length : 0,
+
+    isStickyItemsGapVisible: (state) => {
+      if (!state.activeDataTable) {
+        return false
+      }
+      return state.activeDataTable.stickyItemIndexes.length > 0
+    },
+
+    isStickyAttributesGapVisible: (state) => {
+      if (!state.activeDataTable) {
+        return false
+      }
+      return state.activeDataTable.stickyAttributes.length > 0
+    },
+
+    getStickyItems: (state) =>
+      state.heatmap.itemNamesAndData.slice(
+        state.activeDataTable ? state.activeDataTable.stickyItemIndexes.length : 0
+      ),
+
     getDataChanging: (state) => state.dataChanging,
     isLoading: (state) => state.loading,
     getTimer: (state) => state.timer
@@ -117,27 +141,26 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         recursivelyCopyData(row)
       })
 
-      this.activeDataTable.initialAttributeOrder = [...receivedHeatmap.attributeNames]
-      this.activeDataTable.initialColDissimilarities = [...receivedHeatmap.attributeDissimilarities]
+      this.initialAttributeOrder = [...receivedHeatmap.attributeNames]
+      this.initialAttributeDissimilarities = [...receivedHeatmap.attributeDissimilarities]
 
       const stickyRows: ItemNameAndData[] = []
 
       for (const stickyRow of settings.stickyItemIndexes) {
         receivedHeatmap.itemNamesAndData.forEach((row) => {
-          const foundRow = findRowByName(row, stickyRow)
+          const foundRow = findRowByIndex(row, stickyRow)
           if (foundRow) {
             stickyRows.push(foundRow)
           }
         })
       }
-      this.activeDataTable.amountOfStickyItems = stickyRows.length
 
       receivedHeatmap.itemNamesAndData = [...stickyRows, ...receivedHeatmap.itemNamesAndData]
       // await usePCAStore().updatePCA()
       this.heatmap = receivedHeatmap
 
-      this.toggleStickyAttribute(this.activeDataTable.initialAttributeOrder[0])
-      this.toggleStickyAttribute(this.activeDataTable.initialAttributeOrder[0])
+      this.toggleStickyAttribute(this.initialAttributeOrder[0])
+      this.toggleStickyAttribute(this.initialAttributeOrder[0])
       this.reorderAllDataBasedOnNewAttributeOrder()
       console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
       this.changeHeatmap()
@@ -271,12 +294,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return
       }
       const indexMap = new Map<string, number>()
-      this.activeDataTable.initialAttributeOrder.forEach((attribute, index) => {
+      this.initialAttributeOrder.forEach((attribute, index) => {
         indexMap.set(attribute, index)
       })
 
       const indexNumbers = this.heatmap.attributeNames.map((colName) => indexMap.get(colName))
-      const newColDissimilarities = new Array(this.activeDataTable.initialColDissimilarities.length)
+      const newColDissimilarities = new Array(this.initialAttributeDissimilarities.length)
 
       if (!this.activeDataTable) {
         console.error('No active data table')
@@ -290,8 +313,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
             return
           }
 
-          newColDissimilarities[newIndex] =
-            this.activeDataTable.initialColDissimilarities[originalIndex]
+          newColDissimilarities[newIndex] = this.initialAttributeDissimilarities[originalIndex]
         }
       })
       this.heatmap.attributeDissimilarities = newColDissimilarities
@@ -384,7 +406,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
 
       const map = new Map<string, number>()
-      this.activeDataTable.initialAttributeOrder.forEach((attribute, index) => {
+      this.initialAttributeOrder.forEach((attribute, index) => {
         map.set(attribute, index)
       })
 
@@ -436,7 +458,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       let removing = false
       let stickyItems = this.heatmap.itemNamesAndData.slice(
         0,
-        this.activeDataTable.amountOfStickyItems
+        this.activeDataTable.stickyItemIndexes.length
       )
       if (stickyItems.includes(row)) {
         stickyItems = stickyItems.filter((item) => item !== row)
@@ -447,12 +469,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       this.heatmap.itemNamesAndData = [
         ...stickyItems,
-        ...this.heatmap.itemNamesAndData.slice(this.activeDataTable.amountOfStickyItems)
+        ...this.heatmap.itemNamesAndData.slice(this.activeDataTable.stickyItemIndexes.length)
       ]
       if (removing) {
-        this.activeDataTable.amountOfStickyItems--
+        this.activeDataTable.stickyItemIndexes = this.activeDataTable.stickyItemIndexes.filter(
+          (item) => item !== row.index
+        )
       } else {
-        this.activeDataTable.amountOfStickyItems++
+        this.activeDataTable.stickyItemIndexes.push(row.index)
       }
       this.changeHeatmap()
     },

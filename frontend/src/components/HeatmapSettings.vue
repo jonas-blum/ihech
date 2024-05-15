@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import type {
-  AbsRelLogEnum,
-  DimReductionAlgoEnum,
-  ItemNameAndData,
-  SortOrderAttributes
-} from '@/helpers/helpers'
+import { AbsRelLogEnum, DimReductionAlgoEnum, SortOrderAttributes } from '@/helpers/helpers'
+
+import type { ItemNameAndData } from '@/helpers/helpers'
 import { getHeatmapColor } from '@/helpers/helpers'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 
@@ -146,7 +143,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
             <ul class="menu menu-vertical bg-base-200">
               <li
                 :key="dimReductionAlgo"
-                style="border: none"
+                :style="{ border: 'none' }"
                 v-for="dimReductionAlgo in Object.values(DimReductionAlgoEnum)"
               >
                 <a
@@ -220,7 +217,11 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
         <li>
           <ul class="menu menu-vertical bg-base-200">
-            <li :key="absRel" style="border: none" v-for="absRel in Object.values(AbsRelLogEnum)">
+            <li
+              :key="absRel"
+              :style="{ border: 'none' }"
+              v-for="absRel in Object.values(AbsRelLogEnum)"
+            >
               <a
                 @click="updateAbsRelLog(absRel)"
                 :class="{
@@ -257,7 +258,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
             <ul class="menu menu-vertical bg-base-200">
               <li
                 :key="sortOrder"
-                style="border: none"
+                :style="{ border: 'none' }"
                 v-for="sortOrder in Object.values(SortOrderAttributes)"
               >
                 <a

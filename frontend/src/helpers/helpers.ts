@@ -39,6 +39,7 @@ export enum DimReductionAlgoEnum {
 }
 
 export interface ItemNameAndData {
+  index: number
   itemName: string
   isOpen: boolean
   data: number[]
@@ -76,7 +77,7 @@ export interface HeatmapSettings {
   sortAttributesBasedOnStickyItems: boolean
   sortOrderAttributes: SortOrderAttributes
 
-  stickyItemIndexes: string[]
+  stickyItemIndexes: number[]
   clusterItemsBasedOnStickyAttributes: boolean
 
   clusterByCollections: boolean
@@ -97,8 +98,6 @@ export interface CsvDataTableProfile {
 
   collectionColorMap: Record<string, string>
 
-  amountOfStickyItems: number
-
   showOnlyStickyItemsInDimReduction: boolean
 
   //Settings for the backend
@@ -114,7 +113,7 @@ export interface CsvDataTableProfile {
   sortAttributesBasedOnStickyItems: boolean
   sortOrderAttributes: SortOrderAttributes
 
-  stickyItemIndexes: string[]
+  stickyItemIndexes: number[]
   clusterItemsBasedOnStickyAttributes: boolean
 
   clusterByCollections: boolean
@@ -142,14 +141,14 @@ export function getDistinctEditionsOfRow(row: ItemNameAndData): Set<string> {
   return editions
 }
 
-export function findRowByName(row: ItemNameAndData, name: string): ItemNameAndData | null {
-  if (row.itemName === name) {
+export function findRowByIndex(row: ItemNameAndData, index: number): ItemNameAndData | null {
+  if (row.index === index) {
     return row
   }
 
   if (row.children) {
     for (const child of row.children) {
-      const found = findRowByName(child, name)
+      const found = findRowByIndex(child, index)
       if (found) {
         return found
       }

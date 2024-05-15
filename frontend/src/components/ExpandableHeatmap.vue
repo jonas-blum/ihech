@@ -3,10 +3,9 @@ import { nextTick, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 import ExpRowComponent from './ExpRowComponent.vue'
 
-import { getHeatmapColor, type ItemNameAndData } from '@helpers/helpers'
+import { AbsRelLogEnum, getHeatmapColor, type ItemNameAndData } from '@helpers/helpers'
 import { useHeatmapStore } from '@stores/heatmapStore'
 
-import { AbsRelLogEnum } from '@stores/heatmapStore'
 import DimReductionVisual from './DimReductionVisual.vue'
 
 import HeatmapSettings from './HeatmapSettings.vue'
@@ -96,7 +95,7 @@ function updateEditionNames() {
 
 function updateStickyAttributesGap() {
   let stickyAttributesGapTemp = STICKY_GAP
-  if (heatmapStore.clusterItemsBasedOnStickyAttributes) {
+  if (heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes) {
     stickyAttributesGapTemp *= 2
   }
   stickyAttributesGap.value = heatmapStore.isStickyAttributesGapVisible
@@ -106,7 +105,7 @@ function updateStickyAttributesGap() {
 
 function updateStickyItemsGap() {
   let stickyItemsGapTemp = STICKY_GAP
-  if (heatmapStore.sortColumnsBasedOnStickyItems) {
+  if (heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems) {
     stickyItemsGapTemp *= 2
   }
   stickyItemsGap.value = heatmapStore.isStickyItemsGapVisible ? stickyItemsGapTemp : 0
@@ -153,11 +152,11 @@ function updateEntireColLabelHeight() {
 }
 
 function getHeatmapColorMaxValue() {
-  if (heatmapStore.getSelectedAbsRel === AbsRelLogEnum.REL) {
+  if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.REL) {
     return 1
-  } else if (heatmapStore.getSelectedAbsRel === AbsRelLogEnum.LOG) {
+  } else if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.LOG) {
     return Math.log(heatmapStore.getHeatmapMaxValue + 1)
-  } else if (heatmapStore.getSelectedAbsRel === AbsRelLogEnum.ABS) {
+  } else if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.ABS) {
     return heatmapStore.getHeatmapMaxValue
   }
   return heatmapStore.getHeatmapMaxValue
@@ -177,21 +176,21 @@ function drawEverything() {
     const heatmapMaxValue = getHeatmapColorMaxValue()
     visibleRows.value.forEach((row, rowIndex) => {
       let maxRowValue = 1
-      if (heatmapStore.getSelectedAbsRel === AbsRelLogEnum.REL) {
+      if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.REL) {
         maxRowValue = Math.max(...row.data)
       }
       row.data.forEach((value, colIndex) => {
         let adjustedValue = value
-        if (heatmapStore.getSelectedAbsRel === AbsRelLogEnum.REL) {
+        if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.REL) {
           adjustedValue = value / maxRowValue
-        } else if (heatmapStore.getSelectedAbsRel === AbsRelLogEnum.LOG) {
+        } else if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.LOG) {
           adjustedValue = Math.log(value + 1)
         }
 
         let x = colIndex * cellWidth.value
         let y = rowIndex * cellHeight.value
 
-        if (colIndex >= heatmapStore.getStickyAttributes.length) {
+        if (colIndex >= heatmapStore.getAmountOfStickyAttributes) {
           x += stickyAttributesGap.value
         }
         if (rowIndex >= heatmapStore.getAmountOfStickyItems) {
@@ -237,7 +236,7 @@ function clickCanvas(e: MouseEvent, leftClick: boolean) {
   let y = e.clientY - rect.top - BORDER_WIDTH
 
   if (heatmapStore.isStickyAttributesGapVisible) {
-    const startX = heatmapStore.getStickyAttributes.length * cellWidth.value
+    const startX = heatmapStore.getAmountOfStickyAttributes * cellWidth.value
     const endX = startX + stickyAttributesGap.value
     if (x >= startX && x <= endX) {
       return
@@ -299,7 +298,7 @@ function updateTooltip(e: MouseEvent) {
   let incorporateStickyItemsGap = false
 
   if (heatmapStore.isStickyAttributesGapVisible) {
-    const startX = heatmapStore.getStickyAttributes.length * cellWidth.value
+    const startX = heatmapStore.getAmountOfStickyAttributes * cellWidth.value
     const endX = startX + stickyAttributesGap.value
     if (x >= startX && x <= endX) {
       resetHoverStyles(true)
@@ -412,14 +411,6 @@ function updateHeatmap() {
   })
 
   drawEverything()
-}
-
-function toggleOpenRow(row: ItemNameAndData) {
-  if (!row.children) {
-    heatmapStore.toggleStickyItem(row)
-  } else {
-    heatmapStore.toggleOpenRow(row)
-  }
 }
 
 function syncScroll(event: Event) {
@@ -537,7 +528,6 @@ onMounted(async () => {
             :depth="1"
             :edition-index="index"
             :row-labels-width="ROW_LABELS_WIDTH"
-            @toggle-open="toggleOpenRow"
             :edition-count="editionNames.length"
             :sticky-items-gap-size="stickyItemsGap"
             :y-start-heatmap="canvas ? canvas.getBoundingClientRect().top : 0"

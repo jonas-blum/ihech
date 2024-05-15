@@ -17,8 +17,6 @@ const props = defineProps<{
   editionCount?: number
 }>()
 
-const emits = defineEmits<{ (e: 'toggleOpen', row: ItemNameAndData): void }>()
-
 const tooltipVisible = ref(false)
 const tooltipContent = ref('')
 const tooltipX = ref(0)
@@ -31,10 +29,6 @@ const marginTop = ref(0)
 const rowTextElement = ref<HTMLElement | null>(null)
 
 const buttonSize = computed(() => props.cellHeight - props.gapHeight + 'px')
-
-const toggleOpen = () => {
-  emits('toggleOpen', props.row)
-}
 
 const rightClickButton = (e: MouseEvent) => {
   e.preventDefault()
@@ -126,6 +120,10 @@ function updateIsRowHighlighted() {
   }
 }
 
+function toggleOpen() {
+  heatmapStore.toggleOpenRow(props.row)
+}
+
 const heatmapStore = useHeatmapStore()
 
 watch(
@@ -189,7 +187,11 @@ watch(
           @click="heatmapStore.toggleStickyItem(props.row)"
           v-if="!props.row.children"
         >
-          {{ heatmapStore.getStickyItems.includes(props.row) ? '-' : '+' }}
+          {{
+            heatmapStore?.getActiveDataTable?.stickyItemIndexes.includes(props.row.index)
+              ? '-'
+              : '+'
+          }}
         </button>
 
         <div
@@ -224,7 +226,6 @@ watch(
         :row-labels-width="props.rowLabelsWidth"
         :sticky-items-gap-size="props.stickyItemsGapSize"
         :y-start-heatmap="props.yStartHeatmap"
-        @toggle-open="($event) => emits('toggleOpen', $event)"
       />
     </div>
 

@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import type { CsvDataTable } from '@/helpers/helpers'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { ref, watch } from 'vue'
 import * as dataForge from 'data-forge'
+import {
+  AbsRelLogEnum,
+  DimReductionAlgoEnum,
+  SortOrderAttributes,
+  type CsvDataTableProfile
+} from '@/helpers/helpers'
 
 const heatmapStore = useHeatmapStore()
 
@@ -12,13 +17,13 @@ const hierarchyLayers: ('None' | number)[] = ['None', 1, 2, 3, 4]
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
-const temporaryDataTable = ref<CsvDataTable | null>(null)
+const temporaryDataTable = ref<CsvDataTableProfile | null>(null)
 
 function toggleAccordion() {
   isOpen.value = !isOpen.value
 }
 
-function selectDataTable(dataTable: CsvDataTable) {
+function selectDataTable(dataTable: CsvDataTableProfile) {
   heatmapStore.setActiveDataTable(dataTable)
 }
 function triggerFileInput() {
@@ -62,17 +67,39 @@ function uploadCsvFile(event: Event) {
 
     const selectedItemNameColumn = naNColumns.length > 0 ? naNColumns[0] : nonNanColumns[0]
 
-    const newDataTable: CsvDataTable = {
+    const newDataTable: CsvDataTableProfile = {
       tableName: fileNameNoExtension,
       df: df,
-      csvFile: csvFile,
+
       nanColumns: naNColumns,
       nonNanColumns: nonNanColumns,
-      selectedAttributes: nonNanColumns,
-      selectedItemIndexes: df.getIndex().toArray(),
-      selectedItemNameColumn: selectedItemNameColumn,
+
+      collectionColorMap: {},
+
+      showOnlyStickyItemsInDimReduction: false,
+
+      csvFile: csvFile,
+
+      itemNamesColumnName: selectedItemNameColumn,
       collectionColumnNames: [],
-      collectionColorMap: {}
+
+      selectedItemIndexes: df.getIndex().toArray(),
+      selectedAttributes: nonNanColumns,
+
+      stickyAttributes: [],
+      sortAttributesBasedOnStickyItems: false,
+      sortOrderAttributes: SortOrderAttributes.STDEV,
+
+      stickyItemIndexes: [],
+      clusterItemsBasedOnStickyAttributes: false,
+
+      clusterByCollections: false,
+
+      clusterSize: 6,
+      dimReductionAlgo: DimReductionAlgoEnum.PCA,
+      clusterAfterDimRed: false,
+
+      absRelLog: AbsRelLogEnum.LOG
     }
     console.log(newDataTable)
     temporaryDataTable.value = newDataTable
@@ -139,7 +166,7 @@ function updateItemNamesColumn(columName: string) {
   if (temporaryDataTable.value === null) {
     return
   }
-  temporaryDataTable.value.selectedItemNameColumn = columName
+  temporaryDataTable.value.itemNamesColumnName = columName
 }
 
 function discardChanges() {
@@ -153,14 +180,39 @@ function setActiveTableAsTemporary() {
     temporaryDataTable.value = {
       tableName: heatmapStore.getActiveDataTable.tableName,
       df: heatmapStore.getActiveDataTable.df,
-      csvFile: heatmapStore.getActiveDataTable.csvFile,
+
       nanColumns: [...heatmapStore.getActiveDataTable.nanColumns],
       nonNanColumns: [...heatmapStore.getActiveDataTable.nonNanColumns],
-      selectedAttributes: [...heatmapStore.getActiveDataTable.selectedAttributes],
-      selectedItemIndexes: [...heatmapStore.getActiveDataTable.selectedItemIndexes],
-      selectedItemNameColumn: heatmapStore.getActiveDataTable.selectedItemNameColumn,
+
+      collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap },
+
+      showOnlyStickyItemsInDimReduction:
+        heatmapStore.getActiveDataTable.showOnlyStickyItemsInDimReduction,
+
+      csvFile: heatmapStore.getActiveDataTable.csvFile,
+
+      itemNamesColumnName: heatmapStore.getActiveDataTable.itemNamesColumnName,
       collectionColumnNames: [...heatmapStore.getActiveDataTable.collectionColumnNames],
-      collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap }
+
+      selectedItemIndexes: [...heatmapStore.getActiveDataTable.selectedItemIndexes],
+      selectedAttributes: [...heatmapStore.getActiveDataTable.selectedAttributes],
+
+      stickyAttributes: [...heatmapStore.getActiveDataTable.stickyAttributes],
+      sortAttributesBasedOnStickyItems:
+        heatmapStore.getActiveDataTable.sortAttributesBasedOnStickyItems,
+      sortOrderAttributes: heatmapStore.getActiveDataTable.sortOrderAttributes,
+
+      stickyItemIndexes: [...heatmapStore.getActiveDataTable.stickyItemIndexes],
+      clusterItemsBasedOnStickyAttributes:
+        heatmapStore.getActiveDataTable.clusterItemsBasedOnStickyAttributes,
+
+      clusterByCollections: heatmapStore.getActiveDataTable.clusterByCollections,
+
+      clusterSize: heatmapStore.getActiveDataTable.clusterSize,
+      dimReductionAlgo: heatmapStore.getActiveDataTable.dimReductionAlgo,
+      clusterAfterDimRed: heatmapStore.getActiveDataTable.clusterAfterDimRed,
+
+      absRelLog: heatmapStore.getActiveDataTable.absRelLog
     }
   }
 }
@@ -235,7 +287,7 @@ watch(
                   @click.stop="updateItemNamesColumn(columnName)"
                   type="checkbox"
                   class="toggle"
-                  :checked="temporaryDataTable?.selectedItemNameColumn === columnName"
+                  :checked="temporaryDataTable?.itemNamesColumnName === columnName"
                 />
                 <select
                   @change="updateHierarchyLayer($event, columnName)"

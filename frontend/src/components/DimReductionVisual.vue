@@ -23,7 +23,10 @@ function getVisibleRowsRecursively(row: ItemNameAndData): ItemNameAndData[] {
 }
 
 function getAllVisibleRows(): ItemNameAndData[] {
-  if (heatmapStore.isOnlyStickyItemsShownInDimReduction && heatmapStore.getStickyItems.length > 2) {
+  if (
+    heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction &&
+    heatmapStore.getAmountOfStickyItems > 2
+  ) {
     return heatmapStore.getStickyItems
   }
   return (
@@ -147,7 +150,10 @@ function drawScatterplot() {
   let minY = heatmapStore.getDimRedMinYValue
   let maxY = heatmapStore.getDimRedMaxYValue
 
-  if (heatmapStore.isOnlyStickyItemsShownInDimReduction && heatmapStore.getStickyItems.length > 2) {
+  if (
+    heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction &&
+    heatmapStore.getStickyItems.length > 2
+  ) {
     minX = getMaxMinStickyItems(false, true)
     maxX = getMaxMinStickyItems(true, true)
     minY = getMaxMinStickyItems(false, false)

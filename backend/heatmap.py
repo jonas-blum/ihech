@@ -67,7 +67,6 @@ def sort_attributes(
 
 def filter_items(original_df: pd.DataFrame, settings: HeatmapSettings) -> pd.DataFrame:
     original_df = original_df.reindex(settings.selectedItemIndexes).dropna(axis=0)
-    original_df = original_df.loc[:, (original_df != 0).any(axis=0)]
     return original_df
 
 
@@ -85,13 +84,11 @@ def filter_attributes(
         settings.collectionColumnNames,
     )
     if len(valid_columns) == 1:
-        original_df = original_df[valid_columns]
         transformed_df = transformed_df[valid_columns]
         transformed_df["null_col"] = 1
         original_df["null_col"] = 1
         original_df = pd.concat([extracted_columns, original_df], axis=1)
     elif len(valid_columns) >= 2:
-        original_df = original_df[valid_columns]
         transformed_df = transformed_df[valid_columns]
         original_df = pd.concat([extracted_columns, original_df], axis=1)
     else:
@@ -121,9 +118,11 @@ def create_heatmap(
     original_df: pd.DataFrame,
     settings: HeatmapSettings,
 ) -> str:
+
     original_filtered_df = filter_items(original_df, settings)
     
     transformed_filtered_df = drop_columns(original_filtered_df, settings.itemNamesColumnName, settings.collectionColumnNames)
+    
     original_filtered_df, transformed_filtered_df = filter_attributes(
         original_filtered_df, transformed_filtered_df, settings
     )

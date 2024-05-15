@@ -2,10 +2,13 @@ import time
 from typing import List, Union
 import pandas as pd
 from sklearn.cluster import KMeans
-
+from sklearn.exceptions import ConvergenceWarning
 from helpers import drop_columns
 from heatmap_types import ItemNameAndData
+import warnings
 
+
+warnings.simplefilter("ignore", ConvergenceWarning)
 
 def all_rows_same(df):
     return (df == df.iloc[0]).all().all()

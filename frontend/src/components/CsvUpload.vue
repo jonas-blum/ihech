@@ -25,6 +25,7 @@ function toggleAccordion() {
 
 function selectDataTable(dataTable: CsvDataTableProfile) {
   heatmapStore.setActiveDataTable(dataTable)
+  heatmapStore.fetchHeatmap()
 }
 function triggerFileInput() {
   fileInput.value?.click()

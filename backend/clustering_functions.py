@@ -1,3 +1,4 @@
+import logging
 import time
 from typing import List, Union
 import pandas as pd
@@ -9,6 +10,9 @@ import warnings
 
 
 warnings.simplefilter("ignore", ConvergenceWarning)
+
+logger = logging.getLogger("IHECH Logger")
+
 
 def all_rows_same(df):
     return (df == df.iloc[0]).all().all()
@@ -30,7 +34,6 @@ def cluster_items_recursively(
     )
 
     is_open = False
- 
 
     if cluster_by_collections and len(collection_column_names) > 0:
         new_item_names_and_data: List[ItemNameAndData] = []
@@ -39,8 +42,6 @@ def cluster_items_recursively(
             collection_column_name
         ):
             remaining_collection_column_names = collection_column_names[1:]
-            
-
 
             transformed_temp_df = transformed_df.loc[original_group_df.index]
             dim_red_temp_df = dim_red_df.loc[original_group_df.index]
@@ -51,20 +52,33 @@ def cluster_items_recursively(
 
             dim_reduction_aggregated = dim_red_temp_df.mean().tolist()
             new_item_name = str(collection) + " " + str(original_group_df.shape[0])
-            
-            if original_group_df.shape[0] == 1 and len(remaining_collection_column_names) == 0:
+
+            if (
+                original_group_df.shape[0] == 1
+                and len(remaining_collection_column_names) == 0
+            ):
                 solo_child_name = str(original_group_df.iloc[0][item_names_column_name])
-                solo_child_data = original_group_df.drop(collection_column_name, axis=1).iloc[0].tolist()
-                new_children = [ItemNameAndData(
-                    index = original_group_df.index[0],
-                    itemName=solo_child_name,
-                    isOpen=is_open,
-                    data=solo_child_data,
-                    amountOfDataPoints=1,
-                    dimReductionX=dim_red_df.loc[original_group_df.index].iloc[0][0],
-                    dimReductionY=dim_red_df.loc[original_group_df.index].iloc[0][1],
-                    children=None,
-                )]
+                solo_child_data = (
+                    original_group_df.drop(collection_column_name, axis=1)
+                    .iloc[0]
+                    .tolist()
+                )
+                new_children = [
+                    ItemNameAndData(
+                        index=original_group_df.index[0],
+                        itemName=solo_child_name,
+                        isOpen=is_open,
+                        data=solo_child_data,
+                        amountOfDataPoints=1,
+                        dimReductionX=dim_red_df.loc[original_group_df.index].iloc[0][
+                            0
+                        ],
+                        dimReductionY=dim_red_df.loc[original_group_df.index].iloc[0][
+                            1
+                        ],
+                        children=None,
+                    )
+                ]
             else:
                 new_children = cluster_items_recursively(
                     original_temp_df,
@@ -104,7 +118,7 @@ def cluster_items_recursively(
             new_item_name = str(original_df.iloc[i][item_names_column_name])
 
             new_item_name_and_data = ItemNameAndData(
-                index = original_df.index[i],
+                index=original_df.index[i],
                 itemName=new_item_name,
                 isOpen=is_open,
                 data=original_df_dropped.iloc[i].tolist(),
@@ -135,7 +149,6 @@ def cluster_items_recursively(
             original_cluster_df_dropped = original_df_dropped.loc[
                 original_cluster_df.index
             ]
-            # print(original_cluster_df_dropped.head())
 
             dim_red_cluster_df = dim_red_df.loc[original_cluster_df.index]
 
@@ -143,14 +156,13 @@ def cluster_items_recursively(
                 original_cluster_df.shape[0] <= 0
                 or original_cluster_df.shape[0] == original_df.shape[0]
             ):
-                print("Skipping cluster with 0 or all documents")
                 continue
 
             if original_cluster_df.shape[0] == 1:
                 new_item_name = str(original_cluster_df.iloc[0][item_names_column_name])
                 new_data = original_cluster_df_dropped.iloc[0].tolist()
                 new_item_name_and_data = ItemNameAndData(
-                    index = original_cluster_df.index[0],
+                    index=original_cluster_df.index[0],
                     itemName=new_item_name,
                     isOpen=is_open,
                     data=new_data,
@@ -178,7 +190,7 @@ def cluster_items_recursively(
             )
 
             new_aggregated_item_name_and_data = ItemNameAndData(
-                index = None,
+                index=None,
                 itemName=new_item_name,
                 isOpen=is_open,
                 data=tag_data_aggregated,

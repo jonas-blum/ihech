@@ -32,18 +32,6 @@ function triggerFileInput() {
   isOpen.value = true
 }
 
-function getNanColumns(df: dataForge.IDataFrame): string[] {
-  const typeFrequencies = df.detectTypes().bake()
-
-  const nanTypeColumns = typeFrequencies.where((row) => row.Type !== 'number' && row.Frequency > 0)
-  const columnsWithNaN = nanTypeColumns
-    .distinct((row) => row.Column)
-    .select((row) => row.Column)
-    .toArray()
-
-  return columnsWithNaN
-}
-
 function uploadCsvFile(event: Event) {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
@@ -52,7 +40,7 @@ function uploadCsvFile(event: Event) {
   reader.onload = (e) => {
     const contents = e.target?.result as string
     const df: dataForge.IDataFrame = dataForge
-      .fromCSV(contents, { dynamicTyping: true, skipEmptyLines: true })
+      .fromCSV(contents, { skipEmptyLines: true })
       .resetIndex()
       .bake()
 
@@ -62,20 +50,12 @@ function uploadCsvFile(event: Event) {
       fileNameNoExtension += '_1'
     }
 
-    const naNColumns = getNanColumns(df)
-    console.log(naNColumns)
-    const nonNanColumns = df
-      .getColumnNames()
-      .filter((columnName) => !naNColumns.includes(columnName))
-
-    const selectedItemNameColumn = naNColumns.length > 0 ? naNColumns[0] : nonNanColumns[0]
-
     const newDataTable: CsvDataTableProfile = {
       tableName: fileNameNoExtension,
       df: df,
 
-      nanColumns: naNColumns,
-      nonNanColumns: nonNanColumns,
+      nanColumns: [],
+      nonNanColumns: [],
 
       collectionColorMap: {},
 
@@ -83,11 +63,11 @@ function uploadCsvFile(event: Event) {
 
       csvFile: csvFile,
 
-      itemNamesColumnName: selectedItemNameColumn,
+      itemNamesColumnName: df.getColumnNames()[0],
       collectionColumnNames: [],
 
       selectedItemIndexes: df.getIndex().toArray(),
-      selectedAttributes: nonNanColumns,
+      selectedAttributes: df.getColumnNames(),
 
       stickyAttributes: [],
       sortAttributesBasedOnStickyItems: false,
@@ -149,6 +129,10 @@ function updateHierarchyLayer(event: Event, columnName: string) {
   if (temporaryDataTable.value === null) {
     return
   }
+
+  temporaryDataTable.value.selectedAttributes = temporaryDataTable.value.selectedAttributes.filter(
+    (attr) => attr !== columnName
+  )
 
   if (selectedHierarchyLayer === 'None') {
     //Remove the column name from the collectionColumnNames array
@@ -306,7 +290,6 @@ watch(
                   @change="updateHierarchyLayer($event, columnName)"
                   @click.stop
                   class="select select-primary max-w-xs"
-                  :disabled="temporaryDataTable?.selectedAttributes.includes(columnName)"
                 >
                   <option
                     :selected="getColumnCollectionHierarchy(columnName) === hierarchyLayer"
@@ -320,10 +303,10 @@ watch(
                   {{ columnName }}
                 </div>
                 <input
-                  :disabled="temporaryDataTable?.nanColumns.includes(columnName)"
                   @click.stop="toggleAttribute(columnName)"
                   type="checkbox"
                   :checked="temporaryDataTable?.selectedAttributes.includes(columnName)"
+                  :disabled="temporaryDataTable?.collectionColumnNames.includes(columnName)"
                 />
               </div>
             </th>

@@ -1,4 +1,14 @@
-from typing import Tuple, List
+from numba.core.errors import NumbaDeprecationWarning
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    category=NumbaDeprecationWarning,
+)
+
+import logging
+from typing import Tuple
+
 import numpy as np
 import pandas as pd
 import time
@@ -7,12 +17,11 @@ from sklearn.discriminant_analysis import StandardScaler
 from sklearn.manifold import TSNE
 from umap import UMAP
 from helpers import drop_columns, extract_columns
-from heatmap_types import HeatmapJSON, HeatmapSettings, ItemNameAndData
+from heatmap_types import HeatmapJSON, HeatmapSettings
 from clustering_functions import cluster_items_recursively
 
-import warnings
 
-warnings.filterwarnings("ignore", message=".*The 'nopython' keyword.*")
+logger = logging.getLogger("IHECH Logger")
 
 
 def sort_attributes(
@@ -22,13 +31,18 @@ def sort_attributes(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     transformed_df_to_sort = transformed_df
 
-    additional_columns = list(set([
-        settings.itemNamesColumnName,
-    ] + settings.collectionColumnNames))
+    additional_columns = list(
+        set(
+            [
+                settings.itemNamesColumnName,
+            ]
+            + settings.collectionColumnNames
+        )
+    )
 
     if settings.sortAttributesBasedOnStickyItems:
         sticky_df = transformed_df.loc[settings.stickyItemIndexes]
-        if sticky_df.shape[0] > 0:
+        if not sticky_df.empty:
             transformed_df_to_sort = sticky_df
     if settings.sortOrderAttributes == "ASC":
         column_means = transformed_df_to_sort.mean()
@@ -65,54 +79,51 @@ def sort_attributes(
     return original_df, transformed_df
 
 
-def filter_items(original_df: pd.DataFrame, settings: HeatmapSettings) -> pd.DataFrame:
-    original_df = original_df.reindex(settings.selectedItemIndexes).dropna(axis=0)
-    return original_df
-
-
-def filter_attributes(
-    original_df: pd.DataFrame, transformed_df: pd.DataFrame, settings: HeatmapSettings
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
-
-    valid_columns = [
-        col for col in settings.selectedAttributes if col in original_df.columns
-    ]
+def filter_attributes_and_items(
+    original_df: pd.DataFrame, settings: HeatmapSettings
+) -> pd.DataFrame:
 
     extracted_columns = extract_columns(
         original_df,
         settings.itemNamesColumnName,
         settings.collectionColumnNames,
     )
-    if len(valid_columns) == 1:
-        original_df = original_df[valid_columns]
-        transformed_df = transformed_df[valid_columns]
-        transformed_df["null_col"] = 1
-        original_df["null_col"] = 1
-        original_df = pd.concat([extracted_columns, original_df], axis=1)
-    elif len(valid_columns) >= 2:
-        original_df = original_df[valid_columns]
-        transformed_df = transformed_df[valid_columns]
-        original_df = pd.concat([extracted_columns, original_df], axis=1)
-    else:
-        print("Not enough attributes")
 
-    return original_df, transformed_df
+    valid_columns = [
+        col for col in settings.selectedAttributes if col in original_df.columns
+    ]
+
+    original_df = original_df[valid_columns]
+
+    original_df = original_df.select_dtypes(include=[np.number])
+    original_df = original_df.dropna(axis=1, how="all")
+
+    medians = original_df.median()
+    original_df = original_df.fillna(medians)
+
+    if original_df.empty:
+        raise ValueError("No attributes left after filtering")
+
+    original_df = pd.concat([extracted_columns, original_df], axis=1)
+    return original_df
 
 
 def set_abs_rel_log(
-     transformed_df: pd.DataFrame, settings: HeatmapSettings
+    transformed_df: pd.DataFrame, settings: HeatmapSettings
 ) -> pd.DataFrame:
 
-    
-    if settings.absRelLog == "REL":
-        row_maxes = transformed_df.max(axis=1)
-        transformed_df = transformed_df.div(row_maxes, axis=0)
-    elif settings.absRelLog == "LOG":
-        transformed_df = np.log(transformed_df + 1)
-    elif settings.absRelLog == "ABS":
-        pass
-    else:
-        raise ValueError("Invalid absRelLog value")
+    # TODO: Implement this
+    # if settings.absRelLog == "REL":
+    #     row_maxes = transformed_df.max(axis=1)
+    #     row_maxes = row_maxes.replace(0, 1)
+    #     transformed_df = transformed_df.div(row_maxes, axis=0)
+    # elif settings.absRelLog == "LOG":
+    #     transformed_df = np.log(transformed_df + 1)
+    # elif settings.absRelLog == "ABS":
+    #     pass
+    # else:
+    #     raise ValueError("Invalid absRelLog value")
+
     return transformed_df
 
 
@@ -120,24 +131,21 @@ def create_heatmap(
     original_df: pd.DataFrame,
     settings: HeatmapSettings,
 ) -> str:
-    
-    
+    start = time.perf_counter()
 
-    original_filtered_df = filter_items(original_df, settings)
-    
-    transformed_filtered_df = drop_columns(original_filtered_df, settings.itemNamesColumnName, settings.collectionColumnNames)
-    
-    original_filtered_df, transformed_filtered_df = filter_attributes(
-        original_filtered_df, transformed_filtered_df, settings
+    original_filtered_df = filter_attributes_and_items(original_df, settings)
+
+    transformed_filtered_df = drop_columns(
+        original_filtered_df,
+        settings.itemNamesColumnName,
+        settings.collectionColumnNames,
     )
 
     transformed_filtered_df = set_abs_rel_log(transformed_filtered_df, settings)
-    
+
     original_filtered_df, transformed_filtered_df = sort_attributes(
         original_filtered_df, transformed_filtered_df, settings
     )
-    
-    
 
     if settings.clusterItemsBasedOnStickyAttributes:
         sticky_columns = [
@@ -145,13 +153,23 @@ def create_heatmap(
             for col in settings.stickyAttributes
             if col in transformed_filtered_df.columns
         ]
-        if len(sticky_columns) == 1:
-            transformed_filtered_df = transformed_filtered_df[sticky_columns]
-            transformed_filtered_df["null_col"] = 1
-        elif len(sticky_columns) >= 2:
-            transformed_filtered_df = transformed_filtered_df[sticky_columns]
+        transformed_filtered_sticky_df = transformed_filtered_df[sticky_columns]
+        if not transformed_filtered_df.empty:
+            transformed_filtered_df = transformed_filtered_sticky_df
         else:
-            print("Not enough sticky attributes to cluster, need at least 2")
+            logger.warning("No sticky attributes found in cleaned dataframe")
+
+    logger.info(f"Filtering and sorting done: {round(time.perf_counter() - start, 3)}")
+    logger.info(
+        "Number of attributes selected: " + str(len(settings.selectedAttributes))
+    )
+    logger.info(
+        "Number of attributes after filtering: "
+        + str(original_filtered_df.shape[1] - len(settings.collectionColumnNames) - 1)
+    )
+    logger.info("Number of items: " + str(original_filtered_df.shape[0]))
+    logger.info("Starting dim reduction...")
+    start = time.perf_counter()
 
     if settings.dimReductionAlgo == "UMAP":
         dim_reduction = UMAP(n_components=2, random_state=42)
@@ -162,6 +180,9 @@ def create_heatmap(
     else:
         raise ValueError("Invalid dim reduction algorithm")
     scaler = StandardScaler()
+
+    if transformed_filtered_df.shape[1] == 1:
+        transformed_filtered_df["null_col"] = 1
 
     transformed_filtered_dim_red_df = scaler.fit_transform(transformed_filtered_df)
     transformed_filtered_dim_red_df = dim_reduction.fit_transform(
@@ -189,16 +210,13 @@ def create_heatmap(
         max_dissimilarity - min_dissimilarity
     )
 
-    if "null_col" in original_filtered_df.columns:
-        original_filtered_df = original_filtered_df.drop("null_col", axis=1)
+    if "null_col" in transformed_filtered_df.columns:
+        transformed_filtered_df = transformed_filtered_df.drop("null_col", axis=1)
 
     if "null_col" in transformed_filtered_dim_red_df.columns:
         transformed_filtered_dim_red_df = transformed_filtered_dim_red_df.drop(
             "null_col", axis=1
         )
-
-    if "null_col" in transformed_filtered_df.columns:
-        transformed_filtered_df = transformed_filtered_df.drop("null_col", axis=1)
 
     if settings.clusterAfterDimRed:
         clustering_transformed_df = transformed_filtered_dim_red_df
@@ -234,7 +252,9 @@ def create_heatmap(
         )
         filtered_collection_column_names = []
 
-    
+    logger.info(f"Dim reduction done: {round(time.perf_counter() - start,3 )}")
+    logger.info("Starting clustering...")
+
     item_names_and_data = cluster_items_recursively(
         original_filtered_df,
         clustering_transformed_df,
@@ -245,13 +265,18 @@ def create_heatmap(
         filtered_collection_column_names,
         level=0,
     )
-    
+
     if item_names_and_data is None:
         raise Exception("No items in cluster")
 
     heatmap_json.itemNamesAndData = item_names_and_data
 
+    logger.info(f"Clustering done: {round(time.perf_counter() - start, 3)}")
+    logger.info("Starting to generate json...")
     start = time.perf_counter()
+
     heatmap_json_str = heatmap_json.generate_json()
-    print(f"Time to generate json: {time.perf_counter() - start}")
+
+    logger.info(f"Generating JSON Done: {round(time.perf_counter() - start, 3)}")
+
     return heatmap_json_str

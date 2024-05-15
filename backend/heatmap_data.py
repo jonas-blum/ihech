@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import time
 from heatmap_types import HeatmapSettings
@@ -14,7 +15,9 @@ from heatmap_types import (
     StructuralFeatureType,
 )
 from sklearn.exceptions import ConvergenceWarning
-from scipy.spatial.distance import pdist, squareform
+
+
+logger = logging.getLogger("IHECH Logger")
 
 
 AGGREGATION_COLUMN = "aggregation_column"
@@ -147,7 +150,7 @@ def do_aggregation_of_df(
     extended_vectors_df: pd.DataFrame,
     type: StructuralFeatureType,
     median_max_min: MedianMaxMinType,
-) ->pd.DataFrame:
+) -> pd.DataFrame:
     grouped_df = extended_vectors_df.groupby(["tag", "document_id"])
     aggregated_df = do_aggregation_based_on_structural_feature_type(
         grouped_df, type, median_max_min
@@ -167,15 +170,15 @@ def do_aggregation_of_df(
 class HeatmapData:
     def __init__(self):
         start = time.perf_counter()
-        print("Loading Heatmap Data...")
+        logger.info("Loading Heatmap Data...")
 
         self.vectors_df = pd.read_csv(EXTENDED_VECTORS)
 
         tei_elements = pd.read_csv("../data/tei_elements.csv")
         self.unique_elements = tei_elements["element"].unique()
 
-        print(f"Time to load data: {time.perf_counter() - start}")
-        print("\n -------- \nHEATMAP DATA IS READY\n -------- \n")
+        logger.info(f"Time to load data: {time.perf_counter() - start}")
+        logger.info("\n -------- \nHEATMAP DATA IS READY\n -------- \n")
 
     def create_data_frame_csv(self, settings: HeatmapSettings) -> pd.DataFrame:
         filtered_df = self.vectors_df[

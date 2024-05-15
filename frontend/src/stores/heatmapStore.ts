@@ -124,12 +124,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         const startTime = new Date().getTime()
         const settings: HeatmapSettings = this.getCurrentHeatmapSettings()
         console.log('settings', settings)
+
         const requestInit: RequestInit = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ settings })
         }
 
+        console.log(import.meta.env.VITE_API_URL)
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, requestInit)
 
         const receivedHeatmap: HeatmapJSON = await response.json()

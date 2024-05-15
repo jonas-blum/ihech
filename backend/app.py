@@ -6,9 +6,27 @@ from heatmap_types import HeatmapSettings
 from flask import Flask, request
 from flask_cors import CORS
 from io import StringIO
+import logging
 
 app = Flask(__name__)
 CORS(app)
+
+logger = logging.getLogger("IHECH Logger")
+logger.setLevel(logging.DEBUG)
+
+
+file_handler = logging.FileHandler("ihech.log")
+file_handler.setLevel(logging.DEBUG)
+file_formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+)
+file_handler.setFormatter(file_formatter)
+logger.addHandler(file_handler)
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.DEBUG)
+console_handler.setFormatter(file_formatter)
+logger.addHandler(console_handler)
 
 
 @app.route("/")
@@ -18,19 +36,26 @@ def index():
 
 @app.route("/api/heatmap", methods=["POST"])
 def get_heatmap():
-    print("Starting to build heatmap...")
+    logger.info("Starting to build heatmap...")
+    start = time.perf_counter()
 
     heatmap_settings = HeatmapSettings(request.json["settings"])
     csv_file = StringIO(heatmap_settings.csvFile)
     original_df = pd.read_csv(csv_file)
-    
+
     if heatmap_settings.itemNamesColumnName in heatmap_settings.selectedAttributes:
         new_item_names_column_name = heatmap_settings.itemNamesColumnName + "_copy"
-        original_df[new_item_names_column_name] = original_df[heatmap_settings.itemNamesColumnName]
+        original_df[new_item_names_column_name] = original_df[
+            heatmap_settings.itemNamesColumnName
+        ]
         heatmap_settings.itemNamesColumnName = new_item_names_column_name
 
-    start = time.perf_counter()
+    logger.info(f"Finished reading csv file: {round(time.perf_counter() - start, 3)}")
+    logger.info("Starting Filtering...")
+
     return_string = create_heatmap(original_df, heatmap_settings)
-    print(f"Time to generate entire heatmap: {time.perf_counter() - start}\n")
-    
+    logger.info(
+        f"Time to generate entire heatmap: {round(time.perf_counter() - start,3 )}\n"
+    )
+
     return return_string

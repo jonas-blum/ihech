@@ -17,6 +17,8 @@ backend/projectenv
 .env
 .pyc
 
+**/*.log
+
 
 
 # exclude flask stuff

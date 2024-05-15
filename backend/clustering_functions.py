@@ -45,7 +45,7 @@ def cluster_items_recursively(
             tag_data_aggregated = original_temp_df_dropped.mean().tolist()
 
             dim_reduction_aggregated = dim_red_temp_df.mean().tolist()
-            new_item_name = collection + " " + str(original_group_df.shape[0])
+            new_item_name = str(collection) + " " + str(original_group_df.shape[0])
 
             new_children = cluster_items_recursively(
                 original_temp_df,
@@ -59,6 +59,7 @@ def cluster_items_recursively(
             )
 
             new_item_name_and_data = ItemNameAndData(
+                index=None,
                 itemName=new_item_name,
                 isOpen=is_open,
                 data=tag_data_aggregated,
@@ -84,6 +85,7 @@ def cluster_items_recursively(
             new_item_name = str(original_df.iloc[i][item_names_column_name])
 
             new_item_name_and_data = ItemNameAndData(
+                index = original_df.index[i],
                 itemName=new_item_name,
                 isOpen=is_open,
                 data=original_df_dropped.iloc[i].tolist(),
@@ -129,6 +131,7 @@ def cluster_items_recursively(
                 new_item_name = str(original_cluster_df.iloc[0][item_names_column_name])
                 new_data = original_cluster_df_dropped.iloc[0].tolist()
                 new_item_name_and_data = ItemNameAndData(
+                    index = original_cluster_df.index[0],
                     itemName=new_item_name,
                     isOpen=is_open,
                     data=new_data,
@@ -156,6 +159,7 @@ def cluster_items_recursively(
             )
 
             new_aggregated_item_name_and_data = ItemNameAndData(
+                index = None,
                 itemName=new_item_name,
                 isOpen=is_open,
                 data=tag_data_aggregated,

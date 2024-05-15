@@ -19,8 +19,8 @@ from scipy.spatial.distance import pdist, squareform
 
 AGGREGATION_COLUMN = "aggregation_column"
 
-
-# EXTENDED_VECTORS = "../data/extended_vectors.csv"
+# Is not here anymore
+EXTENDED_VECTORS = "../data/extended_vectors.csv"
 
 
 warnings.simplefilter("ignore", ConvergenceWarning)
@@ -147,7 +147,7 @@ def do_aggregation_of_df(
     extended_vectors_df: pd.DataFrame,
     type: StructuralFeatureType,
     median_max_min: MedianMaxMinType,
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) ->pd.DataFrame:
     grouped_df = extended_vectors_df.groupby(["tag", "document_id"])
     aggregated_df = do_aggregation_based_on_structural_feature_type(
         grouped_df, type, median_max_min
@@ -179,13 +179,13 @@ class HeatmapData:
 
     def create_data_frame_csv(self, settings: HeatmapSettings) -> pd.DataFrame:
         filtered_df = self.vectors_df[
-            self.vectors_df["document_id"].isin(settings.selectedItemIds)
+            self.vectors_df["document_id"].isin(settings.selectedItemIndexes)
         ]
 
         original_df = do_aggregation_of_df(
             filtered_df,
-            settings.structuralFeature,
-            settings.medianMaxMin,
+            "AMOUNT_OF_TAGS",
+            "MEDIAN",
         )
 
         original_df.columns.name = None

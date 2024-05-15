@@ -27,7 +27,7 @@ def sort_attributes(
     ] + settings.collectionColumnNames
 
     if settings.sortAttributesBasedOnStickyItems:
-        sticky_df = transformed_df.loc[settings.stickyItemIds]
+        sticky_df = transformed_df.loc[settings.stickyItemIndexes]
         if sticky_df.shape[0] > 0:
             transformed_df_to_sort = sticky_df
     if settings.sortOrderAttributes == "ASC":
@@ -66,7 +66,7 @@ def sort_attributes(
 
 
 def filter_items(original_df: pd.DataFrame, settings: HeatmapSettings) -> pd.DataFrame:
-    original_df = original_df.reindex(settings.selectedItemIds).dropna(axis=0)
+    original_df = original_df.reindex(settings.selectedItemIndexes).dropna(axis=0)
     original_df = original_df.loc[:, (original_df != 0).any(axis=0)]
     return original_df
 
@@ -115,13 +115,13 @@ def create_transformed_df(
             settings.collectionColumnNames,
         ).div(row_maxes, axis=0)
     elif settings.absRelLog == "LOG":
-        transformed_df = np.log(
+        transformed_df = pd.DataFrame(np.log(
             drop_columns(
                 original_df,
                 settings.itemNamesColumnName,
                 settings.collectionColumnNames,
             )
-            + 1
+            + 1)
         )
     elif settings.absRelLog == "ABS":
         transformed_df = drop_columns(
@@ -180,7 +180,7 @@ def create_heatmap(
         transformed_filtered_dim_red_df, index=original_filtered_df.index
     )
 
-    transformed_sticky_df = transformed_filtered_df.loc[settings.stickyItemIds,]
+    transformed_sticky_df = transformed_filtered_df.loc[settings.stickyItemIndexes,]
     if (
         transformed_sticky_df.shape[0] >= 2
         and settings.sortAttributesBasedOnStickyItems
@@ -243,7 +243,7 @@ def create_heatmap(
         )
         filtered_collection_column_names = []
 
-    item_names_and_data: List[ItemNameAndData] = cluster_items_recursively(
+    item_names_and_data = cluster_items_recursively(
         original_filtered_df,
         clustering_transformed_df,
         transformed_filtered_dim_red_df,
@@ -253,6 +253,9 @@ def create_heatmap(
         filtered_collection_column_names,
         level=0,
     )
+    
+    if item_names_and_data is None:
+        raise Exception("No items in cluster")
 
     heatmap_json.itemNamesAndData = item_names_and_data
 

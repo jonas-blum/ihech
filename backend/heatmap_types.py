@@ -65,6 +65,7 @@ class ExtendedVectorRepresentation:
 
 
 class ItemNameAndData:
+    index: int | None
     itemName: str
     isOpen: bool
     data: List[float]
@@ -75,6 +76,7 @@ class ItemNameAndData:
 
     def __init__(
         self,
+        index: int | None,
         itemName: str,
         isOpen: bool,
         data: List[float],
@@ -83,6 +85,7 @@ class ItemNameAndData:
         dimReductionY: float,
         children: Union["List[ItemNameAndData]", None],
     ):
+        self.index: int | None = index
         self.itemName: str = itemName
         self.isOpen: bool = isOpen
         self.data: List[float] = data
@@ -93,7 +96,7 @@ class ItemNameAndData:
 
 
 def custom_encoder(obj):
-    if isinstance(obj, np.float32):
+    if isinstance(obj, np.float32): # type: ignore
         return float(obj)
     elif isinstance(obj, np.integer):
         return int(obj)
@@ -143,18 +146,17 @@ class HeatmapJSON:
 class HeatmapSettings:
     csvFile: str
 
-    idsColumnName: str
     itemNamesColumnName: str
     collectionColumnNames: List[str]
 
-    selectedItemIds: List[str]
+    selectedItemIndexes: List[str]
     selectedAttributes: List[str]
 
     stickyAttributes: List[str]
     sortAttributesBasedOnStickyItems: bool
     sortOrderAttributes: SortOrderAttributes
 
-    stickyItemIds: List[str]
+    stickyItemIndexes: List[str]
     clusterItemsBasedOnStickyAttributes: bool
 
     clusterByCollections: bool
@@ -165,24 +167,22 @@ class HeatmapSettings:
 
     absRelLog: AbsRelLogType
 
-    medianMaxMin: MedianMaxMinType
-    structuralFeature: StructuralFeatureType
+
 
     def __init__(self, dict):
         self.csvFile = dict["csvFile"]
 
-        self.idsColumnName = dict["idsColumnName"]
         self.itemNamesColumnName = dict["itemNamesColumnName"]
         self.collectionColumnNames = dict["collectionColumnNames"]
 
-        self.selectedItemIds = dict["selectedItemIds"]
+        self.selectedItemIndexes = dict["selectedItemIndexes"]
         self.selectedAttributes = dict["selectedAttributes"]
 
         self.stickyAttributes = dict["stickyAttributes"]
         self.sortAttributesBasedOnStickyItems = dict["sortAttributesBasedOnStickyItems"]
         self.sortOrderAttributes = dict["sortOrderAttributes"]
 
-        self.stickyItemIds = dict["stickyItemIds"]
+        self.stickyItemIndexes = dict["stickyItemIndexes"]
         self.clusterItemsBasedOnStickyAttributes = dict[
             "clusterItemsBasedOnStickyAttributes"
         ]
@@ -195,5 +195,3 @@ class HeatmapSettings:
 
         self.absRelLog = dict["absRelLog"]
 
-        self.medianMaxMin = dict["medianMaxMin"]
-        self.structuralFeature = dict["structuralFeature"]

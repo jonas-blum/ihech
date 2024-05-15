@@ -213,25 +213,29 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
             />
           </div>
         </li>
-      </ul>
-      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-        <li>
-          <ul class="menu menu-vertical bg-base-200">
-            <li
-              :key="absRel"
-              :style="{ border: 'none' }"
-              v-for="absRel in Object.values(AbsRelLogEnum)"
-            >
-              <a
-                @click="updateAbsRelLog(absRel)"
-                :class="{
-                  'bg-green-700 text-white': heatmapStore.getActiveDataTable?.absRelLog === absRel
-                }"
-                >{{ absRel }}</a
+
+        <ul
+          tabindex="0"
+          class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+        >
+          <li>
+            <ul class="menu menu-vertical bg-base-200">
+              <li
+                :key="absRel"
+                :style="{ border: 'none' }"
+                v-for="absRel in Object.values(AbsRelLogEnum)"
               >
-            </li>
-          </ul>
-        </li>
+                <a
+                  @click="updateAbsRelLog(absRel)"
+                  :class="{
+                    'bg-green-700 text-white': heatmapStore.getActiveDataTable?.absRelLog === absRel
+                  }"
+                  >{{ absRel }}</a
+                >
+              </li>
+            </ul>
+          </li>
+        </ul>
       </ul>
     </div>
 

@@ -100,35 +100,18 @@ def filter_attributes(
     return original_df, transformed_df
 
 
-def create_transformed_df(
-    original_df: pd.DataFrame, settings: HeatmapSettings
+def set_abs_rel_log(
+     transformed_df: pd.DataFrame, settings: HeatmapSettings
 ) -> pd.DataFrame:
+
+    
     if settings.absRelLog == "REL":
-        row_maxes = drop_columns(
-            original_df,
-            settings.itemNamesColumnName,
-            settings.collectionColumnNames,
-        ).max(axis=1)
-        transformed_df = drop_columns(
-            original_df,
-            settings.itemNamesColumnName,
-            settings.collectionColumnNames,
-        ).div(row_maxes, axis=0)
+        row_maxes = transformed_df.max(axis=1)
+        transformed_df = transformed_df.div(row_maxes, axis=0)
     elif settings.absRelLog == "LOG":
-        transformed_df = pd.DataFrame(np.log(
-            drop_columns(
-                original_df,
-                settings.itemNamesColumnName,
-                settings.collectionColumnNames,
-            )
-            + 1)
-        )
+        transformed_df = np.log(transformed_df + 1)
     elif settings.absRelLog == "ABS":
-        transformed_df = drop_columns(
-            original_df,
-            settings.itemNamesColumnName,
-            settings.collectionColumnNames,
-        )
+        pass
     else:
         raise ValueError("Invalid absRelLog value")
     return transformed_df
@@ -139,11 +122,14 @@ def create_heatmap(
     settings: HeatmapSettings,
 ) -> str:
     original_filtered_df = filter_items(original_df, settings)
-    transformed_filtered_df = create_transformed_df(original_filtered_df, settings)
+    
+    transformed_filtered_df = drop_columns(original_filtered_df, settings.itemNamesColumnName, settings.collectionColumnNames)
     original_filtered_df, transformed_filtered_df = filter_attributes(
         original_filtered_df, transformed_filtered_df, settings
     )
-
+    
+    transformed_filtered_df = set_abs_rel_log(transformed_filtered_df, settings)
+    
     original_filtered_df, transformed_filtered_df = sort_attributes(
         original_filtered_df, transformed_filtered_df, settings
     )
@@ -180,7 +166,7 @@ def create_heatmap(
         transformed_filtered_dim_red_df, index=original_filtered_df.index
     )
 
-    transformed_sticky_df = transformed_filtered_df.loc[settings.stickyItemIndexes,]
+    transformed_sticky_df = transformed_filtered_df.loc[settings.stickyItemIndexes]
     if (
         transformed_sticky_df.shape[0] >= 2
         and settings.sortAttributesBasedOnStickyItems

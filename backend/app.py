@@ -1,4 +1,5 @@
 import time
+import numpy as np
 import pandas as pd
 from heatmap import create_heatmap
 from heatmap_types import HeatmapSettings
@@ -23,6 +24,7 @@ def get_heatmap():
     csv_file = StringIO(heatmap_settings.csvFile)
     original_df = pd.read_csv(csv_file)
 
+ 
     
 
     start = time.perf_counter()

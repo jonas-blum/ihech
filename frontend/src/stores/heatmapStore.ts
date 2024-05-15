@@ -107,64 +107,71 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       } else {
         this.dataTables.push(dataTable)
       }
+      this.setActiveDataTable(dataTable)
+      this.fetchHeatmap()
     },
     setActiveDataTable(dataTable: CsvDataTableProfile) {
       this.activeDataTable = dataTable
     },
     async fetchHeatmap() {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-      console.log('fetchingHeatmap....')
-      this.loading = true
-      const startTime = new Date().getTime()
-      const settings: HeatmapSettings = this.getCurrentHeatmapSettings()
-      console.log('settings', settings)
-      const requestInit: RequestInit = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ settings })
-      }
+      try {
+        if (!this.activeDataTable) {
+          console.error('No active data table')
+          return
+        }
+        console.log('fetchingHeatmap....')
+        this.loading = true
+        const startTime = new Date().getTime()
+        const settings: HeatmapSettings = this.getCurrentHeatmapSettings()
+        console.log('settings', settings)
+        const requestInit: RequestInit = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ settings })
+        }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, requestInit)
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, requestInit)
 
-      const receivedHeatmap: HeatmapJSON = await response.json()
-      if (!receivedHeatmap) {
-        console.error('No heatmap data received.')
-        return
-      }
-      receivedHeatmap.itemNamesAndData.forEach((row) => {
-        setParentOfRowsRec(row, null)
-      })
-      receivedHeatmap.itemNamesAndData.forEach((row) => {
-        recursivelyCopyData(row)
-      })
-
-      this.initialAttributeOrder = [...receivedHeatmap.attributeNames]
-      this.initialAttributeDissimilarities = [...receivedHeatmap.attributeDissimilarities]
-
-      const stickyRows: ItemNameAndData[] = []
-
-      for (const stickyRow of settings.stickyItemIndexes) {
+        const receivedHeatmap: HeatmapJSON = await response.json()
+        if (!receivedHeatmap) {
+          console.error('No heatmap data received.')
+          return
+        }
         receivedHeatmap.itemNamesAndData.forEach((row) => {
-          const foundRow = findRowByIndex(row, stickyRow)
-          if (foundRow) {
-            stickyRows.push(foundRow)
-          }
+          setParentOfRowsRec(row, null)
         })
+        receivedHeatmap.itemNamesAndData.forEach((row) => {
+          recursivelyCopyData(row)
+        })
+
+        this.initialAttributeOrder = [...receivedHeatmap.attributeNames]
+        this.initialAttributeDissimilarities = [...receivedHeatmap.attributeDissimilarities]
+
+        const stickyRows: ItemNameAndData[] = []
+
+        for (const stickyRow of settings.stickyItemIndexes) {
+          receivedHeatmap.itemNamesAndData.forEach((row) => {
+            const foundRow = findRowByIndex(row, stickyRow)
+            if (foundRow) {
+              stickyRows.push(foundRow)
+            }
+          })
+        }
+
+        receivedHeatmap.itemNamesAndData = [...stickyRows, ...receivedHeatmap.itemNamesAndData]
+        // await usePCAStore().updatePCA()
+        this.heatmap = receivedHeatmap
+
+        this.toggleStickyAttribute(this.initialAttributeOrder[0])
+        this.toggleStickyAttribute(this.initialAttributeOrder[0])
+        this.reorderAllDataBasedOnNewAttributeOrder()
+        console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
+        this.changeHeatmap()
+      } catch (error) {
+        console.error('Error during fetching heatmap', error)
+      } finally {
+        this.loading = false
       }
-
-      receivedHeatmap.itemNamesAndData = [...stickyRows, ...receivedHeatmap.itemNamesAndData]
-      // await usePCAStore().updatePCA()
-      this.heatmap = receivedHeatmap
-
-      this.toggleStickyAttribute(this.initialAttributeOrder[0])
-      this.toggleStickyAttribute(this.initialAttributeOrder[0])
-      this.reorderAllDataBasedOnNewAttributeOrder()
-      console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
-      this.changeHeatmap()
-      this.loading = false
     },
     setTimer(timer: number) {
       this.timer = timer

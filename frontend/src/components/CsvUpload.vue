@@ -28,6 +28,7 @@ function selectDataTable(dataTable: CsvDataTableProfile) {
 }
 function triggerFileInput() {
   fileInput.value?.click()
+  isOpen.value = true
 }
 
 function getNanColumns(df: dataForge.IDataFrame): string[] {
@@ -61,6 +62,7 @@ function uploadCsvFile(event: Event) {
     }
 
     const naNColumns = getNanColumns(df)
+    console.log(naNColumns)
     const nonNanColumns = df
       .getColumnNames()
       .filter((columnName) => !naNColumns.includes(columnName))
@@ -112,7 +114,6 @@ function saveDataTable() {
     return
   }
   heatmapStore.saveDataTable(temporaryDataTable.value)
-  setActiveTableAsTemporary()
 }
 
 function toggleAttribute(attribute: string) {
@@ -159,7 +160,6 @@ function updateHierarchyLayer(event: Event, columnName: string) {
     }
     temporaryDataTable.value?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
   }
-  console.log(temporaryDataTable.value?.collectionColumnNames)
 }
 
 function updateItemNamesColumn(columName: string) {
@@ -226,13 +226,17 @@ watch(
 </script>
 
 <template>
-  <div style="width: 100%" class="collapse collapse-arrow bg-base-200" @click="toggleAccordion">
+  <div
+    style="width: 90vw; margin-bottom: 50px"
+    class="collapse collapse-arrow bg-base-200"
+    @click.stop="toggleAccordion"
+  >
     <input type="checkbox" class="hidden" v-model="isOpen" />
     <div class="collapse-title text-xl font-medium">Stored Data Tables</div>
     <div class="collapse-content content-grid" v-if="isOpen">
       <div style="display: flex; flex-direction: column; width: 200px">
-        <div class="file-input-container" @click="triggerFileInput">
-          <button type="button">Upload Csv File</button>
+        <div class="file-input-container" @click.stop="triggerFileInput">
+          <button @click.stop type="button">Upload Csv File</button>
         </div>
 
         <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />

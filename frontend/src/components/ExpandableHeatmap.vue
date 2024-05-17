@@ -165,6 +165,20 @@ function getHeatmapColorMaxValue() {
   return heatmapStore.getHeatmapMaxValue
 }
 
+function getHeatmapColorMinValue() {
+  if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
+    return 0
+  } else if (
+    heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
+  ) {
+    const offsetValue = heatmapStore.getHeatmapMinValue + 1
+    return Math.log(heatmapStore.getHeatmapMinValue + offsetValue)
+  } else if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ABSOLUTE) {
+    return heatmapStore.getHeatmapMinValue
+  }
+  return heatmapStore.getHeatmapMinValue
+}
+
 function drawEverything() {
   if (!canvas.value) {
     return
@@ -177,11 +191,18 @@ function drawEverything() {
 
   nextTick(() => {
     const heatmapMaxValue = getHeatmapColorMaxValue()
+    const heatmapMinValue = getHeatmapColorMinValue()
+    let offsetValue = 1
+    if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC) {
+      offsetValue = heatmapStore.getHeatmapMinValue + 1
+    }
+
     visibleRows.value.forEach((row, rowIndex) => {
       let maxRowValue = 1
       if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
         maxRowValue = Math.max(...row.data)
       }
+
       row.data.forEach((value, colIndex) => {
         let adjustedValue = value
         if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
@@ -189,7 +210,7 @@ function drawEverything() {
         } else if (
           heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
         ) {
-          adjustedValue = Math.log(value + 1)
+          adjustedValue = Math.log(value + offsetValue)
         }
 
         let x = colIndex * cellWidth.value
@@ -201,11 +222,7 @@ function drawEverything() {
         if (rowIndex >= heatmapStore.getAmountOfStickyItems) {
           y += stickyItemsGap.value
         }
-        ctx.fillStyle = getHeatmapColor(
-          adjustedValue,
-          heatmapStore.getHeatmapMinValue,
-          heatmapMaxValue,
-        )
+        ctx.fillStyle = getHeatmapColor(adjustedValue, heatmapMinValue, heatmapMaxValue)
         ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
       })
     })
@@ -435,7 +452,6 @@ function syncScroll(event: Event) {
 }
 
 onMounted(async () => {
-  heatmapStore.resetSettings()
   if (!canvas.value) {
     return
   }
@@ -511,7 +527,7 @@ onMounted(async () => {
         :key="'row-label-' + dataChangingRef"
         :style="{
           height: heatmapHeight + 'px',
-          marginTop: entireColLabelHeight + 'px',
+          marginTop: entireColLabelHeight + BORDER_WIDTH + 'px',
           gap: GAP_HEIGHT + 'px',
           marginRight: SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
           width: ROW_LABELS_WIDTH + 'px',
@@ -536,6 +552,9 @@ onMounted(async () => {
             :edition-count="editionNames.length"
             :sticky-items-gap-size="stickyItemsGap"
             :y-start-heatmap="canvas ? canvas.getBoundingClientRect().top : 0"
+            :needs-sticky-items-margin="
+              index === heatmapStore.getAmountOfStickyItems && heatmapStore.isStickyItemsGapVisible
+            "
           />
         </div>
       </div>

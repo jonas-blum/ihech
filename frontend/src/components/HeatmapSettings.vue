@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ScalingEnum, DimReductionAlgoEnum, SortOrderAttributes } from '@/helpers/helpers'
+import {
+  ScalingEnum,
+  DimReductionAlgoEnum,
+  SortOrderAttributes,
+  ColoringHeatmapEnum,
+} from '@/helpers/helpers'
 
 import type { ItemNameAndData } from '@/helpers/helpers'
 import { getHeatmapColor } from '@/helpers/helpers'
@@ -50,6 +55,10 @@ function findRowAndOpenIt(event: Event) {
 async function updateScaling(scaling: ScalingEnum) {
   heatmapStore.setScaling(scaling)
   await heatmapStore.fetchHeatmap()
+}
+
+function updateColoringHeatmap(coloringHeatmap: ColoringHeatmapEnum) {
+  heatmapStore.setColoringHeatmap(coloringHeatmap)
 }
 
 async function updateClusterByCollections(event: Event) {
@@ -161,7 +170,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
       </ul>
     </div>
     <div style="z-index: 99999" class="dropdown dropdown-bottom">
-      <div tabindex="0" role="button" class="btn m-1">
+      <div tabindex="0" class="btn m-1">
         <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
         <p>Clustering</p>
       </div>
@@ -214,10 +223,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
           </div>
         </li>
 
-        <ul
-          tabindex="0"
-          class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-        >
+        <ul>
           <li>
             <ul class="menu menu-vertical bg-base-200">
               <li
@@ -231,6 +237,26 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
                     'bg-green-700 text-white': heatmapStore.getActiveDataTable?.scaling === scaling,
                   }"
                   >{{ scaling }}</a
+                >
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <ul class="menu menu-vertical bg-base-200">
+              <li
+                :key="coloringHeatmap"
+                :style="{ border: 'none' }"
+                v-for="coloringHeatmap in Object.values(ColoringHeatmapEnum)"
+              >
+                <a
+                  @click="updateColoringHeatmap(coloringHeatmap)"
+                  :class="{
+                    'bg-green-700 text-white':
+                      heatmapStore.getActiveDataTable?.coloringHeatmap === coloringHeatmap,
+                  }"
+                  >{{ coloringHeatmap }}</a
                 >
               </li>
             </ul>

@@ -13,6 +13,7 @@ const props = defineProps<{
   rowLabelsWidth: number
   stickyItemsGapSize: number
   yStartHeatmap: number
+  needsStickyItemsMargin: boolean
   editionIndex?: number
   editionCount?: number
 }>()
@@ -23,8 +24,6 @@ const tooltipX = ref(0)
 const tooltipY = ref(0)
 
 const isRowHighlighted = ref(false)
-
-const marginTop = ref(0)
 
 const rowTextElement = ref<HTMLElement | null>(null)
 
@@ -90,29 +89,12 @@ function applyMultipleColors(colors: string[]) {
 //   applyMultipleColors(editionColorList)
 // }
 
-function updateMarginTop() {
-  let y = rowTextElement.value?.getBoundingClientRect().bottom
-  if (!y) {
-    if (marginTop.value !== 0) {
-      marginTop.value = 0
-    }
-    return
+const marginTop = computed(() => {
+  if (props.needsStickyItemsMargin && heatmapStore.isStickyItemsGapVisible) {
+    return props.stickyItemsGapSize
   }
-  y -= props.yStartHeatmap + props.borderWidth
-  if (heatmapStore.isStickyItemsGapVisible) {
-    const startY = heatmapStore.getAmountOfStickyItems * props.cellHeight
-    const endY = startY + props.stickyItemsGapSize
-    if (y > endY && y < endY + props.cellHeight) {
-      if (marginTop.value !== props.stickyItemsGapSize) {
-        marginTop.value = props.stickyItemsGapSize
-      }
-      return
-    }
-  }
-  if (marginTop.value !== 0) {
-    marginTop.value = 0
-  }
-}
+  return 0
+})
 
 function updateIsRowHighlighted() {
   if (isRowHighlighted.value !== (heatmapStore.getHighlightedRow === props.row)) {
@@ -130,15 +112,6 @@ watch(
   () => heatmapStore.getHighlightedRow,
   () => {
     updateIsRowHighlighted()
-  },
-)
-
-watch(
-  () => heatmapStore.getDataChanging,
-  () => {
-    nextTick(() => {
-      updateMarginTop()
-    })
   },
 )
 </script>
@@ -194,6 +167,8 @@ watch(
           }}
         </button>
 
+        <div ref="invisibleRef" style="display: none; height: 1px; width: 1px"></div>
+
         <div
           ref="rowTextElement"
           @mouseenter="showTooltip"
@@ -226,6 +201,7 @@ watch(
         :row-labels-width="props.rowLabelsWidth"
         :sticky-items-gap-size="props.stickyItemsGapSize"
         :y-start-heatmap="props.yStartHeatmap"
+        :needs-sticky-items-margin="false"
       />
     </div>
 

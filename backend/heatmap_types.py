@@ -110,6 +110,7 @@ def custom_encoder(obj):
     elif isinstance(obj, ItemNameAndData):
 
         return {
+            "index": obj.index,
             "itemName": obj.itemName,
             "isOpen": obj.isOpen,
             "data": obj.data,

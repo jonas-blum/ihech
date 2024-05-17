@@ -30,7 +30,13 @@ def sort_attributes(
     scaled_df: pd.DataFrame,
     settings: HeatmapSettings,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    scaled_df_to_sort = scaled_df
+
+    original_dropped_df = drop_columns(
+        original_df,
+        settings.itemNamesColumnName,
+        settings.collectionColumnNames,
+    )
+    original_df_to_sort = original_dropped_df
 
     additional_columns = list(
         set(
@@ -42,17 +48,17 @@ def sort_attributes(
     )
 
     if settings.sortAttributesBasedOnStickyItems:
-        sticky_df = scaled_df.loc[settings.stickyItemIndexes]
+        sticky_df = original_dropped_df.loc[settings.stickyItemIndexes]
         if not sticky_df.empty:
-            scaled_df_to_sort = sticky_df
+            original_df_to_sort = sticky_df
     if settings.sortOrderAttributes == "ASC":
-        column_means = scaled_df_to_sort.mean()
+        column_means = original_df_to_sort.mean()
         sorted_columns = column_means.sort_values().index
 
         scaled_df = scaled_df[sorted_columns]
         original_df = original_df[list(sorted_columns) + additional_columns]
     elif settings.sortOrderAttributes == "DESC":
-        column_means = scaled_df_to_sort.mean()
+        column_means = original_df_to_sort.mean()
         sorted_columns = column_means.sort_values(ascending=False).index
 
         scaled_df = scaled_df[sorted_columns]
@@ -62,11 +68,11 @@ def sort_attributes(
         scaled_df = scaled_df.sort_index(axis=1)
         original_df = original_df.sort_index(axis=1)
     elif settings.sortOrderAttributes == "STDEV":
-        if scaled_df_to_sort.shape[0] < 2:
-            scaled_df_to_sort = scaled_df
-        std_devs = scaled_df_to_sort.std()
+        if original_df_to_sort.shape[0] < 2:
+            original_df_to_sort = original_dropped_df
+        std_devs = original_df_to_sort.std()
         col_std_map = {
-            col: std_val for col, std_val in zip(scaled_df_to_sort.columns, std_devs)
+            col: std_val for col, std_val in zip(original_df_to_sort.columns, std_devs)
         }
         sorted_columns = sorted(col_std_map, key=col_std_map.get, reverse=True)
 
@@ -188,11 +194,22 @@ def create_heatmap(
     dim_red_df = dim_reduction.fit_transform(scaled_filtered_df)
     dim_red_df = pd.DataFrame(dim_red_df, index=original_filtered_df.index)
 
-    scaled_sticky_df = scaled_filtered_df.loc[settings.stickyItemIndexes]
-    if scaled_sticky_df.shape[0] >= 2 and settings.sortAttributesBasedOnStickyItems:
-        std_devs = scaled_sticky_df.std()
+    original_filtered_df_dropped = drop_columns(
+        original_filtered_df,
+        settings.itemNamesColumnName,
+        settings.collectionColumnNames,
+    )
+
+    original_dropped_sticky_df = original_filtered_df_dropped.loc[
+        settings.stickyItemIndexes
+    ]
+    if (
+        original_dropped_sticky_df.shape[0] >= 2
+        and settings.sortAttributesBasedOnStickyItems
+    ):
+        std_devs = original_dropped_sticky_df.std()
     else:
-        std_devs = scaled_filtered_df.std()
+        std_devs = original_filtered_df_dropped.std()
 
     min_dissimilarity = std_devs.min()
     max_dissimilarity = std_devs.max()
@@ -211,13 +228,6 @@ def create_heatmap(
 
     if settings.clusterAfterDimRed:
         scaled_filtered_df = dim_red_df.copy()
-
-    original_filtered_df_dropped = original_filtered_df.copy()
-    original_filtered_df_dropped = drop_columns(
-        original_filtered_df_dropped,
-        settings.itemNamesColumnName,
-        settings.collectionColumnNames,
-    )
 
     heatmap_json = HeatmapJSON()
     heatmap_json.attributeDissimilarities = normalized_dissimilarities.tolist()
@@ -249,7 +259,12 @@ def create_heatmap(
         {"cluster": [-1] * len(original_filtered_df)}, index=original_filtered_df.index
     )
     original_filtered_df = pd.concat([original_filtered_df, cluster_column], axis=1)
+
+    # Copying dataframes so they are "clean" in memory
     original_filtered_df = original_filtered_df.copy()
+    original_filtered_df_dropped = original_filtered_df_dropped.copy()
+    scaled_filtered_df = scaled_filtered_df.copy()
+    dim_red_df = dim_red_df.copy()
 
     item_names_and_data = cluster_items_recursively(
         original_filtered_df,

@@ -8,6 +8,7 @@ import {
   DimReductionAlgoEnum,
   SortOrderAttributes,
   type HeatmapSettings,
+  ColoringHeatmapEnum,
 } from '../helpers/helpers'
 
 export interface HeatmapStoreState {
@@ -83,10 +84,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return state.activeDataTable.stickyAttributes.length > 0
     },
 
-    getStickyItems: (state) =>
-      state.heatmap.itemNamesAndData.slice(
-        state.activeDataTable ? state.activeDataTable.stickyItemIndexes.length : 0,
-      ),
+    getStickyItems: (state) => {
+      if (!state.activeDataTable) {
+        return []
+      }
+      return state.heatmap.itemNamesAndData.slice(0, state.activeDataTable.stickyItemIndexes.length)
+    },
 
     getDataChanging: (state) => state.dataChanging,
     isLoading: (state) => state.loading,
@@ -168,6 +171,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.toggleStickyAttribute(this.initialAttributeOrder[0])
         this.reorderAllDataBasedOnNewAttributeOrder()
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
+        console.log('heatmap', this.heatmap)
         this.changeHeatmap()
       } catch (error) {
         console.error('Error during fetching heatmap', error)
@@ -184,6 +188,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return
       }
       this.activeDataTable.scaling = scaling
+    },
+    setColoringHeatmap(coloringHeatmap: ColoringHeatmapEnum) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.coloringHeatmap = coloringHeatmap
+      this.changeHeatmap()
     },
     setClusterByCollections(clusterByCollections: boolean) {
       if (!this.activeDataTable) {
@@ -231,37 +243,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.activeDataTable.clusterAfterDimRed = clusterAfterDim
     },
 
-    resetSettings() {
-      // ;(this.heatmap = {
-      //   attributeNames: [],
-      //   attributeDissimilarities: [],
-      //   itemNamesAndData: [],
-      //   maxHeatmapValue: 100,
-      //   minHeatmapValue: 0,
-      //   maxDimRedXValue: 100,
-      //   maxDimRedYValue: 0,
-      //   minDimRedXValue: 0,
-      //   minDimRedYValue: 100
-      // }),
-      //   (this.initialAttributeOrder = []),
-      //   (this.initialColDissimilarities = []),
-      //   (this.selectedFeature = StructuralFeatureEnum.BINARY_TAG_EXISTS),
-      //   (this.selectedAbsRel = AbsRelLogEnum.REL),
-      //   (this.selectedMedianMaxMin = MedianMaxMinEnum.MEDIAN),
-      //   (this.clusterByEditions = false),
-      //   (this.sortOrderColumns = SortOrderAttributes.STDEV),
-      //   (this.sortColumnsBasedOnStickyItems = false),
-      //   (this.clusterSize = 6),
-      //   (this.dimReductionAlgoEnum = DimReductionAlgoEnum.PCA),
-      //   (this.dataChanging = 1),
-      //   (this.highlightedRow = null),
-      //   (this.amountOfStickyItems = 0),
-      //   (this.loading = false),
-      //   (this.stickyAttributes = []),
-      //   (this.clusterItemsBasedOnStickyAttributes = false),
-      //   (this.showOnlyStickyItemsInDimReduction = false),
-      //   (this.clusterAfterDimRed = false)
-    },
     getCurrentHeatmapSettings(): HeatmapSettings {
       if (!this.activeDataTable) {
         console.error('No active data table')
@@ -335,6 +316,37 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
       this.activeDataTable.showOnlyStickyItemsInDimReduction = showOnlyStickyItemsInDimRed
     },
+    toggleStickyItem(stickyItem: ItemNameAndData) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        throw new Error('No active data table')
+      }
+
+      if (stickyItem.children) {
+        return
+      }
+
+      const stickyItems = this.getStickyItems
+
+      const previousNonStickyItems = this.heatmap.itemNamesAndData.slice(
+        stickyItems.length,
+        undefined,
+      )
+
+      if (stickyItems.includes(stickyItem)) {
+        this.activeDataTable.stickyItemIndexes = this.activeDataTable.stickyItemIndexes.filter(
+          (item) => item !== stickyItem.index,
+        )
+        stickyItems.splice(stickyItems.indexOf(stickyItem), 1)
+        this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
+      } else {
+        this.activeDataTable.stickyItemIndexes.push(stickyItem.index)
+        stickyItems.push(stickyItem)
+        this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
+      }
+
+      this.changeHeatmap()
+    },
     toggleStickyAttribute(attribute: string) {
       if (!this.activeDataTable) {
         console.error('No active data table')
@@ -356,17 +368,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         this.heatmap.attributeNames.sort((a, b) => {
           if (
-            !this.activeDataTable.stickyAttributes.includes(a) &&
-            !this.activeDataTable.stickyAttributes.includes(b)
+            !this.activeDataTable?.stickyAttributes.includes(a) &&
+            !this.activeDataTable?.stickyAttributes.includes(b)
           ) {
-            return (
-              this.activeDataTable.initialAttributeOrder.indexOf(a) -
-              this.activeDataTable.initialAttributeOrder.indexOf(b)
-            )
+            return this.initialAttributeOrder.indexOf(a) - this.initialAttributeOrder.indexOf(b)
           }
           if (
-            this.activeDataTable.stickyAttributes.includes(a) &&
-            !this.activeDataTable.stickyAttributes.includes(b)
+            this.activeDataTable?.stickyAttributes.includes(a) &&
+            !this.activeDataTable?.stickyAttributes.includes(b)
           ) {
             return -1
           }
@@ -390,14 +399,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
             return -2
           }
           if (
-            this.activeDataTable.stickyAttributes.includes(a) &&
-            !this.activeDataTable.stickyAttributes.includes(b)
+            this.activeDataTable?.stickyAttributes.includes(a) &&
+            !this.activeDataTable?.stickyAttributes.includes(b)
           ) {
             return -1
           }
           if (
-            this.activeDataTable.stickyAttributes.includes(b) &&
-            !this.activeDataTable.stickyAttributes.includes(a)
+            this.activeDataTable?.stickyAttributes.includes(b) &&
+            !this.activeDataTable?.stickyAttributes.includes(a)
           ) {
             return 1
           }
@@ -454,40 +463,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         throw new Error('No active data table')
       }
       this.activeDataTable.clusterItemsBasedOnStickyAttributes = clusterItemsBasedOnStickyAttributes
-    },
-    toggleStickyItem(row: ItemNameAndData) {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        throw new Error('No active data table')
-      }
-
-      if (row.children) {
-        return
-      }
-      let removing = false
-      let stickyItems = this.heatmap.itemNamesAndData.slice(
-        0,
-        this.activeDataTable.stickyItemIndexes.length,
-      )
-      if (stickyItems.includes(row)) {
-        stickyItems = stickyItems.filter((item) => item !== row)
-        removing = true
-      } else {
-        stickyItems.push(row)
-        removing = false
-      }
-      this.heatmap.itemNamesAndData = [
-        ...stickyItems,
-        ...this.heatmap.itemNamesAndData.slice(this.activeDataTable.stickyItemIndexes.length),
-      ]
-      if (removing) {
-        this.activeDataTable.stickyItemIndexes = this.activeDataTable.stickyItemIndexes.filter(
-          (item) => item !== row.index,
-        )
-      } else {
-        this.activeDataTable.stickyItemIndexes.push(row.index)
-      }
-      this.changeHeatmap()
     },
 
     expandRow(row: ItemNameAndData) {

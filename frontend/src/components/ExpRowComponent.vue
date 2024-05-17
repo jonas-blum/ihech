@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, computed, onMounted, watch, nextTick, onUpdated } from 'vue'
-import { getDistinctEditionsOfRow, type ItemNameAndData } from '@helpers/helpers'
+import { defineProps, ref, computed, watch, nextTick, onUpdated, onMounted } from 'vue'
+import { type ItemNameAndData } from '@helpers/helpers'
 
 import { useHeatmapStore } from '@stores/heatmapStore'
 
@@ -18,7 +18,7 @@ const props = defineProps<{
   editionCount?: number
 }>()
 
-const tooltipVisible = ref(false)
+const tooltip = ref<HTMLElement | null>(null)
 const tooltipContent = ref('')
 const tooltipX = ref(0)
 const tooltipY = ref(0)
@@ -34,21 +34,35 @@ const rightClickButton = (e: MouseEvent) => {
   toggleOpen()
 }
 
-const showTooltip = (e: MouseEvent) => {
-  if (!props.row.children) return
+const updateToolTipContent = (e: MouseEvent) => {
+  if (!tooltip.value) {
+    return
+  }
+  const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
+  if (collectionNamesOfItem.length === 0) {
+    hideTooltip()
+    return
+  }
   tooltipX.value = e.clientX + 10
   tooltipY.value = e.clientY + 10
-  //   tooltipContent.value = computeTooltipContent(props.row)
-  tooltipVisible.value = true
+  tooltipContent.value = collectionNamesOfItem.join('\n')
+  showTooltip()
 }
 
 const hideTooltip = () => {
-  tooltipVisible.value = false
+  nextTick(() => {
+    if (!tooltip.value) {
+      return
+    }
+    tooltip.value.style.display = 'none'
+  })
 }
 
-function computeTooltipContent(row: ItemNameAndData): string {
-  const editions = getDistinctEditionsOfRow(row)
-  return Array.from(editions).join('\n')
+const showTooltip = () => {
+  if (!tooltip.value) {
+    return
+  }
+  tooltip.value.style.display = 'block'
 }
 
 function applyMultipleColors(colors: string[]) {
@@ -82,12 +96,10 @@ function applyMultipleColors(colors: string[]) {
   rowTextElement.value.innerHTML = coloredText
 }
 
-// function doColoring() {
-//   const editionSet = getDistinctEditionsOfRow(props.row)
-//   const editionList = Array.from(editionSet)
-//   const editionColorList = editionList.map((edition) => editionStore.editionColor(edition))
-//   applyMultipleColors(editionColorList)
-// }
+function doColoring() {
+  const colorsOfItem = heatmapStore.getColorsOfItem(props.row)
+  applyMultipleColors(colorsOfItem)
+}
 
 const marginTop = computed(() => {
   if (props.needsStickyItemsMargin && heatmapStore.isStickyItemsGapVisible) {
@@ -114,6 +126,18 @@ watch(
     updateIsRowHighlighted()
   },
 )
+
+onMounted(() => {
+  doColoring()
+  const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
+  tooltipContent.value = collectionNamesOfItem.join('\n')
+})
+
+onUpdated(() => {
+  doColoring()
+  const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
+  tooltipContent.value = collectionNamesOfItem.join('\n')
+})
 </script>
 
 <template>
@@ -125,62 +149,60 @@ watch(
       marginTop: marginTop + 'px',
     }"
   >
-    <div class="row-div">
-      <button
-        :style="{
-          height: buttonSize,
-          width: buttonSize,
-        }"
-        v-if="props.row.children"
-        @click="toggleOpen"
-        @contextmenu="rightClickButton"
-        class="expand-button"
-      >
-        <div class="symbol-container">
-          <img
-            :style="{ transform: props.row.isOpen ? 'rotate(90deg)' : '' }"
-            src="@assets/chevron-right.svg"
-          />
-        </div>
-      </button>
-
-      <div
-        :style="{
-          display: 'flex',
-          alignItems: 'center',
-          height: props.cellHeight - props.gapHeight + 'px',
-          maxWidth: '110px',
-        }"
-      >
+    <div class="tooltip" :data-tip="tooltipContent">
+      <div class="row-div">
         <button
           :style="{
+            height: buttonSize,
             width: buttonSize,
           }"
-          class="sticky-button"
-          @click="heatmapStore.toggleStickyItem(props.row)"
-          v-if="!props.row.children"
+          v-if="props.row.children"
+          @click="toggleOpen"
+          @contextmenu="rightClickButton"
+          class="expand-button"
         >
-          {{
-            heatmapStore?.getActiveDataTable?.stickyItemIndexes.includes(props.row.index)
-              ? '-'
-              : '+'
-          }}
+          <div class="symbol-container">
+            <img
+              :style="{ transform: props.row.isOpen ? 'rotate(90deg)' : '' }"
+              src="@assets/chevron-right.svg"
+            />
+          </div>
         </button>
 
-        <div ref="invisibleRef" style="display: none; height: 1px; width: 1px"></div>
-
         <div
-          ref="rowTextElement"
-          @mouseenter="showTooltip"
-          @mouseleave="hideTooltip"
           :style="{
-            fontWeight: isRowHighlighted ? 900 : 'normal',
+            display: 'flex',
+            alignItems: 'center',
             height: props.cellHeight - props.gapHeight + 'px',
-            fontSize: props.cellHeight * 0.9 - props.gapHeight + 'px',
+            maxWidth: '110px',
           }"
-          class="text-div"
         >
-          {{ props.row.itemName }}
+          <button
+            :style="{
+              width: buttonSize,
+            }"
+            class="sticky-button"
+            @click="heatmapStore.toggleStickyItem(props.row)"
+            v-if="!props.row.children"
+          >
+            {{
+              heatmapStore?.getActiveDataTable?.stickyItemIndexes.includes(props.row.index ?? -1)
+                ? '-'
+                : '+'
+            }}
+          </button>
+
+          <div
+            ref="rowTextElement"
+            :style="{
+              fontWeight: isRowHighlighted ? 900 : 'normal',
+              height: props.cellHeight - props.gapHeight + 'px',
+              fontSize: props.cellHeight * 0.9 - props.gapHeight + 'px',
+            }"
+            class="text-div"
+          >
+            {{ props.row.itemName }}
+          </div>
         </div>
       </div>
     </div>
@@ -203,14 +225,6 @@ watch(
         :y-start-heatmap="props.yStartHeatmap"
         :needs-sticky-items-margin="false"
       />
-    </div>
-
-    <div
-      v-if="tooltipVisible"
-      class="tooltip"
-      :style="{ top: tooltipY + 'px', left: tooltipX + 'px' }"
-    >
-      {{ tooltipContent }}
     </div>
   </div>
 </template>
@@ -277,15 +291,5 @@ watch(
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.tooltip {
-  position: fixed;
-  padding: 10px;
-  background-color: black;
-  color: white;
-  border-radius: 5px;
-  z-index: 100;
-  white-space: pre-line;
 }
 </style>

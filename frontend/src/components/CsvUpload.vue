@@ -8,6 +8,7 @@ import {
   SortOrderAttributes,
   type CsvDataTableProfile,
   ColoringHeatmapEnum,
+  getDistinctColor,
 } from '@/helpers/helpers'
 
 const heatmapStore = useHeatmapStore()
@@ -18,7 +19,7 @@ const hierarchyLayers: ('None' | number)[] = ['None', 1, 2, 3, 4]
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
-const temporaryDataTable = ref<CsvDataTableProfile | null>(null)
+const oldStateDataTable = ref<CsvDataTableProfile | null>(null)
 
 function toggleAccordion() {
   isOpen.value = !isOpen.value
@@ -48,7 +49,7 @@ function uploadCsvFile(event: Event) {
     const csvFile = df.toCSV()
     let fileNameNoExtension = file.name.split('.').slice(0, -1).join('.')
     while (heatmapStore.getAllDataTableNames.includes(fileNameNoExtension)) {
-      fileNameNoExtension += '_1'
+      fileNameNoExtension = '_1' + fileNameNoExtension
     }
 
     const newDataTable: CsvDataTableProfile = {
@@ -59,6 +60,8 @@ function uploadCsvFile(event: Event) {
       nonNanColumns: [],
 
       collectionColorMap: {},
+      itemCollectionMap: {},
+      firstLayerCollectionNames: [],
 
       showOnlyStickyItemsInDimReduction: false,
 
@@ -88,38 +91,96 @@ function uploadCsvFile(event: Event) {
       coloringHeatmap: ColoringHeatmapEnum.ABSOLUTE,
     }
     console.log(newDataTable)
-    temporaryDataTable.value = newDataTable
+    heatmapStore.saveDataTable(newDataTable)
   }
   reader.readAsText(file)
 }
 
 function saveDataTable() {
-  if (temporaryDataTable.value === null) {
+  if (heatmapStore.getActiveDataTable === null) {
     return
   }
-  heatmapStore.saveDataTable(temporaryDataTable.value)
+  heatmapStore.saveDataTable(heatmapStore.getActiveDataTable)
 }
 
 function toggleAttribute(attribute: string) {
-  if (temporaryDataTable.value === null) return
-  if (temporaryDataTable.value.selectedAttributes.includes(attribute)) {
-    temporaryDataTable.value.selectedAttributes =
-      temporaryDataTable.value.selectedAttributes.filter((attr) => attr !== attribute)
+  if (heatmapStore.getActiveDataTable === null) return
+  if (heatmapStore.getActiveDataTable.selectedAttributes.includes(attribute)) {
+    heatmapStore.getActiveDataTable.selectedAttributes =
+      heatmapStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== attribute)
   } else {
-    temporaryDataTable.value.selectedAttributes.push(attribute)
+    heatmapStore.getActiveDataTable.selectedAttributes.push(attribute)
   }
 }
 
 function getColumnCollectionHierarchy(columnName: string): 'None' | number {
-  if (temporaryDataTable.value === null) {
+  if (heatmapStore.getActiveDataTable === null) {
     return 'None'
   }
-  const foundIndex = temporaryDataTable.value.collectionColumnNames.indexOf(columnName)
+  const foundIndex = heatmapStore.getActiveDataTable.collectionColumnNames.indexOf(columnName)
   if (foundIndex === -1) {
     return 'None'
   } else {
     return foundIndex + 1
   }
+}
+
+function updateItemCollectionMap() {
+  if (heatmapStore.getActiveDataTable === null) {
+    return
+  }
+  if (heatmapStore.getActiveDataTable.collectionColumnNames.length === 0) {
+    heatmapStore.getActiveDataTable.itemCollectionMap = {}
+    return
+  }
+
+  const collectionColumnName = heatmapStore.getActiveDataTable.collectionColumnNames[0]
+
+  const itemCollectionMap: Record<number, string> = {}
+  heatmapStore.getActiveDataTable.df.forEach((row, index) => {
+    itemCollectionMap[index] = row[collectionColumnName]
+  })
+  heatmapStore.getActiveDataTable.itemCollectionMap = itemCollectionMap
+}
+
+function resetFirstLayerCollectionNames() {
+  if (heatmapStore.getActiveDataTable === null) {
+    return
+  }
+  if (heatmapStore.getActiveDataTable.collectionColumnNames.length === 0) {
+    heatmapStore.getActiveDataTable.firstLayerCollectionNames = []
+    return
+  }
+
+  const collectionColumnName = heatmapStore.getActiveDataTable.collectionColumnNames[0]
+  const newFirstLayerCollectionNames: string[] = []
+  heatmapStore.getActiveDataTable.df.forEach((row, index) => {
+    newFirstLayerCollectionNames.push(row[collectionColumnName])
+  })
+  heatmapStore.getActiveDataTable.firstLayerCollectionNames = [
+    ...new Set(newFirstLayerCollectionNames),
+  ]
+}
+
+function resetCollectionColorMap(): void {
+  if (heatmapStore.getActiveDataTable === null) {
+    return
+  }
+  if (heatmapStore.getActiveDataTable.firstLayerCollectionNames.length === 0) {
+    heatmapStore.getActiveDataTable.collectionColorMap = {}
+    return
+  }
+
+  const colorMap: Record<string, string> = {}
+  let index = 0
+  heatmapStore.getActiveDataTable.firstLayerCollectionNames.forEach((collection) => {
+    if (collection in colorMap) {
+      return
+    }
+    colorMap[collection] = getDistinctColor(index)
+    index++
+  })
+  heatmapStore.getActiveDataTable.collectionColorMap = colorMap
 }
 
 function updateHierarchyLayer(event: Event, columnName: string) {
@@ -129,51 +190,65 @@ function updateHierarchyLayer(event: Event, columnName: string) {
   }
   const selectedHierarchyLayer = event.target.value
 
-  if (temporaryDataTable.value === null) {
+  if (heatmapStore.getActiveDataTable === null) {
     return
   }
 
-  temporaryDataTable.value.selectedAttributes = temporaryDataTable.value.selectedAttributes.filter(
-    (attr) => attr !== columnName,
-  )
+  heatmapStore.getActiveDataTable.selectedAttributes =
+    heatmapStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== columnName)
 
   if (selectedHierarchyLayer === 'None') {
     //Remove the column name from the collectionColumnNames array
-    const foundIndex = temporaryDataTable.value?.collectionColumnNames.indexOf(columnName)
+    const foundIndex = heatmapStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
     if (foundIndex !== undefined && foundIndex !== -1) {
-      temporaryDataTable.value?.collectionColumnNames.splice(foundIndex, 1)
+      heatmapStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
     }
   } else {
     // Insert the column name at the selected hierarchy layer
     const hierarchyLayer = parseInt(selectedHierarchyLayer)
-    const foundIndex = temporaryDataTable.value?.collectionColumnNames.indexOf(columnName)
+    const foundIndex = heatmapStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
     if (foundIndex !== undefined && foundIndex !== -1) {
-      temporaryDataTable.value?.collectionColumnNames.splice(foundIndex, 1)
+      heatmapStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
     }
-    temporaryDataTable.value?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
+    heatmapStore.getActiveDataTable?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
   }
-  if (temporaryDataTable.value.collectionColumnNames.length > 4) {
-    temporaryDataTable.value.collectionColumnNames =
-      temporaryDataTable.value.collectionColumnNames.slice(0, 4)
+  if (heatmapStore.getActiveDataTable.collectionColumnNames.length > 4) {
+    heatmapStore.getActiveDataTable.collectionColumnNames =
+      heatmapStore.getActiveDataTable.collectionColumnNames.slice(0, 4)
   }
+  resetFirstLayerCollectionNames()
+  updateItemCollectionMap()
+  resetCollectionColorMap()
 }
 
 function updateItemNamesColumn(columName: string) {
-  if (temporaryDataTable.value === null) {
+  if (heatmapStore.getActiveDataTable === null) {
     return
   }
-  temporaryDataTable.value.itemNamesColumnName = columName
+  heatmapStore.getActiveDataTable.itemNamesColumnName = columName
 }
 
 function discardChanges() {
-  setActiveTableAsTemporary()
+  resetToOldStateDataTable()
 }
 
-function setActiveTableAsTemporary() {
+function resetToOldStateDataTable() {
+  if (oldStateDataTable.value === null) {
+    return
+  }
+  heatmapStore.setActiveDataTable(oldStateDataTable.value)
+}
+
+function copyDataTableState() {
   if (heatmapStore.getActiveDataTable === null) {
-    temporaryDataTable.value = null
+    oldStateDataTable.value = null
   } else {
-    temporaryDataTable.value = {
+    const copiedItemCollectionMap: Record<number, string> = {}
+    for (const key in heatmapStore.getActiveDataTable.itemCollectionMap) {
+      copiedItemCollectionMap[key] = heatmapStore.getActiveDataTable.itemCollectionMap[key]
+    }
+
+    oldStateDataTable.value = {
       tableName: heatmapStore.getActiveDataTable.tableName,
       df: heatmapStore.getActiveDataTable.df,
 
@@ -181,6 +256,8 @@ function setActiveTableAsTemporary() {
       nonNanColumns: [...heatmapStore.getActiveDataTable.nonNanColumns],
 
       collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap },
+      itemCollectionMap: copiedItemCollectionMap,
+      firstLayerCollectionNames: [...heatmapStore.getActiveDataTable.firstLayerCollectionNames],
 
       showOnlyStickyItemsInDimReduction:
         heatmapStore.getActiveDataTable.showOnlyStickyItemsInDimReduction,
@@ -218,7 +295,7 @@ function setActiveTableAsTemporary() {
 watch(
   () => heatmapStore.getActiveDataTable,
   () => {
-    setActiveTableAsTemporary()
+    copyDataTableState()
   },
 )
 </script>
@@ -251,7 +328,9 @@ watch(
             <button
               :style="{
                 fontWeight:
-                  temporaryDataTable?.tableName === dataTable.tableName ? 'bold' : 'normal',
+                  heatmapStore.getActiveDataTable?.tableName === dataTable.tableName
+                    ? 'bold'
+                    : 'normal',
               }"
               @click.stop="selectDataTable(dataTable)"
             >
@@ -264,7 +343,12 @@ watch(
           </li>
         </ul>
       </div>
-      <div :style="{ display: temporaryDataTable ? 'flex' : 'none', flexDirection: 'column' }">
+      <div
+        :style="{
+          display: heatmapStore.getActiveDataTable ? 'flex' : 'none',
+          flexDirection: 'column',
+        }"
+      >
         <div
           style="
             display: grid;
@@ -273,23 +357,26 @@ watch(
             margin-right: auto;
           "
         >
-          <button class="btn-success" @click.stop="saveDataTable">Save Data Table</button>
+          <button class="btn-success" @click.stop="saveDataTable">Save Changes</button>
           <button class="btn-warning" @click.stop="discardChanges">Discard Changes</button>
           <h1 :style="{ fontSize: '25px', fontWeight: 'bold', marginLeft: '20px' }">
-            {{ temporaryDataTable?.tableName }}
+            {{ heatmapStore.getActiveDataTable?.tableName }}
           </h1>
           <div></div>
           <div></div>
         </div>
         <table class="data-table">
           <thead>
-            <th :key="index" v-for="(columnName, index) in temporaryDataTable?.df.getColumnNames()">
+            <th
+              :key="index"
+              v-for="(columnName, index) in heatmapStore.getActiveDataTable?.df.getColumnNames()"
+            >
               <div :style="{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }">
                 <input
                   @click.stop="updateItemNamesColumn(columnName)"
                   type="checkbox"
                   class="toggle"
-                  :checked="temporaryDataTable?.itemNamesColumnName === columnName"
+                  :checked="heatmapStore.getActiveDataTable?.itemNamesColumnName === columnName"
                 />
                 <select
                   @change="updateHierarchyLayer($event, columnName)"
@@ -310,14 +397,21 @@ watch(
                 <input
                   @click.stop="toggleAttribute(columnName)"
                   type="checkbox"
-                  :checked="temporaryDataTable?.selectedAttributes.includes(columnName)"
-                  :disabled="temporaryDataTable?.collectionColumnNames.includes(columnName)"
+                  :checked="
+                    heatmapStore.getActiveDataTable?.selectedAttributes.includes(columnName)
+                  "
+                  :disabled="
+                    heatmapStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
+                  "
                 />
               </div>
             </th>
           </thead>
           <tbody>
-            <tr :key="index" v-for="(row, index) in temporaryDataTable?.df.head(5).toArray()">
+            <tr
+              :key="index"
+              v-for="(row, index) in heatmapStore.getActiveDataTable?.df.head(5).toArray()"
+            >
               <td :key="index" v-for="(value, index) in row">
                 {{ value }}
               </td>

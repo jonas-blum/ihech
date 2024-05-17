@@ -1,6 +1,24 @@
 import * as dataForge from 'data-forge'
 
-const COLORS_DISTINCT = ['darkGreen', 'purple']
+export const COLORS = [
+  '#FF0000', // Red
+  '#0000FF', // Blue
+  '#FF00FF', // Magenta
+  '#800000', // Maroon
+  '#808000', // Olive
+  '#008000', // Green
+  '#800080', // Purple
+  '#008080', // Teal
+  '#000080', // Navy
+  '#FF4500', // OrangeRed
+  '#FFD700', // Gold
+  '#C71585', // MediumVioletRed
+  '#DAA520', // GoldenRod
+  '#4682B4', // SteelBlue
+  '#9ACD32', // YellowGreen
+  '#F5DEB3', // Wheat
+  '#FAEBD7', // AntiqueWhite
+]
 
 export function getHeatmapColor(value: number, min: number, max: number) {
   const normalizedValue = (value - min) / (max - min)
@@ -8,11 +26,7 @@ export function getHeatmapColor(value: number, min: number, max: number) {
   return `hsl(215, 100%, ${l}%)`
 }
 
-export function colorFromRangeDistinct(
-  index: number,
-  numColors: number,
-  colorList = COLORS_DISTINCT,
-): string {
+export function getDistinctColor(index: number, colorList = COLORS): string {
   const newIndex = index % colorList.length
   const selectedColor = colorList[newIndex]
 
@@ -44,7 +58,7 @@ export enum ColoringHeatmapEnum {
 }
 
 export interface ItemNameAndData {
-  index: number
+  index: number | null
   itemName: string
   isOpen: boolean
   data: number[]
@@ -102,6 +116,8 @@ export interface CsvDataTableProfile {
   nonNanColumns: string[]
 
   collectionColorMap: Record<string, string>
+  itemCollectionMap: Record<number, string>
+  firstLayerCollectionNames: string[]
 
   showOnlyStickyItemsInDimReduction: boolean
 
@@ -130,22 +146,6 @@ export interface CsvDataTableProfile {
   clusterAfterDimRed: boolean
 
   scaling: ScalingEnum
-}
-
-export function getDistinctEditionsOfRow(row: ItemNameAndData): Set<string> {
-  const editions = new Set<string>()
-
-  function traverse(node: ItemNameAndData) {
-    if (!node.children) {
-      editions.add(node.itemName.split('//')[0])
-      return
-    }
-
-    node.children.forEach((child) => traverse(child))
-  }
-
-  traverse(row)
-  return editions
 }
 
 export function findRowByIndex(row: ItemNameAndData, index: number): ItemNameAndData | null {

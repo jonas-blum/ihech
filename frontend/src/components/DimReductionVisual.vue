@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { type ItemNameAndData, getDistinctEditionsOfRow } from '@helpers/helpers'
+import { type ItemNameAndData } from '@helpers/helpers'
 
 import * as d3 from 'd3'
 import { useHeatmapStore } from '@stores/heatmapStore'
@@ -173,8 +173,8 @@ function drawScatterplot() {
       (row: ItemNameAndData) => `translate(${x(row.dimReductionX)},${y(row.dimReductionY)})`,
     )
     .each(function (row: ItemNameAndData) {
-      const editionColorList = ['blue']
-      const pie = d3.pie()(editionColorList.map(() => 1))
+      const itemColors = heatmapStore.getColorsOfItem(row)
+      const pie = d3.pie()(itemColors.map(() => 1))
       let radius = Math.log10(Math.sqrt(row.amountOfDataPoints)) * 20 + 5
       if (row.amountOfDataPoints === 1) {
         if (heatmapStore.getStickyItems.includes(row)) {
@@ -189,7 +189,7 @@ function drawScatterplot() {
         .enter()
         .append('path')
         .attr('d', arc)
-        .style('fill', (_, i) => editionColorList[i])
+        .style('fill', (_, i) => itemColors[i])
         .style('stroke', row.children ? 'black' : 'none')
         .style('stroke-width', () => {
           if (!isRowCollapsible(row)) {
@@ -227,7 +227,7 @@ function drawScatterplot() {
     .append('title')
     .text(
       (row) =>
-        `Name: ${row.itemName}\nEditions: ${Array.from(getDistinctEditionsOfRow(row)).join(', ')}`,
+        `Name: ${row.itemName}\nCollections: ${heatmapStore.getCollectionNamesOfItem(row).join(', ')}`,
     )
 }
 </script>

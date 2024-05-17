@@ -9,6 +9,8 @@ import {
   SortOrderAttributes,
   type HeatmapSettings,
   ColoringHeatmapEnum,
+  COLORS,
+  getDistinctColor,
 } from '../helpers/helpers'
 
 export interface HeatmapStoreState {
@@ -138,10 +140,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, requestInit)
 
         const receivedHeatmap: HeatmapJSON = await response.json()
+
         if (!receivedHeatmap) {
           console.error('No heatmap data received.')
           return
         }
+
         receivedHeatmap.itemNamesAndData.forEach((row) => {
           setParentOfRowsRec(row, null)
         })
@@ -164,7 +168,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         }
 
         receivedHeatmap.itemNamesAndData = [...stickyRows, ...receivedHeatmap.itemNamesAndData]
-        // await usePCAStore().updatePCA()
+
         this.heatmap = receivedHeatmap
 
         this.toggleStickyAttribute(this.initialAttributeOrder[0])
@@ -278,6 +282,58 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.dataChanging++
       console.log('changing heatmap', this.dataChanging)
     },
+
+    getCollectionNamesOfItemRecursively(item: ItemNameAndData): string[] {
+      if (!this.activeDataTable) {
+        return []
+      }
+      if (item.children === null) {
+        if (item.index !== null) {
+          return [this.activeDataTable.itemCollectionMap[item.index]]
+        }
+        return []
+      }
+      const collections = []
+      for (const child of item.children) {
+        collections.push(...this.getCollectionNamesOfItemRecursively(child))
+      }
+      return collections
+    },
+
+    getCollectionNamesOfItem(item: ItemNameAndData): string[] {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return []
+      }
+      const collectionColumnNames = this.getCollectionNamesOfItemRecursively(item)
+      return [...new Set(collectionColumnNames)]
+    },
+
+    getColorsOfItem(item: ItemNameAndData): string[] {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return ['black']
+      }
+      if (this.activeDataTable.collectionColumnNames.length === 0) {
+        let topMostParent = item
+        while (topMostParent.parent !== null) {
+          topMostParent = topMostParent.parent
+        }
+        const index =
+          this.heatmap.itemNamesAndData.indexOf(topMostParent) - this.getAmountOfStickyItems
+        return [getDistinctColor(index)]
+      }
+
+      const collectionsOfItem = this.getCollectionNamesOfItem(item)
+      const colors: string[] = []
+      for (const collection of collectionsOfItem) {
+        const color = this.activeDataTable.collectionColorMap[collection]
+        if (color) {
+          colors.push(color)
+        }
+      }
+      return colors
+    },
     reorderColDissimilarities(): void {
       if (!this.activeDataTable) {
         console.error('No active data table')
@@ -297,12 +353,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
 
       indexNumbers.forEach((originalIndex, newIndex) => {
-        if (originalIndex) {
-          if (!this.activeDataTable) {
-            console.error('No active data table')
-            return
-          }
-
+        if (originalIndex !== undefined) {
           newColDissimilarities[newIndex] = this.initialAttributeDissimilarities[originalIndex]
         }
       })
@@ -340,9 +391,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         stickyItems.splice(stickyItems.indexOf(stickyItem), 1)
         this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
       } else {
-        this.activeDataTable.stickyItemIndexes.push(stickyItem.index)
-        stickyItems.push(stickyItem)
-        this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
+        if (stickyItem.index !== null) {
+          this.activeDataTable.stickyItemIndexes.push(stickyItem.index)
+          stickyItems.push(stickyItem)
+          this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
+        }
       }
 
       this.changeHeatmap()

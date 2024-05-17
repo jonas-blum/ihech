@@ -20,7 +20,6 @@ from umap import UMAP
 from helpers import drop_columns, extract_columns
 from heatmap_types import HeatmapJSON, HeatmapSettings
 from clustering_functions import cluster_items_recursively
-from line_profiler import LineProfiler
 
 
 logger = logging.getLogger("IHECH Logger")
@@ -252,9 +251,7 @@ def create_heatmap(
     original_filtered_df = pd.concat([original_filtered_df, cluster_column], axis=1)
     original_filtered_df = original_filtered_df.copy()
 
-    lp = LineProfiler()
-    profiled_cluster_items_recursively = lp(cluster_items_recursively)
-    item_names_and_data = profiled_cluster_items_recursively(
+    item_names_and_data = cluster_items_recursively(
         original_filtered_df,
         original_filtered_df_dropped,
         scaled_filtered_df,
@@ -265,7 +262,6 @@ def create_heatmap(
         filtered_collection_column_names,
         level=0,
     )
-    lp.print_stats()
 
     if item_names_and_data is None:
         raise Exception("No items in cluster")

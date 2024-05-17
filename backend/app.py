@@ -1,5 +1,4 @@
 import time
-import numpy as np
 import pandas as pd
 from heatmap import create_heatmap
 from heatmap_types import HeatmapSettings
@@ -7,6 +6,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from io import StringIO
 import logging
+
 
 app = Flask(__name__)
 CORS(app)
@@ -36,6 +36,7 @@ def index():
 
 @app.route("/api/heatmap", methods=["POST"])
 def get_heatmap():
+
     logger.info("Starting to build heatmap...")
     start = time.perf_counter()
 

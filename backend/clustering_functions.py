@@ -1,6 +1,7 @@
 import logging
 import time
 from typing import List, Union
+import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.exceptions import ConvergenceWarning
@@ -110,18 +111,23 @@ def cluster_items_recursively(
             raise Exception("Only one item in cluster")
 
         new_item_names_and_data: List[ItemNameAndData] = []
+        new_item_names = new_item_names = (
+            original_df[item_names_column_name].astype(str).tolist()
+        )
+        dimReductionsX = dim_red_df[0].tolist()
+        dimReductionsY = dim_red_df[1].tolist()
+        all_data = original_df_dropped.values.tolist()
 
         for i in range(original_df.shape[0]):
-            new_item_name = str(original_df.iloc[i][item_names_column_name])
 
             new_item_name_and_data = ItemNameAndData(
                 index=original_df.index[i],
-                itemName=new_item_name,
+                itemName=new_item_names[i],
                 isOpen=is_open,
-                data=original_df_dropped.iloc[i].tolist(),
+                data=all_data[i],
                 amountOfDataPoints=1,
-                dimReductionX=dim_red_df.iloc[i][0],
-                dimReductionY=dim_red_df.iloc[i][1],
+                dimReductionX=dimReductionsX[i],
+                dimReductionY=dimReductionsY[i],
                 children=None,
             )
 
@@ -133,16 +139,19 @@ def cluster_items_recursively(
         kmeans = KMeans(n_clusters=cluster_size, random_state=9283, n_init=1)
         labels = kmeans.fit_predict(scaled_df)
 
-        original_df.loc[:, "cluster"] = labels
-
         new_item_names_and_data: List[ItemNameAndData] = []
 
-        for _, original_cluster_df in original_df.groupby("cluster"):
-            scaled_cluster_df = scaled_df.loc[original_cluster_df.index]
-            original_cluster_df_dropped = original_df_dropped.loc[
-                original_cluster_df.index
-            ]
-            dim_red_cluster_df = dim_red_df.loc[original_cluster_df.index]
+        cluster_indices = {
+            cluster_id: original_df.index[labels == cluster_id]
+            for cluster_id in np.unique(labels)
+        }
+
+        for _, indices in cluster_indices.items():
+
+            scaled_cluster_df = scaled_df.loc[indices]
+            original_cluster_df_dropped = original_df_dropped.loc[indices]
+            dim_red_cluster_df = dim_red_df.loc[indices]
+            original_cluster_df = original_df.loc[indices]
 
             if (
                 original_cluster_df.shape[0] <= 0
@@ -151,7 +160,9 @@ def cluster_items_recursively(
                 continue
 
             if original_cluster_df.shape[0] == 1:
-                new_item_name = str(original_cluster_df.iloc[0][item_names_column_name])
+                new_item_name = (
+                    original_cluster_df[item_names_column_name].astype(str).iat[0]
+                )
                 new_data = original_cluster_df_dropped.iloc[0].tolist()
                 new_item_name_and_data = ItemNameAndData(
                     index=original_cluster_df.index[0],

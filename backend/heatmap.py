@@ -1,7 +1,6 @@
 from numba.core.errors import NumbaDeprecationWarning
 import warnings
 
-from sympy import Nor
 
 warnings.filterwarnings(
     "ignore",
@@ -21,6 +20,7 @@ from umap import UMAP
 from helpers import drop_columns, extract_columns
 from heatmap_types import HeatmapJSON, HeatmapSettings
 from clustering_functions import cluster_items_recursively
+from line_profiler import LineProfiler
 
 
 logger = logging.getLogger("IHECH Logger")
@@ -83,6 +83,8 @@ def sort_attributes(
 def filter_attributes_and_items(
     original_df: pd.DataFrame, settings: HeatmapSettings
 ) -> pd.DataFrame:
+
+    original_df = original_df.loc[settings.selectedItemIndexes]
 
     extracted_columns = extract_columns(
         original_df,
@@ -211,8 +213,9 @@ def create_heatmap(
     if settings.clusterAfterDimRed:
         scaled_filtered_df = dim_red_df.copy()
 
+    original_filtered_df_dropped = original_filtered_df.copy()
     original_filtered_df_dropped = drop_columns(
-        original_filtered_df,
+        original_filtered_df_dropped,
         settings.itemNamesColumnName,
         settings.collectionColumnNames,
     )
@@ -247,9 +250,13 @@ def create_heatmap(
         {"cluster": [-1] * len(original_filtered_df)}, index=original_filtered_df.index
     )
     original_filtered_df = pd.concat([original_filtered_df, cluster_column], axis=1)
+    original_filtered_df = original_filtered_df.copy()
 
-    item_names_and_data = cluster_items_recursively(
+    lp = LineProfiler()
+    profiled_cluster_items_recursively = lp(cluster_items_recursively)
+    item_names_and_data = profiled_cluster_items_recursively(
         original_filtered_df,
+        original_filtered_df_dropped,
         scaled_filtered_df,
         dim_red_df,
         settings.clusterSize,
@@ -258,6 +265,7 @@ def create_heatmap(
         filtered_collection_column_names,
         level=0,
     )
+    lp.print_stats()
 
     if item_names_and_data is None:
         raise Exception("No items in cluster")

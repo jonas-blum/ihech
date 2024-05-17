@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AbsRelLogEnum, DimReductionAlgoEnum, SortOrderAttributes } from '@/helpers/helpers'
+import { ScalingEnum, DimReductionAlgoEnum, SortOrderAttributes } from '@/helpers/helpers'
 
 import type { ItemNameAndData } from '@/helpers/helpers'
 import { getHeatmapColor } from '@/helpers/helpers'
@@ -47,8 +47,8 @@ function findRowAndOpenIt(event: Event) {
   }
 }
 
-async function updateAbsRelLog(selectedAbsRelLog: AbsRelLogEnum) {
-  heatmapStore.setAbsRelLog(selectedAbsRelLog)
+async function updateScaling(scaling: ScalingEnum) {
+  heatmapStore.setScaling(scaling)
   await heatmapStore.fetchHeatmap()
 }
 
@@ -150,7 +150,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
                   @click="updateDimReductionAlgo(dimReductionAlgo)"
                   :class="{
                     'bg-green-700 text-white':
-                      heatmapStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo
+                      heatmapStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo,
                   }"
                   >{{ dimReductionAlgo }}</a
                 >
@@ -221,16 +221,16 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
           <li>
             <ul class="menu menu-vertical bg-base-200">
               <li
-                :key="absRel"
+                :key="scaling"
                 :style="{ border: 'none' }"
-                v-for="absRel in Object.values(AbsRelLogEnum)"
+                v-for="scaling in Object.values(ScalingEnum)"
               >
                 <a
-                  @click="updateAbsRelLog(absRel)"
+                  @click="updateScaling(scaling)"
                   :class="{
-                    'bg-green-700 text-white': heatmapStore.getActiveDataTable?.absRelLog === absRel
+                    'bg-green-700 text-white': heatmapStore.getActiveDataTable?.scaling === scaling,
                   }"
-                  >{{ absRel }}</a
+                  >{{ scaling }}</a
                 >
               </li>
             </ul>
@@ -269,7 +269,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
                   @click="updateSortOrderAttributes(sortOrder)"
                   :class="{
                     'bg-green-700 text-white':
-                      heatmapStore.getActiveDataTable?.sortOrderAttributes === sortOrder
+                      heatmapStore.getActiveDataTable?.sortOrderAttributes === sortOrder,
                   }"
                   >{{ sortOrder }}</a
                 >
@@ -292,7 +292,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
             getHeatmapColor(0, 0, 1) +
             ', ' +
             getHeatmapColor(1, 0, 1) +
-            ')'
+            ')',
         }"
         class="color-scale"
       ></div>

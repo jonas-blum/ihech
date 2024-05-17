@@ -30,7 +30,7 @@ def cluster_items_recursively(
 ) -> Union[List[ItemNameAndData], None]:
 
     original_df_dropped = drop_columns(
-        original_df, item_names_column_name, collection_column_names
+        original_df, item_names_column_name, collection_column_names + ["cluster"]
     )
 
     is_open = False
@@ -141,9 +141,7 @@ def cluster_items_recursively(
 
         new_item_names_and_data: List[ItemNameAndData] = []
         for cluster_id in sorted(original_df["cluster"].unique()):
-            original_cluster_df = original_df[
-                original_df["cluster"] == cluster_id
-            ].drop("cluster", axis=1)
+            original_cluster_df = original_df[original_df["cluster"] == cluster_id]
 
             scaled_cluster_df = scaled_df.loc[original_cluster_df.index]
             original_cluster_df_dropped = original_df_dropped.loc[

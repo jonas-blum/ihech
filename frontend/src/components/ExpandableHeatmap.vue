@@ -3,7 +3,7 @@ import { nextTick, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 import ExpRowComponent from './ExpRowComponent.vue'
 
-import { AbsRelLogEnum, getHeatmapColor, type ItemNameAndData } from '@helpers/helpers'
+import { ColoringHeatmapEnum, getHeatmapColor, type ItemNameAndData } from '@helpers/helpers'
 import { useHeatmapStore } from '@stores/heatmapStore'
 
 import DimReductionVisual from './DimReductionVisual.vue'
@@ -65,7 +65,7 @@ function updateDimReductionWidth() {
       ROW_LABELS_WIDTH -
       SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
       MARGIN_RIGHT,
-    window.innerHeight / 1.5
+    window.innerHeight / 1.5,
   )
 }
 
@@ -75,7 +75,8 @@ function updateHeatmapWidth() {
 
 function updateCellWidth() {
   cellWidth.value = Math.round(
-    (heatmapWidth.value - stickyAttributesGap.value) / heatmapStore.getHeatmap.attributeNames.length
+    (heatmapWidth.value - stickyAttributesGap.value) /
+      heatmapStore.getHeatmap.attributeNames.length,
   )
 }
 
@@ -85,7 +86,7 @@ function updateHeatmapHeight() {
 
 function updateCellHeight() {
   cellHeight.value = Math.round(
-    (heatmapHeight.value - stickyItemsGap.value) / visibleRows.value.length
+    (heatmapHeight.value - stickyItemsGap.value) / visibleRows.value.length,
   )
 }
 
@@ -117,13 +118,13 @@ function updateVisibleRows() {
       return [row]
     } else if (row.isOpen && row.children) {
       return [row].concat(
-        row.children.flatMap((child: ItemNameAndData) => getVisibleRowsRecursively(child))
+        row.children.flatMap((child: ItemNameAndData) => getVisibleRowsRecursively(child)),
       )
     }
     return []
   }
   visibleRows.value = heatmapStore.getHeatmap.itemNamesAndData.flatMap((row) =>
-    getVisibleRowsRecursively(row)
+    getVisibleRowsRecursively(row),
   )
 }
 
@@ -133,7 +134,7 @@ function updateHeatmapContainerWidth() {
       ROW_LABELS_WIDTH -
       MIN_DIM_REDUCTION_WIDTH -
       SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
-      MARGIN_RIGHT
+      MARGIN_RIGHT,
   )
 
   const width = Math.min(maxWidth, heatmapWidth.value + 2 * BORDER_WIDTH)
@@ -152,11 +153,13 @@ function updateEntireColLabelHeight() {
 }
 
 function getHeatmapColorMaxValue() {
-  if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.REL) {
+  if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
     return 1
-  } else if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.LOG) {
+  } else if (
+    heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
+  ) {
     return Math.log(heatmapStore.getHeatmapMaxValue + 1)
-  } else if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.ABS) {
+  } else if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ABSOLUTE) {
     return heatmapStore.getHeatmapMaxValue
   }
   return heatmapStore.getHeatmapMaxValue
@@ -176,14 +179,16 @@ function drawEverything() {
     const heatmapMaxValue = getHeatmapColorMaxValue()
     visibleRows.value.forEach((row, rowIndex) => {
       let maxRowValue = 1
-      if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.REL) {
+      if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
         maxRowValue = Math.max(...row.data)
       }
       row.data.forEach((value, colIndex) => {
         let adjustedValue = value
-        if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.REL) {
+        if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
           adjustedValue = value / maxRowValue
-        } else if (heatmapStore?.getActiveDataTable?.absRelLog === AbsRelLogEnum.LOG) {
+        } else if (
+          heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
+        ) {
           adjustedValue = Math.log(value + 1)
         }
 
@@ -199,7 +204,7 @@ function drawEverything() {
         ctx.fillStyle = getHeatmapColor(
           adjustedValue,
           heatmapStore.getHeatmapMinValue,
-          heatmapMaxValue
+          heatmapMaxValue,
         )
         ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
       })
@@ -387,7 +392,7 @@ watch(
   () => {
     updateHeatmap()
     // dataChangingRef.value++
-  }
+  },
 )
 
 function updateHeatmap() {
@@ -488,14 +493,14 @@ onMounted(async () => {
           height: dimReductionWidth + 'px',
           paddingTop: entireColLabelHeight - 25 + 'px',
           position: 'sticky',
-          top: 0
+          top: 0,
         }"
       >
         <div
           :style="{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
           }"
         >
           <p style="height: 25px">{{ heatmapStore.getActiveDataTable?.dimReductionAlgo }}</p>
@@ -509,7 +514,7 @@ onMounted(async () => {
           marginTop: entireColLabelHeight + 'px',
           gap: GAP_HEIGHT + 'px',
           marginRight: SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
-          width: ROW_LABELS_WIDTH + 'px'
+          width: ROW_LABELS_WIDTH + 'px',
         }"
         class="row-label-container"
       >
@@ -538,7 +543,7 @@ onMounted(async () => {
         ref="heatmapAndColumnsContainer"
         :style="{
           width: heatmapContainerWidth + 'px',
-          marginRight: 'auto'
+          marginRight: 'auto',
         }"
       >
         <div
@@ -547,7 +552,7 @@ onMounted(async () => {
             overflowX: 'auto',
             width: heatmapContainerWidth + 'px',
             marginBottom: TOP_SCROLLBAR_OFFSET + 'px',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
           }"
           @scroll="syncScroll"
           ref="topScrollbarContainer"
@@ -555,7 +560,7 @@ onMounted(async () => {
           <div
             :style="{
               width: heatmapWidth + 'px',
-              height: 1 + 'px'
+              height: 1 + 'px',
             }"
           ></div>
         </div>
@@ -563,7 +568,7 @@ onMounted(async () => {
           :style="{
             width: heatmapContainerWidth + 'px',
             overflowX: 'auto',
-            paddingBottom: TOP_SCROLLBAR_OFFSET + 'px'
+            paddingBottom: TOP_SCROLLBAR_OFFSET + 'px',
           }"
           @scroll="syncScroll"
           ref="bottomScrollbarContainer"
@@ -580,7 +585,7 @@ onMounted(async () => {
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'center',
-              fontSize: 'small'
+              fontSize: 'small',
             }"
             class="sticky-top"
           >
@@ -599,7 +604,7 @@ onMounted(async () => {
                 marginLeft:
                   index === heatmapStore.getActiveDataTable?.stickyAttributes.length
                     ? stickyAttributesGap + 'px'
-                    : 0
+                    : 0,
               }"
             >
               <div
@@ -610,7 +615,7 @@ onMounted(async () => {
                   backgroundColor: '#ccc',
                   top: '10px',
                   left: 0,
-                  zIndex: 0
+                  zIndex: 0,
                 }"
               ></div>
               <div
@@ -620,14 +625,14 @@ onMounted(async () => {
                   width: '100%',
                   zIndex: 2,
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
                 }"
               >
                 <div
                   :style="{
                     width: '100%',
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
                   }"
                 >
                   {{
@@ -642,7 +647,7 @@ onMounted(async () => {
                   alignItems: 'center',
                   top: '10px',
                   width: '100%',
-                  zIndex: 1
+                  zIndex: 1,
                 }"
               >
                 <div>{{ colName }}</div>
@@ -653,7 +658,7 @@ onMounted(async () => {
           <canvas
             :style="{
               border: BORDER_WIDTH + 'px solid black',
-              boxSizing: 'content-box'
+              boxSizing: 'content-box',
             }"
             :width="heatmapWidth"
             :height="heatmapHeight"

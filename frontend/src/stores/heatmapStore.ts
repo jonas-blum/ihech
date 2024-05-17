@@ -4,10 +4,10 @@ import {
   type ItemNameAndData,
   findRowByIndex,
   type CsvDataTableProfile,
-  AbsRelLogEnum,
+  ScalingEnum,
   DimReductionAlgoEnum,
   SortOrderAttributes,
-  type HeatmapSettings
+  type HeatmapSettings,
 } from '../helpers/helpers'
 
 export interface HeatmapStoreState {
@@ -39,7 +39,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       maxDimRedXValue: 100,
       maxDimRedYValue: 0,
       minDimRedXValue: 0,
-      minDimRedYValue: 100
+      minDimRedYValue: 100,
     },
     highlightedRow: null,
 
@@ -48,7 +48,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
     dataChanging: 1,
     loading: false,
-    timer: 0
+    timer: 0,
   }),
   getters: {
     getAllDataTables: (state) => state.dataTables,
@@ -85,12 +85,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
     getStickyItems: (state) =>
       state.heatmap.itemNamesAndData.slice(
-        state.activeDataTable ? state.activeDataTable.stickyItemIndexes.length : 0
+        state.activeDataTable ? state.activeDataTable.stickyItemIndexes.length : 0,
       ),
 
     getDataChanging: (state) => state.dataChanging,
     isLoading: (state) => state.loading,
-    getTimer: (state) => state.timer
+    getTimer: (state) => state.timer,
   },
   actions: {
     saveDataTable(dataTable: CsvDataTableProfile) {
@@ -128,7 +128,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         const requestInit: RequestInit = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ settings })
+          body: JSON.stringify({ settings }),
         }
 
         console.log(import.meta.env.VITE_API_URL)
@@ -178,12 +178,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     setTimer(timer: number) {
       this.timer = timer
     },
-    setAbsRelLog(absRelLog: AbsRelLogEnum) {
+    setScaling(scaling: ScalingEnum) {
       if (!this.activeDataTable) {
         console.error('No active data table')
         return
       }
-      this.activeDataTable.absRelLog = absRelLog
+      this.activeDataTable.scaling = scaling
     },
     setClusterByCollections(clusterByCollections: boolean) {
       if (!this.activeDataTable) {
@@ -290,7 +290,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         dimReductionAlgo: this.activeDataTable.dimReductionAlgo,
         clusterAfterDimRed: this.activeDataTable.clusterAfterDimRed,
 
-        absRelLog: this.activeDataTable.absRelLog
+        scaling: this.activeDataTable.scaling,
       }
     },
     changeHeatmap(): void {
@@ -342,11 +342,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
 
       this.activeDataTable.stickyAttributes = this.activeDataTable.stickyAttributes.filter((attr) =>
-        this.heatmap.attributeNames.includes(attr)
+        this.heatmap.attributeNames.includes(attr),
       )
       if (this.activeDataTable.stickyAttributes.includes(attribute)) {
         this.activeDataTable.stickyAttributes = this.activeDataTable.stickyAttributes.filter(
-          (attr) => attr !== attribute
+          (attr) => attr !== attribute,
         )
 
         if (!this.activeDataTable) {
@@ -467,7 +467,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       let removing = false
       let stickyItems = this.heatmap.itemNamesAndData.slice(
         0,
-        this.activeDataTable.stickyItemIndexes.length
+        this.activeDataTable.stickyItemIndexes.length,
       )
       if (stickyItems.includes(row)) {
         stickyItems = stickyItems.filter((item) => item !== row)
@@ -478,11 +478,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       this.heatmap.itemNamesAndData = [
         ...stickyItems,
-        ...this.heatmap.itemNamesAndData.slice(this.activeDataTable.stickyItemIndexes.length)
+        ...this.heatmap.itemNamesAndData.slice(this.activeDataTable.stickyItemIndexes.length),
       ]
       if (removing) {
         this.activeDataTable.stickyItemIndexes = this.activeDataTable.stickyItemIndexes.filter(
-          (item) => item !== row.index
+          (item) => item !== row.index,
         )
       } else {
         this.activeDataTable.stickyItemIndexes.push(row.index)
@@ -528,8 +528,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       } else {
         this.expandRow(row)
       }
-    }
-  }
+    },
+  },
 })
 
 function recursivelyCopyData(row: ItemNameAndData): void {

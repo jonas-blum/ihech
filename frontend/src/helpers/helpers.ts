@@ -11,7 +11,7 @@ export function getHeatmapColor(value: number, min: number, max: number) {
 export function colorFromRangeDistinct(
   index: number,
   numColors: number,
-  colorList = COLORS_DISTINCT
+  colorList = COLORS_DISTINCT,
 ): string {
   const newIndex = index % colorList.length
   const selectedColor = colorList[newIndex]
@@ -23,19 +23,24 @@ export enum SortOrderAttributes {
   STDEV = 'STDEV',
   ASC = 'ASC',
   DESC = 'DESC',
-  ALPHABETICAL = 'ALPHABETICAL'
+  ALPHABETICAL = 'ALPHABETICAL',
 }
 
-export enum AbsRelLogEnum {
-  REL = 'REL',
-  ABS = 'ABS',
-  LOG = 'LOG'
+export enum ScalingEnum {
+  NO_SCALING = 'NO_SCALING',
+  STANDARDIZING = 'STANDARDIZING',
 }
 
 export enum DimReductionAlgoEnum {
   PCA = 'PCA',
   UMAP = 'UMAP',
-  TSNE = 'TSNE'
+  TSNE = 'TSNE',
+}
+
+export enum ColoringHeatmapEnum {
+  ABSOLUTE = 'ABSOLUTE',
+  LOGARITHMIC = 'LOGARITHMIC',
+  RELATIVE = 'RELATIVE',
 }
 
 export interface ItemNameAndData {
@@ -86,7 +91,7 @@ export interface HeatmapSettings {
   dimReductionAlgo: DimReductionAlgoEnum
   clusterAfterDimRed: boolean
 
-  absRelLog: AbsRelLogEnum
+  scaling: ScalingEnum
 }
 
 export interface CsvDataTableProfile {
@@ -99,6 +104,8 @@ export interface CsvDataTableProfile {
   collectionColorMap: Record<string, string>
 
   showOnlyStickyItemsInDimReduction: boolean
+
+  coloringHeatmap: ColoringHeatmapEnum
 
   //Settings for the backend
   csvFile: string
@@ -122,7 +129,7 @@ export interface CsvDataTableProfile {
   dimReductionAlgo: DimReductionAlgoEnum
   clusterAfterDimRed: boolean
 
-  absRelLog: AbsRelLogEnum
+  scaling: ScalingEnum
 }
 
 export function getDistinctEditionsOfRow(row: ItemNameAndData): Set<string> {

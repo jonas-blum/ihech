@@ -67,7 +67,7 @@ function applyMultipleColors(colors: string[]) {
     const textPart = text.slice(start, end)
     coloredText += `<span  style="color: ${colors[i]}; max-width:${Math.max(
       15,
-      props.rowLabelsWidth - props.depth * 30
+      props.rowLabelsWidth - props.depth * 30,
     )}px">${textPart}</span>`
   }
   if (colors.length > 1) {
@@ -130,7 +130,7 @@ watch(
   () => heatmapStore.getHighlightedRow,
   () => {
     updateIsRowHighlighted()
-  }
+  },
 )
 
 watch(
@@ -139,7 +139,7 @@ watch(
     nextTick(() => {
       updateMarginTop()
     })
-  }
+  },
 )
 </script>
 
@@ -149,14 +149,14 @@ watch(
     :style="{
       gap: props.gapHeight + 'px',
       marginLeft: buttonSize,
-      marginTop: marginTop + 'px'
+      marginTop: marginTop + 'px',
     }"
   >
     <div class="row-div">
       <button
         :style="{
           height: buttonSize,
-          width: buttonSize
+          width: buttonSize,
         }"
         v-if="props.row.children"
         @click="toggleOpen"
@@ -176,12 +176,12 @@ watch(
           display: 'flex',
           alignItems: 'center',
           height: props.cellHeight - props.gapHeight + 'px',
-          maxWidth: '110px'
+          maxWidth: '110px',
         }"
       >
         <button
           :style="{
-            width: buttonSize
+            width: buttonSize,
           }"
           class="sticky-button"
           @click="heatmapStore.toggleStickyItem(props.row)"
@@ -201,7 +201,7 @@ watch(
           :style="{
             fontWeight: isRowHighlighted ? 900 : 'normal',
             height: props.cellHeight - props.gapHeight + 'px',
-            fontSize: props.cellHeight * 0.9 - props.gapHeight + 'px'
+            fontSize: props.cellHeight * 0.9 - props.gapHeight + 'px',
           }"
           class="text-div"
         >

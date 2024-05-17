@@ -31,7 +31,7 @@ function getAllVisibleRows(): ItemNameAndData[] {
   }
   return (
     heatmapStore.getHeatmap?.itemNamesAndData.flatMap((row: ItemNameAndData) =>
-      getVisibleRowsRecursively(row)
+      getVisibleRowsRecursively(row),
     ) || []
   )
 }
@@ -49,7 +49,7 @@ function getMaxMinRecursively(row: ItemNameAndData, max: boolean, x: boolean): n
         return Math.min(acc, value)
       }
     },
-    x ? row.dimReductionX : row.dimReductionY
+    x ? row.dimReductionX : row.dimReductionY,
   )
 }
 
@@ -110,14 +110,14 @@ watch(
   () => heatmapStore.getHighlightedRow,
   () => {
     updateCirclesOpacity()
-  }
+  },
 )
 
 watch(
   () => heatmapStore.getDataChanging,
   () => {
     drawScatterplot()
-  }
+  },
 )
 
 function drawScatterplot() {
@@ -170,7 +170,7 @@ function drawScatterplot() {
     .append('g')
     .attr(
       'transform',
-      (row: ItemNameAndData) => `translate(${x(row.dimReductionX)},${y(row.dimReductionY)})`
+      (row: ItemNameAndData) => `translate(${x(row.dimReductionX)},${y(row.dimReductionY)})`,
     )
     .each(function (row: ItemNameAndData) {
       const editionColorList = ['blue']
@@ -227,7 +227,7 @@ function drawScatterplot() {
     .append('title')
     .text(
       (row) =>
-        `Name: ${row.itemName}\nEditions: ${Array.from(getDistinctEditionsOfRow(row)).join(', ')}`
+        `Name: ${row.itemName}\nEditions: ${Array.from(getDistinctEditionsOfRow(row)).join(', ')}`,
     )
 }
 </script>

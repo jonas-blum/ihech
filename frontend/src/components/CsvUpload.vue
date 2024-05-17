@@ -3,10 +3,11 @@ import { useHeatmapStore } from '@/stores/heatmapStore'
 import { ref, watch } from 'vue'
 import * as dataForge from 'data-forge'
 import {
-  AbsRelLogEnum,
+  ScalingEnum,
   DimReductionAlgoEnum,
   SortOrderAttributes,
-  type CsvDataTableProfile
+  type CsvDataTableProfile,
+  ColoringHeatmapEnum,
 } from '@/helpers/helpers'
 
 const heatmapStore = useHeatmapStore()
@@ -82,7 +83,9 @@ function uploadCsvFile(event: Event) {
       dimReductionAlgo: DimReductionAlgoEnum.PCA,
       clusterAfterDimRed: false,
 
-      absRelLog: AbsRelLogEnum.LOG
+      scaling: ScalingEnum.STANDARDIZING,
+
+      coloringHeatmap: ColoringHeatmapEnum.ABSOLUTE,
     }
     console.log(newDataTable)
     temporaryDataTable.value = newDataTable
@@ -131,7 +134,7 @@ function updateHierarchyLayer(event: Event, columnName: string) {
   }
 
   temporaryDataTable.value.selectedAttributes = temporaryDataTable.value.selectedAttributes.filter(
-    (attr) => attr !== columnName
+    (attr) => attr !== columnName,
   )
 
   if (selectedHierarchyLayer === 'None') {
@@ -205,7 +208,9 @@ function setActiveTableAsTemporary() {
       dimReductionAlgo: heatmapStore.getActiveDataTable.dimReductionAlgo,
       clusterAfterDimRed: heatmapStore.getActiveDataTable.clusterAfterDimRed,
 
-      absRelLog: heatmapStore.getActiveDataTable.absRelLog
+      scaling: heatmapStore.getActiveDataTable.scaling,
+
+      coloringHeatmap: heatmapStore.getActiveDataTable.coloringHeatmap,
     }
   }
 }
@@ -214,7 +219,7 @@ watch(
   () => heatmapStore.getActiveDataTable,
   () => {
     setActiveTableAsTemporary()
-  }
+  },
 )
 </script>
 
@@ -239,14 +244,14 @@ watch(
             flexDirection: 'column',
             gap: '5px',
             border: '1px solid black',
-            padding: '5px'
+            padding: '5px',
           }"
         >
           <li :key="index" v-for="(dataTable, index) in heatmapStore.getAllDataTables">
             <button
               :style="{
                 fontWeight:
-                  temporaryDataTable?.tableName === dataTable.tableName ? 'bold' : 'normal'
+                  temporaryDataTable?.tableName === dataTable.tableName ? 'bold' : 'normal',
               }"
               @click.stop="selectDataTable(dataTable)"
             >

@@ -118,7 +118,11 @@ def do_scaling(
     elif settings.scaling == "STANDARDIZING":
         scaler = StandardScaler()
         scaled_df = scaler.fit_transform(original_filtered_df)
-        scaled_df = pd.DataFrame(scaled_df, index=original_filtered_df.index)
+        scaled_df = pd.DataFrame(
+            scaled_df,
+            index=original_filtered_df.index,
+            columns=original_filtered_df.columns,
+        )
         return scaled_df
     else:
         raise ValueError("Invalid absRelLog value")
@@ -238,6 +242,11 @@ def create_heatmap(
 
     logger.info(f"Dim reduction done: {round(time.perf_counter() - start,3 )}")
     logger.info("Starting clustering...")
+
+    cluster_column = pd.DataFrame(
+        {"cluster": [-1] * len(original_filtered_df)}, index=original_filtered_df.index
+    )
+    original_filtered_df = pd.concat([original_filtered_df, cluster_column], axis=1)
 
     item_names_and_data = cluster_items_recursively(
         original_filtered_df,

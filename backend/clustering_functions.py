@@ -20,6 +20,7 @@ def all_rows_same(df):
 
 def cluster_items_recursively(
     original_df: pd.DataFrame,
+    original_df_dropped: pd.DataFrame,
     scaled_df: pd.DataFrame,
     dim_red_df: pd.DataFrame,
     cluster_size: int,
@@ -28,11 +29,6 @@ def cluster_items_recursively(
     collection_column_names: List[str],
     level: int = 0,
 ) -> Union[List[ItemNameAndData], None]:
-
-    original_df_dropped = drop_columns(
-        original_df, item_names_column_name, collection_column_names + ["cluster"]
-    )
-
     is_open = False
 
     if cluster_by_collections and len(collection_column_names) > 0:
@@ -82,6 +78,7 @@ def cluster_items_recursively(
             else:
                 new_children = cluster_items_recursively(
                     original_temp_df,
+                    original_temp_df_dropped,
                     scaled_temp_df,
                     dim_red_temp_df,
                     cluster_size,
@@ -133,21 +130,18 @@ def cluster_items_recursively(
         return new_item_names_and_data
 
     else:
-        n_clusters = cluster_size
-        kmeans = KMeans(n_clusters=n_clusters, random_state=9283, n_init=1)
+        kmeans = KMeans(n_clusters=cluster_size, random_state=9283, n_init=1)
         labels = kmeans.fit_predict(scaled_df)
 
         original_df.loc[:, "cluster"] = labels
 
         new_item_names_and_data: List[ItemNameAndData] = []
-        for cluster_id in sorted(original_df["cluster"].unique()):
-            original_cluster_df = original_df[original_df["cluster"] == cluster_id]
 
+        for _, original_cluster_df in original_df.groupby("cluster"):
             scaled_cluster_df = scaled_df.loc[original_cluster_df.index]
             original_cluster_df_dropped = original_df_dropped.loc[
                 original_cluster_df.index
             ]
-
             dim_red_cluster_df = dim_red_df.loc[original_cluster_df.index]
 
             if (
@@ -172,12 +166,17 @@ def cluster_items_recursively(
                 new_item_names_and_data.append(new_item_name_and_data)
                 continue
 
-            tag_data_aggregated = original_cluster_df_dropped.mean().tolist()
+            tag_data_aggregated_mean = original_cluster_df_dropped.mean()
+
+            tag_data_aggregated = tag_data_aggregated_mean.tolist()
+
             dim_reduction_aggregated = dim_red_cluster_df.mean().tolist()
+
             new_item_name = str(original_cluster_df.shape[0])
 
             children = cluster_items_recursively(
                 original_cluster_df,
+                original_cluster_df_dropped,
                 scaled_cluster_df,
                 dim_red_cluster_df,
                 cluster_size,

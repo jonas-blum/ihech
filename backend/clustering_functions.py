@@ -20,7 +20,7 @@ def all_rows_same(df):
 
 def cluster_items_recursively(
     original_df: pd.DataFrame,
-    transformed_df: pd.DataFrame,
+    scaled_df: pd.DataFrame,
     dim_red_df: pd.DataFrame,
     cluster_size: int,
     item_names_column_name: str,
@@ -43,7 +43,7 @@ def cluster_items_recursively(
         ):
             remaining_collection_column_names = collection_column_names[1:]
 
-            transformed_temp_df = transformed_df.loc[original_group_df.index]
+            scaled_temp_df = scaled_df.loc[original_group_df.index]
             dim_red_temp_df = dim_red_df.loc[original_group_df.index]
             original_temp_df_dropped = original_df_dropped.loc[original_group_df.index]
             original_temp_df = original_group_df.drop(collection_column_name, axis=1)
@@ -82,7 +82,7 @@ def cluster_items_recursively(
             else:
                 new_children = cluster_items_recursively(
                     original_temp_df,
-                    transformed_temp_df,
+                    scaled_temp_df,
                     dim_red_temp_df,
                     cluster_size,
                     item_names_column_name,
@@ -106,7 +106,7 @@ def cluster_items_recursively(
 
         return new_item_names_and_data
 
-    if original_df.shape[0] <= cluster_size or all_rows_same(transformed_df):
+    if original_df.shape[0] <= cluster_size or all_rows_same(scaled_df):
         if original_df.shape[0] == 0:
             raise Exception("No items in cluster")
         if original_df.shape[0] == 1:
@@ -135,7 +135,7 @@ def cluster_items_recursively(
     else:
         n_clusters = cluster_size
         kmeans = KMeans(n_clusters=n_clusters, random_state=9283, n_init=1)
-        labels = kmeans.fit_predict(transformed_df)
+        labels = kmeans.fit_predict(scaled_df)
 
         original_df.loc[:, "cluster"] = labels
 
@@ -145,7 +145,7 @@ def cluster_items_recursively(
                 original_df["cluster"] == cluster_id
             ].drop("cluster", axis=1)
 
-            transformed_cluster_df = transformed_df.loc[original_cluster_df.index]
+            scaled_cluster_df = scaled_df.loc[original_cluster_df.index]
             original_cluster_df_dropped = original_df_dropped.loc[
                 original_cluster_df.index
             ]
@@ -180,7 +180,7 @@ def cluster_items_recursively(
 
             children = cluster_items_recursively(
                 original_cluster_df,
-                transformed_cluster_df,
+                scaled_cluster_df,
                 dim_red_cluster_df,
                 cluster_size,
                 item_names_column_name,

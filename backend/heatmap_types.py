@@ -3,7 +3,10 @@ from typing import List, Literal, Union
 import numpy as np
 
 
-AbsRelLogType = Literal["ABS", "REL", "LOG"]
+ScalingType = Literal[
+    "NO_SCALING",
+    "STANDARDIZING",
+]
 
 MedianMaxMinType = Literal["MEDIAN", "MIN", "MAX"]
 
@@ -96,7 +99,7 @@ class ItemNameAndData:
 
 
 def custom_encoder(obj):
-    if isinstance(obj, np.float32): # type: ignore
+    if isinstance(obj, np.float32):  # type: ignore
         return float(obj)
     elif isinstance(obj, np.integer):
         return int(obj)
@@ -165,9 +168,7 @@ class HeatmapSettings:
     dimReductionAlgo: DimReductionAlgoType
     clusterAfterDimRed: bool
 
-    absRelLog: AbsRelLogType
-
-
+    scaling: ScalingType
 
     def __init__(self, dict):
         self.csvFile = dict["csvFile"]
@@ -193,5 +194,4 @@ class HeatmapSettings:
         self.dimReductionAlgo = dict["dimReductionAlgo"]
         self.clusterAfterDimRed = dict["clusterAfterDimRed"]
 
-        self.absRelLog = dict["absRelLog"]
-
+        self.scaling = dict["scaling"]

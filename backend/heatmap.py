@@ -231,7 +231,8 @@ def create_heatmap(
 
     heatmap_json = HeatmapJSON()
     heatmap_json.attributeDissimilarities = normalized_dissimilarities.tolist()
-    heatmap_json.attributeNames = list(original_filtered_df_dropped.columns)
+    heatmap_json.attributeNames = [attr.replace("\n", " ") for attr in original_filtered_df_dropped.columns]
+
 
     heatmap_json.maxHeatmapValue = original_filtered_df_dropped.max().max()
     heatmap_json.minHeatmapValue = original_filtered_df_dropped.min().min()

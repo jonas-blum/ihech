@@ -68,7 +68,7 @@ class ExtendedVectorRepresentation:
 
 
 class ItemNameAndData:
-    index: int | None
+    index: Union[int, None]
     itemName: str
     isOpen: bool
     data: List[float]
@@ -79,7 +79,7 @@ class ItemNameAndData:
 
     def __init__(
         self,
-        index: int | None,
+        index: Union[int, None],
         itemName: str,
         isOpen: bool,
         data: List[float],
@@ -88,7 +88,7 @@ class ItemNameAndData:
         dimReductionY: float,
         children: Union["List[ItemNameAndData]", None],
     ):
-        self.index: int | None = index
+        self.index: Union[int, None] = index
         self.itemName: str = itemName
         self.isOpen: bool = isOpen
         self.data: List[float] = data

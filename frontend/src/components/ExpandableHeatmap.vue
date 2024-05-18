@@ -17,7 +17,6 @@ const heatmapStore = useHeatmapStore()
 const MIN_CELL_HEIGHT = 17
 const GAP_HEIGHT = 2
 const COL_LABELS_HEIGHT = 100
-const TOP_SCROLLBAR_OFFSET = 15
 const MIN_DIM_REDUCTION_WIDTH = 250
 const ROW_LABELS_WIDTH = 200
 const MIN_COL_LABELS_WIDTH = 12
@@ -40,7 +39,6 @@ const colLabelContainer = ref<HTMLElement | null>(null)
 const highlightOverlay = ref<HTMLElement | null>(null)
 const canvas = ref<HTMLCanvasElement | null>(null)
 
-const topScrollbarContainer = ref<HTMLElement | null>(null)
 const bottomScrollbarContainer = ref<HTMLElement | null>(null)
 
 const visibleRows = ref<ItemNameAndData[]>([])
@@ -143,14 +141,10 @@ function updateHeatmapContainerWidth() {
 }
 
 function updateEntireColLabelHeight() {
-  if (!topScrollbarContainer.value || !colLabelContainer.value) {
+  if (!colLabelContainer.value) {
     return
   }
-  entireColLabelHeight.value =
-    topScrollbarContainer.value.offsetHeight +
-    colLabelContainer.value.offsetHeight +
-    TOP_SCROLLBAR_OFFSET +
-    SPACE_BETWEEN_COL_LABELS_AND_HEATMAP
+  entireColLabelHeight.value = COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP
 }
 
 function getHeatmapColorMaxValue() {
@@ -436,22 +430,6 @@ function updateHeatmap() {
   drawEverything()
 }
 
-function syncScroll(event: Event) {
-  if (!(event.target instanceof HTMLElement)) {
-    console.error('Event target is not an HTMLElement:', event.target)
-    return
-  }
-  if (!topScrollbarContainer.value || !bottomScrollbarContainer.value) {
-    return
-  }
-
-  if (event.target === topScrollbarContainer.value) {
-    bottomScrollbarContainer.value.scrollLeft = event.target.scrollLeft
-  } else if (event.target === bottomScrollbarContainer.value) {
-    topScrollbarContainer.value.scrollLeft = event.target.scrollLeft
-  }
-}
-
 onMounted(async () => {
   if (!canvas.value) {
     return
@@ -514,7 +492,9 @@ onMounted(async () => {
 
     <CsvUpload />
 
-    <div v-if="heatmapStore.heatmap.itemNamesAndData.length !== 0">
+    <div
+      :style="{ display: heatmapStore.heatmap.itemNamesAndData.length !== 0 ? 'block' : 'none' }"
+    >
       <HeatmapSettings />
 
       <div class="heatmap-container">
@@ -522,8 +502,6 @@ onMounted(async () => {
           :style="{
             width: dimReductionWidth + 'px',
             height: dimReductionWidth + 'px',
-            position: 'sticky',
-            top: 0,
           }"
         >
           <div
@@ -545,7 +523,7 @@ onMounted(async () => {
           :key="'row-label-' + dataChangingRef"
           :style="{
             height: heatmapHeight + 'px',
-            marginTop: entireColLabelHeight + BORDER_WIDTH + 'px',
+            marginTop: COL_LABELS_HEIGHT + BORDER_WIDTH + 'px',
             gap: GAP_HEIGHT + 'px',
             marginRight: SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
             width: ROW_LABELS_WIDTH + 'px',
@@ -577,135 +555,110 @@ onMounted(async () => {
             />
           </div>
         </div>
+
         <div
-          ref="heatmapAndColumnsContainer"
           :style="{
             width: heatmapContainerWidth + 'px',
+            overflowX: 'auto',
+            overflowY: 'auto',
             marginRight: 'auto',
+            boxSizing: 'content-box',
+            height: '100%',
           }"
+          ref="bottomScrollbarContainer"
         >
           <div
-            class="sticky-top"
+            ref="colLabelContainer"
+            :key="'col-label-' + dataChangingRef"
             :style="{
-              overflowX: 'auto',
-              width: heatmapContainerWidth + 'px',
-              marginBottom: TOP_SCROLLBAR_OFFSET + 'px',
-              boxSizing: 'border-box',
+              width: heatmapWidth + 'px',
+              marginLeft: BORDER_WIDTH + 'px',
+              height: COL_LABELS_HEIGHT - SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
+              marginBottom: SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
+              display: 'flex',
+              flexDirection: 'row',
+              position: 'sticky',
+              top: '0px',
+              zIndex: 10000,
+              backgroundColor: 'white',
             }"
-            @scroll="syncScroll"
-            ref="topScrollbarContainer"
           >
-            <div
+            <button
+              :key="colName"
+              @click="heatmapStore.toggleStickyAttribute(colName)"
+              v-for="(colName, index) in heatmapStore.getHeatmap.attributeNames"
+              class="col-label"
               :style="{
-                width: heatmapWidth + 'px',
-                height: 1 + 'px',
+                width: cellWidth + 'px',
+                height: 'auto',
+                position: 'relative',
+                color: 'black',
+                textAlign: 'center',
+                cursor: 'pointer',
+                marginLeft:
+                  index === heatmapStore.getActiveDataTable?.stickyAttributes.length
+                    ? stickyAttributesGap + 'px'
+                    : 0,
               }"
-            ></div>
-          </div>
-          <div
-            :style="{
-              width: heatmapContainerWidth + 'px',
-              overflowX: 'auto',
-              paddingBottom: TOP_SCROLLBAR_OFFSET + 'px',
-            }"
-            @scroll="syncScroll"
-            ref="bottomScrollbarContainer"
-          >
-            <div
-              ref="colLabelContainer"
-              :key="'col-label-' + dataChangingRef"
-              :style="{
-                width: heatmapWidth + 'px',
-                marginLeft: BORDER_WIDTH + 'px',
-                height: COL_LABELS_HEIGHT - SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
-                marginBottom: SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
-
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                fontSize: 'small',
-              }"
-              class="sticky-top"
             >
-              <button
-                :key="colName"
-                @click="heatmapStore.toggleStickyAttribute(colName)"
-                v-for="(colName, index) in heatmapStore.getHeatmap.attributeNames"
-                class="col-label"
+              <div
                 :style="{
-                  width: cellWidth + 'px',
-                  height: 'auto',
-                  position: 'relative',
-                  color: 'black',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  marginLeft:
-                    index === heatmapStore.getActiveDataTable?.stickyAttributes.length
-                      ? stickyAttributesGap + 'px'
-                      : 0,
+                  position: 'absolute',
+                  width: '100%',
+                  height: heatmapStore.getHeatmap.attributeDissimilarities[index] * 100 + '%',
+                  backgroundColor: '#ccc',
+                  top: '10px',
+                  left: 0,
+                  zIndex: 0,
+                }"
+              ></div>
+              <div
+                :style="{
+                  position: 'absolute',
+                  top: '0',
+                  width: '100%',
+                  zIndex: 2,
+                  display: 'flex',
+                  alignItems: 'center',
                 }"
               >
                 <div
                   :style="{
-                    position: 'absolute',
                     width: '100%',
-                    height: heatmapStore.getHeatmap.attributeDissimilarities[index] * 100 + '%',
-                    backgroundColor: '#ccc',
-                    top: '10px',
-                    left: 0,
-                    zIndex: 0,
-                  }"
-                ></div>
-                <div
-                  :style="{
-                    position: 'absolute',
-                    top: '0',
-                    width: '100%',
-                    zIndex: 2,
                     display: 'flex',
                     alignItems: 'center',
                   }"
                 >
-                  <div
-                    :style="{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }"
-                  >
-                    {{
-                      heatmapStore.getActiveDataTable?.stickyAttributes.includes(colName)
-                        ? '-'
-                        : '+'
-                    }}
-                  </div>
+                  {{
+                    heatmapStore.getActiveDataTable?.stickyAttributes.includes(colName) ? '-' : '+'
+                  }}
                 </div>
-                <div
-                  :style="{
-                    position: 'absolute',
-                    display: 'flex',
-                    alignItems: 'center',
-                    top: '10px',
-                    width: '100%',
-                    zIndex: 1,
-                  }"
-                >
-                  <div>{{ colName }}</div>
-                </div>
-              </button>
-            </div>
-
-            <canvas
-              :style="{
-                border: BORDER_WIDTH + 'px solid black',
-                boxSizing: 'content-box',
-              }"
-              :width="heatmapWidth"
-              :height="heatmapHeight"
-              class="heatmap-canvas"
-              ref="canvas"
-            ></canvas>
+              </div>
+              <div
+                :style="{
+                  position: 'absolute',
+                  display: 'flex',
+                  alignItems: 'center',
+                  top: '10px',
+                  width: '100%',
+                  zIndex: 1,
+                }"
+              >
+                <div>{{ colName.length > 13 ? colName.slice(0, 13) + '...' : colName }}</div>
+              </div>
+            </button>
           </div>
+
+          <canvas
+            :style="{
+              border: BORDER_WIDTH + 'px solid black',
+              boxSizing: 'content-box',
+            }"
+            :width="heatmapWidth"
+            :height="heatmapHeight"
+            class="heatmap-canvas"
+            ref="canvas"
+          ></canvas>
         </div>
       </div>
     </div>
@@ -725,11 +678,6 @@ main {
 }
 
 .sticky-top {
-  position: -webkit-sticky;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: white;
 }
 
 .highlight-overlay {
@@ -780,6 +728,7 @@ main {
 }
 
 .heatmap-container {
+  position: relative;
   display: grid;
   grid-template-columns: auto auto 1fr;
   width: 100%;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHeatmapStore } from '@/stores/heatmapStore'
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import * as dataForge from 'data-forge'
 import {
   ScalingEnum,
@@ -314,30 +314,51 @@ watch(
     @click.stop="toggleAccordion"
   >
     <input type="checkbox" class="hidden" v-model="isOpen" />
-    <div class="collapse-title text-xl font-medium">Stored Data Tables</div>
-    <div class="collapse-content content-grid" v-if="isOpen">
-      <div style="display: flex; flex-direction: column; width: 200px">
-        <div class="file-input-container" @click.stop="triggerFileInput">
-          <button @click.stop type="button">Upload Csv File</button>
-        </div>
+
+    <div class="collapse-title" :style="{ display: 'flex' }">
+      <div class="text-2xl font-bold" :style="{ width: '250px' }">Data Table Menu</div>
+      <div :style="{ display: 'flex', gap: '5px' }" v-if="isOpen">
+        <button
+          :style="{ width: '150px' }"
+          class="btn btn-info"
+          @click.stop="triggerFileInput"
+          type="button"
+        >
+          Upload Csv File
+        </button>
 
         <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />
+        <button class="btn btn-success" @click.stop="saveDataTable">Save Changes</button>
+        <button class="btn btn-warning" @click.stop="discardChanges">Discard Changes</button>
+        <h1 :style="{ fontSize: '25px', fontWeight: 'bold', marginLeft: '40px' }">
+          {{ heatmapStore.getActiveDataTable?.tableName }}
+        </h1>
+      </div>
+    </div>
+
+    <div class="collapse-content content-grid" v-if="isOpen">
+      <div style="display: flex; flex-direction: column; width: 250px; gap: 10px; margin-top: 20px">
+        <h3 class="text-lg">Saved Data Tables:</h3>
         <ul
           :style="{
             display: 'flex',
             flexDirection: 'column',
             gap: '5px',
-            border: '1px solid black',
-            padding: '5px',
           }"
         >
           <li :key="index" v-for="(dataTable, index) in heatmapStore.getAllDataTables">
             <button
+              :class="{
+                btn: true,
+                'btn-outline': true,
+                'btn-primary': true,
+                'btn-active': heatmapStore.getActiveDataTable?.tableName === dataTable.tableName,
+              }"
               :style="{
-                fontWeight:
-                  heatmapStore.getActiveDataTable?.tableName === dataTable.tableName
-                    ? 'bold'
-                    : 'normal',
+                overflow: 'hidden',
+                textAlign: 'left',
+                textOverflow: 'ellipsis',
+                width: '200px',
               }"
               @click.stop="selectDataTable(dataTable)"
             >
@@ -345,9 +366,7 @@ watch(
             </button>
           </li>
 
-          <li v-if="heatmapStore.getAllDataTables.length === 0">
-            You don't have any saved data tables
-          </li>
+          <li v-if="heatmapStore.getAllDataTables.length === 0">Upload a CSV File first</li>
         </ul>
       </div>
       <div
@@ -356,22 +375,6 @@ watch(
           flexDirection: 'column',
         }"
       >
-        <div
-          style="
-            display: grid;
-            gap: 10px;
-            grid-template-columns: 1fr 1fr auto 1fr 1fr;
-            margin-right: auto;
-          "
-        >
-          <button class="btn-success" @click.stop="saveDataTable">Save Changes</button>
-          <button class="btn-warning" @click.stop="discardChanges">Discard Changes</button>
-          <h1 :style="{ fontSize: '25px', fontWeight: 'bold', marginLeft: '20px' }">
-            {{ heatmapStore.getActiveDataTable?.tableName }}
-          </h1>
-          <div></div>
-          <div></div>
-        </div>
         <table class="data-table">
           <thead>
             <th
@@ -451,7 +454,9 @@ watch(
               v-for="(row, index) in heatmapStore.getActiveDataTable?.df.head(5).toArray()"
             >
               <td :key="index" v-for="(value, index) in row">
-                {{ value }}
+                <div :style="{ maxHeight: '70px', overflow: 'hidden' }">
+                  {{ value }}
+                </div>
               </td>
             </tr>
           </tbody>
@@ -463,15 +468,23 @@ watch(
 
 <style scoped>
 .content-grid {
+  border-top: 1px solid black;
+
+  margin-top: 20px;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 10px;
+  gap: 40px;
   overflow: auto;
 }
 
 .data-table {
   border-collapse: collapse;
   border-spacing: 10px;
+  td {
+    vertical-align: top;
+    max-height: 100px;
+    overflow: hidden;
+  }
 
   th,
   td {
@@ -481,6 +494,10 @@ watch(
   }
   th {
     border-bottom: 3px solid black;
+  }
+  th:first-child,
+  td:first-child {
+    border-left: 1px solid black;
   }
   th:last-child,
   td:last-child {

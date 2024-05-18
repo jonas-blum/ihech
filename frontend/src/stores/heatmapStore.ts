@@ -9,7 +9,6 @@ import {
   SortOrderAttributes,
   type HeatmapSettings,
   ColoringHeatmapEnum,
-  COLORS,
   getDistinctColor,
 } from '../helpers/helpers'
 

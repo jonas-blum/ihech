@@ -18,10 +18,7 @@ const props = defineProps<{
   editionCount?: number
 }>()
 
-const tooltip = ref<HTMLElement | null>(null)
 const tooltipContent = ref('')
-const tooltipX = ref(0)
-const tooltipY = ref(0)
 
 const isRowHighlighted = ref(false)
 
@@ -32,37 +29,6 @@ const buttonSize = computed(() => props.cellHeight - props.gapHeight + 'px')
 const rightClickButton = (e: MouseEvent) => {
   e.preventDefault()
   toggleOpen()
-}
-
-const updateToolTipContent = (e: MouseEvent) => {
-  if (!tooltip.value) {
-    return
-  }
-  const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
-  if (collectionNamesOfItem.length === 0) {
-    hideTooltip()
-    return
-  }
-  tooltipX.value = e.clientX + 10
-  tooltipY.value = e.clientY + 10
-  tooltipContent.value = collectionNamesOfItem.join('\n')
-  showTooltip()
-}
-
-const hideTooltip = () => {
-  nextTick(() => {
-    if (!tooltip.value) {
-      return
-    }
-    tooltip.value.style.display = 'none'
-  })
-}
-
-const showTooltip = () => {
-  if (!tooltip.value) {
-    return
-  }
-  tooltip.value.style.display = 'block'
 }
 
 function applyMultipleColors(colors: string[]) {
@@ -118,6 +84,12 @@ function toggleOpen() {
   heatmapStore.toggleOpenRow(props.row)
 }
 
+function updateTooltipContent() {
+  const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
+  const collectionsString = collectionNamesOfItem.join(' | ')
+  tooltipContent.value = `${collectionsString}`
+}
+
 const heatmapStore = useHeatmapStore()
 
 watch(
@@ -129,14 +101,12 @@ watch(
 
 onMounted(() => {
   doColoring()
-  const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
-  tooltipContent.value = collectionNamesOfItem.join('\n')
+  updateTooltipContent()
 })
 
 onUpdated(() => {
   doColoring()
-  const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
-  tooltipContent.value = collectionNamesOfItem.join('\n')
+  updateTooltipContent()
 })
 </script>
 
@@ -149,7 +119,7 @@ onUpdated(() => {
       marginTop: marginTop + 'px',
     }"
   >
-    <div class="tooltip" :data-tip="tooltipContent">
+    <div class="tooltip tooltip-left" :data-tip="tooltipContent">
       <div class="row-div">
         <button
           :style="{

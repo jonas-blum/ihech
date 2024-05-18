@@ -470,13 +470,21 @@ watch(
 }
 
 .data-table {
-  border-collapse: separate;
+  border-collapse: collapse;
   border-spacing: 10px;
 
   th,
   td {
     padding: 10px;
     text-align: left;
+    border-right: 1px solid black;
+  }
+  th {
+    border-bottom: 3px solid black;
+  }
+  th:last-child,
+  td:last-child {
+    border-right: none;
   }
 }
 

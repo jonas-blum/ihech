@@ -10,6 +10,7 @@ import {
   ColoringHeatmapEnum,
   getDistinctColor,
 } from '@/helpers/helpers'
+import SettingsIcon from '@assets/settings.svg'
 
 const heatmapStore = useHeatmapStore()
 
@@ -378,38 +379,69 @@ watch(
               v-for="(columnName, index) in heatmapStore.getActiveDataTable?.df.getColumnNames()"
             >
               <div :style="{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }">
-                <input
-                  @click.stop="updateItemNamesColumn(columnName)"
-                  type="checkbox"
-                  class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.itemNamesColumnName === columnName"
-                />
-                <select
-                  @change="updateHierarchyLayer($event, columnName)"
-                  @click.stop
-                  class="select select-primary max-w-xs"
-                >
-                  <option
-                    :selected="getColumnCollectionHierarchy(columnName) === hierarchyLayer"
-                    v-for="hierarchyLayer in hierarchyLayers"
-                    :key="hierarchyLayer"
+                <details @click.stop class="dropdown">
+                  <summary
+                    :style="{
+                      margin: '0px',
+                      zIndex: 99999,
+                    }"
+                    class="m-1 btn"
                   >
-                    {{ hierarchyLayer }}
-                  </option>
-                </select>
-                <div>
-                  {{ columnName }}
+                    <SettingsIcon :style="{ height: '15px', width: '15px' }" />
+                  </summary>
+                  <ul
+                    :style="{ width: '250px' }"
+                    class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
+                  >
+                    <li>
+                      <a :style="{ display: 'flex', gap: '5px' }">
+                        <p>Item Name Column?</p>
+                        <input
+                          @click.stop="updateItemNamesColumn(columnName)"
+                          type="checkbox"
+                          class="toggle"
+                          :checked="
+                            heatmapStore.getActiveDataTable?.itemNamesColumnName === columnName
+                          "
+                        />
+                      </a>
+                    </li>
+                    <li>
+                      <a :style="{ display: 'flex', gap: '5px' }">
+                        <p>Set hierarchy Layer:</p>
+                        <select
+                          @change="updateHierarchyLayer($event, columnName)"
+                          @click.stop
+                          class="select select-primary max-w-xs"
+                        >
+                          <option
+                            :selected="getColumnCollectionHierarchy(columnName) === hierarchyLayer"
+                            v-for="hierarchyLayer in hierarchyLayers"
+                            :key="hierarchyLayer"
+                          >
+                            {{ hierarchyLayer }}
+                          </option>
+                        </select>
+                      </a>
+                    </li>
+                  </ul>
+                </details>
+
+                <div :style="{ display: 'flex', gap: '5px' }">
+                  <input
+                    @click.stop="toggleAttribute(columnName)"
+                    type="checkbox"
+                    :checked="
+                      heatmapStore.getActiveDataTable?.selectedAttributes.includes(columnName)
+                    "
+                    :disabled="
+                      heatmapStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
+                    "
+                  />
+                  <div>
+                    {{ columnName }}
+                  </div>
                 </div>
-                <input
-                  @click.stop="toggleAttribute(columnName)"
-                  type="checkbox"
-                  :checked="
-                    heatmapStore.getActiveDataTable?.selectedAttributes.includes(columnName)
-                  "
-                  :disabled="
-                    heatmapStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
-                  "
-                />
               </div>
             </th>
           </thead>

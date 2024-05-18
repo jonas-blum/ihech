@@ -9,6 +9,7 @@ import {
 import type { ItemNameAndData } from '@/helpers/helpers'
 import { getHeatmapColor } from '@/helpers/helpers'
 import { useHeatmapStore } from '@/stores/heatmapStore'
+import SettingsIcon from '@assets/settings.svg'
 
 const heatmapStore = useHeatmapStore()
 
@@ -131,135 +132,152 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
   <div class="settings-container">
     <div style="z-index: 99999" class="dropdown dropdown-bottom">
       <div tabindex="0" role="button" class="btn m-1">
-        <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
+        <SettingsIcon style="height: 20px; width: 20px" />
         <p>Dim Reduction</p>
       </div>
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
         <li>
-          <div class="toggle-container" style="align-self: center">
-            <p>Only sticky items?</p>
-            <input
-              @click="updateOnlyDimReductionBasedOnStickyItems($event)"
-              type="checkbox"
-              class="toggle"
-              :checked="heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
-            />
-          </div>
+          <a>
+            <div class="toggle-container" style="align-self: center">
+              <p>Only sticky items?</p>
+              <input
+                @click="updateOnlyDimReductionBasedOnStickyItems($event)"
+                type="checkbox"
+                class="toggle"
+                :checked="heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
+              />
+            </div>
+          </a>
         </li>
         <li>
-          <div>
-            <p>Algorithm:</p>
-            <ul class="menu menu-vertical bg-base-200">
-              <li
-                :key="dimReductionAlgo"
-                :style="{ border: 'none' }"
-                v-for="dimReductionAlgo in Object.values(DimReductionAlgoEnum)"
-              >
-                <a
-                  @click="updateDimReductionAlgo(dimReductionAlgo)"
-                  :class="{
-                    'bg-green-700 text-white':
-                      heatmapStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo,
-                  }"
-                  >{{ dimReductionAlgo }}</a
+          <a>
+            <div>
+              <p>Algorithm:</p>
+              <ul class="menu menu-vertical bg-base-200">
+                <li
+                  :key="dimReductionAlgo"
+                  :style="{ border: 'none' }"
+                  v-for="dimReductionAlgo in Object.values(DimReductionAlgoEnum)"
                 >
-              </li>
-            </ul>
-          </div>
+                  <a
+                    @click="updateDimReductionAlgo(dimReductionAlgo)"
+                    :class="{
+                      'bg-green-700 text-white':
+                        heatmapStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo,
+                    }"
+                    >{{ dimReductionAlgo }}</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </a>
         </li>
       </ul>
     </div>
     <div style="z-index: 99999" class="dropdown dropdown-bottom">
       <div tabindex="0" class="btn m-1">
-        <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
+        <SettingsIcon style="height: 20px; width: 20px" />
         <p>Clustering</p>
       </div>
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
         <li>
-          <div class="size-container">
-            <p>Size:</p>
-            <select @change="updateClusterSize($event)" class="select select-primary max-w-xs">
-              <option
-                :key="i"
-                :selected="heatmapStore.getActiveDataTable?.clusterSize === i"
-                v-for="i in Array.from({ length: 29 }, (_, i) => i + 2)"
-              >
-                {{ i }}
-              </option>
-            </select>
-          </div>
+          <a>
+            <div class="size-container">
+              <p>Size:</p>
+              <select @change="updateClusterSize($event)" class="select select-primary max-w-xs">
+                <option
+                  :key="i"
+                  :selected="heatmapStore.getActiveDataTable?.clusterSize === i"
+                  v-for="i in Array.from({ length: 29 }, (_, i) => i + 2)"
+                >
+                  {{ i }}
+                </option>
+              </select>
+            </div>
+          </a>
         </li>
         <li>
-          <div class="toggle-container">
-            <p>By Collections?</p>
-            <input
-              @click="updateClusterByCollections"
-              type="checkbox"
-              class="toggle"
-              :checked="heatmapStore.getActiveDataTable?.clusterByCollections"
-            />
-          </div>
+          <a>
+            <div class="toggle-container">
+              <p>By Collections?</p>
+              <input
+                @click="updateClusterByCollections"
+                type="checkbox"
+                class="toggle"
+                :checked="heatmapStore.getActiveDataTable?.clusterByCollections"
+              />
+            </div>
+          </a>
         </li>
         <li>
-          <div class="toggle-container">
-            <p>After Dim Red?</p>
-            <input
-              @click="updateClusterAfterDimRed($event)"
-              type="checkbox"
-              class="toggle"
-              :checked="heatmapStore.getActiveDataTable?.clusterAfterDimRed"
-            />
-          </div>
+          <a>
+            <div class="toggle-container">
+              <p>After Dim Red?</p>
+              <input
+                @click="updateClusterAfterDimRed($event)"
+                type="checkbox"
+                class="toggle"
+                :checked="heatmapStore.getActiveDataTable?.clusterAfterDimRed"
+              />
+            </div>
+          </a>
         </li>
         <li>
-          <div class="toggle-container">
-            <p>Based on sticky Attributes?</p>
-            <input
-              @click="updateClusterBasedOnStickyAttributes($event)"
-              type="checkbox"
-              class="toggle"
-              :checked="heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
-            />
-          </div>
+          <a>
+            <div class="toggle-container">
+              <p>Based on sticky Attributes?</p>
+              <input
+                @click="updateClusterBasedOnStickyAttributes($event)"
+                type="checkbox"
+                class="toggle"
+                :checked="heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
+              />
+            </div>
+          </a>
         </li>
 
         <ul>
           <li>
-            <ul class="menu menu-vertical bg-base-200">
-              <li
-                :key="scaling"
-                :style="{ border: 'none' }"
-                v-for="scaling in Object.values(ScalingEnum)"
-              >
-                <a
-                  @click="updateScaling(scaling)"
-                  :class="{
-                    'bg-green-700 text-white': heatmapStore.getActiveDataTable?.scaling === scaling,
-                  }"
-                  >{{ scaling }}</a
+            <a>
+              <ul class="menu menu-vertical bg-base-200">
+                <li
+                  :key="scaling"
+                  :style="{ border: 'none' }"
+                  v-for="scaling in Object.values(ScalingEnum)"
                 >
-              </li>
-            </ul>
+                  <a
+                    @click="updateScaling(scaling)"
+                    :class="{
+                      'bg-green-700 text-white':
+                        heatmapStore.getActiveDataTable?.scaling === scaling,
+                    }"
+                    >{{ scaling }}</a
+                  >
+                </li>
+              </ul>
+            </a>
           </li>
         </ul>
         <ul>
           <li>
-            <ul class="menu menu-vertical bg-base-200">
-              <li
-                :key="coloringHeatmap"
-                :style="{ border: 'none' }"
-                v-for="coloringHeatmap in Object.values(ColoringHeatmapEnum)"
-              >
-                <a
-                  @click="updateColoringHeatmap(coloringHeatmap)"
-                  :class="{
-                    'bg-green-700 text-white':
-                      heatmapStore.getActiveDataTable?.coloringHeatmap === coloringHeatmap,
-                  }"
-                  >{{ coloringHeatmap }}</a
+            <a>
+              <ul class="menu menu-vertical bg-base-200">
+                <li
+                  :key="coloringHeatmap"
+                  :style="{ border: 'none' }"
+                  v-for="coloringHeatmap in Object.values(ColoringHeatmapEnum)"
                 >
-              </li>
-            </ul>
+                  <a
+                    @click="updateColoringHeatmap(coloringHeatmap)"
+                    :class="{
+                      'bg-green-700 text-white':
+                        heatmapStore.getActiveDataTable?.coloringHeatmap === coloringHeatmap,
+                    }"
+                    >{{ coloringHeatmap }}</a
+                  >
+                </li>
+              </ul>
+            </a>
           </li>
         </ul>
       </ul>
@@ -267,41 +285,45 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
 
     <div style="z-index: 99999" class="dropdown dropdown-bottom">
       <div tabindex="0" role="button" class="btn m-1">
-        <img style="height: 20px; width: 20px" src="@assets/settings.svg" />
+        <SettingsIcon style="height: 20px; width: 20px" />
         <p>Attributes</p>
       </div>
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
         <li>
-          <div class="toggle-container">
-            <p>Sort based on sticky items?</p>
-            <input
-              @click="updateSortAttributesBasedOnStickyItems"
-              type="checkbox"
-              class="toggle"
-              :checked="heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems"
-            />
-          </div>
+          <a>
+            <div class="toggle-container">
+              <p>Sort based on sticky items?</p>
+              <input
+                @click="updateSortAttributesBasedOnStickyItems"
+                type="checkbox"
+                class="toggle"
+                :checked="heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems"
+              />
+            </div>
+          </a>
         </li>
         <li>
-          <div>
-            <p>Order:</p>
-            <ul class="menu menu-vertical bg-base-200">
-              <li
-                :key="sortOrder"
-                :style="{ border: 'none' }"
-                v-for="sortOrder in Object.values(SortOrderAttributes)"
-              >
-                <a
-                  @click="updateSortOrderAttributes(sortOrder)"
-                  :class="{
-                    'bg-green-700 text-white':
-                      heatmapStore.getActiveDataTable?.sortOrderAttributes === sortOrder,
-                  }"
-                  >{{ sortOrder }}</a
+          <a>
+            <div>
+              <p>Order:</p>
+              <ul class="menu menu-vertical bg-base-200">
+                <li
+                  :key="sortOrder"
+                  :style="{ border: 'none' }"
+                  v-for="sortOrder in Object.values(SortOrderAttributes)"
                 >
-              </li>
-            </ul>
-          </div>
+                  <a
+                    @click="updateSortOrderAttributes(sortOrder)"
+                    :class="{
+                      'bg-green-700 text-white':
+                        heatmapStore.getActiveDataTable?.sortOrderAttributes === sortOrder,
+                    }"
+                    >{{ sortOrder }}</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </a>
         </li>
       </ul>
     </div>

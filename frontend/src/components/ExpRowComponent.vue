@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineProps, ref, computed, watch, nextTick, onUpdated, onMounted } from 'vue'
 import { type ItemNameAndData } from '@helpers/helpers'
+import ChevronRight from '@assets/chevron-right.svg'
 
 import { useHeatmapStore } from '@stores/heatmapStore'
 
@@ -139,9 +140,12 @@ onUpdated(() => {
           class="expand-button"
         >
           <div class="symbol-container">
-            <img
-              :style="{ transform: props.row.isOpen ? 'rotate(90deg)' : '' }"
-              src="@assets/chevron-right.svg"
+            <ChevronRight
+              :style="{
+                transform: props.row.isOpen ? 'rotate(90deg)' : '',
+                height: buttonSize,
+                width: buttonSize,
+              }"
             />
           </div>
         </button>

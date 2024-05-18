@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHeatmapStore } from '@/stores/heatmapStore'
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import * as dataForge from 'data-forge'
 import {
   ScalingEnum,
@@ -308,11 +308,7 @@ watch(
 </script>
 
 <template>
-  <div
-    style="width: 90vw; margin-bottom: 50px"
-    class="collapse collapse-arrow bg-base-200"
-    @click.stop="toggleAccordion"
-  >
+  <div class="collapse collapse-arrow bg-base-200" @click.stop="toggleAccordion">
     <input type="checkbox" class="hidden" v-model="isOpen" />
 
     <div class="collapse-title" :style="{ display: 'flex' }">
@@ -336,7 +332,7 @@ watch(
       </div>
     </div>
 
-    <div class="collapse-content content-grid" v-if="isOpen">
+    <div :style="{ paddingLeft: '0px' }" class="collapse-content content-grid" v-if="isOpen">
       <div style="display: flex; flex-direction: column; width: 250px; gap: 10px; margin-top: 20px">
         <h3 class="text-lg">Saved Data Tables:</h3>
         <ul
@@ -469,6 +465,8 @@ watch(
 <style scoped>
 .content-grid {
   border-top: 1px solid black;
+  margin-left: 10px;
+  margin-right: 10px;
 
   margin-top: 20px;
   display: grid;

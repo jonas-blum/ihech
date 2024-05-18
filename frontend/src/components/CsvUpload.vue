@@ -98,23 +98,6 @@ function uploadCsvFile(event: Event) {
   reader.readAsText(file)
 }
 
-function saveDataTable() {
-  if (heatmapStore.getActiveDataTable === null) {
-    return
-  }
-  heatmapStore.saveDataTable(heatmapStore.getActiveDataTable)
-}
-
-function toggleAttribute(attribute: string) {
-  if (heatmapStore.getActiveDataTable === null) return
-  if (heatmapStore.getActiveDataTable.selectedAttributes.includes(attribute)) {
-    heatmapStore.getActiveDataTable.selectedAttributes =
-      heatmapStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== attribute)
-  } else {
-    heatmapStore.getActiveDataTable.selectedAttributes.push(attribute)
-  }
-}
-
 function getColumnCollectionHierarchy(columnName: string): 'None' | number {
   if (heatmapStore.getActiveDataTable === null) {
     return 'None'
@@ -223,6 +206,7 @@ function updateHierarchyLayer(event: Event, columnName: string) {
   updateItemCollectionMap()
   resetCollectionColorMap()
   heatmapStore.updateSelectedItemIndexesBasedOnSelectedCollections()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 function updateItemNamesColumn(columName: string) {
@@ -230,106 +214,133 @@ function updateItemNamesColumn(columName: string) {
     return
   }
   heatmapStore.getActiveDataTable.itemNamesColumnName = columName
+  heatmapStore.setIsOutOfSync(true)
 }
 
-function discardChanges() {
-  resetToOldStateDataTable()
-}
-
-function resetToOldStateDataTable() {
-  if (oldStateDataTable.value === null) {
-    return
-  }
-  heatmapStore.setActiveDataTable(oldStateDataTable.value)
-}
-
-function copyDataTableState() {
-  if (heatmapStore.getActiveDataTable === null) {
-    oldStateDataTable.value = null
+function toggleAttribute(attribute: string) {
+  if (heatmapStore.getActiveDataTable === null) return
+  if (heatmapStore.getActiveDataTable.selectedAttributes.includes(attribute)) {
+    heatmapStore.getActiveDataTable.selectedAttributes =
+      heatmapStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== attribute)
   } else {
-    const copiedItemCollectionMap: Record<number, string> = {}
-    for (const key in heatmapStore.getActiveDataTable.itemCollectionMap) {
-      copiedItemCollectionMap[key] = heatmapStore.getActiveDataTable.itemCollectionMap[key]
-    }
-
-    oldStateDataTable.value = {
-      tableName: heatmapStore.getActiveDataTable.tableName,
-      df: heatmapStore.getActiveDataTable.df,
-
-      nanColumns: [...heatmapStore.getActiveDataTable.nanColumns],
-      nonNanColumns: [...heatmapStore.getActiveDataTable.nonNanColumns],
-
-      collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap },
-      itemCollectionMap: copiedItemCollectionMap,
-      firstLayerCollectionNames: [...heatmapStore.getActiveDataTable.firstLayerCollectionNames],
-      selectedFirstLayerCollections: [
-        ...heatmapStore.getActiveDataTable.selectedFirstLayerCollections,
-      ],
-
-      showOnlyStickyItemsInDimReduction:
-        heatmapStore.getActiveDataTable.showOnlyStickyItemsInDimReduction,
-
-      csvFile: heatmapStore.getActiveDataTable.csvFile,
-
-      itemNamesColumnName: heatmapStore.getActiveDataTable.itemNamesColumnName,
-      collectionColumnNames: [...heatmapStore.getActiveDataTable.collectionColumnNames],
-
-      selectedItemIndexes: [...heatmapStore.getActiveDataTable.selectedItemIndexes],
-      selectedAttributes: [...heatmapStore.getActiveDataTable.selectedAttributes],
-
-      stickyAttributes: [...heatmapStore.getActiveDataTable.stickyAttributes],
-      sortAttributesBasedOnStickyItems:
-        heatmapStore.getActiveDataTable.sortAttributesBasedOnStickyItems,
-      sortOrderAttributes: heatmapStore.getActiveDataTable.sortOrderAttributes,
-
-      stickyItemIndexes: [...heatmapStore.getActiveDataTable.stickyItemIndexes],
-      clusterItemsBasedOnStickyAttributes:
-        heatmapStore.getActiveDataTable.clusterItemsBasedOnStickyAttributes,
-
-      clusterByCollections: heatmapStore.getActiveDataTable.clusterByCollections,
-
-      clusterSize: heatmapStore.getActiveDataTable.clusterSize,
-      dimReductionAlgo: heatmapStore.getActiveDataTable.dimReductionAlgo,
-      clusterAfterDimRed: heatmapStore.getActiveDataTable.clusterAfterDimRed,
-
-      scaling: heatmapStore.getActiveDataTable.scaling,
-
-      coloringHeatmap: heatmapStore.getActiveDataTable.coloringHeatmap,
-    }
+    heatmapStore.getActiveDataTable.selectedAttributes.push(attribute)
   }
+  heatmapStore.setIsOutOfSync(true)
 }
 
-watch(
-  () => heatmapStore.getActiveDataTable,
-  () => {
-    copyDataTableState()
-  },
-)
+//Currently Not used -> Feature to Save Table or Discard Table Changes
+
+// function saveDataTable() {
+//   if (heatmapStore.getActiveDataTable === null) {
+//     return
+//   }
+//   heatmapStore.saveDataTable(heatmapStore.getActiveDataTable)
+// }
+
+// function discardChanges() {
+//   resetToOldStateDataTable()
+// }
+
+// function resetToOldStateDataTable() {
+//   if (oldStateDataTable.value === null) {
+//     return
+//   }
+//   heatmapStore.setActiveDataTable(oldStateDataTable.value)
+// }
+
+// function copyDataTableState() {
+//   if (heatmapStore.getActiveDataTable === null) {
+//     oldStateDataTable.value = null
+//   } else {
+//     const copiedItemCollectionMap: Record<number, string> = {}
+//     for (const key in heatmapStore.getActiveDataTable.itemCollectionMap) {
+//       copiedItemCollectionMap[key] = heatmapStore.getActiveDataTable.itemCollectionMap[key]
+//     }
+
+//     oldStateDataTable.value = {
+//       tableName: heatmapStore.getActiveDataTable.tableName,
+//       df: heatmapStore.getActiveDataTable.df,
+
+//       nanColumns: [...heatmapStore.getActiveDataTable.nanColumns],
+//       nonNanColumns: [...heatmapStore.getActiveDataTable.nonNanColumns],
+
+//       collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap },
+//       itemCollectionMap: copiedItemCollectionMap,
+//       firstLayerCollectionNames: [...heatmapStore.getActiveDataTable.firstLayerCollectionNames],
+//       selectedFirstLayerCollections: [
+//         ...heatmapStore.getActiveDataTable.selectedFirstLayerCollections,
+//       ],
+
+//       showOnlyStickyItemsInDimReduction:
+//         heatmapStore.getActiveDataTable.showOnlyStickyItemsInDimReduction,
+
+//       csvFile: heatmapStore.getActiveDataTable.csvFile,
+
+//       itemNamesColumnName: heatmapStore.getActiveDataTable.itemNamesColumnName,
+//       collectionColumnNames: [...heatmapStore.getActiveDataTable.collectionColumnNames],
+
+//       selectedItemIndexes: [...heatmapStore.getActiveDataTable.selectedItemIndexes],
+//       selectedAttributes: [...heatmapStore.getActiveDataTable.selectedAttributes],
+
+//       stickyAttributes: [...heatmapStore.getActiveDataTable.stickyAttributes],
+//       sortAttributesBasedOnStickyItems:
+//         heatmapStore.getActiveDataTable.sortAttributesBasedOnStickyItems,
+//       sortOrderAttributes: heatmapStore.getActiveDataTable.sortOrderAttributes,
+
+//       stickyItemIndexes: [...heatmapStore.getActiveDataTable.stickyItemIndexes],
+//       clusterItemsBasedOnStickyAttributes:
+//         heatmapStore.getActiveDataTable.clusterItemsBasedOnStickyAttributes,
+
+//       clusterByCollections: heatmapStore.getActiveDataTable.clusterByCollections,
+
+//       clusterSize: heatmapStore.getActiveDataTable.clusterSize,
+//       dimReductionAlgo: heatmapStore.getActiveDataTable.dimReductionAlgo,
+//       clusterAfterDimRed: heatmapStore.getActiveDataTable.clusterAfterDimRed,
+
+//       scaling: heatmapStore.getActiveDataTable.scaling,
+
+//       coloringHeatmap: heatmapStore.getActiveDataTable.coloringHeatmap,
+//     }
+//   }
+// }
+
+// watch(
+//   () => heatmapStore.getActiveDataTable,
+//   () => {
+//     copyDataTableState()
+//   },
+// )
 </script>
 
 <template>
   <div class="collapse collapse-arrow bg-base-200" @click.stop="toggleAccordion">
     <input type="checkbox" class="hidden" v-model="isOpen" />
 
-    <div class="collapse-title" :style="{ display: 'flex' }">
-      <div class="text-2xl font-bold" :style="{ width: '250px' }">Data Table Menu</div>
-      <div :style="{ display: 'flex', gap: '5px' }" v-if="isOpen">
-        <button
-          :style="{ width: '150px' }"
-          class="btn btn-info"
-          @click.stop="triggerFileInput"
-          type="button"
-        >
-          Upload Csv File
-        </button>
-
-        <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />
-        <button class="btn btn-success" @click.stop="saveDataTable">Save Changes</button>
-        <button class="btn btn-warning" @click.stop="discardChanges">Discard Changes</button>
-        <h1 :style="{ fontSize: '25px', fontWeight: 'bold', marginLeft: '40px' }">
-          {{ heatmapStore.getActiveDataTable?.tableName }}
-        </h1>
+    <div class="collapse-title title-menu-grid">
+      <div
+        class="text-3xl font-bold"
+        :style="{ width: '300px', display: 'flex', alignItems: 'center' }"
+      >
+        <div>Data Table Menu</div>
       </div>
+
+      <button
+        :style="{ width: '150px' }"
+        class="btn btn-info"
+        @click.stop="triggerFileInput"
+        type="button"
+      >
+        Upload Csv File
+      </button>
+
+      <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />
+      <!-- <button class="btn btn-success" @click.stop="saveDataTable">Save Changes</button>
+        <button class="btn btn-warning" @click.stop="discardChanges">Discard Changes</button> -->
+      <h1 class="font-bold text-5xl">
+        {{ heatmapStore.getActiveDataTable?.tableName }}
+      </h1>
+      <div></div>
+      <div></div>
     </div>
 
     <div :style="{ paddingLeft: '0px' }" class="collapse-content content-grid" v-if="isOpen">
@@ -468,11 +479,17 @@ watch(
   margin-left: 10px;
   margin-right: 10px;
 
-  margin-top: 20px;
+  margin-top: 15px;
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 40px;
+  gap: 50px;
   overflow: auto;
+}
+
+.title-menu-grid {
+  display: grid;
+
+  grid-template-columns: auto 1fr auto 1fr auto;
 }
 
 .data-table {

@@ -180,10 +180,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.toggleStickyAttribute(this.initialAttributeOrder[0])
         this.reorderAllDataBasedOnNewAttributeOrder()
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
-        console.log('heatmap', this.heatmap)
+        this.setIsOutOfSync(false)
         this.changeHeatmap()
       } catch (error) {
         console.error('Error during fetching heatmap', error)
+        this.setIsOutOfSync(true)
       } finally {
         this.loading = false
       }

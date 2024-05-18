@@ -345,6 +345,16 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
         class="color-scale"
       ></div>
     </div>
+
+    <button
+      @click="heatmapStore.fetchHeatmap()"
+      :style="{ marginLeft: '30px' }"
+      class="btn btn-success text-lg"
+    >
+      Reload Heatmap
+      <span v-if="heatmapStore.isOutOfSync">(unsaved changes!)</span>
+      <span v-if="heatmapStore.isLoading" class="loading loading-spinner"></span>
+    </button>
   </div>
 </template>
 

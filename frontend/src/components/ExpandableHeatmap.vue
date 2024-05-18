@@ -498,7 +498,7 @@ onMounted(async () => {
 
     <CsvUpload />
 
-    <div>
+    <div v-if="heatmapStore.heatmap.itemNamesAndData.length !== 0">
       <HeatmapSettings />
 
       <div class="heatmap-container">

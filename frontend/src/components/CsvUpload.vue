@@ -62,6 +62,7 @@ function uploadCsvFile(event: Event) {
       collectionColorMap: {},
       itemCollectionMap: {},
       firstLayerCollectionNames: [],
+      selectedFirstLayerCollections: [],
 
       showOnlyStickyItemsInDimReduction: false,
 
@@ -84,7 +85,7 @@ function uploadCsvFile(event: Event) {
 
       clusterSize: 6,
       dimReductionAlgo: DimReductionAlgoEnum.PCA,
-      clusterAfterDimRed: false,
+      clusterAfterDimRed: true,
 
       scaling: ScalingEnum.STANDARDIZING,
 
@@ -149,6 +150,7 @@ function resetFirstLayerCollectionNames() {
   }
   if (heatmapStore.getActiveDataTable.collectionColumnNames.length === 0) {
     heatmapStore.getActiveDataTable.firstLayerCollectionNames = []
+    heatmapStore.getActiveDataTable.selectedFirstLayerCollections = []
     return
   }
 
@@ -157,9 +159,9 @@ function resetFirstLayerCollectionNames() {
   heatmapStore.getActiveDataTable.df.forEach((row, index) => {
     newFirstLayerCollectionNames.push(row[collectionColumnName])
   })
-  heatmapStore.getActiveDataTable.firstLayerCollectionNames = [
-    ...new Set(newFirstLayerCollectionNames),
-  ]
+  const uniqueFirstLayerCollectionNames = [...new Set(newFirstLayerCollectionNames)]
+  heatmapStore.getActiveDataTable.firstLayerCollectionNames = uniqueFirstLayerCollectionNames
+  heatmapStore.getActiveDataTable.selectedFirstLayerCollections = uniqueFirstLayerCollectionNames
 }
 
 function resetCollectionColorMap(): void {
@@ -219,6 +221,7 @@ function updateHierarchyLayer(event: Event, columnName: string) {
   resetFirstLayerCollectionNames()
   updateItemCollectionMap()
   resetCollectionColorMap()
+  heatmapStore.updateSelectedItemIndexesBasedOnSelectedCollections()
 }
 
 function updateItemNamesColumn(columName: string) {
@@ -258,6 +261,9 @@ function copyDataTableState() {
       collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap },
       itemCollectionMap: copiedItemCollectionMap,
       firstLayerCollectionNames: [...heatmapStore.getActiveDataTable.firstLayerCollectionNames],
+      selectedFirstLayerCollections: [
+        ...heatmapStore.getActiveDataTable.selectedFirstLayerCollections,
+      ],
 
       showOnlyStickyItemsInDimReduction:
         heatmapStore.getActiveDataTable.showOnlyStickyItemsInDimReduction,

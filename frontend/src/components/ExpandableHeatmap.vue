@@ -7,6 +7,7 @@ import { ColoringHeatmapEnum, getHeatmapColor, type ItemNameAndData } from '@hel
 import { useHeatmapStore } from '@stores/heatmapStore'
 
 import DimReductionVisual from './DimReductionVisual.vue'
+import CollectionSelector from './CollectionSelector.vue'
 
 import HeatmapSettings from './HeatmapSettings.vue'
 import CsvUpload from './CsvUpload.vue'
@@ -507,7 +508,6 @@ onMounted(async () => {
         :style="{
           width: dimReductionWidth + 'px',
           height: dimReductionWidth + 'px',
-          paddingTop: entireColLabelHeight - 25 + 'px',
           position: 'sticky',
           top: 0,
         }"
@@ -517,10 +517,14 @@ onMounted(async () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+            gap: '20px',
           }"
         >
-          <p style="height: 25px">{{ heatmapStore.getActiveDataTable?.dimReductionAlgo }}</p>
-          <DimReductionVisual style="border: 1px solid black" :width="dimReductionWidth" />
+          <div :style="{ display: 'flex', flexDirection: 'column', alignItems: 'center' }">
+            <p style="height: 25px">{{ heatmapStore.getActiveDataTable?.dimReductionAlgo }}</p>
+            <DimReductionVisual style="border: 1px solid black" :width="dimReductionWidth" />
+          </div>
+          <CollectionSelector />
         </div>
       </div>
       <div

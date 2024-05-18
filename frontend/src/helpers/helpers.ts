@@ -118,6 +118,7 @@ export interface CsvDataTableProfile {
   collectionColorMap: Record<string, string>
   itemCollectionMap: Record<number, string>
   firstLayerCollectionNames: string[]
+  selectedFirstLayerCollections: string[]
 
   showOnlyStickyItemsInDimReduction: boolean
 

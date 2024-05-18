@@ -26,6 +26,8 @@ export interface HeatmapStoreState {
   dataChanging: number
   loading: boolean
   timer: number
+
+  outOfSync: boolean
 }
 
 export const useHeatmapStore = defineStore('heatmapStore', {
@@ -52,6 +54,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     dataChanging: 1,
     loading: false,
     timer: 0,
+
+    outOfSync: false,
   }),
   getters: {
     getAllDataTables: (state) => state.dataTables,
@@ -96,6 +100,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getDataChanging: (state) => state.dataChanging,
     isLoading: (state) => state.loading,
     getTimer: (state) => state.timer,
+
+    isOutOfSync: (state) => state.outOfSync,
   },
   actions: {
     saveDataTable(dataTable: CsvDataTableProfile) {
@@ -308,6 +314,64 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       const collectionColumnNames = this.getCollectionNamesOfItemRecursively(item)
       return [...new Set(collectionColumnNames)]
     },
+    updateSelectedItemIndexesBasedOnSelectedCollections(): void {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      const newSelectedItemIndexes: number[] = []
+
+      const selectedCollections = this.activeDataTable.selectedFirstLayerCollections
+      const collectionColumnName = this.activeDataTable.collectionColumnNames[0]
+
+      this.activeDataTable.df.forEach((row, index) => {
+        const rowCollection = row[collectionColumnName]
+        if (selectedCollections.includes(rowCollection)) {
+          newSelectedItemIndexes.push(index)
+        }
+      })
+      this.activeDataTable.selectedItemIndexes = newSelectedItemIndexes
+    },
+
+    isCollectionEnabled(collection: string): boolean {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return false
+      }
+      return this.activeDataTable.selectedFirstLayerCollections.includes(collection)
+    },
+    toggleCollectionEnabled(collection: string) {
+      if (this.isCollectionEnabled(collection)) {
+        this.disabledCollection(collection)
+      } else {
+        this.enableCollection(collection)
+      }
+    },
+    enableCollection(collection: string) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.selectedFirstLayerCollections.push(collection)
+      this.updateSelectedItemIndexesBasedOnSelectedCollections()
+      this.changeHeatmap()
+      this.setIsOutOfSync(true)
+    },
+    disabledCollection(collection: string) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.selectedFirstLayerCollections =
+        this.activeDataTable.selectedFirstLayerCollections.filter((col) => col !== collection)
+      this.updateSelectedItemIndexesBasedOnSelectedCollections()
+      this.changeHeatmap()
+      this.setIsOutOfSync(true)
+    },
+
+    setIsOutOfSync(outOfSync: boolean) {
+      this.outOfSync = outOfSync
+    },
 
     getColorsOfItem(item: ItemNameAndData): string[] {
       if (!this.activeDataTable) {
@@ -333,6 +397,21 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         }
       }
       return colors
+    },
+    getColorOfCollection(collection: string): string {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return 'black'
+      }
+      return this.activeDataTable.collectionColorMap[collection] || 'black'
+    },
+    setColorOfCollection(collection: string, color: string) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.collectionColorMap[collection] = color
+      this.changeHeatmap()
     },
     reorderColDissimilarities(): void {
       if (!this.activeDataTable) {

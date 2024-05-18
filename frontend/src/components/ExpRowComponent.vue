@@ -99,6 +99,13 @@ watch(
   },
 )
 
+watch(
+  () => heatmapStore.getDataChanging,
+  () => {
+    doColoring()
+  },
+)
+
 onMounted(() => {
   doColoring()
   updateTooltipContent()

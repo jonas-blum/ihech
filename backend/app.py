@@ -34,29 +34,42 @@ def index():
     return {"message": "Hello World!"}
 
 
+isComputing = False
+
+
 @app.route("/api/heatmap", methods=["POST"])
 def get_heatmap():
+    global isComputing
+    # if isComputing:
+    #     return "Server is busy. Please try again later.", 503
+    try:
+        isComputing = True
+        logger.info("Starting to build heatmap...")
+        start = time.perf_counter()
 
-    logger.info("Starting to build heatmap...")
-    start = time.perf_counter()
+        heatmap_settings = HeatmapSettings(request.json["settings"])
+        csv_file = StringIO(heatmap_settings.csvFile)
+        original_df = pd.read_csv(csv_file)
 
-    heatmap_settings = HeatmapSettings(request.json["settings"])
-    csv_file = StringIO(heatmap_settings.csvFile)
-    original_df = pd.read_csv(csv_file)
+        if heatmap_settings.itemNamesColumnName in heatmap_settings.selectedAttributes:
+            new_item_names_column_name = heatmap_settings.itemNamesColumnName + "_copy"
+            original_df[new_item_names_column_name] = original_df[
+                heatmap_settings.itemNamesColumnName
+            ]
+            heatmap_settings.itemNamesColumnName = new_item_names_column_name
 
-    if heatmap_settings.itemNamesColumnName in heatmap_settings.selectedAttributes:
-        new_item_names_column_name = heatmap_settings.itemNamesColumnName + "_copy"
-        original_df[new_item_names_column_name] = original_df[
-            heatmap_settings.itemNamesColumnName
-        ]
-        heatmap_settings.itemNamesColumnName = new_item_names_column_name
+        logger.info(
+            f"Finished reading csv file: {round(time.perf_counter() - start, 3)}"
+        )
+        logger.info("Starting Filtering...")
 
-    logger.info(f"Finished reading csv file: {round(time.perf_counter() - start, 3)}")
-    logger.info("Starting Filtering...")
-
-    return_string = create_heatmap(original_df, heatmap_settings)
-    logger.info(
-        f"Time to generate entire heatmap: {round(time.perf_counter() - start,3 )}\n"
-    )
-
-    return return_string
+        return_string = create_heatmap(original_df, heatmap_settings)
+        logger.info(
+            f"Time to generate entire heatmap: {round(time.perf_counter() - start,3 )}\n"
+        )
+        return return_string
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return str(e), 400
+    finally:
+        isComputing = False

@@ -27,6 +27,7 @@ export interface HeatmapStoreState {
   timer: number
 
   outOfSync: boolean
+  reloadingScheduled: boolean
 }
 
 export const useHeatmapStore = defineStore('heatmapStore', {
@@ -55,6 +56,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     timer: 0,
 
     outOfSync: false,
+    reloadingScheduled: false,
   }),
   getters: {
     getAllDataTables: (state) => state.dataTables,
@@ -124,6 +126,15 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.activeDataTable = dataTable
     },
     async fetchHeatmap() {
+      if (this.reloadingScheduled) {
+        console.log('Reloading scheduled, skipping fetchHeatmap')
+        return
+      }
+      if (this.isLoading) {
+        console.log('Already loading, skipping fetchHeatmap, queuing reload')
+        this.reloadingScheduled = true
+        return
+      }
       try {
         if (!this.activeDataTable) {
           console.error('No active data table')
@@ -187,6 +198,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.setIsOutOfSync(true)
       } finally {
         this.loading = false
+        if (this.reloadingScheduled) {
+          this.reloadingScheduled = false
+          this.fetchHeatmap()
+        }
       }
     },
     setTimer(timer: number) {

@@ -494,7 +494,23 @@ onMounted(async () => {
     </div>
     <div ref="highlightOverlay" class="highlight-overlay"></div>
 
-    <h1 :style="{ alignSelf: 'center' }" class="text-7xl">IHECH</h1>
+    <div
+      :style="{
+        alignSelf: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '75px',
+      }"
+    >
+      <h1
+        v-if="!heatmapStore.isLoading || heatmapStore.heatmap.itemNamesAndData.length !== 0"
+        class="text-7xl"
+      >
+        IHECH
+      </h1>
+      <span v-else class="loading loading-spinner loading-lg"></span>
+    </div>
 
     <CsvUpload />
 

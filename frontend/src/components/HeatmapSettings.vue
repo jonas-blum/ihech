@@ -349,7 +349,12 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
     <button
       @click="heatmapStore.fetchHeatmap()"
       :style="{ marginLeft: '30px' }"
-      class="btn btn-success text-lg"
+      :class="{
+        btn: true,
+        'btn-success': !heatmapStore.isOutOfSync,
+        'btn-warning': heatmapStore.isOutOfSync,
+        'text-lg': true,
+      }"
     >
       Reload Heatmap
       <span v-if="heatmapStore.isOutOfSync">(unsaved changes!)</span>

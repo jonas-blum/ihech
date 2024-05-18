@@ -50,7 +50,11 @@ function uploadCsvFile(event: Event) {
     const csvFile = df.toCSV()
     let fileNameNoExtension = file.name.split('.').slice(0, -1).join('.')
     while (heatmapStore.getAllDataTableNames.includes(fileNameNoExtension)) {
-      fileNameNoExtension = '_1' + fileNameNoExtension
+      fileNameNoExtension = '1_' + fileNameNoExtension
+      console.log(
+        'File name already exists, adding 1 to the beginning of the file name',
+        fileNameNoExtension,
+      )
     }
 
     const newDataTable: CsvDataTableProfile = {
@@ -345,7 +349,7 @@ function toggleAttribute(attribute: string) {
 
     <div :style="{ paddingLeft: '0px' }" class="collapse-content content-grid" v-if="isOpen">
       <div style="display: flex; flex-direction: column; width: 250px; gap: 10px; margin-top: 20px">
-        <h3 class="text-lg">Saved Data Tables:</h3>
+        <h3 class="text-2xl">Saved Data Tables:</h3>
         <ul
           :style="{
             display: 'flex',
@@ -361,15 +365,18 @@ function toggleAttribute(attribute: string) {
                 'btn-primary': true,
                 'btn-active': heatmapStore.getActiveDataTable?.tableName === dataTable.tableName,
               }"
-              :style="{
-                overflow: 'hidden',
-                textAlign: 'left',
-                textOverflow: 'ellipsis',
-                width: '200px',
-              }"
               @click.stop="selectDataTable(dataTable)"
             >
-              {{ dataTable.tableName }}
+              <div
+                :style="{
+                  overflow: 'hidden',
+                  textAlign: 'left',
+                  textOverflow: 'ellipsis',
+                  width: '200px',
+                }"
+              >
+                {{ dataTable.tableName }}
+              </div>
             </button>
           </li>
 

@@ -11,6 +11,7 @@ import {
   ColoringHeatmapEnum,
   getDistinctColor,
 } from '../helpers/helpers'
+import { nextTick } from 'vue'
 
 export interface HeatmapStoreState {
   dataTables: CsvDataTableProfile[]
@@ -192,7 +193,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.reorderAllDataBasedOnNewAttributeOrder()
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
-        this.changeHeatmap()
+        nextTick(() => {
+          this.changeHeatmap()
+        })
       } catch (error) {
         console.error('Error during fetching heatmap', error)
         this.setIsOutOfSync(true)

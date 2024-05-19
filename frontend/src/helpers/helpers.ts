@@ -20,6 +20,10 @@ export const COLORS = [
   '#FAEBD7', // AntiqueWhite
 ]
 
+export const CSV_UPLOAD_COLLAPSED_HEIGHT = 105
+export const CSV_UPLOAD_CONTENT_HEIGHT = 365
+export const CSV_UPLOAD_EXPANDED_HEIGHT = CSV_UPLOAD_COLLAPSED_HEIGHT + CSV_UPLOAD_CONTENT_HEIGHT
+
 export function getHeatmapColor(value: number, min: number, max: number) {
   const normalizedValue = (value - min) / (max - min)
   const l = 90 - normalizedValue * 65

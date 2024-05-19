@@ -3,7 +3,13 @@ import { nextTick, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 import ExpRowComponent from './ExpRowComponent.vue'
 
-import { ColoringHeatmapEnum, getHeatmapColor, type ItemNameAndData } from '@helpers/helpers'
+import {
+  ColoringHeatmapEnum,
+  getHeatmapColor,
+  type ItemNameAndData,
+  CSV_UPLOAD_COLLAPSED_HEIGHT,
+  CSV_UPLOAD_EXPANDED_HEIGHT,
+} from '@helpers/helpers'
 import { useHeatmapStore } from '@stores/heatmapStore'
 
 import DimReductionVisual from './DimReductionVisual.vue'
@@ -42,7 +48,6 @@ const colLabelContainer = ref<HTMLElement | null>(null)
 const highlightOverlay = ref<HTMLElement | null>(null)
 const canvas = ref<HTMLCanvasElement | null>(null)
 const bottomScrollbarContainer = ref<HTMLElement | null>(null)
-const csvUpload = ref<HTMLElement | null>(null)
 
 const visibleRows = ref<ItemNameAndData[]>([])
 
@@ -152,16 +157,16 @@ function updateEntireColLabelHeight() {
 }
 
 function updateVisibleHeatmapHeight() {
-  if (!csvUpload.value) {
-    return
-  }
+  const csvUploadHeight = heatmapStore.isCsvUploadOpen
+    ? CSV_UPLOAD_EXPANDED_HEIGHT
+    : CSV_UPLOAD_COLLAPSED_HEIGHT
   visibleHeatmapHeight.value =
     window.innerHeight -
     MARGIN_TOP -
     SETTINGS_HEIGHT -
     GAP_SETTINGS_HEATMAP -
     GAP_CSV_HEATMAP -
-    csvUpload.value.offsetHeight
+    csvUploadHeight
 }
 
 function getHeatmapColorMaxValue() {
@@ -512,7 +517,13 @@ onMounted(async () => {
     </div>
     <div ref="highlightOverlay" class="highlight-overlay"></div>
 
-    <div ref="csvUpload">
+    <div
+      :style="{
+        height: heatmapStore.isCsvUploadOpen
+          ? CSV_UPLOAD_EXPANDED_HEIGHT + 'px'
+          : CSV_UPLOAD_COLLAPSED_HEIGHT + 'px',
+      }"
+    >
       <CsvUpload />
     </div>
 

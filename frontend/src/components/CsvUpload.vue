@@ -9,8 +9,20 @@ import {
   type CsvDataTableProfile,
   ColoringHeatmapEnum,
   getDistinctColor,
+  CSV_UPLOAD_COLLAPSED_HEIGHT,
+  CSV_UPLOAD_EXPANDED_HEIGHT,
+  CSV_UPLOAD_CONTENT_HEIGHT,
 } from '@/helpers/helpers'
 import SettingsIcon from '@assets/settings.svg'
+
+const GAP_COLLAPSED_EXPANDED = 20
+const PADDING_BOTTOM = 10
+
+const CSV_UPLOAD_CONTENT_HEIGHT_FINAL =
+  CSV_UPLOAD_CONTENT_HEIGHT - GAP_COLLAPSED_EXPANDED - PADDING_BOTTOM
+
+const MAX_CELL_WIDTH = 300
+const TABLE_PADDING = 10
 
 const heatmapStore = useHeatmapStore()
 
@@ -315,186 +327,250 @@ function toggleAttribute(attribute: string) {
 </script>
 
 <template>
-  <div class="collapse collapse-arrow bg-base-200" @click.stop="toggleAccordion">
-    <input type="checkbox" class="hidden" v-model="heatmapStore.isCsvUploadOpen" />
+  <div class="box-content">
+    <div class="collapse collapse-arrow bg-base-200" @click.stop="toggleAccordion">
+      <input type="checkbox" class="hidden" v-model="heatmapStore.isCsvUploadOpen" />
 
-    <div class="collapse-title title-menu-grid">
       <div
-        class="text-3xl font-bold"
-        :style="{ width: '300px', display: 'flex', alignItems: 'center' }"
+        class="collapse-title title-menu-grid"
+        :style="{ height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px' }"
       >
-        <div>Data Table Menu</div>
-      </div>
-
-      <div :style="{ display: 'flex', alignItems: 'center' }">
-        <button
-          :style="{ width: '150px' }"
-          class="btn btn-info"
-          @click.stop="triggerFileInput"
-          type="button"
+        <div
+          class="text-3xl font-bold"
+          :style="{ width: '300px', display: 'flex', alignItems: 'center' }"
         >
-          Upload Csv File
-        </button>
-      </div>
+          <div>Data Table Menu</div>
+        </div>
 
-      <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />
-      <!-- <button class="btn btn-success" @click.stop="saveDataTable">Save Changes</button>
+        <div :style="{ display: 'flex', alignItems: 'center' }">
+          <button
+            :style="{ width: '150px' }"
+            class="btn btn-info"
+            @click.stop="triggerFileInput"
+            type="button"
+          >
+            Upload Csv File
+          </button>
+        </div>
+
+        <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />
+        <!-- <button class="btn btn-success" @click.stop="saveDataTable">Save Changes</button>
         <button class="btn btn-warning" @click.stop="discardChanges">Discard Changes</button> -->
-      <h1 class="font-bold text-5xl">
-        {{ heatmapStore.getActiveDataTable?.tableName }}
-      </h1>
-      <div></div>
-      <div
-        :style="{
-          alignSelf: 'center',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginRight: '10px',
-        }"
-      >
-        <h1
-          v-if="!heatmapStore.isLoading || heatmapStore.heatmap.itemNamesAndData.length !== 0"
-          class="text-7xl"
-        >
-          IHECH
-        </h1>
-        <span v-else class="loading loading-spinner loading-lg"></span>
-      </div>
-    </div>
-
-    <div
-      :style="{ paddingLeft: '0px' }"
-      class="collapse-content content-grid"
-      v-if="heatmapStore.isCsvUploadOpen"
-    >
-      <div style="display: flex; flex-direction: column; width: 250px; gap: 10px; margin-top: 20px">
-        <h3 class="text-2xl">Saved Data Tables:</h3>
-        <ul
+        <div :style="{ display: 'flex', alignItems: 'center' }">
+          <h1
+            class="font-bold text-5xl"
+            :style="{
+              overflow: 'hidden',
+              textAlign: 'left',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              margin: '0px 30px',
+            }"
+          >
+            {{ heatmapStore.getActiveDataTable?.tableName }}
+          </h1>
+        </div>
+        <div></div>
+        <div
           :style="{
+            alignSelf: 'center',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '5px',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: '10px',
           }"
         >
-          <li :key="index" v-for="(dataTable, index) in heatmapStore.getAllDataTables">
-            <button
-              :class="{
-                btn: true,
-                'btn-outline': true,
-                'btn-primary': true,
-                'btn-active': heatmapStore.getActiveDataTable?.tableName === dataTable.tableName,
-              }"
-              @click.stop="selectDataTable(dataTable)"
-            >
-              <div
-                :style="{
-                  overflow: 'hidden',
-                  textAlign: 'left',
-                  textOverflow: 'ellipsis',
-                  width: '200px',
-                }"
-              >
-                {{ dataTable.tableName }}
-              </div>
-            </button>
-          </li>
-
-          <li v-if="heatmapStore.getAllDataTables.length === 0">Upload a CSV File first</li>
-        </ul>
+          <h1
+            v-if="!heatmapStore.isLoading || heatmapStore.heatmap.itemNamesAndData.length !== 0"
+            class="text-7xl"
+          >
+            IHECH
+          </h1>
+          <span v-else class="loading loading-spinner loading-lg"></span>
+        </div>
       </div>
+
       <div
         :style="{
-          display: heatmapStore.getActiveDataTable ? 'flex' : 'none',
-          flexDirection: 'column',
+          marginTop: GAP_COLLAPSED_EXPANDED + 'px',
+          paddingLeft: '0px',
+          paddingBottom: PADDING_BOTTOM + 'px',
+          marginBottom: '0px',
+          height: CSV_UPLOAD_CONTENT_HEIGHT_FINAL + 'px',
         }"
+        class="collapse-content content-grid"
+        v-if="heatmapStore.isCsvUploadOpen"
       >
-        <table class="data-table">
-          <thead>
-            <th
-              :key="index"
-              v-for="(columnName, index) in heatmapStore.getActiveDataTable?.df.getColumnNames()"
-            >
-              <div :style="{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }">
-                <details @click.stop class="dropdown">
-                  <summary
-                    :style="{
-                      margin: '0px',
-                      zIndex: 99999,
-                    }"
-                    class="m-1 btn"
-                  >
-                    <SettingsIcon :style="{ height: '15px', width: '15px' }" />
-                  </summary>
-                  <ul
-                    :style="{ width: '250px' }"
-                    class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
-                  >
-                    <li>
-                      <a :style="{ display: 'flex', gap: '5px' }">
-                        <p>Item Name Column?</p>
-                        <input
-                          @click.stop="updateItemNamesColumn(columnName)"
-                          type="checkbox"
-                          class="toggle"
-                          :checked="
-                            heatmapStore.getActiveDataTable?.itemNamesColumnName === columnName
-                          "
-                        />
-                      </a>
-                    </li>
-                    <li>
-                      <a :style="{ display: 'flex', gap: '5px' }">
-                        <p>Set hierarchy Layer:</p>
-                        <select
-                          @change="updateHierarchyLayer($event, columnName)"
-                          @click.stop
-                          class="select select-primary max-w-xs"
-                        >
-                          <option
-                            :selected="getColumnCollectionHierarchy(columnName) === hierarchyLayer"
-                            v-for="hierarchyLayer in hierarchyLayers"
-                            :key="hierarchyLayer"
-                          >
-                            {{ hierarchyLayer }}
-                          </option>
-                        </select>
-                      </a>
-                    </li>
-                  </ul>
-                </details>
+        <div
+          style="display: flex; flex-direction: column; width: 250px; gap: 5px; margin-top: 20px"
+        >
+          <h3 :style="{ height: '32px' }" class="text-2xl">Saved Data Tables:</h3>
+          <ul
+            :style="{
+              display: 'flex',
+              padding: '10px 0px',
+              flexDirection: 'column',
+              gap: '5px',
+              height: CSV_UPLOAD_CONTENT_HEIGHT_FINAL - 32 - 5 - 20 - 20 - PADDING_BOTTOM + 'px',
+              overflowY: 'auto',
+            }"
+          >
+            <li :key="index" v-for="(dataTable, index) in heatmapStore.getAllDataTables">
+              <button
+                :class="{
+                  btn: true,
+                  'btn-outline': true,
+                  'btn-primary': true,
+                  'btn-active': heatmapStore.getActiveDataTable?.tableName === dataTable.tableName,
+                }"
+                @click.stop="selectDataTable(dataTable)"
+              >
+                <div
+                  :style="{
+                    overflow: 'hidden',
+                    textAlign: 'left',
+                    textOverflow: 'ellipsis',
+                    width: '200px',
+                  }"
+                >
+                  {{ dataTable.tableName }}
+                </div>
+              </button>
+            </li>
 
-                <div :style="{ display: 'flex', gap: '5px' }">
-                  <input
-                    @click.stop="toggleAttribute(columnName)"
-                    type="checkbox"
-                    :checked="
-                      heatmapStore.getActiveDataTable?.selectedAttributes.includes(columnName)
-                    "
-                    :disabled="
-                      heatmapStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
-                    "
-                  />
-                  <div>
-                    {{ columnName }}
+            <li v-if="heatmapStore.getAllDataTables.length === 0">Upload a CSV File first</li>
+          </ul>
+        </div>
+        <div
+          v-if="heatmapStore.getActiveDataTable"
+          :style="{
+            flexDirection: 'column',
+            display: 'flex',
+          }"
+        >
+          <table class="data-table">
+            <thead>
+              <th
+                :key="index"
+                v-for="(columnName, index) in heatmapStore.getActiveDataTable?.df.getColumnNames()"
+                :style="{
+                  padding: TABLE_PADDING + 'px',
+                }"
+              >
+                <div
+                  :style="{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    maxWidth: MAX_CELL_WIDTH - 2 * TABLE_PADDING + 'px',
+                  }"
+                >
+                  <details @click.stop class="dropdown">
+                    <summary
+                      :style="{
+                        margin: '0px',
+                        zIndex: 99999,
+                      }"
+                      class="m-1 btn"
+                    >
+                      <SettingsIcon :style="{ height: '15px', width: '15px' }" />
+                    </summary>
+                    <ul
+                      :style="{ width: '250px' }"
+                      class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
+                    >
+                      <li>
+                        <a :style="{ display: 'flex', gap: '5px' }">
+                          <p>Item Name Column?</p>
+                          <input
+                            @click.stop="updateItemNamesColumn(columnName)"
+                            type="checkbox"
+                            class="toggle"
+                            :checked="
+                              heatmapStore.getActiveDataTable?.itemNamesColumnName === columnName
+                            "
+                          />
+                        </a>
+                      </li>
+                      <li>
+                        <a :style="{ display: 'flex', gap: '5px' }">
+                          <p>Set hierarchy Layer:</p>
+                          <select
+                            @change="updateHierarchyLayer($event, columnName)"
+                            @click.stop
+                            class="select select-primary max-w-xs"
+                          >
+                            <option
+                              :selected="
+                                getColumnCollectionHierarchy(columnName) === hierarchyLayer
+                              "
+                              v-for="hierarchyLayer in hierarchyLayers"
+                              :key="hierarchyLayer"
+                            >
+                              {{ hierarchyLayer }}
+                            </option>
+                          </select>
+                        </a>
+                      </li>
+                    </ul>
+                  </details>
+
+                  <div
+                    :style="{
+                      display: 'flex',
+                      gap: '5px',
+                      maxWidth: MAX_CELL_WIDTH - 2 * TABLE_PADDING + 'px',
+                    }"
+                  >
+                    <input
+                      @click.stop="toggleAttribute(columnName)"
+                      type="checkbox"
+                      :checked="
+                        heatmapStore.getActiveDataTable?.selectedAttributes.includes(columnName)
+                      "
+                      :disabled="
+                        heatmapStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
+                      "
+                    />
+                    <div
+                      :style="{
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }"
+                    >
+                      {{ columnName }}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </th>
-          </thead>
-          <tbody>
-            <tr
-              :key="index"
-              v-for="(row, index) in heatmapStore.getActiveDataTable?.df.head(5).toArray()"
-            >
-              <td :key="index" v-for="(value, index) in row">
-                <div :style="{ maxHeight: '70px', overflow: 'hidden' }">
-                  {{ value }}
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+              </th>
+            </thead>
+            <tbody>
+              <tr
+                :key="index"
+                v-for="(row, index) in heatmapStore.getActiveDataTable?.df.head(5).toArray()"
+                :style="{ maxWidth: MAX_CELL_WIDTH - 2 * TABLE_PADDING + 'px' }"
+              >
+                <td
+                  :style="{ padding: TABLE_PADDING + 'px' }"
+                  :key="index"
+                  v-for="(value, index) in row"
+                >
+                  <div
+                    :style="{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: MAX_CELL_WIDTH - 2 * TABLE_PADDING + 'px',
+                    }"
+                  >
+                    {{ value }}
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
@@ -506,11 +582,11 @@ function toggleAttribute(attribute: string) {
   margin-left: 10px;
   margin-right: 10px;
 
-  margin-top: 15px;
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr;
   gap: 50px;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .title-menu-grid {
@@ -530,7 +606,6 @@ function toggleAttribute(attribute: string) {
 
   th,
   td {
-    padding: 10px;
     text-align: left;
     border-right: 1px solid black;
   }

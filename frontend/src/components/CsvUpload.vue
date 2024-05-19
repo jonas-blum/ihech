@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHeatmapStore } from '@/stores/heatmapStore'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import * as dataForge from 'data-forge'
 import {
   ScalingEnum,
@@ -14,8 +14,6 @@ import SettingsIcon from '@assets/settings.svg'
 
 const heatmapStore = useHeatmapStore()
 
-const isOpen = ref(true)
-
 const hierarchyLayers: ('None' | number)[] = ['None', 1, 2, 3, 4]
 
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -23,7 +21,7 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const oldStateDataTable = ref<CsvDataTableProfile | null>(null)
 
 function toggleAccordion() {
-  isOpen.value = !isOpen.value
+  heatmapStore.setCsvUploadOpen(!heatmapStore.isCsvUploadOpen)
 }
 
 function selectDataTable(dataTable: CsvDataTableProfile) {
@@ -32,7 +30,7 @@ function selectDataTable(dataTable: CsvDataTableProfile) {
 }
 function triggerFileInput() {
   fileInput.value?.click()
-  isOpen.value = true
+  heatmapStore.setCsvUploadOpen(true)
 }
 
 function uploadCsvFile(event: Event) {
@@ -318,7 +316,7 @@ function toggleAttribute(attribute: string) {
 
 <template>
   <div class="collapse collapse-arrow bg-base-200" @click.stop="toggleAccordion">
-    <input type="checkbox" class="hidden" v-model="isOpen" />
+    <input type="checkbox" class="hidden" v-model="heatmapStore.isCsvUploadOpen" />
 
     <div class="collapse-title title-menu-grid">
       <div
@@ -328,14 +326,16 @@ function toggleAttribute(attribute: string) {
         <div>Data Table Menu</div>
       </div>
 
-      <button
-        :style="{ width: '150px' }"
-        class="btn btn-info"
-        @click.stop="triggerFileInput"
-        type="button"
-      >
-        Upload Csv File
-      </button>
+      <div :style="{ display: 'flex', alignItems: 'center' }">
+        <button
+          :style="{ width: '150px' }"
+          class="btn btn-info"
+          @click.stop="triggerFileInput"
+          type="button"
+        >
+          Upload Csv File
+        </button>
+      </div>
 
       <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />
       <!-- <button class="btn btn-success" @click.stop="saveDataTable">Save Changes</button>
@@ -344,10 +344,30 @@ function toggleAttribute(attribute: string) {
         {{ heatmapStore.getActiveDataTable?.tableName }}
       </h1>
       <div></div>
-      <div></div>
+      <div
+        :style="{
+          alignSelf: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginRight: '10px',
+        }"
+      >
+        <h1
+          v-if="!heatmapStore.isLoading || heatmapStore.heatmap.itemNamesAndData.length !== 0"
+          class="text-7xl"
+        >
+          IHECH
+        </h1>
+        <span v-else class="loading loading-spinner loading-lg"></span>
+      </div>
     </div>
 
-    <div :style="{ paddingLeft: '0px' }" class="collapse-content content-grid" v-if="isOpen">
+    <div
+      :style="{ paddingLeft: '0px' }"
+      class="collapse-content content-grid"
+      v-if="heatmapStore.isCsvUploadOpen"
+    >
       <div style="display: flex; flex-direction: column; width: 250px; gap: 10px; margin-top: 20px">
         <h3 class="text-2xl">Saved Data Tables:</h3>
         <ul

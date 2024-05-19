@@ -125,6 +125,7 @@ onUpdated(() => {
       gap: props.gapHeight + 'px',
       marginLeft: buttonSize,
       marginTop: marginTop + 'px',
+      backgroundColor: 'white',
     }"
   >
     <div class="tooltip tooltip-left" :data-tip="tooltipContent">

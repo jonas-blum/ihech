@@ -366,8 +366,6 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
 <style scoped>
 .settings-container {
   width: 100%;
-  margin-bottom: 30px;
-  margin-top: 10px;
   display: flex;
   gap: 10px;
 

@@ -29,6 +29,8 @@ export interface HeatmapStoreState {
 
   outOfSync: boolean
   reloadingScheduled: boolean
+
+  csvUploadOpen: boolean
 }
 
 export const useHeatmapStore = defineStore('heatmapStore', {
@@ -58,6 +60,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
     outOfSync: false,
     reloadingScheduled: false,
+
+    csvUploadOpen: true,
   }),
   getters: {
     getAllDataTables: (state) => state.dataTables,
@@ -104,6 +108,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getTimer: (state) => state.timer,
 
     isOutOfSync: (state) => state.outOfSync,
+
+    isCsvUploadOpen: (state) => state.csvUploadOpen,
   },
   actions: {
     saveDataTable(dataTable: CsvDataTableProfile) {
@@ -125,6 +131,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     },
     setActiveDataTable(dataTable: CsvDataTableProfile) {
       this.activeDataTable = dataTable
+    },
+    setCsvUploadOpen(open: boolean) {
+      nextTick(() => {
+        this.csvUploadOpen = open
+      })
     },
     async fetchHeatmap() {
       if (this.reloadingScheduled) {

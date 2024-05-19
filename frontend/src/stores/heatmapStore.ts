@@ -112,7 +112,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     isCsvUploadOpen: (state) => state.csvUploadOpen,
   },
   actions: {
-    saveDataTable(dataTable: CsvDataTableProfile) {
+    saveDataTable(dataTable: CsvDataTableProfile, fetchHeatmap = true) {
       if (
         dataTable.tableName === null ||
         dataTable.df === null ||
@@ -127,7 +127,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.dataTables.push(dataTable)
       }
       this.setActiveDataTable(dataTable)
-      this.fetchHeatmap()
+      if (fetchHeatmap) {
+        this.fetchHeatmap()
+      }
     },
     setActiveDataTable(dataTable: CsvDataTableProfile) {
       this.activeDataTable = dataTable
@@ -349,16 +351,24 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return
       }
       const newSelectedItemIndexes: number[] = []
-
-      const selectedCollections = this.activeDataTable.selectedFirstLayerCollections
-      const collectionColumnName = this.activeDataTable.collectionColumnNames[0]
-
-      this.activeDataTable.df.forEach((row, index) => {
-        const rowCollection = row[collectionColumnName]
-        if (selectedCollections.includes(rowCollection)) {
+      if (
+        this.activeDataTable.collectionColumnNames.length === 0 ||
+        this.activeDataTable.selectedFirstLayerCollections.length === 0
+      ) {
+        this.activeDataTable.df.forEach((row, index) => {
           newSelectedItemIndexes.push(index)
-        }
-      })
+        })
+      } else {
+        const selectedCollections = this.activeDataTable.selectedFirstLayerCollections
+        const collectionColumnName = this.activeDataTable.collectionColumnNames[0]
+
+        this.activeDataTable.df.forEach((row, index) => {
+          const rowCollection = row[collectionColumnName]
+          if (selectedCollections.includes(rowCollection)) {
+            newSelectedItemIndexes.push(index)
+          }
+        })
+      }
       this.activeDataTable.selectedItemIndexes = newSelectedItemIndexes
     },
 

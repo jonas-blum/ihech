@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHeatmapStore } from '@/stores/heatmapStore'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import * as dataForge from 'data-forge'
 import {
   ScalingEnum,
@@ -45,6 +45,65 @@ function triggerFileInput() {
   heatmapStore.setCsvUploadOpen(true)
 }
 
+function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap = true) {
+  const df: dataForge.IDataFrame = dataForge
+    .fromCSV(contents, { skipEmptyLines: true })
+    .resetIndex()
+    .bake()
+
+  const csvFile = df.toCSV()
+  let fileNameNoExtension = fileName.split('.').slice(0, -1).join('.')
+  while (heatmapStore.getAllDataTableNames.includes(fileNameNoExtension)) {
+    fileNameNoExtension = '1_' + fileNameNoExtension
+    console.log(
+      'File name already exists, adding 1 to the beginning of the file name',
+      fileNameNoExtension,
+    )
+  }
+
+  const newDataTable: CsvDataTableProfile = {
+    tableName: fileNameNoExtension,
+    df: df,
+
+    nanColumns: [],
+    nonNanColumns: [],
+
+    collectionColorMap: {},
+    itemCollectionMap: {},
+    firstLayerCollectionNames: [],
+    selectedFirstLayerCollections: [],
+
+    showOnlyStickyItemsInDimReduction: false,
+
+    csvFile: csvFile,
+
+    itemNamesColumnName: df.getColumnNames()[0],
+    collectionColumnNames: [],
+
+    selectedItemIndexes: df.getIndex().toArray(),
+    selectedAttributes: df.getColumnNames(),
+
+    stickyAttributes: [],
+    sortAttributesBasedOnStickyItems: false,
+    sortOrderAttributes: SortOrderAttributes.STDEV,
+
+    stickyItemIndexes: [],
+    clusterItemsBasedOnStickyAttributes: false,
+
+    clusterByCollections: false,
+
+    clusterSize: 6,
+    dimReductionAlgo: DimReductionAlgoEnum.PCA,
+    clusterAfterDimRed: true,
+
+    scaling: ScalingEnum.STANDARDIZING,
+
+    coloringHeatmap: ColoringHeatmapEnum.ABSOLUTE,
+  }
+
+  heatmapStore.saveDataTable(newDataTable, fetchHeatmap)
+}
+
 function uploadCsvFile(event: Event) {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
@@ -52,62 +111,7 @@ function uploadCsvFile(event: Event) {
   const reader = new FileReader()
   reader.onload = (e) => {
     const contents = e.target?.result as string
-    const df: dataForge.IDataFrame = dataForge
-      .fromCSV(contents, { skipEmptyLines: true })
-      .resetIndex()
-      .bake()
-
-    const csvFile = df.toCSV()
-    let fileNameNoExtension = file.name.split('.').slice(0, -1).join('.')
-    while (heatmapStore.getAllDataTableNames.includes(fileNameNoExtension)) {
-      fileNameNoExtension = '1_' + fileNameNoExtension
-      console.log(
-        'File name already exists, adding 1 to the beginning of the file name',
-        fileNameNoExtension,
-      )
-    }
-
-    const newDataTable: CsvDataTableProfile = {
-      tableName: fileNameNoExtension,
-      df: df,
-
-      nanColumns: [],
-      nonNanColumns: [],
-
-      collectionColorMap: {},
-      itemCollectionMap: {},
-      firstLayerCollectionNames: [],
-      selectedFirstLayerCollections: [],
-
-      showOnlyStickyItemsInDimReduction: false,
-
-      csvFile: csvFile,
-
-      itemNamesColumnName: df.getColumnNames()[0],
-      collectionColumnNames: [],
-
-      selectedItemIndexes: df.getIndex().toArray(),
-      selectedAttributes: df.getColumnNames(),
-
-      stickyAttributes: [],
-      sortAttributesBasedOnStickyItems: false,
-      sortOrderAttributes: SortOrderAttributes.STDEV,
-
-      stickyItemIndexes: [],
-      clusterItemsBasedOnStickyAttributes: false,
-
-      clusterByCollections: false,
-
-      clusterSize: 6,
-      dimReductionAlgo: DimReductionAlgoEnum.PCA,
-      clusterAfterDimRed: true,
-
-      scaling: ScalingEnum.STANDARDIZING,
-
-      coloringHeatmap: ColoringHeatmapEnum.ABSOLUTE,
-    }
-    console.log(newDataTable)
-    heatmapStore.saveDataTable(newDataTable)
+    uploadCsvFileFromFile(contents, file.name)
   }
   reader.readAsText(file)
 }
@@ -324,6 +328,20 @@ function toggleAttribute(attribute: string) {
 //     copyDataTableState()
 //   },
 // )
+
+async function fetchCsvFileByFileName(fileName: string) {
+  const response = await fetch(fileName)
+  if (!response.ok) {
+    throw new Error('Failed to fetch the CSV file.')
+  }
+  const csvText = await response.text()
+  uploadCsvFileFromFile(csvText, fileName, false)
+}
+
+onMounted(async () => {
+  await fetchCsvFileByFileName('tag_depth.csv')
+  await fetchCsvFileByFileName('abs_amount_different_attributes.csv')
+})
 </script>
 
 <template>
@@ -380,13 +398,7 @@ function toggleAttribute(attribute: string) {
             marginRight: '10px',
           }"
         >
-          <h1
-            v-if="!heatmapStore.isLoading || heatmapStore.heatmap.itemNamesAndData.length !== 0"
-            class="text-7xl"
-          >
-            IHECH
-          </h1>
-          <span v-else class="loading loading-spinner loading-lg"></span>
+          <h1 class="text-7xl">IHECH</h1>
         </div>
       </div>
 

@@ -55,7 +55,7 @@ function findRowAndOpenIt(event: Event) {
 
 async function updateScaling(scaling: ScalingEnum) {
   heatmapStore.setScaling(scaling)
-  await heatmapStore.fetchHeatmap()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 function updateColoringHeatmap(coloringHeatmap: ColoringHeatmapEnum) {
@@ -68,12 +68,12 @@ async function updateClusterByCollections(event: Event) {
     return
   }
   heatmapStore.setClusterByCollections(event.target.checked)
-  await heatmapStore.fetchHeatmap()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 async function updateSortOrderAttributes(sortOrder: SortOrderAttributes) {
   heatmapStore.setSortOrderAttributes(sortOrder)
-  await heatmapStore.fetchHeatmap()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 async function updateSortAttributesBasedOnStickyItems(event: Event) {
@@ -82,7 +82,7 @@ async function updateSortAttributesBasedOnStickyItems(event: Event) {
     return
   }
   heatmapStore.setSortAttributesBasedOnStickyItems(event.target.checked)
-  await heatmapStore.fetchHeatmap()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 async function updateClusterBasedOnStickyAttributes(event: Event) {
@@ -91,7 +91,7 @@ async function updateClusterBasedOnStickyAttributes(event: Event) {
     return
   }
   heatmapStore.setClusterItemsBasedOnStickyAttributes(event.target.checked)
-  await heatmapStore.fetchHeatmap()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 async function updateClusterAfterDimRed(event: Event) {
@@ -100,7 +100,7 @@ async function updateClusterAfterDimRed(event: Event) {
     return
   }
   heatmapStore.setClusterAfterDimRed(event.target.checked)
-  await heatmapStore.fetchHeatmap()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 async function updateClusterSize(event: Event) {
@@ -110,12 +110,12 @@ async function updateClusterSize(event: Event) {
   }
   const size = event.target.value
   heatmapStore.setClusterSize(parseInt(size, 10))
-  await heatmapStore.fetchHeatmap()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 async function updateDimReductionAlgo(dimReductionAlgo: DimReductionAlgoEnum) {
   heatmapStore.setDimReductionAlgo(dimReductionAlgo)
-  await heatmapStore.fetchHeatmap()
+  heatmapStore.setIsOutOfSync(true)
 }
 
 function updateOnlyDimReductionBasedOnStickyItems(event: Event) {

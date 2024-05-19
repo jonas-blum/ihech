@@ -527,9 +527,7 @@ onMounted(async () => {
       <CsvUpload />
     </div>
 
-    <div
-      :style="{ display: heatmapStore.heatmap.itemNamesAndData.length !== 0 ? 'block' : 'none' }"
-    >
+    <div>
       <div :style="{ display: 'flex', height: SETTINGS_HEIGHT + 'px', alignItems: 'center' }">
         <HeatmapSettings />
       </div>
@@ -540,7 +538,7 @@ onMounted(async () => {
           marginTop: GAP_SETTINGS_HEATMAP + 'px',
           overflow: 'auto',
           position: 'relative',
-          display: 'grid',
+          display: heatmapStore.heatmap.itemNamesAndData.length !== 0 ? 'grid' : 'none',
           gridTemplateColumns: 'auto auto 1fr',
           width: '100%',
         }"

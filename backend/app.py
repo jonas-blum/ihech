@@ -3,7 +3,7 @@ import traceback
 import pandas as pd
 from heatmap import create_heatmap
 from heatmap_types import HeatmapSettings
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from io import StringIO
 import logging
@@ -33,6 +33,11 @@ logger.addHandler(console_handler)
 @app.route("/")
 def index():
     return {"message": "Hello World!"}
+
+
+@app.route("/health", methods=["GET"])
+def health_check():
+    return jsonify({"status": "up"}), 200
 
 
 isComputing = False

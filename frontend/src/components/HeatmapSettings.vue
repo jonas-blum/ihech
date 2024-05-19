@@ -126,6 +126,11 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
   heatmapStore.toggleShowOnlyStickyItemsInDimReduction(event.target.checked)
   heatmapStore.changeHeatmap()
 }
+
+function reloadHeatmap() {
+  heatmapStore.setCsvUploadOpen(false)
+  heatmapStore.fetchHeatmap()
+}
 </script>
 
 <template>
@@ -347,7 +352,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
     </div>
 
     <button
-      @click="heatmapStore.fetchHeatmap()"
+      @click="reloadHeatmap()"
       :style="{ marginLeft: '30px' }"
       :class="{
         btn: true,

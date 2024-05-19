@@ -74,6 +74,7 @@ function updateDimReductionWidth() {
       SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
       MARGIN_RIGHT,
     window.innerHeight / 1.5,
+    visibleHeatmapHeight.value - 50,
   )
 }
 
@@ -160,13 +161,14 @@ function updateVisibleHeatmapHeight() {
   const csvUploadHeight = heatmapStore.isCsvUploadOpen
     ? CSV_UPLOAD_EXPANDED_HEIGHT
     : CSV_UPLOAD_COLLAPSED_HEIGHT
-  visibleHeatmapHeight.value =
+  const visHeight =
     window.innerHeight -
     MARGIN_TOP -
-    SETTINGS_HEIGHT -
+    csvUploadHeight -
     GAP_SETTINGS_HEATMAP -
-    GAP_CSV_HEATMAP -
-    csvUploadHeight
+    SETTINGS_HEIGHT -
+    GAP_CSV_HEATMAP
+  visibleHeatmapHeight.value = visHeight
 }
 
 function getHeatmapColorMaxValue() {
@@ -446,13 +448,12 @@ function updateHeatmap() {
   updateHeatmapContainerWidth()
   updateCellWidth()
 
-  updateDimReductionWidth()
-
   updateHeatmapHeight()
   updateCellHeight()
 
   updateEditionNames()
   updateVisibleHeatmapHeight()
+  updateDimReductionWidth()
 
   nextTick(() => {
     updateEntireColLabelHeight()
@@ -494,6 +495,7 @@ onMounted(async () => {
       marginRight: MARGIN_RIGHT + 'px',
       boxSizing: 'content-box',
       fontFamily: 'Roboto Condensed',
+      overflow: 'hidden',
     }"
     class="box-content"
   >
@@ -546,7 +548,7 @@ onMounted(async () => {
         <div
           :style="{
             width: dimReductionWidth + 'px',
-            height: visibleHeatmapHeight - 15 + 'px',
+
             backgroundColor: 'white',
             position: 'sticky',
             top: 0,

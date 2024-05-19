@@ -15,7 +15,7 @@ import {
 } from '@/helpers/helpers'
 import SettingsIcon from '@assets/settings.svg'
 
-const GAP_COLLAPSED_EXPANDED = 20
+const GAP_COLLAPSED_EXPANDED = 10
 const PADDING_BOTTOM = 10
 
 const CSV_UPLOAD_CONTENT_HEIGHT_FINAL =
@@ -329,18 +329,18 @@ function toggleAttribute(attribute: string) {
 //   },
 // )
 
-async function fetchCsvFileByFileName(fileName: string) {
+async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
   const response = await fetch(fileName)
   if (!response.ok) {
     throw new Error('Failed to fetch the CSV file.')
   }
   const csvText = await response.text()
-  uploadCsvFileFromFile(csvText, fileName, false)
+  uploadCsvFileFromFile(csvText, fileName, fetchHeatmap)
 }
 
 onMounted(async () => {
-  await fetchCsvFileByFileName('tag_depth.csv')
-  await fetchCsvFileByFileName('abs_amount_different_attributes.csv')
+  await fetchCsvFileByFileName('tag_depth.csv', false)
+  await fetchCsvFileByFileName('abs_amount_different_attributes.csv', true)
 })
 </script>
 
@@ -350,56 +350,53 @@ onMounted(async () => {
       <input type="checkbox" class="hidden" v-model="heatmapStore.isCsvUploadOpen" />
 
       <div
-        class="collapse-title title-menu-grid"
-        :style="{ height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px' }"
+        class="collapse-title"
+        :style="{
+          height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+          width: '100%',
+          overflow: 'hidden',
+        }"
       >
-        <div
-          class="text-3xl font-bold"
-          :style="{ width: '300px', display: 'flex', alignItems: 'center' }"
-        >
-          <div>Data Table Menu</div>
-        </div>
+        <div class="text-2xl">Data Table Menu</div>
 
-        <div :style="{ display: 'flex', alignItems: 'center' }">
+        <div>
           <button
-            :style="{ width: '150px' }"
+            :style="{ width: '120px' }"
             class="btn btn-info"
             @click.stop="triggerFileInput"
             type="button"
           >
             Upload Csv File
           </button>
-        </div>
 
-        <input type="file" ref="fileInput" @change="uploadCsvFile($event)" style="display: none" />
+          <input
+            type="file"
+            ref="fileInput"
+            @change="uploadCsvFile($event)"
+            style="display: none"
+          />
+        </div>
         <!-- <button class="btn btn-success" @click.stop="saveDataTable">Save Changes</button>
         <button class="btn btn-warning" @click.stop="discardChanges">Discard Changes</button> -->
-        <div :style="{ display: 'flex', alignItems: 'center' }">
-          <h1
-            class="font-bold text-5xl"
-            :style="{
-              overflow: 'hidden',
-              textAlign: 'left',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              margin: '0px 30px',
-            }"
-          >
-            {{ heatmapStore.getActiveDataTable?.tableName }}
-          </h1>
-        </div>
-        <div></div>
-        <div
+
+        <h1
+          v-if="heatmapStore.getActiveDataTable"
+          class="font-bold text-3xl"
           :style="{
-            alignSelf: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: '10px',
+            overflow: 'hidden',
+            textAlign: 'left',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            margin: '0px 30px',
           }"
         >
-          <h1 class="text-7xl">IHECH</h1>
-        </div>
+          {{ heatmapStore.getActiveDataTable?.tableName }}
+        </h1>
+
+        <h1 class="text-5xl">IHECH</h1>
       </div>
 
       <div
@@ -599,12 +596,6 @@ onMounted(async () => {
   gap: 50px;
   overflow-x: auto;
   overflow-y: hidden;
-}
-
-.title-menu-grid {
-  display: grid;
-
-  grid-template-columns: auto 1fr auto 1fr auto;
 }
 
 .data-table {

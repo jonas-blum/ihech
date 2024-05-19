@@ -48,6 +48,7 @@ const colLabelContainer = ref<HTMLElement | null>(null)
 const highlightOverlay = ref<HTMLElement | null>(null)
 const canvas = ref<HTMLCanvasElement | null>(null)
 const bottomScrollbarContainer = ref<HTMLElement | null>(null)
+const dimRedCollections = ref<HTMLElement | null>(null)
 
 const visibleRows = ref<ItemNameAndData[]>([])
 
@@ -546,7 +547,9 @@ onMounted(async () => {
         <div
           :style="{
             width: dimReductionWidth + 'px',
-
+            height: dimRedCollections
+              ? dimRedCollections.getBoundingClientRect().height + 'px'
+              : 'auto',
             backgroundColor: 'white',
             position: 'sticky',
             top: 0,
@@ -555,6 +558,7 @@ onMounted(async () => {
           }"
         >
           <div
+            ref="dimRedCollections"
             :style="{
               display: 'flex',
               flexDirection: 'column',
@@ -569,6 +573,7 @@ onMounted(async () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                height: '100%',
               }"
             >
               <p style="height: 25px">{{ heatmapStore.getActiveDataTable?.dimReductionAlgo }}</p>

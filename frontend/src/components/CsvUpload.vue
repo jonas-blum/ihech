@@ -90,7 +90,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
     stickyItemIndexes: [],
     clusterItemsBasedOnStickyAttributes: false,
 
-    clusterByCollections: false,
+    clusterByCollections: true,
 
     clusterSize: 6,
     dimReductionAlgo: DimReductionAlgoEnum.PCA,

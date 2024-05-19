@@ -348,7 +348,7 @@ onMounted(async () => {
 
 <template>
   <div class="box-content">
-    <div class="collapse collapse-arrow bg-base-200" @click.stop="toggleAccordion">
+    <div class="collapse collapse-arrow bg-base-200">
       <input type="checkbox" class="hidden" v-model="heatmapStore.isCsvUploadOpen" />
 
       <div
@@ -361,6 +361,7 @@ onMounted(async () => {
           width: '100%',
           overflow: 'hidden',
         }"
+        @click.stop="toggleAccordion"
       >
         <div :style="{ display: 'flex', alignItems: 'center', gap: '20px' }">
           <div class="text-2xl">Data Table Menu</div>
@@ -411,6 +412,7 @@ onMounted(async () => {
         }"
         class="collapse-content content-grid"
         v-if="heatmapStore.isCsvUploadOpen"
+        @click.stop
       >
         <div
           style="display: flex; flex-direction: column; width: 250px; gap: 5px; margin-top: 20px"
@@ -476,19 +478,22 @@ onMounted(async () => {
                     maxWidth: MAX_CELL_WIDTH - 2 * TABLE_PADDING + 'px',
                   }"
                 >
-                  <details @click.stop class="dropdown">
-                    <summary
+                  <div style="z-index: 99999" class="dropdown dropdown-end">
+                    <div
                       :style="{
                         margin: '0px',
                         zIndex: 99999,
                       }"
                       class="m-1 btn"
+                      tabindex="0"
                     >
                       <SettingsIcon :style="{ height: '15px', width: '15px' }" />
-                    </summary>
+                    </div>
+
                     <ul
                       :style="{ width: '250px' }"
-                      class="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52"
+                      tabindex="0"
+                      class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
                     >
                       <li>
                         <a :style="{ display: 'flex', gap: '5px' }">
@@ -524,7 +529,7 @@ onMounted(async () => {
                         </a>
                       </li>
                     </ul>
-                  </details>
+                  </div>
 
                   <div
                     :style="{

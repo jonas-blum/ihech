@@ -111,9 +111,7 @@ def cluster_items_recursively(
             raise Exception("Only one item in cluster")
 
         new_item_names_and_data: List[ItemNameAndData] = []
-        new_item_names = new_item_names = (
-            original_df[item_names_column_name].astype(str).tolist()
-        )
+        new_item_names = original_df[item_names_column_name].astype(str).tolist()
         dimReductionsX = dim_red_df[0].tolist()
         dimReductionsY = dim_red_df[1].tolist()
         all_data = original_df_dropped.values.tolist()

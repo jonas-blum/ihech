@@ -1,4 +1,5 @@
 import time
+import traceback
 import pandas as pd
 from heatmap import create_heatmap
 from heatmap_types import HeatmapSettings
@@ -52,7 +53,17 @@ def get_heatmap():
         original_df = pd.read_csv(csv_file)
 
         if heatmap_settings.itemNamesColumnName in heatmap_settings.selectedAttributes:
-            new_item_names_column_name = heatmap_settings.itemNamesColumnName + "_copy"
+            new_item_names_column_name = heatmap_settings.itemNamesColumnName + "_copy1"
+            original_df[new_item_names_column_name] = original_df[
+                heatmap_settings.itemNamesColumnName
+            ]
+            heatmap_settings.itemNamesColumnName = new_item_names_column_name
+
+        elif (
+            heatmap_settings.itemNamesColumnName
+            in heatmap_settings.collectionColumnNames
+        ):
+            new_item_names_column_name = heatmap_settings.itemNamesColumnName + "_copy2"
             original_df[new_item_names_column_name] = original_df[
                 heatmap_settings.itemNamesColumnName
             ]
@@ -69,7 +80,9 @@ def get_heatmap():
         )
         return return_string
     except Exception as e:
-        logger.error(f"Error: {e}")
+
+        logger.error(f"Error: {traceback.format_exc()}")
+
         return str(e), 400
     finally:
         isComputing = False

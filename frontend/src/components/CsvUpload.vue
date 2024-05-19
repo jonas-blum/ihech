@@ -15,7 +15,7 @@ import {
 } from '@/helpers/helpers'
 import SettingsIcon from '@assets/settings.svg'
 
-const GAP_COLLAPSED_EXPANDED = 10
+const GAP_COLLAPSED_EXPANDED = 0
 const PADDING_BOTTOM = 10
 
 const CSV_UPLOAD_CONTENT_HEIGHT_FINAL =
@@ -339,8 +339,10 @@ async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
 }
 
 onMounted(async () => {
-  await fetchCsvFileByFileName('tag_depth.csv', false)
-  await fetchCsvFileByFileName('abs_amount_different_attributes.csv', true)
+  if (heatmapStore.getAllDataTableNames.length === 0) {
+    // await fetchCsvFileByFileName('tag_depth.csv', false)
+    await fetchCsvFileByFileName('abs_amount_different_attributes.csv', true)
+  }
 })
 </script>
 
@@ -355,29 +357,31 @@ onMounted(async () => {
           height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-around',
+          justifyContent: 'space-between',
           width: '100%',
           overflow: 'hidden',
         }"
       >
-        <div class="text-2xl">Data Table Menu</div>
+        <div :style="{ display: 'flex', alignItems: 'center', gap: '20px' }">
+          <div class="text-2xl">Data Table Menu</div>
 
-        <div>
-          <button
-            :style="{ width: '120px' }"
-            class="btn btn-info"
-            @click.stop="triggerFileInput"
-            type="button"
-          >
-            Upload Csv File
-          </button>
+          <div v-if="heatmapStore.isCsvUploadOpen">
+            <button
+              :style="{ width: '120px' }"
+              class="btn btn-info"
+              @click.stop="triggerFileInput"
+              type="button"
+            >
+              Upload Csv File
+            </button>
 
-          <input
-            type="file"
-            ref="fileInput"
-            @change="uploadCsvFile($event)"
-            style="display: none"
-          />
+            <input
+              type="file"
+              ref="fileInput"
+              @change="uploadCsvFile($event)"
+              style="display: none"
+            />
+          </div>
         </div>
         <!-- <button class="btn btn-success" @click.stop="saveDataTable">Save Changes</button>
         <button class="btn btn-warning" @click.stop="discardChanges">Discard Changes</button> -->
@@ -395,8 +399,6 @@ onMounted(async () => {
         >
           {{ heatmapStore.getActiveDataTable?.tableName }}
         </h1>
-
-        <h1 class="text-5xl">IHECH</h1>
       </div>
 
       <div

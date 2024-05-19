@@ -159,17 +159,15 @@ function updateEntireColLabelHeight() {
 }
 
 function updateVisibleHeatmapHeight() {
-  const csvUploadHeight = heatmapStore.isCsvUploadOpen
-    ? CSV_UPLOAD_EXPANDED_HEIGHT
-    : CSV_UPLOAD_COLLAPSED_HEIGHT
-  const visHeight =
-    window.innerHeight -
-    MARGIN_TOP -
-    csvUploadHeight -
-    GAP_SETTINGS_HEATMAP -
-    SETTINGS_HEIGHT -
-    GAP_CSV_HEATMAP
-  visibleHeatmapHeight.value = visHeight
+  let TOP_PART = 0
+
+  if (heatmapStore.isCsvUploadOpen) {
+    TOP_PART = CSV_UPLOAD_EXPANDED_HEIGHT + GAP_CSV_HEATMAP + SETTINGS_HEIGHT
+  } else {
+    TOP_PART = CSV_UPLOAD_COLLAPSED_HEIGHT
+  }
+
+  visibleHeatmapHeight.value = window.innerHeight - MARGIN_TOP - TOP_PART - GAP_SETTINGS_HEATMAP
 }
 
 function getHeatmapColorMaxValue() {
@@ -519,18 +517,32 @@ onMounted(async () => {
     <div ref="highlightOverlay" class="highlight-overlay"></div>
 
     <div
+      v-if="heatmapStore.isCsvUploadOpen"
       :style="{
-        height: heatmapStore.isCsvUploadOpen
-          ? CSV_UPLOAD_EXPANDED_HEIGHT + 'px'
-          : CSV_UPLOAD_COLLAPSED_HEIGHT + 'px',
+        height: CSV_UPLOAD_EXPANDED_HEIGHT + 'px',
       }"
     >
       <CsvUpload />
     </div>
 
     <div>
-      <div :style="{ display: 'flex', height: SETTINGS_HEIGHT + 'px', alignItems: 'center' }">
+      <div
+        :style="{
+          display: 'flex',
+          height: heatmapStore.isCsvUploadOpen
+            ? SETTINGS_HEIGHT + 'px'
+            : CSV_UPLOAD_COLLAPSED_HEIGHT + 'px',
+          alignItems: 'center',
+          gap: '20px',
+        }"
+      >
         <HeatmapSettings />
+        <div
+          v-if="!heatmapStore.isCsvUploadOpen"
+          :style="{ height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px', width: '100%' }"
+        >
+          <CsvUpload />
+        </div>
       </div>
 
       <div
@@ -547,9 +559,8 @@ onMounted(async () => {
         <div
           :style="{
             width: dimReductionWidth + 'px',
-            height: dimRedCollections
-              ? dimRedCollections.getBoundingClientRect().height + 'px'
-              : 'auto',
+            height: visibleHeatmapHeight - 15 + 'px',
+
             backgroundColor: 'white',
             position: 'sticky',
             top: 0,

@@ -393,12 +393,8 @@ function updateTooltip(e: MouseEvent) {
   highlightOverlay.value.style.left = `${overlayX}px`
   highlightOverlay.value.style.top = `${overlayY}px`
   highlightOverlay.value.style.display = 'block'
+  highlightOverlay.value.style.zIndex = '10000'
 
-  const tooltipHeight = tooltip.value.offsetHeight
-
-  const tooltipTop = e.clientY - tooltipHeight - 10 + window.scrollY
-
-  tooltip.value.style.top = `${tooltipTop}px`
   tooltip.value.style.display = 'block'
   tooltip.value.style.zIndex = '10000'
 
@@ -413,6 +409,8 @@ function updateTooltip(e: MouseEvent) {
   } else {
     tooltip.value.style.left = `${tooltipXRight}px`
   }
+
+  tooltip.value.style.top = `${e.clientY - tooltip.value.offsetHeight - 20}px`
 
   const colLabelChildren = colLabelContainer.value.children
   if (colLabelChildren.length > colIdx) {

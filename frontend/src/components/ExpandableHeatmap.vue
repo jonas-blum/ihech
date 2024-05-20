@@ -505,11 +505,11 @@ onMounted(async () => {
           <div ref="tooltipValue"></div>
         </div>
         <div class="rows-tooltip">
-          <div>Document:</div>
+          <div>Item:</div>
           <div ref="tooltipRow"></div>
         </div>
         <div class="rows-tooltip">
-          <div>Tag:</div>
+          <div>Attribute:</div>
           <div ref="tooltipCol"></div>
         </div>
       </div>

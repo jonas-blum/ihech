@@ -1,0 +1,244 @@
+wahl_jahr;ebene_resultat;geoLevelName;kanton_nummer;kanton_bezeichnung;anzahl_listen;anzahl_kandidierende;anzahl_kandidierende_f;anzahl_kandidierende_m;anzahl_gewaehlte;anzahl_gewaehlte_f;anzahl_gewaehlte_m;frauen_anteil;wahlbeteiligung
+1991;Schweiz;Schweiz;;;248;2561;834;1727;200;35;165;17.5;46.045700707
+1995;Schweiz;Schweiz;;;278;2834;990;1844;200;43;157;21.5;42.222231409
+1999;Schweiz;Schweiz;;;268;2845;983;1862;200;47;153;23.5;43.303141085
+2003;Schweiz;Schweiz;;;262;2836;993;1843;200;52;148;26;45.230999305
+2007;Schweiz;Schweiz;;;311;3089;1088;2001;200;59;141;29.5;48.276098472
+2011;Schweiz;Schweiz;;;365;3458;1133;2325;200;58;142;29;48.504810858
+2015;Schweiz;Schweiz;;;422;3788;1308;2480;200;64;136;32;48.509980778
+2019;Schweiz;Schweiz;;;511;4645;1873;2772;200;84;116;42;45.109775796
+2023;Schweiz;Schweiz;;;618;5909;2409;3500;200;77;123;38.5;46.657368569
+1991;Kanton;Zürich;1;Zürich;34;814;290;524;35;9;26;25.714285714;46.25177542
+1995;Kanton;Zürich;1;Zürich;27;805;277;528;34;14;20;41.176470588;43.028874805
+1999;Kanton;Zürich;1;Zürich;28;892;319;573;34;14;20;41.176470588;45.127497749
+2003;Kanton;Zürich;1;Zürich;32;964;370;594;34;12;22;35.294117647;45.133119999
+2007;Kanton;Zürich;1;Zürich;29;804;303;501;34;12;22;35.294117647;48.965336738
+2011;Kanton;Zürich;1;Zürich;30;802;275;527;34;10;24;29.411764706;46.817958641
+2015;Kanton;Zürich;1;Zürich;35;873;304;569;35;14;21;40;47.24836193
+2019;Kanton;Zürich;1;Zürich;32;966;415;551;35;16;19;45.714285714;44.439305012
+2023;Kanton;Zürich;1;Zürich;44;1341;571;770;36;17;19;47.222222222;46.952044171
+1991;Kanton;Bern / Berne;2;Bern / Berne;27;571;190;381;29;7;22;24.137931034;46.198412571
+1995;Kanton;Bern / Berne;2;Bern / Berne;27;583;182;401;27;5;22;18.518518519;40.433806057
+1999;Kanton;Bern / Berne;2;Bern / Berne;20;443;154;289;27;7;20;25.925925926;41.108253905
+2003;Kanton;Bern / Berne;2;Bern / Berne;21;462;175;287;26;8;18;30.769230769;42.133139899
+2007;Kanton;Bern / Berne;2;Bern / Berne;24;514;184;330;26;8;18;30.769230769;46.399904072
+2011;Kanton;Bern / Berne;2;Bern / Berne;28;545;185;360;26;11;15;42.307692308;50.365157759
+2015;Kanton;Bern / Berne;2;Bern / Berne;26;567;212;355;25;10;15;40;49.063155253
+2019;Kanton;Bern / Berne;2;Bern / Berne;34;651;274;377;24;13;11;54.166666667;47.376696425
+2023;Kanton;Bern / Berne;2;Bern / Berne;39;776;328;448;24;10;14;41.666666667;49.749192183
+1991;Kanton;Luzern;3;Luzern;8;57;20;37;9;3;6;33.333333333;50.509609457
+1995;Kanton;Luzern;3;Luzern;10;68;26;42;10;3;7;30;49.423093797
+1999;Kanton;Luzern;3;Luzern;11;90;23;67;10;2;8;20;52.880039527
+2003;Kanton;Luzern;3;Luzern;14;102;29;73;10;1;9;10;50.926802982
+2007;Kanton;Luzern;3;Luzern;16;133;42;91;10;2;8;20;52.990741115
+2011;Kanton;Luzern;3;Luzern;18;129;40;89;10;3;7;30;50.921757317
+2015;Kanton;Luzern;3;Luzern;21;159;54;105;10;4;6;40;50.931058519
+2019;Kanton;Luzern;3;Luzern;33;252;108;144;9;4;5;44.444444444;48.387027461
+2023;Kanton;Luzern;3;Luzern;48;387;136;251;9;2;7;22.222222222;50.252466892
+1991;Kanton;Uri;4;Uri;;;;;1;0;1;0;34.637831788
+1995;Kanton;Uri;4;Uri;;;;;1;0;1;0;39.718687207
+1999;Kanton;Uri;4;Uri;;;;;1;0;1;0;36.265765589
+2003;Kanton;Uri;4;Uri;;;;;1;1;0;100;44.393476045
+2007;Kanton;Uri;4;Uri;;;;;1;1;0;100;24.136589919
+2011;Kanton;Uri;4;Uri;;;;;1;1;0;100;49.793182689
+2015;Kanton;Uri;4;Uri;;;;;1;0;1;0;57.132581207
+2019;Kanton;Uri;4;Uri;;;;;1;0;1;0;45.860871513
+2023;Kanton;Uri;4;Uri;;;;;1;0;1;0;50.489489822
+1991;Kanton;Schwyz;5;Schwyz;8;19;5;14;3;0;3;0;40.505663058
+1995;Kanton;Schwyz;5;Schwyz;8;21;3;18;3;0;3;0;35.068729166
+1999;Kanton;Schwyz;5;Schwyz;8;20;5;15;3;1;2;33.333333333;40.960358268
+2003;Kanton;Schwyz;5;Schwyz;8;27;4;23;4;1;3;25;48.20582412
+2007;Kanton;Schwyz;5;Schwyz;12;48;18;30;4;0;4;0;52.311029357
+2011;Kanton;Schwyz;5;Schwyz;17;64;21;43;4;1;3;25;50.493416028
+2015;Kanton;Schwyz;5;Schwyz;13;50;18;32;4;1;3;25;53.705027167
+2019;Kanton;Schwyz;5;Schwyz;21;84;29;55;4;1;3;25;48.647804102
+2023;Kanton;Schwyz;5;Schwyz;27;103;46;57;4;1;3;25;54.611661759
+1991;Kanton;Obwalden;6;Obwalden;;;;;1;0;1;0;26.6892722
+1995;Kanton;Obwalden;6;Obwalden;;;;;1;0;1;0;31.850117096
+1999;Kanton;;6;;;;;;1;0;1;0;
+2003;Kanton;Obwalden;6;Obwalden;;;;;1;0;1;0;45.72489083
+2007;Kanton;Obwalden;6;Obwalden;;;;;1;0;1;0;59.716353596
+2011;Kanton;Obwalden;6;Obwalden;;;;;1;0;1;0;64.267872011
+2015;Kanton;Obwalden;6;Obwalden;;;;;1;0;1;0;59.506934918
+2019;Kanton;Obwalden;6;Obwalden;;;;;1;1;0;100;55.077706818
+2023;Kanton;Obwalden;6;Obwalden;;;;;1;1;0;100;58.750362634
+1991;Kanton;Nidwalden;7;Nidwalden;;;;;1;0;1;0;23.579058958
+1995;Kanton;Nidwalden;7;Nidwalden;;;;;1;0;1;0;58.919046125
+1999;Kanton;Nidwalden;7;Nidwalden;;;;;1;0;1;0;46.036187278
+2003;Kanton;Nidwalden;7;Nidwalden;;;;;1;0;1;0;39.397155593
+2007;Kanton;;7;;;;;;1;0;1;0;
+2011;Kanton;Nidwalden;7;Nidwalden;;;;;1;0;1;0;60.932714159
+2015;Kanton;Nidwalden;7;Nidwalden;;;;;1;0;1;0;58.328464784
+2019;Kanton;Nidwalden;7;Nidwalden;;;;;1;0;1;0;50.384161699
+2023;Kanton;Nidwalden;7;Nidwalden;;;;;1;1;0;100;56.204996556
+1991;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;41.824572745
+1995;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;24.497700315
+1999;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;28.241758242
+2003;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;25.282746451
+2007;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;32.587084149
+2011;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;34.185903827
+2015;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;41.457286432
+2019;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;39.886877828
+2023;Kanton;Glarus;8;Glarus;;;;;1;0;1;0;47.978003068
+1991;Kanton;Zug;9;Zug;5;8;1;7;2;0;2;0;51.143476588
+1995;Kanton;Zug;9;Zug;8;19;6;13;3;0;3;0;44.41907787
+1999;Kanton;Zug;9;Zug;5;15;4;11;3;0;3;0;53.503886312
+2003;Kanton;Zug;9;Zug;8;24;6;18;3;0;3;0;52.612971271
+2007;Kanton;Zug;9;Zug;11;33;14;19;3;0;3;0;53.724566531
+2011;Kanton;Zug;9;Zug;12;35;12;23;3;0;3;0;55.129793305
+2015;Kanton;Zug;9;Zug;17;50;20;30;3;0;3;0;53.741160114
+2019;Kanton;Zug;9;Zug;25;75;37;38;3;1;2;33.333333333;52.115657674
+2023;Kanton;Zug;9;Zug;34;99;44;55;3;1;2;33.333333333;53.10464998
+1991;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;10;58;16;42;6;0;6;0;45.012980719
+1995;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;17;78;28;50;6;1;5;16.666666667;39.47662095
+1999;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;14;58;22;36;6;2;4;33.333333333;41.240740977
+2003;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;12;61;24;37;7;1;6;14.285714286;45.398186435
+2007;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;13;80;26;54;7;1;6;14.285714286;47.954820492
+2011;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;18;99;24;75;7;2;5;28.571428571;47.217834326
+2015;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;20;131;39;92;7;2;5;28.571428571;47.167992164
+2019;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;25;154;61;93;7;4;3;57.142857143;43.023419488
+2023;Kanton;Fribourg / Freiburg;10;Fribourg / Freiburg;22;141;51;90;7;4;3;57.142857143;45.403295146
+1991;Kanton;Solothurn;11;Solothurn;13;67;25;42;7;2;5;28.571428571;56.069187299
+1995;Kanton;Solothurn;11;Solothurn;10;59;22;37;7;1;6;14.285714286;48.253003899
+1999;Kanton;Solothurn;11;Solothurn;13;86;26;60;7;1;6;14.285714286;50.008244426
+2003;Kanton;Solothurn;11;Solothurn;11;75;23;52;7;2;5;28.571428571;47.388167562
+2007;Kanton;Solothurn;11;Solothurn;13;81;26;55;7;3;4;42.857142857;50.713029889
+2011;Kanton;Solothurn;11;Solothurn;22;141;48;93;7;1;6;14.285714286;51.714968043
+2015;Kanton;Solothurn;11;Solothurn;27;147;46;101;6;1;5;16.666666667;50.227308621
+2019;Kanton;Solothurn;11;Solothurn;29;166;62;104;6;1;5;16.666666667;44.803394876
+2023;Kanton;Solothurn;11;Solothurn;29;170;67;103;6;1;5;16.666666667;47.860748097
+1991;Kanton;Basel-Stadt;12;Basel-Stadt;16;78;27;51;6;1;5;16.666666667;44.977274977
+1995;Kanton;Basel-Stadt;12;Basel-Stadt;14;74;37;37;6;1;5;16.666666667;46.798010504
+1999;Kanton;Basel-Stadt;12;Basel-Stadt;12;72;32;40;6;1;5;16.666666667;47.428309011
+2003;Kanton;Basel-Stadt;12;Basel-Stadt;14;67;25;42;5;1;4;20;49.617139763
+2007;Kanton;Basel-Stadt;12;Basel-Stadt;18;88;33;55;5;2;3;40;52.41900079
+2011;Kanton;Basel-Stadt;12;Basel-Stadt;25;114;38;76;5;1;4;20;50.267393744
+2015;Kanton;Basel-Stadt;12;Basel-Stadt;26;122;54;68;5;2;3;40;50.39527951
+2019;Kanton;Basel-Stadt;12;Basel-Stadt;28;133;61;72;5;3;2;60;47.735655648
+2023;Kanton;Basel-Stadt;12;Basel-Stadt;32;122;56;66;4;4;0;100;49.725525273
+1991;Kanton;Basel-Landschaft;13;Basel-Landschaft;9;59;20;39;7;2;5;28.571428571;44.530491901
+1995;Kanton;Basel-Landschaft;13;Basel-Landschaft;14;88;30;58;7;2;5;28.571428571;41.297709924
+1999;Kanton;Basel-Landschaft;13;Basel-Landschaft;10;62;26;36;7;2;5;28.571428571;41.820747817
+2003;Kanton;Basel-Landschaft;13;Basel-Landschaft;12;79;26;53;7;2;5;28.571428571;44.226669494
+2007;Kanton;Basel-Landschaft;13;Basel-Landschaft;13;85;29;56;7;3;4;42.857142857;49.330404476
+2011;Kanton;Basel-Landschaft;13;Basel-Landschaft;14;97;29;68;7;4;3;57.142857143;48.151022986
+2015;Kanton;Basel-Landschaft;13;Basel-Landschaft;16;112;43;69;7;5;2;71.428571429;46.811240106
+2019;Kanton;Basel-Landschaft;13;Basel-Landschaft;20;134;59;75;7;5;2;71.428571429;42.527683527
+2023;Kanton;Basel-Landschaft;13;Basel-Landschaft;27;178;75;103;7;5;2;71.428571429;45.110035326
+1991;Kanton;Schaffhausen;14;Schaffhausen;6;12;3;9;2;1;1;50;68.960677056
+1995;Kanton;Schaffhausen;14;Schaffhausen;5;9;3;6;2;1;1;50;64.370341471
+1999;Kanton;Schaffhausen;14;Schaffhausen;3;6;2;4;2;0;2;0;61.931841767
+2003;Kanton;Schaffhausen;14;Schaffhausen;5;9;1;8;2;0;2;0;63.198117529
+2007;Kanton;Schaffhausen;14;Schaffhausen;7;14;4;10;2;0;2;0;65.348670022
+2011;Kanton;Schaffhausen;14;Schaffhausen;11;21;5;16;2;0;2;0;60.789827853
+2015;Kanton;Schaffhausen;14;Schaffhausen;11;21;5;16;2;1;1;50;62.640097186
+2019;Kanton;Schaffhausen;14;Schaffhausen;15;29;7;22;2;1;1;50;59.648318919
+2023;Kanton;Schaffhausen;14;Schaffhausen;20;38;13;25;2;1;1;50;61.627131208
+1991;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;4;4;0;4;2;0;2;0;44.533715925
+1995;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;7;10;2;8;2;1;1;50;48.790390797
+1999;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;3;3;1;2;2;1;1;50;51.175943555
+2003;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;;;;;1;1;0;100;49.349460427
+2007;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;;;;;1;1;0;100;33.3387402
+2011;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;;;;;1;0;1;0;47.507829503
+2015;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;;;;;1;0;1;0;47.095953037
+2019;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;;;;;1;0;1;0;41.28203159
+2023;Kanton;Appenzell Ausserrhoden;15;Appenzell Ausserrhoden;;;;;1;0;1;0;46.564749119
+1991;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;39.877555256
+1995;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;17.354368932
+1999;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;51.511195903
+2003;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;35.148611654
+2007;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;21.098981745
+2011;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;37.260081
+2015;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;36.722870731
+2019;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;48.735555183
+2023;Kanton;Appenzell Innerrhoden;16;Appenzell Innerrhoden;;;;;1;0;1;0;24.503798089
+1991;Kanton;St. Gallen;17;St. Gallen;10;116;38;78;12;4;8;33.333333333;42.912233946
+1995;Kanton;St. Gallen;17;St. Gallen;20;192;73;119;12;3;9;25;41.025248443
+1999;Kanton;St. Gallen;17;St. Gallen;18;181;58;123;12;4;8;33.333333333;43.633360043
+2003;Kanton;St. Gallen;17;St. Gallen;18;163;56;107;12;4;8;33.333333333;42.816311826
+2007;Kanton;St. Gallen;17;St. Gallen;24;231;76;155;12;4;8;33.333333333;46.783031256
+2011;Kanton;St. Gallen;17;St. Gallen;15;176;59;117;12;4;8;33.333333333;46.760622161
+2015;Kanton;St. Gallen;17;St. Gallen;23;198;64;134;12;3;9;25;46.466479437
+2019;Kanton;St. Gallen;17;St. Gallen;25;255;84;171;12;5;7;41.666666667;41.927574268
+2023;Kanton;St. Gallen;17;St. Gallen;29;311;123;188;12;4;8;33.333333333;44.591775205
+1991;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;9;41;9;32;5;0;5;0;37.924689383
+1995;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;12;51;23;28;5;2;3;40;36.67854997
+1999;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;13;57;18;39;5;1;4;20;40.61327935
+2003;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;9;43;13;30;5;1;4;20;39.116364365
+2007;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;13;61;22;39;5;1;4;20;41.854009077
+2011;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;15;69;17;52;5;1;4;20;45.112142133
+2015;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;15;70;23;47;5;2;3;40;45.981797763
+2019;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;20;100;35;65;5;3;2;60;42.923890411
+2023;Kanton;Graubünden / Grigioni / Grischun;18;Graubünden / Grigioni / Grischun;25;122;43;79;5;2;3;40;43.077607011
+1991;Kanton;Aargau;19;Aargau;14;153;45;108;14;1;13;7.1428571429;42.336628309
+1995;Kanton;Aargau;19;Aargau;19;218;85;133;15;3;12;20;42.118008594
+1999;Kanton;Aargau;19;Aargau;17;228;81;147;15;3;12;20;42.044257113
+2003;Kanton;Aargau;19;Aargau;17;207;64;143;15;5;10;33.333333333;42.270828754
+2007;Kanton;Aargau;19;Aargau;18;239;86;153;15;6;9;40;47.948520341
+2011;Kanton;Aargau;19;Aargau;22;280;95;185;15;4;11;26.666666667;48.510368537
+2015;Kanton;Aargau;19;Aargau;23;288;105;183;16;4;12;25;48.257845182
+2019;Kanton;Aargau;19;Aargau;36;496;187;309;16;7;9;43.75;44.730114827
+2023;Kanton;Aargau;19;Aargau;52;713;291;422;16;7;9;43.75;46.55426627
+1991;Kanton;Thurgau;20;Thurgau;12;67;17;50;6;1;5;16.666666667;47.067113841
+1995;Kanton;Thurgau;20;Thurgau;14;80;30;50;6;0;6;0;44.147011062
+1999;Kanton;Thurgau;20;Thurgau;17;91;29;62;6;0;6;0;44.611610561
+2003;Kanton;Thurgau;20;Thurgau;12;63;22;41;6;1;5;16.666666667;42.86728903
+2007;Kanton;Thurgau;20;Thurgau;14;75;30;45;6;2;4;33.333333333;46.894539663
+2011;Kanton;Thurgau;20;Thurgau;17;102;36;66;6;2;4;33.333333333;46.727078958
+2015;Kanton;Thurgau;20;Thurgau;22;123;41;82;6;2;4;33.333333333;46.620558073
+2019;Kanton;Thurgau;20;Thurgau;23;135;59;76;6;3;3;50;42.411536277
+2023;Kanton;Thurgau;20;Thurgau;36;210;79;131;6;3;3;50;46.640177241
+1991;Kanton;Ticino;21;Ticino;10;64;15;49;8;0;8;0;67.521442086
+1995;Kanton;Ticino;21;Ticino;9;63;10;53;8;0;8;0;52.75832685
+1999;Kanton;Ticino;21;Ticino;10;62;10;52;8;1;7;12.5;49.709535827
+2003;Kanton;Ticino;21;Ticino;7;49;14;35;8;2;6;25;48.571371203
+2007;Kanton;Ticino;21;Ticino;11;79;22;57;8;2;6;25;47.35146169
+2011;Kanton;Ticino;21;Ticino;11;68;18;50;8;2;6;25;54.300504943
+2015;Kanton;Ticino;21;Ticino;18;122;34;88;8;2;6;25;54.375972184
+2019;Kanton;Ticino;21;Ticino;23;149;54;95;8;2;6;25;49.614593924
+2023;Kanton;Ticino;21;Ticino;33;256;100;156;8;1;7;12.5;47.966507707
+1991;Kanton;Vaud;22;Vaud;14;175;55;120;17;3;14;17.647058824;37.443703837
+1995;Kanton;Vaud;22;Vaud;16;216;86;130;17;4;13;23.529411765;32.851980584
+1999;Kanton;Vaud;22;Vaud;18;257;102;155;17;3;14;17.647058824;31.541083337
+2003;Kanton;Vaud;22;Vaud;15;204;65;139;18;5;13;27.777777778;42.68424078
+2007;Kanton;Vaud;22;Vaud;14;224;78;146;18;6;12;33.333333333;44.322710443
+2011;Kanton;Vaud;22;Vaud;22;334;108;226;18;7;11;38.888888889;41.630734191
+2015;Kanton;Vaud;22;Vaud;23;326;113;213;18;6;12;33.333333333;42.926576584
+2019;Kanton;Vaud;22;Vaud;24;374;144;230;19;8;11;42.105263158;41.39692905
+2023;Kanton;Vaud;22;Vaud;22;385;141;244;19;7;12;36.842105263;40.233848125
+1991;Kanton;Valais / Wallis;23;Valais / Wallis;9;40;10;30;7;0;7;0;60.253474439
+1995;Kanton;Valais / Wallis;23;Valais / Wallis;12;58;17;41;7;0;7;0;54.954736182
+1999;Kanton;Valais / Wallis;23;Valais / Wallis;15;72;21;51;7;0;7;0;52.736748276
+2003;Kanton;Valais / Wallis;23;Valais / Wallis;17;91;25;66;7;0;7;0;53.55542403
+2007;Kanton;Valais / Wallis;23;Valais / Wallis;28;132;38;94;7;1;6;14.285714286;59.818563944
+2011;Kanton;Valais / Wallis;23;Valais / Wallis;29;151;40;111;7;1;6;14.285714286;61.845792237
+2015;Kanton;Valais / Wallis;23;Valais / Wallis;33;173;45;128;8;2;6;25;59.758564347
+2019;Kanton;Valais / Wallis;23;Valais / Wallis;40;236;90;146;8;0;8;0;54.058436538
+2023;Kanton;Valais / Wallis;23;Valais / Wallis;36;213;84;129;8;0;8;0;48.691670207
+1991;Kanton;Neuchâtel;24;Neuchâtel;7;31;8;23;5;0;5;0;38.083334954
+1995;Kanton;Neuchâtel;24;Neuchâtel;10;40;13;27;5;0;5;0;31.928687196
+1999;Kanton;Neuchâtel;24;Neuchâtel;9;41;15;26;5;1;4;20;33.9566798
+2003;Kanton;Neuchâtel;24;Neuchâtel;11;55;21;34;5;1;4;20;50.360157194
+2007;Kanton;Neuchâtel;24;Neuchâtel;12;55;20;35;5;2;3;40;50.226324582
+2011;Kanton;Neuchâtel;24;Neuchâtel;9;45;14;31;5;1;4;20;42.393064425
+2015;Kanton;Neuchâtel;24;Neuchâtel;15;54;13;41;4;0;4;0;41.786458708
+2019;Kanton;Neuchâtel;24;Neuchâtel;13;46;18;28;4;0;4;0;40.171599943
+2023;Kanton;Neuchâtel;24;Neuchâtel;16;59;29;30;4;0;4;0;40.251197221
+1991;Kanton;Genève;25;Genève;17;115;36;79;11;1;10;9.0909090909;39.649164785
+1995;Kanton;Genève;25;Genève;15;94;36;58;11;2;9;18.181818182;35.634565553
+1999;Kanton;Genève;25;Genève;14;89;31;58;11;3;8;27.272727273;36.329150861
+2003;Kanton;Genève;25;Genève;11;75;28;47;11;3;8;27.272727273;45.949250855
+2007;Kanton;Genève;25;Genève;13;97;35;62;11;2;9;18.181818182;46.711126017
+2011;Kanton;Genève;25;Genève;22;170;64;106;11;2;9;18.181818182;42.392327361
+2015;Kanton;Genève;25;Genève;26;178;66;112;11;3;8;27.272727273;42.92710363
+2019;Kanton;Genève;25;Genève;28;176;76;100;12;6;6;50;38.196745138
+2023;Kanton;Genève;25;Genève;30;251;119;132;12;5;7;41.666666667;39.850953006
+1991;Kanton;Jura;26;Jura;6;12;4;8;2;0;2;0;43.416255629
+1995;Kanton;Jura;26;Jura;4;8;1;7;2;0;2;0;42.361838522
+1999;Kanton;Jura;26;Jura;10;20;4;16;2;0;2;0;40.937304728
+2003;Kanton;Jura;26;Jura;8;16;2;14;2;0;2;0;46.641297154
+2007;Kanton;Jura;26;Jura;8;16;2;14;2;0;2;0;44.043896633
+2011;Kanton;Jura;26;Jura;8;16;5;11;2;0;2;0;44.38562879
+2015;Kanton;Jura;26;Jura;12;24;9;15;2;0;2;0;54.268715342
+2019;Kanton;Jura;26;Jura;17;34;13;21;2;0;2;0;42.552595194
+2023;Kanton;Jura;26;Jura;17;34;13;21;2;0;2;0;43.646064429

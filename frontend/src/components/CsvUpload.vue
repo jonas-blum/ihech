@@ -343,7 +343,10 @@ onMounted(async () => {
     await fetchCsvFileByFileName('amount_different_attributes.csv', false)
     await fetchCsvFileByFileName('length_of_content_inside_tag.csv', false)
     await fetchCsvFileByFileName('tag_count.csv', false)
-    await fetchCsvFileByFileName('tag_depth.csv', true)
+    await fetchCsvFileByFileName('tag_depth.csv', false)
+    await fetchCsvFileByFileName('frauen_stimmbeteiligung.csv', false)
+    await fetchCsvFileByFileName('stadt_zuerich_abstimmungen.csv', false)
+    await fetchCsvFileByFileName('zeitreihen_parteien.csv', true)
   }
 })
 </script>

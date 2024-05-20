@@ -156,25 +156,23 @@ function reloadHeatmap() {
         </li>
         <li>
           <a>
-            <div>
-              <p>Algorithm:</p>
-              <ul class="menu menu-vertical bg-base-200">
-                <li
-                  :key="dimReductionAlgo"
-                  :style="{ border: 'none' }"
-                  v-for="dimReductionAlgo in Object.values(DimReductionAlgoEnum)"
+            Algorithm:
+            <ul class="menu menu-vertical bg-base-200">
+              <li
+                :key="dimReductionAlgo"
+                :style="{ border: 'none' }"
+                v-for="dimReductionAlgo in Object.values(DimReductionAlgoEnum)"
+              >
+                <a
+                  @click="updateDimReductionAlgo(dimReductionAlgo)"
+                  :class="{
+                    'bg-green-700 text-white':
+                      heatmapStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo,
+                  }"
+                  >{{ dimReductionAlgo }}</a
                 >
-                  <a
-                    @click="updateDimReductionAlgo(dimReductionAlgo)"
-                    :class="{
-                      'bg-green-700 text-white':
-                        heatmapStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo,
-                    }"
-                    >{{ dimReductionAlgo }}</a
-                  >
-                </li>
-              </ul>
-            </div>
+              </li>
+            </ul>
           </a>
         </li>
       </ul>
@@ -187,18 +185,16 @@ function reloadHeatmap() {
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
         <li>
           <a>
-            <div class="size-container">
-              <p>Size:</p>
-              <select @change="updateClusterSize($event)" class="select select-primary max-w-xs">
-                <option
-                  :key="i"
-                  :selected="heatmapStore.getActiveDataTable?.clusterSize === i"
-                  v-for="i in Array.from({ length: 29 }, (_, i) => i + 2)"
-                >
-                  {{ i }}
-                </option>
-              </select>
-            </div>
+            Size:
+            <select @change="updateClusterSize($event)" class="select select-primary max-w-xs">
+              <option
+                :key="i"
+                :selected="heatmapStore.getActiveDataTable?.clusterSize === i"
+                v-for="i in Array.from({ length: 29 }, (_, i) => i + 2)"
+              >
+                {{ i }}
+              </option>
+            </select>
           </a>
         </li>
         <li>
@@ -241,50 +237,48 @@ function reloadHeatmap() {
           </a>
         </li>
 
-        <ul>
-          <li>
-            <a>
-              <ul class="menu menu-vertical bg-base-200">
-                <li
-                  :key="scaling"
-                  :style="{ border: 'none' }"
-                  v-for="scaling in Object.values(ScalingEnum)"
+        <li>
+          <a>
+            Scaling:
+            <ul class="menu menu-vertical bg-base-200">
+              <li
+                :key="scaling"
+                :style="{ border: 'none' }"
+                v-for="scaling in Object.values(ScalingEnum)"
+              >
+                <a
+                  @click="updateScaling(scaling)"
+                  :class="{
+                    'bg-green-700 text-white': heatmapStore.getActiveDataTable?.scaling === scaling,
+                  }"
+                  >{{ scaling }}</a
                 >
-                  <a
-                    @click="updateScaling(scaling)"
-                    :class="{
-                      'bg-green-700 text-white':
-                        heatmapStore.getActiveDataTable?.scaling === scaling,
-                    }"
-                    >{{ scaling }}</a
-                  >
-                </li>
-              </ul>
-            </a>
-          </li>
-        </ul>
-        <ul>
-          <li>
-            <a>
-              <ul class="menu menu-vertical bg-base-200">
-                <li
-                  :key="coloringHeatmap"
-                  :style="{ border: 'none' }"
-                  v-for="coloringHeatmap in Object.values(ColoringHeatmapEnum)"
+              </li>
+            </ul>
+          </a>
+        </li>
+
+        <li>
+          <a>
+            Color weights:
+            <ul class="menu menu-vertical bg-base-200">
+              <li
+                :key="coloringHeatmap"
+                :style="{ border: 'none' }"
+                v-for="coloringHeatmap in Object.values(ColoringHeatmapEnum)"
+              >
+                <a
+                  @click="updateColoringHeatmap(coloringHeatmap)"
+                  :class="{
+                    'bg-green-700 text-white':
+                      heatmapStore.getActiveDataTable?.coloringHeatmap === coloringHeatmap,
+                  }"
+                  >{{ coloringHeatmap }}</a
                 >
-                  <a
-                    @click="updateColoringHeatmap(coloringHeatmap)"
-                    :class="{
-                      'bg-green-700 text-white':
-                        heatmapStore.getActiveDataTable?.coloringHeatmap === coloringHeatmap,
-                    }"
-                    >{{ coloringHeatmap }}</a
-                  >
-                </li>
-              </ul>
-            </a>
-          </li>
-        </ul>
+              </li>
+            </ul>
+          </a>
+        </li>
       </ul>
     </div>
 
@@ -309,25 +303,23 @@ function reloadHeatmap() {
         </li>
         <li>
           <a>
-            <div>
-              <p>Order:</p>
-              <ul class="menu menu-vertical bg-base-200">
-                <li
-                  :key="sortOrder"
-                  :style="{ border: 'none' }"
-                  v-for="sortOrder in Object.values(SortOrderAttributes)"
+            Order:
+            <ul class="menu menu-vertical bg-base-200">
+              <li
+                :key="sortOrder"
+                :style="{ border: 'none' }"
+                v-for="sortOrder in Object.values(SortOrderAttributes)"
+              >
+                <a
+                  @click="updateSortOrderAttributes(sortOrder)"
+                  :class="{
+                    'bg-green-700 text-white':
+                      heatmapStore.getActiveDataTable?.sortOrderAttributes === sortOrder,
+                  }"
+                  >{{ sortOrder }}</a
                 >
-                  <a
-                    @click="updateSortOrderAttributes(sortOrder)"
-                    :class="{
-                      'bg-green-700 text-white':
-                        heatmapStore.getActiveDataTable?.sortOrderAttributes === sortOrder,
-                    }"
-                    >{{ sortOrder }}</a
-                  >
-                </li>
-              </ul>
-            </div>
+              </li>
+            </ul>
           </a>
         </li>
       </ul>

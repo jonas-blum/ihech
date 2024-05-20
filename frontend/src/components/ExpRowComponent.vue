@@ -87,8 +87,13 @@ function toggleOpen() {
 
 function updateTooltipContent() {
   const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
+
   const collectionsString = collectionNamesOfItem.join(' | ')
-  tooltipContent.value = `${collectionsString}`
+  if (collectionsString.length === 0) {
+    tooltipContent.value = props.row.itemName
+  } else {
+    tooltipContent.value = collectionsString
+  }
 }
 
 const heatmapStore = useHeatmapStore()

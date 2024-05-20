@@ -22,10 +22,11 @@ const heatmapStore = useHeatmapStore()
 
 const MIN_CELL_HEIGHT = 17
 const GAP_HEIGHT = 2
-const COL_LABELS_HEIGHT = 100
+const COL_LABELS_HEIGHT = 125
 const MIN_DIM_REDUCTION_WIDTH = 250
 const ROW_LABELS_WIDTH = 200
-const MIN_COL_LABELS_WIDTH = 12
+const MIN_COL_LABELS_WIDTH = 15
+const MAX_COL_LABELS_WIDTH = MIN_COL_LABELS_WIDTH * 2
 const BORDER_WIDTH = 0
 const SPACE_BETWEEN_COL_LABELS_AND_HEATMAP = 5
 const SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP = 10
@@ -67,41 +68,22 @@ const editionNames = ref<string[]>([])
 const stickyAttributesGap = ref<number>(0)
 const stickyItemsGap = ref<number>(0)
 
-function updateDimReductionWidth() {
-  dimReductionWidth.value = Math.min(
-    window.innerWidth -
-      heatmapContainerWidth.value -
-      ROW_LABELS_WIDTH -
-      SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
-      MARGIN_RIGHT,
-    window.innerHeight / 1.5,
-    visibleHeatmapHeight.value - 50,
+// Updates every time the heatmap changes
+
+function updateVisibleRows() {
+  function getVisibleRowsRecursively(row: ItemNameAndData): ItemNameAndData[] {
+    if (!row.isOpen || row.children === null) {
+      return [row]
+    } else if (row.isOpen && row.children) {
+      return [row].concat(
+        row.children.flatMap((child: ItemNameAndData) => getVisibleRowsRecursively(child)),
+      )
+    }
+    return []
+  }
+  visibleRows.value = heatmapStore.getHeatmap.itemNamesAndData.flatMap((row) =>
+    getVisibleRowsRecursively(row),
   )
-}
-
-function updateHeatmapWidth() {
-  heatmapWidth.value = MIN_COL_LABELS_WIDTH * heatmapStore.getHeatmap.attributeNames.length
-}
-
-function updateCellWidth() {
-  cellWidth.value = Math.round(
-    (heatmapWidth.value - stickyAttributesGap.value) /
-      heatmapStore.getHeatmap.attributeNames.length,
-  )
-}
-
-function updateHeatmapHeight() {
-  heatmapHeight.value = MIN_CELL_HEIGHT * visibleRows.value.length + stickyItemsGap.value
-}
-
-function updateCellHeight() {
-  cellHeight.value = Math.round(
-    (heatmapHeight.value - stickyItemsGap.value) / visibleRows.value.length,
-  )
-}
-
-function updateEditionNames() {
-  editionNames.value = heatmapStore.getHeatmap.itemNamesAndData.map((row) => row.itemName)
 }
 
 function updateStickyAttributesGap() {
@@ -122,20 +104,24 @@ function updateStickyItemsGap() {
   stickyItemsGap.value = heatmapStore.isStickyItemsGapVisible ? stickyItemsGapTemp : 0
 }
 
-function updateVisibleRows() {
-  function getVisibleRowsRecursively(row: ItemNameAndData): ItemNameAndData[] {
-    if (!row.isOpen || row.children === null) {
-      return [row]
-    } else if (row.isOpen && row.children) {
-      return [row].concat(
-        row.children.flatMap((child: ItemNameAndData) => getVisibleRowsRecursively(child)),
-      )
-    }
-    return []
-  }
-  visibleRows.value = heatmapStore.getHeatmap.itemNamesAndData.flatMap((row) =>
-    getVisibleRowsRecursively(row),
+function updateHeatmapWidth() {
+  const availableWidth =
+    window.innerWidth -
+    stickyAttributesGap.value -
+    ROW_LABELS_WIDTH -
+    MIN_DIM_REDUCTION_WIDTH -
+    SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
+    MARGIN_RIGHT -
+    MARGIN_LEFT -
+    2 * BORDER_WIDTH
+
+  let cellWidthTemp = Math.max(
+    Math.floor(availableWidth / heatmapStore.getHeatmap.attributeNames.length),
+    MIN_COL_LABELS_WIDTH,
   )
+  cellWidthTemp = Math.min(cellWidthTemp, MAX_COL_LABELS_WIDTH)
+  heatmapWidth.value = cellWidthTemp * heatmapStore.getHeatmap.attributeNames.length
+  cellWidth.value = cellWidthTemp
 }
 
 function updateHeatmapContainerWidth() {
@@ -147,8 +133,45 @@ function updateHeatmapContainerWidth() {
       MARGIN_RIGHT,
   )
 
-  const width = Math.min(maxWidth, heatmapWidth.value + 2 * BORDER_WIDTH)
+  const width = Math.min(
+    maxWidth,
+    heatmapWidth.value + 2 * BORDER_WIDTH + stickyAttributesGap.value,
+  )
   heatmapContainerWidth.value = width
+}
+
+function updateHeatmapHeight() {
+  heatmapHeight.value = MIN_CELL_HEIGHT * visibleRows.value.length + stickyItemsGap.value
+  cellHeight.value = MIN_CELL_HEIGHT
+}
+
+function updateEditionNames() {
+  editionNames.value = heatmapStore.getHeatmap.itemNamesAndData.map((row) => row.itemName)
+}
+
+function updateDimReductionWidth() {
+  dimReductionWidth.value = Math.min(
+    window.innerWidth -
+      heatmapContainerWidth.value -
+      ROW_LABELS_WIDTH -
+      SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
+      MARGIN_RIGHT,
+    window.innerHeight / 1.5,
+  )
+}
+
+function updateVisibleHeatmapHeight() {
+  const maxHeight = window.innerHeight - MARGIN_TOP
+  const minHeight = Math.max(
+    heatmapHeight.value +
+      COL_LABELS_HEIGHT +
+      SPACE_BETWEEN_COL_LABELS_AND_HEATMAP +
+      2 * BORDER_WIDTH +
+      20,
+    dimReductionWidth.value + COL_LABELS_HEIGHT,
+  )
+
+  visibleHeatmapHeight.value = Math.min(maxHeight, minHeight)
 }
 
 function updateEntireColLabelHeight() {
@@ -158,16 +181,27 @@ function updateEntireColLabelHeight() {
   entireColLabelHeight.value = COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP
 }
 
-function updateVisibleHeatmapHeight() {
-  let TOP_PART = 0
+function updateHeatmap() {
+  updateVisibleRows()
+  updateStickyAttributesGap()
+  updateStickyItemsGap()
 
-  if (heatmapStore.isCsvUploadOpen) {
-    TOP_PART = CSV_UPLOAD_EXPANDED_HEIGHT + GAP_CSV_HEATMAP + SETTINGS_HEIGHT
-  } else {
-    TOP_PART = CSV_UPLOAD_COLLAPSED_HEIGHT
-  }
+  updateHeatmapWidth()
+  updateHeatmapContainerWidth()
 
-  visibleHeatmapHeight.value = window.innerHeight - MARGIN_TOP - TOP_PART - GAP_SETTINGS_HEATMAP
+  updateHeatmapHeight()
+
+  updateEditionNames()
+
+  updateDimReductionWidth()
+
+  updateVisibleHeatmapHeight()
+
+  nextTick(() => {
+    updateEntireColLabelHeight()
+  })
+
+  drawEverything()
 }
 
 function getHeatmapColorMaxValue() {
@@ -438,29 +472,6 @@ watch(
   },
 )
 
-function updateHeatmap() {
-  updateVisibleRows()
-  updateStickyAttributesGap()
-  updateStickyItemsGap()
-
-  updateHeatmapWidth()
-  updateHeatmapContainerWidth()
-  updateCellWidth()
-
-  updateHeatmapHeight()
-  updateCellHeight()
-
-  updateEditionNames()
-  updateVisibleHeatmapHeight()
-  updateDimReductionWidth()
-
-  nextTick(() => {
-    updateEntireColLabelHeight()
-  })
-
-  drawEverything()
-}
-
 onMounted(async () => {
   if (!canvas.value) {
     return
@@ -494,7 +505,6 @@ onMounted(async () => {
       marginRight: MARGIN_RIGHT + 'px',
       boxSizing: 'content-box',
       fontFamily: 'Roboto Condensed',
-      overflow: 'hidden',
     }"
     class="box-content"
   >
@@ -559,10 +569,10 @@ onMounted(async () => {
         <div
           :style="{
             width: dimReductionWidth + 'px',
-            height: visibleHeatmapHeight - 15 + 'px',
-
+            minHeight: visibleHeatmapHeight - 20 + 'px',
             backgroundColor: 'white',
             position: 'sticky',
+            marginBottom: 'auto',
             top: 0,
             left: 0,
             zIndex: 1000,
@@ -593,6 +603,7 @@ onMounted(async () => {
             <CollectionSelector />
           </div>
         </div>
+
         <div
           :style="{
             display: 'flex',
@@ -655,7 +666,6 @@ onMounted(async () => {
           :style="{
             width: heatmapContainerWidth + 'px',
 
-            marginRight: 'auto',
             boxSizing: 'content-box',
             height: '100%',
           }"
@@ -739,7 +749,7 @@ onMounted(async () => {
                   zIndex: 1,
                 }"
               >
-                <div>{{ colName.length > 13 ? colName.slice(0, 13) + '...' : colName }}</div>
+                <div>{{ colName }}</div>
               </div>
             </button>
           </div>

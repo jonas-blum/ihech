@@ -340,8 +340,10 @@ async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
 
 onMounted(async () => {
   if (heatmapStore.getAllDataTableNames.length === 0) {
-    // await fetchCsvFileByFileName('tag_depth.csv', false)
-    await fetchCsvFileByFileName('abs_amount_different_attributes.csv', true)
+    await fetchCsvFileByFileName('amount_different_attributes.csv', false)
+    await fetchCsvFileByFileName('length_of_content_inside_tag.csv', false)
+    await fetchCsvFileByFileName('tag_count.csv', false)
+    await fetchCsvFileByFileName('tag_depth.csv', true)
   }
 })
 </script>

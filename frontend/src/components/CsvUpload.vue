@@ -539,11 +539,13 @@ onMounted(async () => {
                   <div
                     :style="{
                       display: 'flex',
+                      alignItems: 'center',
                       gap: '5px',
                       maxWidth: MAX_CELL_WIDTH - 2 * TABLE_PADDING + 'px',
                     }"
                   >
                     <input
+                      :style="{ width: '15px', height: '15px' }"
                       @click.stop="toggleAttribute(columnName)"
                       type="checkbox"
                       :checked="

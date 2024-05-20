@@ -161,7 +161,7 @@ function updateDimReductionWidth() {
 }
 
 function updateVisibleHeatmapHeight() {
-  const maxHeight = window.innerHeight - MARGIN_TOP
+  const maxHeight = window.innerHeight - MARGIN_TOP - CSV_UPLOAD_COLLAPSED_HEIGHT - GAP_CSV_HEATMAP
   const minHeight = Math.max(
     heatmapHeight.value +
       COL_LABELS_HEIGHT +
@@ -445,7 +445,7 @@ function updateTooltip(e: MouseEvent) {
     tooltip.value.style.left = `${tooltipXRight}px`
   }
 
-  tooltip.value.style.top = `${e.clientY - tooltip.value.offsetHeight - 20}px`
+  tooltip.value.style.top = `${e.clientY + scrollY - tooltip.value.offsetHeight - 20}px`
 
   const colLabelChildren = colLabelContainer.value.children
   if (colLabelChildren.length > colIdx) {

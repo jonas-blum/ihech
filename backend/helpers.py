@@ -1,3 +1,5 @@
+import gzip
+import json
 from typing import List
 import pandas as pd
 
@@ -13,3 +15,9 @@ def extract_columns(
 ) -> pd.DataFrame:
     unique_columns = list(set([row_names_column_name] + collection_column_names))
     return df[unique_columns]
+
+
+def compress_json(data):
+    json_str = json.dumps(data).encode("utf-8")
+    compressed_data = gzip.compress(json_str)
+    return compressed_data

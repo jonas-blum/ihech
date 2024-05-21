@@ -1,6 +1,7 @@
 import time
 import traceback
 import pandas as pd
+from helpers import compress_json
 from heatmap import create_heatmap
 from heatmap_types import HeatmapSettings
 from flask import Flask, request, jsonify
@@ -80,10 +81,18 @@ def get_heatmap():
         logger.info("Starting Filtering...")
 
         return_string = create_heatmap(original_df, heatmap_settings)
+
+        logger.info(f"Starting compression...")
+        start_compression = time.perf_counter()
+        compressed_json = compress_json(return_string)
+        logger.info(
+            f"Compressing Done: {round(time.perf_counter() - start_compression,3 )}\n"
+        )
+
         logger.info(
             f"Time to generate entire heatmap: {round(time.perf_counter() - start,3 )}\n"
         )
-        return return_string
+        return compressed_json
     except Exception as e:
 
         logger.error(f"Error: {traceback.format_exc()}")

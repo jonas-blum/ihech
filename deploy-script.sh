@@ -8,7 +8,7 @@ REMOTE=$(git rev-parse @{u})
 BACKEND_IMAGE="jonasblum/ihech-backend:$LOCAL"
 FRONTEND_IMAGE="jonasblum/ihech-frontend:$LOCAL"
 
-export VITE_API_URL=https://backend.ihech.jonas-blum.ch
+export VITE_API_URL=https://backend.jonas-blum.ch
 
 if [ "$LOCAL" != "$REMOTE" ]; then
     echo "Changes detected, updating and restarting the container..."

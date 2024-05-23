@@ -21,7 +21,7 @@ spec:
             - containerPort: 80
           env:
             - name: VITE_API_URL
-              value: "https://backend.ihech.jonas-blum.ch"
+              value: "https://backend.jonas-blum.ch"
           livenessProbe:
             httpGet:
               path: /

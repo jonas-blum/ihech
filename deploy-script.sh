@@ -14,6 +14,8 @@ if [ "$LOCAL" != "$REMOTE" ]; then
     echo "Changes detected, updating and restarting the container..."
     git reset --hard origin/main
 
+    sleep 5
+
     docker build -t $BACKEND_IMAGE ./backend
     docker push $BACKEND_IMAGE
 

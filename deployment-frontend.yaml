@@ -1,36 +1,178 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ihech-frontend
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    field.cattle.io/publicEndpoints: >-
+      [{"addresses":["192.168.1.222"],"port":80,"protocol":"HTTP","serviceName":"default:ihech-frontend","ingressName":"default:ihech-frontend","hostname":"ihech.jonas-blum.ch","path":"/","allNodes":false}]
+  creationTimestamp: "2024-05-24T21:08:30Z"
+  generation: 2
   labels:
-    app: ihech-frontend
+    workload.user.cattle.io/workloadselector: apps.deployment-default-ihech-frontend
+  managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            f:field.cattle.io/publicEndpoints: {}
+          f:labels:
+            .: {}
+            f:workload.user.cattle.io/workloadselector: {}
+        f:spec:
+          f:progressDeadlineSeconds: {}
+          f:replicas: {}
+          f:revisionHistoryLimit: {}
+          f:selector: {}
+          f:strategy:
+            f:rollingUpdate:
+              .: {}
+              f:maxSurge: {}
+              f:maxUnavailable: {}
+            f:type: {}
+          f:template:
+            f:metadata:
+              f:labels:
+                .: {}
+                f:workload.user.cattle.io/workloadselector: {}
+              f:namespace: {}
+            f:spec:
+              f:affinity: {}
+              f:containers:
+                k:{"name":"ihech-frontend"}:
+                  .: {}
+                  f:env:
+                    .: {}
+                    k:{"name":"VITE_API_URL"}:
+                      .: {}
+                      f:name: {}
+                      f:value: {}
+                  f:image: {}
+                  f:imagePullPolicy: {}
+                  f:name: {}
+                  f:ports:
+                    .: {}
+                    k:{"containerPort":80,"protocol":"TCP"}:
+                      .: {}
+                      f:containerPort: {}
+                      f:name: {}
+                      f:protocol: {}
+                  f:resources: {}
+                  f:securityContext:
+                    .: {}
+                    f:allowPrivilegeEscalation: {}
+                    f:privileged: {}
+                    f:readOnlyRootFilesystem: {}
+                    f:runAsNonRoot: {}
+                  f:terminationMessagePath: {}
+                  f:terminationMessagePolicy: {}
+              f:dnsPolicy: {}
+              f:restartPolicy: {}
+              f:schedulerName: {}
+              f:securityContext: {}
+              f:terminationGracePeriodSeconds: {}
+      manager: agent
+      operation: Update
+      time: "2024-05-24T21:09:12Z"
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:deployment.kubernetes.io/revision: {}
+        f:status:
+          f:availableReplicas: {}
+          f:conditions:
+            .: {}
+            k:{"type":"Available"}:
+              .: {}
+              f:lastTransitionTime: {}
+              f:lastUpdateTime: {}
+              f:message: {}
+              f:reason: {}
+              f:status: {}
+              f:type: {}
+            k:{"type":"Progressing"}:
+              .: {}
+              f:lastTransitionTime: {}
+              f:lastUpdateTime: {}
+              f:message: {}
+              f:reason: {}
+              f:status: {}
+              f:type: {}
+          f:observedGeneration: {}
+          f:readyReplicas: {}
+          f:replicas: {}
+          f:updatedReplicas: {}
+      manager: k3s
+      operation: Update
+      subresource: status
+      time: "2024-05-24T21:25:47Z"
+  name: ihech-frontend
+  namespace: default
+  resourceVersion: "627120"
+  uid: 4ba03cb5-2d8f-4a5f-b87b-85cd4b3f86e8
 spec:
+  progressDeadlineSeconds: 600
   replicas: 2
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: ihech-frontend
+      workload.user.cattle.io/workloadselector: apps.deployment-default-ihech-frontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
+      creationTimestamp: null
       labels:
-        app: ihech-frontend
+        workload.user.cattle.io/workloadselector: apps.deployment-default-ihech-frontend
+      namespace: default
     spec:
+      affinity: {}
       containers:
-        - name: ihech-frontend
-          image: jonasblum/ihech-frontend:latest
+        - env:
+            - name: VITE_API_URL
+              value: https://backend.jonas-blum.ch
+          image: jonasblum/ihech-frontend:ad6b32b9a73ee00cd09c800878a8f9aa384a352c
+          imagePullPolicy: IfNotPresent
+          name: ihech-frontend
           ports:
             - containerPort: 80
-          env:
-            - name: VITE_API_URL
-              value: "https://backend.jonas-blum.ch"
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 120
-            periodSeconds: 120
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 10
-            periodSeconds: 60
+              name: ihech-frontend
+              protocol: TCP
+          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 2
+  conditions:
+    - lastTransitionTime: "2024-05-24T21:08:30Z"
+      lastUpdateTime: "2024-05-24T21:08:32Z"
+      message: ReplicaSet "ihech-frontend-676b88b5d8" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2024-05-24T21:25:47Z"
+      lastUpdateTime: "2024-05-24T21:25:47Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+  observedGeneration: 2
+  readyReplicas: 2
+  replicas: 2
+  updatedReplicas: 2

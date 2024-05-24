@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    field.cattle.io/targetWorkloadIds: '["default/ihech-backend"]'
+    management.cattle.io/ui-managed: "true"
+  creationTimestamp: "2024-05-24T21:12:57Z"
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:field.cattle.io/targetWorkloadIds: {}
+            f:management.cattle.io/ui-managed: {}
+          f:ownerReferences:
+            .: {}
+            k:{"uid":"2788c210-d4e0-46b6-bb2a-44f9ff320e84"}: {}
+        f:spec:
+          f:internalTrafficPolicy: {}
+          f:ports:
+            .: {}
+            k:{"port":5000,"protocol":"TCP"}:
+              .: {}
+              f:name: {}
+              f:port: {}
+              f:protocol: {}
+              f:targetPort: {}
+          f:selector: {}
+          f:sessionAffinity: {}
+          f:type: {}
+      manager: agent
+      operation: Update
+      time: "2024-05-24T21:12:57Z"
+  name: ihech-backend
+  namespace: default
+  ownerReferences:
+    - apiVersion: apps/v1
+      controller: true
+      kind: Deployment
+      name: ihech-backend
+      uid: 2788c210-d4e0-46b6-bb2a-44f9ff320e84
+  resourceVersion: "625862"
+  uid: fbdd28a4-d003-4d51-a4c4-8908b937ec0a
+spec:
+  clusterIP: 10.43.9.166
+  clusterIPs:
+    - 10.43.9.166
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: ihech-backend
+      port: 5000
+      protocol: TCP
+      targetPort: 5000
+  selector:
+    workload.user.cattle.io/workloadselector: apps.deployment-default-ihech-backend
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

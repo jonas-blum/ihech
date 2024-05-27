@@ -5,8 +5,8 @@ git fetch
 LOCAL=$(git rev-parse HEAD)
 REMOTE=$(git rev-parse @{u})
 
-BACKEND_IMAGE="jonasblum/ihech-backend:$LOCAL"
-FRONTEND_IMAGE="jonasblum/ihech-frontend:$LOCAL"
+BACKEND_IMAGE="jonasblum/ihech-backend:latest"
+FRONTEND_IMAGE="jonasblum/ihech-frontend:latest"
 
 export VITE_API_URL=https://backend-ihech.jonas-blum.ch
 

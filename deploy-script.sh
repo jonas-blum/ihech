@@ -14,8 +14,6 @@ if [ "$LOCAL" != "$REMOTE" ]; then
     echo "Changes detected, updating and restarting the container..."
     git reset --hard origin/main
 
-    sleep 5
-
     docker build -t $BACKEND_IMAGE ./backend
     docker push $BACKEND_IMAGE
 
@@ -24,6 +22,9 @@ if [ "$LOCAL" != "$REMOTE" ]; then
 
     /usr/local/bin/kubectl set image deployment/ihech-backend ihech-backend=$BACKEND_IMAGE
     /usr/local/bin/kubectl set image deployment/ihech-frontend ihech-frontend=$FRONTEND_IMAGE
+
+    /usr/local/bin/kubectl rollout restart deployment/ihech-backend
+    /usr/local/bin/kubectl rollout restart deployment/ihech-frontend
 
     echo "Deployment updated successfully."
 else

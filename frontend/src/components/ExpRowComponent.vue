@@ -19,6 +19,8 @@ const props = defineProps<{
   editionCount?: number
 }>()
 
+const tooltip = ref<HTMLElement | null>(null)
+
 const tooltipContent = ref('')
 
 const isRowHighlighted = ref(false)
@@ -26,6 +28,23 @@ const isRowHighlighted = ref(false)
 const rowTextElement = ref<HTMLElement | null>(null)
 
 const buttonSize = computed(() => props.cellHeight - props.gapHeight + 'px')
+
+const isTooltipVisible = ref(false)
+
+function showTooltip(event: MouseEvent) {
+  isTooltipVisible.value = true
+  updateTooltipPosition(event)
+}
+
+function hideTooltip(event: MouseEvent) {
+  isTooltipVisible.value = false
+}
+
+function updateTooltipPosition(event: MouseEvent) {
+  if (!tooltip.value) return
+  tooltip.value.style.top = `${event.clientY - 10}px`
+  tooltip.value.style.left = `${event.clientX + 20}px`
+}
 
 const rightClickButton = (e: MouseEvent) => {
   e.preventDefault()
@@ -125,6 +144,7 @@ onUpdated(() => {
 
 <template>
   <div
+    @mouseleave="hideTooltip"
     class="children-container"
     :style="{
       gap: props.gapHeight + 'px',
@@ -133,7 +153,14 @@ onUpdated(() => {
       backgroundColor: 'white',
     }"
   >
-    <div class="tooltip tooltip-left" :data-tip="tooltipContent">
+    <div
+      v-if="isTooltipVisible"
+      ref="tooltip"
+      :style="{ position: 'fixed', zIndex: 1000001, fontWeight: 600 }"
+    >
+      {{ tooltipContent }}
+    </div>
+    <div>
       <div class="row-div">
         <button
           :style="{
@@ -180,6 +207,8 @@ onUpdated(() => {
           </button>
 
           <div
+            @mouseleave="hideTooltip"
+            @mousemove="updateTooltipPosition"
             ref="rowTextElement"
             :style="{
               fontWeight: isRowHighlighted ? 900 : 'normal',

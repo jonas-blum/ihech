@@ -37,6 +37,7 @@ const BORDER_WIDTH = 4
 const MARGIN_RIGHT = 20
 const MARGIN_LEFT = 20
 const MARGIN_TOP = 20
+const MARGIN_BOTTOM = 20
 const GAP_CSV_HEATMAP = 40
 const GAP_SETTINGS_HEATMAP = 30
 const SETTINGS_HEIGHT = 60
@@ -60,10 +61,10 @@ const visibleRows = ref<ItemNameAndData[]>([])
 const dimReductionWidth = ref<number>(MIN_DIM_REDUCTION_WIDTH)
 
 const heatmapWidth = ref<number>(0)
-const visibleHeatmapWidth = ref<number>(0)
+const entireVisibleHeatmapWidth = ref<number>(0)
 const cellWidth = ref<number>(0)
 const heatmapHeight = ref<number>(0)
-const visibleHeatmapHeight = ref<number>(window.innerHeight - 20)
+const entireVisibleHeatmapHeight = ref<number>(window.innerHeight - 20)
 const cellHeight = ref<number>(0)
 
 const editionNames = ref<string[]>([])
@@ -126,20 +127,33 @@ function updateHeatmapWidth() {
   cellWidth.value = cellWidthTemp
 }
 
-function updateVisibleHeatmapWidth() {
-  let maxWidth = Math.round(
-    window.innerWidth -
-      ROW_LABELS_WIDTH -
-      MIN_DIM_REDUCTION_WIDTH -
-      SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
-      MARGIN_RIGHT,
-  )
+function updateEntireVisibleHeatmapWidth() {
+  const scrollableWidth = window.innerWidth - MIN_DIM_REDUCTION_WIDTH - MARGIN_RIGHT - MARGIN_LEFT
 
-  const width = Math.min(
-    maxWidth,
-    heatmapWidth.value + 2 * BORDER_WIDTH + stickyAttributesGap.value,
-  )
-  visibleHeatmapWidth.value = width
+  const nonScrollableWidth =
+    heatmapWidth.value +
+    2 * BORDER_WIDTH +
+    stickyAttributesGap.value +
+    ROW_LABELS_WIDTH +
+    SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP +
+    30
+
+  entireVisibleHeatmapWidth.value = Math.min(scrollableWidth, nonScrollableWidth)
+}
+
+function updateEntireVisibleHeatmapHeight() {
+  const scrollableHeight =
+    window.innerHeight - MARGIN_TOP - MARGIN_BOTTOM - CSV_UPLOAD_COLLAPSED_HEIGHT - GAP_CSV_HEATMAP
+
+  const nonScrollableHeight =
+    heatmapHeight.value +
+    2 * BORDER_WIDTH +
+    stickyItemsGap.value +
+    COL_LABELS_HEIGHT +
+    SPACE_BETWEEN_COL_LABELS_AND_HEATMAP +
+    30
+
+  entireVisibleHeatmapHeight.value = Math.min(scrollableHeight, nonScrollableHeight)
 }
 
 function updateHeatmapHeight() {
@@ -152,27 +166,11 @@ function updateEditionNames() {
 }
 
 function updateDimReductionWidth() {
-  dimReductionWidth.value = Math.min(
-    window.innerWidth -
-      visibleHeatmapWidth.value -
-      ROW_LABELS_WIDTH -
-      SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
-      MARGIN_RIGHT,
-    window.innerHeight / 1.5,
-  )
-}
+  const usingExactlyRemainingSpace =
+    window.innerWidth - entireVisibleHeatmapWidth.value - MARGIN_RIGHT - MARGIN_LEFT
+  const maximumWidth = window.innerHeight / 1.5
 
-function updateVisibleHeatmapHeight() {
-  const maxHeight = window.innerHeight - MARGIN_TOP - CSV_UPLOAD_COLLAPSED_HEIGHT - GAP_CSV_HEATMAP
-  const minHeight = Math.max(
-    heatmapHeight.value +
-      COL_LABELS_HEIGHT +
-      SPACE_BETWEEN_COL_LABELS_AND_HEATMAP +
-      2 * BORDER_WIDTH +
-      20,
-  )
-
-  visibleHeatmapHeight.value = Math.min(maxHeight, minHeight)
+  dimReductionWidth.value = Math.min(usingExactlyRemainingSpace, maximumWidth)
 }
 
 function updateHeatmap() {
@@ -181,7 +179,7 @@ function updateHeatmap() {
   updateStickyItemsGap()
 
   updateHeatmapWidth()
-  updateVisibleHeatmapWidth()
+  updateEntireVisibleHeatmapWidth()
 
   updateHeatmapHeight()
 
@@ -189,7 +187,7 @@ function updateHeatmap() {
 
   updateDimReductionWidth()
 
-  updateVisibleHeatmapHeight()
+  updateEntireVisibleHeatmapHeight()
 
   drawEverything()
 }
@@ -461,9 +459,9 @@ watch(
   () => heatmapStore.isCsvUploadOpen,
   () => {
     nextTick(() => {
-      updateVisibleHeatmapHeight()
+      updateEntireVisibleHeatmapHeight()
     })
-    updateVisibleHeatmapHeight()
+    updateEntireVisibleHeatmapHeight()
   },
 )
 
@@ -496,6 +494,7 @@ onMounted(async () => {
       flexDirection: 'column',
       gap: GAP_CSV_HEATMAP + 'px',
       marginTop: MARGIN_TOP + 'px',
+      marginBottom: MARGIN_BOTTOM + 'px',
       marginLeft: MARGIN_LEFT + 'px',
       marginRight: MARGIN_RIGHT + 'px',
       fontFamily: 'Roboto Condensed',
@@ -553,9 +552,8 @@ onMounted(async () => {
         <div
           :style="{
             width: dimReductionWidth + 'px',
-            minHeight: visibleHeatmapHeight - 20 + 'px',
+            minHeight: entireVisibleHeatmapHeight - 20 + 'px',
             backgroundColor: 'white',
-            zIndex: 1000,
           }"
         >
           <div
@@ -593,8 +591,8 @@ onMounted(async () => {
             gridTemplateColumns:
               ROW_LABELS_WIDTH + SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px auto',
             gridTemplateRows: COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px auto',
-            width: visibleHeatmapWidth + 'px',
-            height: visibleHeatmapHeight + 'px',
+            width: entireVisibleHeatmapWidth + 'px',
+            height: entireVisibleHeatmapHeight + 'px',
           }"
         >
           <div
@@ -769,7 +767,6 @@ onMounted(async () => {
             ref="canvas"
           ></canvas>
         </div>
-        >
       </div>
     </div>
   </main>

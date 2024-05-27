@@ -193,7 +193,7 @@ function drawScatterplot() {
         .style('stroke', row.children ? 'black' : 'none')
         .style('stroke-width', () => {
           if (!isRowCollapsible(row)) {
-            return 5
+            return 4
           }
           if (row.children) {
             return 2

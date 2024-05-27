@@ -141,6 +141,13 @@ def create_heatmap(
 ) -> str:
     start = time.perf_counter()
 
+    settings.stickyAttributes = [
+        attr for attr in settings.stickyAttributes if attr in original_df.columns
+    ]
+    settings.stickyItemIndexes = [
+        index for index in settings.stickyItemIndexes if index in original_df.index
+    ]
+
     original_filtered_df = filter_attributes_and_items(original_df, settings)
 
     original_filtered_dropped = drop_columns(
@@ -162,7 +169,7 @@ def create_heatmap(
             if col in scaled_filtered_df.columns
         ]
         scaled_filtered_sticky_df = scaled_filtered_df[sticky_columns]
-        if not scaled_filtered_df.empty:
+        if not scaled_filtered_sticky_df.empty:
             scaled_filtered_df = scaled_filtered_sticky_df
         else:
             logger.warning("No sticky attributes found in cleaned dataframe")
@@ -200,13 +207,13 @@ def create_heatmap(
         settings.collectionColumnNames,
     )
 
-    original_dropped_sticky_df = original_filtered_df_dropped.loc[
-        settings.stickyItemIndexes
-    ]
     if (
-        original_dropped_sticky_df.shape[0] >= 2
+        len(settings.stickyItemIndexes) >= 2
         and settings.sortAttributesBasedOnStickyItems
     ):
+        original_dropped_sticky_df = original_filtered_df_dropped.loc[
+            settings.stickyItemIndexes
+        ]
         std_devs = original_dropped_sticky_df.std()
     else:
         std_devs = original_filtered_df_dropped.std()
@@ -231,8 +238,9 @@ def create_heatmap(
 
     heatmap_json = HeatmapJSON()
     heatmap_json.attributeDissimilarities = normalized_dissimilarities.tolist()
-    heatmap_json.attributeNames = [attr.replace("\n", " ") for attr in original_filtered_df_dropped.columns]
-
+    heatmap_json.attributeNames = [
+        attr.replace("\n", " ") for attr in original_filtered_df_dropped.columns
+    ]
 
     heatmap_json.maxHeatmapValue = original_filtered_df_dropped.max().max()
     heatmap_json.minHeatmapValue = original_filtered_df_dropped.min().min()

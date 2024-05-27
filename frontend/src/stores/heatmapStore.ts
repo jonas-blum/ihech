@@ -185,7 +185,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         const decompressedStream = blob.stream().pipeThrough(ds)
         const reader = decompressedStream.getReader()
 
-        let receivedHeatmap = null
+        let receivedHeatmap: HeatmapJSON | null = null
         const chunks = []
         let result
         while (!(result = await reader.read()).done) {
@@ -214,7 +214,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         const stickyRows: ItemNameAndData[] = []
 
-        for (const stickyRow of settings.stickyItemIndexes) {
+        for (const stickyRow of this.activeDataTable.stickyItemIndexes) {
           receivedHeatmap.itemNamesAndData.forEach((row) => {
             const foundRow = findRowByIndex(row, stickyRow)
             if (foundRow) {
@@ -222,6 +222,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
             }
           })
         }
+
+        this.activeDataTable.stickyItemIndexes = stickyRows
+          .map((row) => row.index)
+          .filter((index) => index !== null) as number[]
 
         receivedHeatmap.itemNamesAndData = [...stickyRows, ...receivedHeatmap.itemNamesAndData]
 
@@ -699,6 +703,33 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.closeRow(row)
       } else {
         this.expandRow(row)
+      }
+    },
+    findItemByIndexRecursively(
+      index: number,
+      itemNamesAndData: ItemNameAndData,
+    ): ItemNameAndData | undefined {
+      if (itemNamesAndData.index === index) {
+        return itemNamesAndData
+      }
+      if (itemNamesAndData.children) {
+        for (const child of itemNamesAndData.children) {
+          const foundItem = this.findItemByIndexRecursively(index, child)
+          if (foundItem) {
+            return foundItem
+          }
+        }
+      }
+    },
+    findItemByIndex(index: number) {
+      if (!this.heatmap) {
+        return
+      }
+      for (const item of this.heatmap.itemNamesAndData) {
+        const foundItem = this.findItemByIndexRecursively(index, item)
+        if (foundItem) {
+          return foundItem
+        }
       }
     },
   },

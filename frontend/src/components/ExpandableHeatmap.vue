@@ -20,16 +20,20 @@ import CsvUpload from './CsvUpload.vue'
 
 const heatmapStore = useHeatmapStore()
 
-const MIN_CELL_HEIGHT = 17
-const GAP_HEIGHT = 2
 const COL_LABELS_HEIGHT = 125
-const MIN_DIM_REDUCTION_WIDTH = 250
 const ROW_LABELS_WIDTH = 200
-const MIN_COL_LABELS_WIDTH = 15
-const MAX_COL_LABELS_WIDTH = MIN_COL_LABELS_WIDTH * 2
-const BORDER_WIDTH = 0
 const SPACE_BETWEEN_COL_LABELS_AND_HEATMAP = 5
 const SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP = 10
+
+const MIN_CELL_HEIGHT = 17
+const GAP_HEIGHT = 2
+
+const MIN_DIM_REDUCTION_WIDTH = 250
+
+const MIN_COL_LABELS_WIDTH = 15
+const MAX_COL_LABELS_WIDTH = MIN_COL_LABELS_WIDTH * 2
+const BORDER_WIDTH = 4
+
 const MARGIN_RIGHT = 20
 const MARGIN_LEFT = 20
 const MARGIN_TOP = 20
@@ -37,7 +41,8 @@ const GAP_CSV_HEATMAP = 40
 const GAP_SETTINGS_HEATMAP = 30
 const SETTINGS_HEIGHT = 60
 
-const STICKY_GAP = 10
+const STICKY_GAP = 4
+const STICKY_GAP_MULTIPLIER = 1
 
 const dataChangingRef = ref<number>(1)
 
@@ -48,7 +53,6 @@ const tooltipCol = ref<HTMLElement | null>(null)
 const colLabelContainer = ref<HTMLElement | null>(null)
 const highlightOverlay = ref<HTMLElement | null>(null)
 const canvas = ref<HTMLCanvasElement | null>(null)
-const bottomScrollbarContainer = ref<HTMLElement | null>(null)
 const dimRedCollections = ref<HTMLElement | null>(null)
 
 const visibleRows = ref<ItemNameAndData[]>([])
@@ -56,13 +60,11 @@ const visibleRows = ref<ItemNameAndData[]>([])
 const dimReductionWidth = ref<number>(MIN_DIM_REDUCTION_WIDTH)
 
 const heatmapWidth = ref<number>(0)
-const heatmapContainerWidth = ref<number>(0)
+const visibleHeatmapWidth = ref<number>(0)
 const cellWidth = ref<number>(0)
 const heatmapHeight = ref<number>(0)
 const visibleHeatmapHeight = ref<number>(window.innerHeight - 20)
 const cellHeight = ref<number>(0)
-
-const entireColLabelHeight = ref<number>(0)
 
 const editionNames = ref<string[]>([])
 const stickyAttributesGap = ref<number>(0)
@@ -89,7 +91,7 @@ function updateVisibleRows() {
 function updateStickyAttributesGap() {
   let stickyAttributesGapTemp = STICKY_GAP
   if (heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes) {
-    stickyAttributesGapTemp *= 2
+    stickyAttributesGapTemp *= STICKY_GAP_MULTIPLIER
   }
   stickyAttributesGap.value = heatmapStore.isStickyAttributesGapVisible
     ? stickyAttributesGapTemp
@@ -99,7 +101,7 @@ function updateStickyAttributesGap() {
 function updateStickyItemsGap() {
   let stickyItemsGapTemp = STICKY_GAP
   if (heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems) {
-    stickyItemsGapTemp *= 2
+    stickyItemsGapTemp *= STICKY_GAP_MULTIPLIER
   }
   stickyItemsGap.value = heatmapStore.isStickyItemsGapVisible ? stickyItemsGapTemp : 0
 }
@@ -124,7 +126,7 @@ function updateHeatmapWidth() {
   cellWidth.value = cellWidthTemp
 }
 
-function updateHeatmapContainerWidth() {
+function updateVisibleHeatmapWidth() {
   let maxWidth = Math.round(
     window.innerWidth -
       ROW_LABELS_WIDTH -
@@ -137,7 +139,7 @@ function updateHeatmapContainerWidth() {
     maxWidth,
     heatmapWidth.value + 2 * BORDER_WIDTH + stickyAttributesGap.value,
   )
-  heatmapContainerWidth.value = width
+  visibleHeatmapWidth.value = width
 }
 
 function updateHeatmapHeight() {
@@ -152,7 +154,7 @@ function updateEditionNames() {
 function updateDimReductionWidth() {
   dimReductionWidth.value = Math.min(
     window.innerWidth -
-      heatmapContainerWidth.value -
+      visibleHeatmapWidth.value -
       ROW_LABELS_WIDTH -
       SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP -
       MARGIN_RIGHT,
@@ -173,20 +175,13 @@ function updateVisibleHeatmapHeight() {
   visibleHeatmapHeight.value = Math.min(maxHeight, minHeight)
 }
 
-function updateEntireColLabelHeight() {
-  if (!colLabelContainer.value) {
-    return
-  }
-  entireColLabelHeight.value = COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP
-}
-
 function updateHeatmap() {
   updateVisibleRows()
   updateStickyAttributesGap()
   updateStickyItemsGap()
 
   updateHeatmapWidth()
-  updateHeatmapContainerWidth()
+  updateVisibleHeatmapWidth()
 
   updateHeatmapHeight()
 
@@ -195,10 +190,6 @@ function updateHeatmap() {
   updateDimReductionWidth()
 
   updateVisibleHeatmapHeight()
-
-  nextTick(() => {
-    updateEntireColLabelHeight()
-  })
 
   drawEverything()
 }
@@ -238,9 +229,14 @@ function drawEverything() {
   if (!ctx) {
     return
   }
-  ctx.clearRect(0, 0, canvas.value.width, canvas.value.height)
+
+  const width = heatmapWidth.value
+  const height = heatmapHeight.value
 
   nextTick(() => {
+    ctx.fillStyle = '#000'
+    ctx.fillRect(0, 0, width, height)
+
     const heatmapMaxValue = getHeatmapColorMaxValue()
     const heatmapMinValue = getHeatmapColorMinValue()
     let offsetValue = 1
@@ -502,7 +498,6 @@ onMounted(async () => {
       marginTop: MARGIN_TOP + 'px',
       marginLeft: MARGIN_LEFT + 'px',
       marginRight: MARGIN_RIGHT + 'px',
-      boxSizing: 'content-box',
       fontFamily: 'Roboto Condensed',
     }"
     class="box-content"
@@ -591,179 +586,190 @@ onMounted(async () => {
 
         <div
           :style="{
-            height: visibleHeatmapHeight + 'px',
             marginTop: GAP_SETTINGS_HEATMAP + 'px',
             overflow: 'auto',
             position: 'relative',
             display: heatmapStore.heatmap.itemNamesAndData.length !== 0 ? 'grid' : 'none',
-            gridTemplateColumns: 'auto 1fr',
-            width: '100%',
+            gridTemplateColumns:
+              ROW_LABELS_WIDTH + SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px auto',
+            gridTemplateRows: COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px auto',
+            width: visibleHeatmapWidth + 'px',
+            height: visibleHeatmapHeight + 'px',
           }"
         >
           <div
             :style="{
+              top: '0px',
+              left: '0px',
+              position: 'sticky',
+              gridRow: 1,
+              gridColumn: 1,
+              backgroundColor: 'white',
+              zIndex: 10000,
+
+              height: COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
+              width: ROW_LABELS_WIDTH + SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
+            }"
+            class="grid-corner"
+          ></div>
+
+          <div
+            class="grid-row-labels"
+            :key="'row-label-' + dataChangingRef"
+            :style="{
+              gridRow: 2,
+              gridColumn: 1,
+              position: 'sticky',
+              top: '0px',
+              left: '0px',
+
               display: 'flex',
               flexDirection: 'column',
-              position: 'sticky',
-              left: '0px',
-              zIndex: 1000,
+              gap: GAP_HEIGHT + 'px',
+
+              height: heatmapHeight + 2 * BORDER_WIDTH + 'px',
               width: ROW_LABELS_WIDTH + SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
+
+              paddingTop: BORDER_WIDTH + 'px',
+              paddingBottom: BORDER_WIDTH + 'px',
+              paddingRight: SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
+
+              backgroundColor: 'white',
             }"
           >
             <div
+              :id="'row-label-' + index"
               :style="{
-                height: COL_LABELS_HEIGHT + BORDER_WIDTH + 'px',
-                backgroundColor: 'white',
-                zIndex: 1001,
-                position: 'relative',
-              }"
-            ></div>
-            <div
-              :key="'row-label-' + dataChangingRef"
-              :style="{
-                height: heatmapHeight + 'px',
-                backgroundColor: 'white',
-                gap: GAP_HEIGHT + 'px',
-
                 display: 'flex',
-                justifySelf: 'flex-start',
                 flexDirection: 'column',
               }"
-              class="row-label-container"
+              :key="index"
+              v-for="(row, index) in heatmapStore.getHeatmap.itemNamesAndData"
             >
-              <div
-                :id="'row-label-' + index"
-                class="edition-row-labels"
-                :key="index"
-                v-for="(row, index) in heatmapStore.getHeatmap.itemNamesAndData"
-              >
-                <ExpRowComponent
-                  class="box-content"
-                  :gap-height="GAP_HEIGHT"
-                  :cellHeight="cellHeight"
-                  :row="row"
-                  :border-width="BORDER_WIDTH"
-                  :depth="1"
-                  :edition-index="index"
-                  :row-labels-width="ROW_LABELS_WIDTH"
-                  :edition-count="editionNames.length"
-                  :sticky-items-gap-size="stickyItemsGap"
-                  :y-start-heatmap="canvas ? canvas.getBoundingClientRect().top : 0"
-                  :needs-sticky-items-margin="
-                    index === heatmapStore.getAmountOfStickyItems &&
-                    heatmapStore.isStickyItemsGapVisible
-                  "
-                />
-              </div>
+              <ExpRowComponent
+                :gap-height="GAP_HEIGHT"
+                :cellHeight="cellHeight"
+                :row="row"
+                :border-width="BORDER_WIDTH"
+                :depth="1"
+                :edition-index="index"
+                :row-labels-width="ROW_LABELS_WIDTH"
+                :edition-count="editionNames.length"
+                :sticky-items-gap-size="stickyItemsGap"
+                :y-start-heatmap="canvas ? canvas.getBoundingClientRect().top : 0"
+                :needs-sticky-items-margin="
+                  index === heatmapStore.getAmountOfStickyItems &&
+                  heatmapStore.isStickyItemsGapVisible
+                "
+              />
             </div>
           </div>
 
           <div
+            ref="colLabelContainer"
+            class="grid-col-labels"
+            :key="'col-label-' + dataChangingRef"
             :style="{
-              width: heatmapContainerWidth + 'px',
+              gridRow: 1,
+              gridColumn: 2,
+              position: 'sticky',
+              top: '0px',
+              left: '0px',
+              zIndex: 100,
 
-              boxSizing: 'content-box',
-              height: '100%',
+              paddingLeft: BORDER_WIDTH + 'px',
+              paddingRight: BORDER_WIDTH + 'px',
+
+              width: heatmapWidth + 2 * BORDER_WIDTH + 'px',
+              height: COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
+              paddingBottom: SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
+
+              display: 'flex',
+              flexDirection: 'row',
+              backgroundColor: 'white',
             }"
-            ref="bottomScrollbarContainer"
           >
-            <div
-              ref="colLabelContainer"
-              :key="'col-label-' + dataChangingRef"
+            <button
+              :key="colName"
+              @click="heatmapStore.toggleStickyAttribute(colName)"
+              v-for="(colName, index) in heatmapStore.getHeatmap.attributeNames"
+              class="col-label"
               :style="{
-                width: heatmapWidth + 'px',
-                marginLeft: BORDER_WIDTH + 'px',
-                height: COL_LABELS_HEIGHT - SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
-                marginBottom: SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
-                display: 'flex',
-                flexDirection: 'row',
-                position: 'sticky',
-                top: '0px',
-                left: '0px',
-                zIndex: 100,
-                backgroundColor: 'white',
+                width: cellWidth + 'px',
+                height: 'auto',
+                position: 'relative',
+                color: 'black',
+                textAlign: 'center',
+                cursor: 'pointer',
+                marginLeft:
+                  index === heatmapStore.getActiveDataTable?.stickyAttributes.length
+                    ? stickyAttributesGap + 'px'
+                    : 0,
               }"
             >
-              <button
-                :key="colName"
-                @click="heatmapStore.toggleStickyAttribute(colName)"
-                v-for="(colName, index) in heatmapStore.getHeatmap.attributeNames"
-                class="col-label"
+              <div
                 :style="{
-                  width: cellWidth + 'px',
-                  height: 'auto',
-                  position: 'relative',
-                  color: 'black',
-                  textAlign: 'center',
-                  cursor: 'pointer',
-                  marginLeft:
-                    index === heatmapStore.getActiveDataTable?.stickyAttributes.length
-                      ? stickyAttributesGap + 'px'
-                      : 0,
+                  position: 'absolute',
+                  width: '100%',
+                  height: heatmapStore.getHeatmap.attributeDissimilarities[index] * 100 + '%',
+                  backgroundColor: '#ccc',
+                  top: '10px',
+                  left: 0,
+                  zIndex: 0,
+                }"
+              ></div>
+              <div
+                :style="{
+                  position: 'absolute',
+                  top: '0',
+                  width: '100%',
+                  zIndex: 2,
+                  display: 'flex',
+                  alignItems: 'center',
                 }"
               >
                 <div
                   :style="{
-                    position: 'absolute',
                     width: '100%',
-                    height: heatmapStore.getHeatmap.attributeDissimilarities[index] * 100 + '%',
-                    backgroundColor: '#ccc',
-                    top: '10px',
-                    left: 0,
-                    zIndex: 0,
-                  }"
-                ></div>
-                <div
-                  :style="{
-                    position: 'absolute',
-                    top: '0',
-                    width: '100%',
-                    zIndex: 2,
                     display: 'flex',
                     alignItems: 'center',
                   }"
                 >
-                  <div
-                    :style="{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                    }"
-                  >
-                    {{
-                      heatmapStore.getActiveDataTable?.stickyAttributes.includes(colName)
-                        ? '-'
-                        : '+'
-                    }}
-                  </div>
+                  {{
+                    heatmapStore.getActiveDataTable?.stickyAttributes.includes(colName) ? '-' : '+'
+                  }}
                 </div>
-                <div
-                  :style="{
-                    position: 'absolute',
-                    display: 'flex',
-                    alignItems: 'center',
-                    top: '10px',
-                    width: '100%',
-                    zIndex: 1,
-                  }"
-                >
-                  <div>{{ colName }}</div>
-                </div>
-              </button>
-            </div>
-
-            <canvas
-              :style="{
-                border: BORDER_WIDTH + 'px solid black',
-                boxSizing: 'content-box',
-              }"
-              :width="heatmapWidth"
-              :height="heatmapHeight"
-              class="heatmap-canvas"
-              ref="canvas"
-            ></canvas>
+              </div>
+              <div
+                :style="{
+                  position: 'absolute',
+                  display: 'flex',
+                  alignItems: 'center',
+                  top: '10px',
+                  width: '100%',
+                  zIndex: 1,
+                }"
+              >
+                <div>{{ colName }}</div>
+              </div>
+            </button>
           </div>
+
+          <canvas
+            :style="{
+              gridRow: 2,
+              gridColumn: 2,
+              height: heatmapHeight + 2 * BORDER_WIDTH + 'px',
+              width: heatmapWidth + 2 * BORDER_WIDTH + 'px',
+              border: BORDER_WIDTH + 'px solid black',
+            }"
+            :width="heatmapWidth"
+            :height="heatmapHeight"
+            class="heatmap-canvas"
+            ref="canvas"
+          ></canvas>
         </div>
+        >
       </div>
     </div>
   </main>
@@ -804,11 +810,6 @@ onMounted(async () => {
 
 .bold {
   font-weight: bold;
-}
-
-.edition-row-labels {
-  display: flex;
-  flex-direction: column;
 }
 
 .col-label {

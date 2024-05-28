@@ -194,6 +194,7 @@ onUpdated(() => {
           <button
             :style="{
               width: buttonSize,
+              height: buttonSize,
             }"
             class="sticky-button"
             @click="heatmapStore.toggleStickyItem(props.row)"
@@ -259,8 +260,10 @@ onUpdated(() => {
 }
 
 .sticky-button {
-  cursor: pointer;
-  margin-right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border-radius: 50%;
   background-color: white;
   transition:

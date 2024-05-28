@@ -20,9 +20,9 @@ import CsvUpload from './CsvUpload.vue'
 
 const heatmapStore = useHeatmapStore()
 
-const COL_LABELS_HEIGHT = 125
+const COL_LABELS_HEIGHT = 150
 const ROW_LABELS_WIDTH = 200
-const SPACE_BETWEEN_COL_LABELS_AND_HEATMAP = 5
+const SPACE_BETWEEN_COL_LABELS_AND_HEATMAP = 0
 const SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP = 10
 
 const MIN_CELL_HEIGHT = 17
@@ -421,10 +421,10 @@ function updateTooltip(e: MouseEvent) {
   highlightOverlay.value.style.left = `${overlayX}px`
   highlightOverlay.value.style.top = `${overlayY}px`
   highlightOverlay.value.style.display = 'block'
-  highlightOverlay.value.style.zIndex = '10000'
+  highlightOverlay.value.style.zIndex = '1000000'
 
   tooltip.value.style.display = 'block'
-  tooltip.value.style.zIndex = '10000'
+  tooltip.value.style.zIndex = '1000000'
 
   tooltipValue.value.textContent = dataValue.toFixed(3).toString()
   tooltipRow.value.textContent = selectedRow.itemName
@@ -513,7 +513,7 @@ onMounted(async () => {
         </div>
         <div class="rows-tooltip">
           <div>Attribute:</div>
-          <div ref="tooltipCol"></div>
+          <div :style="{ display: 'flex', flexWrap: 'wrap' }" ref="tooltipCol"></div>
         </div>
       </div>
     </div>
@@ -687,9 +687,8 @@ onMounted(async () => {
               backgroundColor: 'white',
             }"
           >
-            <button
+            <div
               :key="colName"
-              @click="heatmapStore.toggleStickyAttribute(colName)"
               v-for="(colName, index) in heatmapStore.getHeatmap.attributeNames"
               class="col-label"
               :style="{
@@ -703,6 +702,13 @@ onMounted(async () => {
                   index === heatmapStore.getActiveDataTable?.stickyAttributes.length
                     ? stickyAttributesGap + 'px'
                     : 0,
+                display: 'flex',
+                alignItems: 'center',
+                writingMode: 'vertical-lr',
+                textOrientation: 'mixed',
+                transform: 'rotate(180deg)',
+                fontSize: '13px',
+                padding: '0px',
               }"
             >
               <div
@@ -711,46 +717,47 @@ onMounted(async () => {
                   width: '100%',
                   height: heatmapStore.getHeatmap.attributeDissimilarities[index] * 100 + '%',
                   backgroundColor: '#ccc',
-                  top: '10px',
+                  top: cellWidth + 'px',
                   left: 0,
                   zIndex: 0,
                 }"
               ></div>
+
               <div
                 :style="{
                   position: 'absolute',
-                  top: '0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  top: cellWidth + 'px',
                   width: '100%',
+                  zIndex: 1,
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                }"
+              >
+                {{ colName }}
+              </div>
+
+              <button
+                :style="{
+                  position: 'absolute',
+                  top: '0px',
                   zIndex: 2,
                   display: 'flex',
                   alignItems: 'center',
+                  width: cellWidth + 'px',
+                  height: cellWidth + 'px',
+                  fontSize: (4 / 5) * cellWidth + 'px',
                 }"
+                @click="heatmapStore.toggleStickyAttribute(colName)"
+                class="sticky-col-button"
               >
-                <div
-                  :style="{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                  }"
-                >
-                  {{
-                    heatmapStore.getActiveDataTable?.stickyAttributes.includes(colName) ? '-' : '+'
-                  }}
-                </div>
-              </div>
-              <div
-                :style="{
-                  position: 'absolute',
-                  display: 'flex',
-                  alignItems: 'center',
-                  top: '10px',
-                  width: '100%',
-                  zIndex: 1,
-                }"
-              >
-                <div>{{ colName }}</div>
-              </div>
-            </button>
+                {{
+                  heatmapStore.getActiveDataTable?.stickyAttributes.includes(colName) ? '-' : '+'
+                }}
+              </button>
+            </div>
           </div>
 
           <canvas
@@ -797,6 +804,7 @@ onMounted(async () => {
 .flex-tooltip {
   display: flex;
   flex-direction: column;
+  max-width: 35vw;
 }
 
 .rows-tooltip {
@@ -809,23 +817,28 @@ onMounted(async () => {
   font-weight: bold;
 }
 
-.col-label {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  writing-mode: vertical-lr;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  font-size: 13px;
-  margin: 0;
-  padding: 0;
-}
-
 .input-container {
   display: grid;
   gap: 10px;
   grid-template-columns: auto auto;
   grid-template-rows: auto auto;
   margin-bottom: 20px;
+}
+
+.sticky-col-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 50%;
+  background-color: white;
+  transition:
+    background-color 0.2s,
+    transform 0.2s;
+}
+
+.sticky-col-button:hover {
+  background-color: grey;
+  outline: none;
 }
 </style>

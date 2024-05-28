@@ -103,7 +103,9 @@ def filter_attributes_and_items(
 
     original_df = original_df[valid_columns]
 
-    original_df = original_df.select_dtypes(include=[np.number])
+    for col in valid_columns:
+        original_df[col] = pd.to_numeric(original_df[col], errors="coerce")
+
     original_df = original_df.dropna(axis=1, how="all")
 
     medians = original_df.median()

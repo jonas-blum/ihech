@@ -344,9 +344,11 @@ onMounted(async () => {
     await fetchCsvFileByFileName('length_of_content_inside_tag.csv', false)
     await fetchCsvFileByFileName('tag_count.csv', false)
     await fetchCsvFileByFileName('tag_depth.csv', false)
-    await fetchCsvFileByFileName('frauen_stimmbeteiligung.csv', false)
-    await fetchCsvFileByFileName('stadt_zuerich_abstimmungen.csv', false)
-    await fetchCsvFileByFileName('zeitreihen_parteien.csv', true)
+    // await fetchCsvFileByFileName('frauen_stimmbeteiligung.csv', false)
+    // await fetchCsvFileByFileName('stadt_zuerich_abstimmungen.csv', false)
+    // await fetchCsvFileByFileName('zeitreihen_parteien.csv', true)
+    await fetchCsvFileByFileName('Ja_in_Prozent_Volksabstimmungen.csv', false)
+    await fetchCsvFileByFileName('Beteiligung_in_Prozent_Volksabstimmungen.csv', true)
   }
 })
 </script>

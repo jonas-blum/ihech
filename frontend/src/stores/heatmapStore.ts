@@ -409,6 +409,32 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       return this.activeDataTable.selectedFirstLayerCollections.includes(collection)
     },
+    areAllCollectionsEnabled(): boolean {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return false
+      }
+
+      return (
+        this.activeDataTable.selectedFirstLayerCollections.length ===
+        this.activeDataTable.firstLayerCollectionNames.length
+      )
+    },
+    toggleAllCollectionsEnabled() {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      if (this.areAllCollectionsEnabled()) {
+        this.activeDataTable.selectedFirstLayerCollections = []
+      } else {
+        this.activeDataTable.selectedFirstLayerCollections =
+          this.activeDataTable.firstLayerCollectionNames
+      }
+      this.updateSelectedItemIndexesBasedOnSelectedCollections()
+      this.changeHeatmap()
+      this.setIsOutOfSync(true)
+    },
     toggleCollectionEnabled(collection: string) {
       if (this.isCollectionEnabled(collection)) {
         this.disabledCollection(collection)

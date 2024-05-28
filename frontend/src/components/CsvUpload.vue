@@ -371,8 +371,6 @@ onMounted(async () => {
         @click.stop="toggleAccordion"
       >
         <div :style="{ display: 'flex', alignItems: 'center', gap: '20px' }">
-          <div class="text-2xl">Data Table Menu</div>
-
           <div v-if="heatmapStore.isCsvUploadOpen">
             <button
               :style="{ width: '120px' }"

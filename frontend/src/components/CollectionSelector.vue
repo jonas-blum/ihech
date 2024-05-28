@@ -10,14 +10,19 @@ function handleCollectionColorChange(event: Event, collection: string) {
 </script>
 
 <template>
-  <div :style="{ alignSelf: 'flex-start', display: 'flex', flexDirection: 'column', gap: '5px' }">
-    <h2
-      class="text-lg font-bold"
-      v-if="heatmapStore.getActiveDataTable?.firstLayerCollectionNames?.length || 0 > 0"
-    >
-      Collections:
-    </h2>
-
+  <div
+    v-if="heatmapStore.getActiveDataTable?.firstLayerCollectionNames?.length || 0 > 0"
+    :style="{ alignSelf: 'flex-start', display: 'flex', flexDirection: 'column', gap: '5px' }"
+  >
+    <div :style="{ display: 'flex', gap: '5px ' }">
+      <input
+        :style="{ width: '20px', height: '20px' }"
+        type="checkbox"
+        :checked="heatmapStore.areAllCollectionsEnabled()"
+        @change="heatmapStore.toggleAllCollectionsEnabled()"
+      />
+      <h2 class="text-lg font-bold">Collections:</h2>
+    </div>
     <ul
       :style="{
         alignSelf: 'flex-start',

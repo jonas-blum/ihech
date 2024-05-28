@@ -498,6 +498,7 @@ onMounted(async () => {
       marginLeft: MARGIN_LEFT + 'px',
       marginRight: MARGIN_RIGHT + 'px',
       fontFamily: 'Roboto Condensed',
+      minHeight: `calc(100vh - ${MARGIN_TOP + MARGIN_BOTTOM}px)`,
     }"
     class="box-content"
   >
@@ -542,7 +543,7 @@ onMounted(async () => {
         <HeatmapSettings />
         <div
           v-if="!heatmapStore.isCsvUploadOpen"
-          :style="{ height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px', width: '100%' }"
+          :style="{ height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px' }"
         >
           <CsvUpload />
         </div>

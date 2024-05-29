@@ -54,21 +54,11 @@ const rightClickButton = (e: MouseEvent) => {
 function applyMultipleColors(colors: string[]) {
   if (!rowTextElement.value) return
   const text = rowTextElement.value.innerText
-  const textLength = text.length
-  const partLength = Math.ceil(textLength / colors.length)
-  let coloredText = ''
+  let coloredText = `<span  style="color: ${colors[0]}; max-width:${Math.max(
+    15,
+    props.rowLabelsWidth - props.depth * 30,
+  )}px">${text}</span>`
 
-  for (let i = 0; i < colors.length; i++) {
-    const start = i * partLength
-    let end = start + partLength
-    if (end > textLength) end = textLength
-
-    const textPart = text.slice(start, end)
-    coloredText += `<span  style="color: ${colors[i]}; max-width:${Math.max(
-      15,
-      props.rowLabelsWidth - props.depth * 30,
-    )}px">${textPart}</span>`
-  }
   if (colors.length > 1) {
     coloredText += `<span style="display: flex;gap: 2px; margin-left:5px">`
     for (let i = 0; i < colors.length; i++) {

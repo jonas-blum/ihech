@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import List, Union
+from typing import List, Tuple, Union
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -33,7 +33,7 @@ def cluster_items_recursively(
     is_open = False
 
     if cluster_by_collections and len(collection_column_names) > 0:
-        new_item_names_and_data: List[ItemNameAndData] = []
+        new_collection_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
         collection_column_name = collection_column_names[0]
         for collection, original_group_df in original_df.groupby(
             collection_column_name
@@ -99,10 +99,19 @@ def cluster_items_recursively(
                 dimReductionY=dim_reduction_aggregated[1],
                 children=new_children,
             )
+            scaled_temp_df_mean = scaled_temp_df.mean().mean()
 
-            new_item_names_and_data.append(new_item_name_and_data)
+            new_collection_item_names_and_data.append(
+                (new_item_name_and_data, scaled_temp_df_mean)
+            )
 
-        return new_item_names_and_data
+        new_collection_item_names_and_data = sorted(
+            new_collection_item_names_and_data, key=lambda x: x[1], reverse=True
+        )
+        new_collection_item_names_and_data_to_return = [
+            x[0] for x in new_collection_item_names_and_data
+        ]
+        return new_collection_item_names_and_data_to_return
 
     if original_df.shape[0] <= cluster_size or all_rows_same(scaled_df):
         if original_df.shape[0] == 0:
@@ -110,11 +119,12 @@ def cluster_items_recursively(
         if original_df.shape[0] == 1:
             raise Exception("Only one item in cluster")
 
-        new_item_names_and_data: List[ItemNameAndData] = []
+        new_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
         new_item_names = original_df[item_names_column_name].astype(str).tolist()
         dimReductionsX = dim_red_df[0].tolist()
         dimReductionsY = dim_red_df[1].tolist()
         all_data = original_df_dropped.values.tolist()
+        scaled_df_list = scaled_df.values.tolist()
 
         for i in range(original_df.shape[0]):
 
@@ -129,15 +139,19 @@ def cluster_items_recursively(
                 children=None,
             )
 
-            new_item_names_and_data.append(new_item_name_and_data)
+            new_item_names_and_data.append((new_item_name_and_data, scaled_df_list[i]))
 
-        return new_item_names_and_data
+        new_item_names_and_data = sorted(
+            new_item_names_and_data, key=lambda x: x[1], reverse=True
+        )
+        new_item_names_and_data_to_return = [x[0] for x in new_item_names_and_data]
+        return new_item_names_and_data_to_return
 
     else:
         kmeans = KMeans(n_clusters=cluster_size, random_state=9283, n_init=1)
         labels = kmeans.fit_predict(scaled_df)
 
-        new_item_names_and_data: List[ItemNameAndData] = []
+        new_clustered_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
 
         cluster_indices = {
             cluster_id: original_df.index[labels == cluster_id]
@@ -161,6 +175,7 @@ def cluster_items_recursively(
                 new_item_name = (
                     original_cluster_df[item_names_column_name].astype(str).iat[0]
                 )
+                mean_value_scaled_df = scaled_cluster_df.mean().mean()
                 new_data = original_cluster_df_dropped.iloc[0].tolist()
                 new_item_name_and_data = ItemNameAndData(
                     index=original_cluster_df.index[0],
@@ -172,7 +187,9 @@ def cluster_items_recursively(
                     dimReductionY=dim_red_cluster_df.iloc[0][1],
                     children=None,
                 )
-                new_item_names_and_data.append(new_item_name_and_data)
+                new_clustered_item_names_and_data.append(
+                    (new_item_name_and_data, mean_value_scaled_df)
+                )
                 continue
 
             tag_data_aggregated_mean = original_cluster_df_dropped.mean()
@@ -180,6 +197,8 @@ def cluster_items_recursively(
             tag_data_aggregated = tag_data_aggregated_mean.tolist()
 
             dim_reduction_aggregated = dim_red_cluster_df.mean().tolist()
+
+            mean_value_scaled_df = scaled_cluster_df.mean().mean()
 
             new_item_name = str(original_cluster_df.shape[0])
 
@@ -205,9 +224,15 @@ def cluster_items_recursively(
                 dimReductionY=dim_reduction_aggregated[1],
                 children=children,
             )
-            new_item_names_and_data.append(new_aggregated_item_name_and_data)
+            new_clustered_item_names_and_data.append(
+                (new_aggregated_item_name_and_data, mean_value_scaled_df)
+            )
 
-        new_item_names_and_data = sorted(
-            new_item_names_and_data, key=lambda x: x.amountOfDataPoints
+        new_clustered_item_names_and_data = sorted(
+            new_clustered_item_names_and_data, key=lambda x: x[1], reverse=True
         )
-        return new_item_names_and_data
+
+        new_clustered_item_names_and_data_to_return = [
+            x[0] for x in new_clustered_item_names_and_data
+        ]
+        return new_clustered_item_names_and_data_to_return

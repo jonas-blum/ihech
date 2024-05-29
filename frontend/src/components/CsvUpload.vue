@@ -349,8 +349,10 @@ onMounted(async () => {
     // await fetchCsvFileByFileName('zeitreihen_parteien.csv', true)
     await fetchCsvFileByFileName('2019_neue_fahrzeuge_absolute.csv', false)
     await fetchCsvFileByFileName('2019_neue_fahrzeuge_relative.csv', false)
-    await fetchCsvFileByFileName('Beteiligung_in_Prozent_Volksabstimmungen.csv', true)
-    await fetchCsvFileByFileName('Ja_in_Prozent_Volksabstimmungen.csv', true)
+    await fetchCsvFileByFileName('Beteiligung_in_Prozent_Volksabstimmungen.csv', false)
+    await fetchCsvFileByFileName('Ja_in_Prozent_Volksabstimmungen.csv', false)
+    await fetchCsvFileByFileName('2019_altersklassen_absolute.csv', false)
+    await fetchCsvFileByFileName('2019_altersklassen_relative.csv', true)
   }
 })
 </script>

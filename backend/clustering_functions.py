@@ -207,4 +207,7 @@ def cluster_items_recursively(
             )
             new_item_names_and_data.append(new_aggregated_item_name_and_data)
 
+        new_item_names_and_data = sorted(
+            new_item_names_and_data, key=lambda x: x.amountOfDataPoints
+        )
         return new_item_names_and_data

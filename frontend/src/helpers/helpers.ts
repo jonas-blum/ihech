@@ -16,8 +16,8 @@ export const COLORS = [
   '#DAA520', // GoldenRod
   '#4682B4', // SteelBlue
   '#9ACD32', // YellowGreen
-  '#F5DEB3', // Wheat
-  '#FAEBD7', // AntiqueWhite
+  '#6A5ACD', // SlateBlue (replaced Wheat)
+  '#32CD32', // LimeGreen (replaced AntiqueWhite)
 ]
 
 export const CSV_UPLOAD_COLLAPSED_HEIGHT = 60

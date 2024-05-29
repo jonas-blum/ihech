@@ -347,8 +347,10 @@ onMounted(async () => {
     // await fetchCsvFileByFileName('frauen_stimmbeteiligung.csv', false)
     // await fetchCsvFileByFileName('stadt_zuerich_abstimmungen.csv', false)
     // await fetchCsvFileByFileName('zeitreihen_parteien.csv', true)
-    await fetchCsvFileByFileName('Ja_in_Prozent_Volksabstimmungen.csv', false)
+    await fetchCsvFileByFileName('2019_neue_fahrzeuge_absolute.csv', false)
+    await fetchCsvFileByFileName('2019_neue_fahrzeuge_relative.csv', false)
     await fetchCsvFileByFileName('Beteiligung_in_Prozent_Volksabstimmungen.csv', true)
+    await fetchCsvFileByFileName('Ja_in_Prozent_Volksabstimmungen.csv', true)
   }
 })
 </script>

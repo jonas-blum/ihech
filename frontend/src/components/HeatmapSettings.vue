@@ -327,8 +327,8 @@ function reloadHeatmap() {
 
     <div id="color-scale-container">
       <div class="color-scale-labels">
-        <span class="min-label">{{ heatmapStore.getHeatmapMinValue }}</span>
-        <span class="max-label">{{ heatmapStore.getHeatmapMaxValue }}</span>
+        <span class="min-label">{{ parseFloat(heatmapStore.getHeatmapMinValue.toFixed(3)) }}</span>
+        <span class="max-label">{{ parseFloat(heatmapStore.getHeatmapMaxValue.toFixed(3)) }}</span>
       </div>
       <div
         :style="{

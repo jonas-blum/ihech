@@ -103,6 +103,13 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return state.heatmap.itemNamesAndData.slice(0, state.activeDataTable.stickyItemIndexes.length)
     },
 
+    getNonStickyItems: (state) => {
+      if (!state.activeDataTable) {
+        return []
+      }
+      return state.heatmap.itemNamesAndData.slice(state.activeDataTable.stickyItemIndexes.length)
+    },
+
     getDataChanging: (state) => state.dataChanging,
     isLoading: (state) => state.loading,
     getTimer: (state) => state.timer,
@@ -478,8 +485,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         while (topMostParent.parent !== null) {
           topMostParent = topMostParent.parent
         }
-        const index =
-          this.heatmap.itemNamesAndData.indexOf(topMostParent) - this.getAmountOfStickyItems
+        const index = this.getNonStickyItems.indexOf(topMostParent)
         return [getDistinctColor(index)]
       }
 

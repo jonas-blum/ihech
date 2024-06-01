@@ -442,19 +442,18 @@ function getMiddleColorScaleValue() {
 .color-scale .middle-marker {
   content: '';
   position: absolute;
-  top: 20px;
-  width: 3px;
+  top: 19px;
+  width: 4px;
   height: 15px;
   background-color: #000;
 }
 
 .color-scale:before {
-  left: 1%;
+  left: 1px;
 }
 
 .color-scale:after {
-  left: 99%;
-  transform: translateX(-100%);
+  right: 1px;
 }
 
 .color-scale .middle-marker {

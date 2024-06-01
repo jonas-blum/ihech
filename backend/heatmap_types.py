@@ -139,6 +139,8 @@ class HeatmapJSON:
         self.minDimRedXValue: float = 0
         self.maxDimRedYValue: float = 0
         self.minDimRedYValue: float = 0
+        self.minAttributeValues: List[float] = []
+        self.maxAttributeValues: List[float] = []
 
     def add_cluster(self, cluster: ItemNameAndData):
         self.itemNamesAndData.append(cluster)

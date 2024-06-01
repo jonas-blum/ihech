@@ -17,7 +17,6 @@ import CollectionSelector from './CollectionSelector.vue'
 
 import HeatmapSettings from './HeatmapSettings.vue'
 import CsvUpload from './CsvUpload.vue'
-import { interpolateMagma } from 'd3'
 
 const heatmapStore = useHeatmapStore()
 
@@ -192,30 +191,33 @@ function updateHeatmap() {
 }
 
 function getHeatmapColorMaxValue() {
-  if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
-    return 1
-  } else if (
-    heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
-  ) {
-    return Math.log(heatmapStore.getHeatmapMaxValue + 1)
-  } else if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ABSOLUTE) {
-    return heatmapStore.getHeatmapMaxValue
+  switch (heatmapStore?.getActiveDataTable?.coloringHeatmap) {
+    case ColoringHeatmapEnum.ITEM_RELATIVE:
+      return 1
+    case ColoringHeatmapEnum.ATTRIBUTE_RELATIVE:
+      return 1
+    case ColoringHeatmapEnum.LOGARITHMIC:
+      return Math.log(heatmapStore.getHeatmapMaxValue + 1)
+    case ColoringHeatmapEnum.ABSOLUTE:
+      return heatmapStore.getHeatmapMaxValue
+    default:
+      return heatmapStore.getHeatmapMaxValue
   }
-  return heatmapStore.getHeatmapMaxValue
 }
 
 function getHeatmapColorMinValue() {
-  if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
-    return 0
-  } else if (
-    heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
-  ) {
-    const offsetValue = heatmapStore.getHeatmapMinValue + 1
-    return Math.log(heatmapStore.getHeatmapMinValue + offsetValue)
-  } else if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ABSOLUTE) {
-    return heatmapStore.getHeatmapMinValue
+  switch (heatmapStore?.getActiveDataTable?.coloringHeatmap) {
+    case ColoringHeatmapEnum.ITEM_RELATIVE:
+      return 0
+    case ColoringHeatmapEnum.ATTRIBUTE_RELATIVE:
+      return 0
+    case ColoringHeatmapEnum.LOGARITHMIC:
+      return Math.log(heatmapStore.getHeatmapMinValue + heatmapStore.getHeatmapMinValue + 1)
+    case ColoringHeatmapEnum.ABSOLUTE:
+      return heatmapStore.getHeatmapMinValue
+    default:
+      return heatmapStore.getHeatmapMinValue
   }
-  return heatmapStore.getHeatmapMinValue
 }
 
 function drawEverything() {
@@ -244,7 +246,7 @@ function drawEverything() {
     for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
       const item = visibleRows.value[itemIdx]
       let maxRowValue = 1
-      if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
+      if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE) {
         maxRowValue = Math.max(...item.data)
       }
 
@@ -253,8 +255,19 @@ function drawEverything() {
         const initialValue = item.data[initialAttrIdx]
 
         let adjustedValue = initialValue
-        if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
+        if (
+          heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
+        ) {
           adjustedValue = initialValue / maxRowValue
+        } else if (
+          heatmapStore?.getActiveDataTable?.coloringHeatmap ===
+          ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
+        ) {
+          const maxAttributeValue = heatmapStore.getMaxAttributeValues[initialAttrIdx]
+          const minAttributeValue = heatmapStore.getMinAttributeValues[initialAttrIdx]
+          const difference =
+            maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
+          adjustedValue = (adjustedValue - minAttributeValue) / difference
         } else if (
           heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
         ) {

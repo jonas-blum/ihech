@@ -197,7 +197,7 @@ function getHeatmapColorMaxValue() {
     case ColoringHeatmapEnum.ATTRIBUTE_RELATIVE:
       return 1
     case ColoringHeatmapEnum.LOGARITHMIC:
-      return Math.log(heatmapStore.getHeatmapMaxValue + 1)
+      return Math.log(heatmapStore.getHeatmapMaxValue + heatmapStore.getLogShiftValue)
     case ColoringHeatmapEnum.ABSOLUTE:
       return heatmapStore.getHeatmapMaxValue
     default:
@@ -212,7 +212,7 @@ function getHeatmapColorMinValue() {
     case ColoringHeatmapEnum.ATTRIBUTE_RELATIVE:
       return 0
     case ColoringHeatmapEnum.LOGARITHMIC:
-      return Math.log(heatmapStore.getHeatmapMinValue + heatmapStore.getHeatmapMinValue + 1)
+      return Math.log(heatmapStore.getHeatmapMinValue + heatmapStore.getLogShiftValue)
     case ColoringHeatmapEnum.ABSOLUTE:
       return heatmapStore.getHeatmapMinValue
     default:
@@ -238,10 +238,6 @@ function drawEverything() {
 
     const heatmapMaxValue = getHeatmapColorMaxValue()
     const heatmapMinValue = getHeatmapColorMinValue()
-    let offsetValue = 1
-    if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC) {
-      offsetValue = heatmapStore.getHeatmapMinValue + 1
-    }
 
     for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
       const item = visibleRows.value[itemIdx]
@@ -271,7 +267,7 @@ function drawEverything() {
         } else if (
           heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
         ) {
-          adjustedValue = Math.log(initialValue + offsetValue)
+          adjustedValue = Math.log(initialValue + heatmapStore.getLogShiftValue)
         }
 
         let x = attrIdx * cellWidth.value

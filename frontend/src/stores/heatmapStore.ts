@@ -114,6 +114,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return state.heatmap.itemNamesAndData.slice(state.activeDataTable.stickyItemIndexes.length)
     },
 
+    getLogShiftValue: (state) => state.heatmap.minHeatmapValue + 1,
+
     getDataChanging: (state) => state.dataChanging,
     isLoading: (state) => state.loading,
     getTimer: (state) => state.timer,
@@ -121,6 +123,16 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     isOutOfSync: (state) => state.outOfSync,
 
     isCsvUploadOpen: (state) => state.csvUploadOpen,
+
+    isColorScaleNotShown: (state) => {
+      if (!state.activeDataTable) {
+        return false
+      }
+      return (
+        state.activeDataTable.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE ||
+        state.activeDataTable.coloringHeatmap === ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
+      )
+    },
   },
   actions: {
     saveDataTable(dataTable: CsvDataTableProfile, fetchHeatmap = true) {
@@ -209,7 +221,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.reloadingScheduled = true
         return
       }
-      function concatenateUint8Arrays(chunks) {
+      function concatenateUint8Arrays(chunks: any[]) {
         const totalLength = chunks.reduce((acc, value) => acc + value.length, 0)
         const result = new Uint8Array(totalLength)
         let length = 0

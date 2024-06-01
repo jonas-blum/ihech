@@ -131,6 +131,21 @@ function reloadHeatmap() {
   heatmapStore.setCsvUploadOpen(false)
   heatmapStore.fetchHeatmap()
 }
+
+function getMiddleColorScaleValue() {
+  if (heatmapStore.isColorScaleNotShown) {
+    return 0
+  }
+  if (heatmapStore.activeDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC) {
+    return (
+      Math.sqrt(
+        (heatmapStore.getHeatmapMinValue + heatmapStore.getLogShiftValue) *
+          (heatmapStore.getHeatmapMaxValue + heatmapStore.getLogShiftValue),
+      ) - heatmapStore.getLogShiftValue
+    )
+  }
+  return (heatmapStore.getHeatmapMinValue + heatmapStore.getHeatmapMaxValue) / 2
+}
 </script>
 
 <template>
@@ -325,9 +340,10 @@ function reloadHeatmap() {
       </ul>
     </div>
 
-    <div id="color-scale-container">
+    <div v-if="!heatmapStore.isColorScaleNotShown" id="color-scale-container">
       <div class="color-scale-labels">
         <span class="min-label">{{ parseFloat(heatmapStore.getHeatmapMinValue.toFixed(3)) }}</span>
+        <span class="middle-label">{{ parseFloat(getMiddleColorScaleValue().toFixed(3)) }}</span>
         <span class="max-label">{{ parseFloat(heatmapStore.getHeatmapMaxValue.toFixed(3)) }}</span>
       </div>
       <div
@@ -340,7 +356,9 @@ function reloadHeatmap() {
             ')',
         }"
         class="color-scale"
-      ></div>
+      >
+        <div class="middle-marker"></div>
+      </div>
     </div>
 
     <button
@@ -406,8 +424,10 @@ function reloadHeatmap() {
 }
 
 #color-scale-container {
-  width: 150px;
+  width: 180px;
   position: relative;
+  padding-left: 1px;
+  padding-right: 1px;
 }
 
 .color-scale {
@@ -417,10 +437,35 @@ function reloadHeatmap() {
   margin-top: 10px;
 }
 
+.color-scale:before,
+.color-scale:after,
+.color-scale .middle-marker {
+  content: '';
+  position: absolute;
+  top: 20px;
+  width: 3px;
+  height: 15px;
+  background-color: #000;
+}
+
+.color-scale:before {
+  left: 1%;
+}
+
+.color-scale:after {
+  left: 99%;
+  transform: translateX(-100%);
+}
+
+.color-scale .middle-marker {
+  left: 50%;
+}
+
 .color-scale-labels {
   width: 100%;
   display: flex;
   justify-content: space-between;
+
   margin-bottom: 2px;
 }
 
@@ -428,5 +473,15 @@ function reloadHeatmap() {
   position: relative;
   font-size: 15px;
   font-weight: bold;
+  width: 60px;
+  text-align: center;
+}
+
+.color-scale-labels span:first-child {
+  text-align: start;
+}
+
+.color-scale-labels span:last-child {
+  text-align: end;
 }
 </style>

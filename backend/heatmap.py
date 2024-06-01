@@ -250,6 +250,8 @@ def create_heatmap(
     heatmap_json.minDimRedXValue = dim_red_df[0].min().min()
     heatmap_json.maxDimRedYValue = dim_red_df[1].max()
     heatmap_json.minDimRedYValue = dim_red_df[1].min().min()
+    heatmap_json.minAttributeValues = original_filtered_df_dropped.min().tolist()
+    heatmap_json.maxAttributeValues = original_filtered_df_dropped.max().tolist()
 
     filtered_collection_column_names = [
         col

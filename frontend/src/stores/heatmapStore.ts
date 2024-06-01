@@ -48,6 +48,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       maxDimRedYValue: 0,
       minDimRedXValue: 0,
       minDimRedYValue: 100,
+      maxAttributeValues: [],
+      minAttributeValues: [],
     },
     highlightedRow: null,
 
@@ -74,6 +76,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getDimRedMinXValue: (state) => state.heatmap.minDimRedXValue,
     getDimRedMaxYValue: (state) => state.heatmap.maxDimRedYValue,
     getDimRedMinYValue: (state) => state.heatmap.minDimRedYValue,
+    getMaxAttributeValues: (state) => state.heatmap.maxAttributeValues,
+    getMinAttributeValues: (state) => state.heatmap.minAttributeValues,
+
     getHighlightedRow: (state) => state.highlightedRow,
 
     getAmountOfStickyItems: (state) =>
@@ -355,6 +360,13 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return
       }
       this.activeDataTable.sortAttributesBasedOnStickyItems = sortAttributesBasedOnStickyItems
+    },
+    setClusterItemsBasedOnStickyAttributes(clusterItemsBasedOnStickyAttributes: boolean) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.clusterItemsBasedOnStickyAttributes = clusterItemsBasedOnStickyAttributes
     },
     setClusterSize(clusterSize: number) {
       if (!this.activeDataTable) {

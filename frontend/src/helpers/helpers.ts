@@ -58,7 +58,8 @@ export enum DimReductionAlgoEnum {
 export enum ColoringHeatmapEnum {
   ABSOLUTE = 'ABSOLUTE',
   LOGARITHMIC = 'LOGARITHMIC',
-  RELATIVE = 'RELATIVE',
+  ITEM_RELATIVE = 'ITEM_RELATIVE',
+  ATTRIBUTE_RELATIVE = 'ATTRIBUTE_RELATIVE',
 }
 
 export interface ItemNameAndData {
@@ -84,6 +85,8 @@ export interface HeatmapJSON {
   minDimRedXValue: number
   maxDimRedYValue: number
   minDimRedYValue: number
+  maxAttributeValues: number[]
+  minAttributeValues: number[]
 }
 
 export interface HeatmapSettings {

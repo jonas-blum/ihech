@@ -72,7 +72,6 @@ export interface ItemNameAndData {
   children: ItemNameAndData[] | null
 
   parent: ItemNameAndData | null
-  initial_data?: number[]
 }
 
 export interface HeatmapJSON {

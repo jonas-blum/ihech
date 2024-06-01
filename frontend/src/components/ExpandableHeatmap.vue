@@ -17,6 +17,7 @@ import CollectionSelector from './CollectionSelector.vue'
 
 import HeatmapSettings from './HeatmapSettings.vue'
 import CsvUpload from './CsvUpload.vue'
+import { interpolateMagma } from 'd3'
 
 const heatmapStore = useHeatmapStore()
 
@@ -44,8 +45,6 @@ const SETTINGS_HEIGHT = 60
 
 const STICKY_GAP = 4
 const STICKY_GAP_MULTIPLIER = 1
-
-const dataChangingRef = ref<number>(1)
 
 const tooltip = ref<HTMLElement | null>(null)
 const tooltipValue = ref<HTMLElement | null>(null)
@@ -133,7 +132,7 @@ function updateEntireVisibleHeatmapWidth() {
   const nonScrollableWidth =
     heatmapWidth.value +
     2 * BORDER_WIDTH +
-    stickyAttributesGap.value +
+    STICKY_GAP +
     ROW_LABELS_WIDTH +
     SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP +
     30
@@ -242,35 +241,39 @@ function drawEverything() {
       offsetValue = heatmapStore.getHeatmapMinValue + 1
     }
 
-    visibleRows.value.forEach((row, rowIndex) => {
+    for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
+      const item = visibleRows.value[itemIdx]
       let maxRowValue = 1
       if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
-        maxRowValue = Math.max(...row.data)
+        maxRowValue = Math.max(...item.data)
       }
 
-      row.data.forEach((value, colIndex) => {
-        let adjustedValue = value
+      for (let attrIdx = 0; attrIdx < item.data.length; attrIdx++) {
+        const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
+        const initialValue = item.data[initialAttrIdx]
+
+        let adjustedValue = initialValue
         if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.RELATIVE) {
-          adjustedValue = value / maxRowValue
+          adjustedValue = initialValue / maxRowValue
         } else if (
           heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
         ) {
-          adjustedValue = Math.log(value + offsetValue)
+          adjustedValue = Math.log(initialValue + offsetValue)
         }
 
-        let x = colIndex * cellWidth.value
-        let y = rowIndex * cellHeight.value
+        let x = attrIdx * cellWidth.value
+        let y = itemIdx * cellHeight.value
 
-        if (colIndex >= heatmapStore.getAmountOfStickyAttributes) {
+        if (attrIdx >= heatmapStore.getAmountOfStickyAttributes) {
           x += stickyAttributesGap.value
         }
-        if (rowIndex >= heatmapStore.getAmountOfStickyItems) {
+        if (itemIdx >= heatmapStore.getAmountOfStickyItems) {
           y += stickyItemsGap.value
         }
         ctx.fillStyle = getHeatmapColor(adjustedValue, heatmapMinValue, heatmapMaxValue)
         ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
-      })
-    })
+      }
+    }
   })
 }
 
@@ -394,13 +397,23 @@ function updateTooltip(e: MouseEvent) {
 
   const colIdx = Math.floor(x / cellWidth.value)
   const rowIdx = Math.floor(y / cellHeight.value)
-  if (colIdx < 0 || rowIdx < 0) return
+  if (
+    colIdx < 0 ||
+    colIdx >= heatmapStore.getHeatmap.attributeNames.length ||
+    rowIdx < 0 ||
+    rowIdx >= visibleRows.value.length
+  ) {
+    return
+  }
+
+  const initialColIdx = heatmapStore.getInitialAttrIdx(colIdx)
+
   const selectedRow = visibleRows.value[rowIdx]
   if (heatmapStore.getHighlightedRow !== selectedRow) {
     heatmapStore.setHighlightedRow(selectedRow)
   }
 
-  let dataValue = selectedRow.data[colIdx]
+  let dataValue = selectedRow.data[initialColIdx]
 
   let overlayX = colIdx * cellWidth.value + rect.left + scrollX
   let overlayY = rowIdx * cellHeight.value + rect.top + scrollY
@@ -428,7 +441,7 @@ function updateTooltip(e: MouseEvent) {
 
   tooltipValue.value.textContent = dataValue.toFixed(3).toString()
   tooltipRow.value.textContent = selectedRow.itemName
-  tooltipCol.value.textContent = heatmapStore.getHeatmap.attributeNames[colIdx]
+  tooltipCol.value.textContent = heatmapStore.getHeatmap.attributeNames[initialColIdx]
 
   const tooltipXRight = e.clientX + 20
   const maxRight = window.innerWidth - tooltip.value.offsetWidth * 1.3
@@ -451,7 +464,6 @@ watch(
   () => heatmapStore.getDataChanging,
   () => {
     updateHeatmap()
-    // dataChangingRef.value++
   },
 )
 
@@ -614,7 +626,7 @@ onMounted(async () => {
 
           <div
             class="grid-row-labels"
-            :key="'row-label-' + dataChangingRef"
+            :key="'row-label-' + heatmapStore.getDataChanging"
             :style="{
               gridRow: 2,
               gridColumn: 1,
@@ -667,7 +679,7 @@ onMounted(async () => {
           <div
             ref="colLabelContainer"
             class="grid-col-labels"
-            :key="'col-label-' + dataChangingRef"
+            :key="'col-label-' + heatmapStore.getDataChanging"
             :style="{
               gridRow: 1,
               gridColumn: 2,
@@ -689,8 +701,8 @@ onMounted(async () => {
             }"
           >
             <div
-              :key="colName"
-              v-for="(colName, index) in heatmapStore.getHeatmap.attributeNames"
+              :key="heatmapStore.getInitialAttrIdx(newIdx)"
+              v-for="(_, newIdx) in heatmapStore.getHeatmap.attributeNames.length"
               class="col-label"
               :style="{
                 width: cellWidth + 'px',
@@ -700,7 +712,7 @@ onMounted(async () => {
                 textAlign: 'center',
                 cursor: 'pointer',
                 marginLeft:
-                  index === heatmapStore.getActiveDataTable?.stickyAttributes.length
+                  newIdx === heatmapStore.getActiveDataTable?.stickyAttributes.length
                     ? stickyAttributesGap + 'px'
                     : 0,
                 display: 'flex',
@@ -716,7 +728,7 @@ onMounted(async () => {
                 :style="{
                   position: 'absolute',
                   width: '100%',
-                  height: heatmapStore.getHeatmap.attributeDissimilarities[index] * 100 + '%',
+                  height: heatmapStore.getAttrDissFromNewIdx(newIdx) * 100 + '%',
                   backgroundColor: '#ccc',
                   top: cellWidth + 'px',
                   left: 0,
@@ -737,7 +749,7 @@ onMounted(async () => {
                   textOverflow: 'ellipsis',
                 }"
               >
-                {{ colName }}
+                {{ heatmapStore.getAttrFromNewIdx(newIdx) }}
               </div>
 
               <button
@@ -751,11 +763,15 @@ onMounted(async () => {
                   height: cellWidth + 'px',
                   fontSize: (4 / 5) * cellWidth + 'px',
                 }"
-                @click="heatmapStore.toggleStickyAttribute(colName)"
+                @click="heatmapStore.toggleStickyAttribute(heatmapStore.getAttrFromNewIdx(newIdx))"
                 class="sticky-col-button"
               >
                 {{
-                  heatmapStore.getActiveDataTable?.stickyAttributes.includes(colName) ? '-' : '+'
+                  heatmapStore.getActiveDataTable?.stickyAttributes.includes(
+                    heatmapStore.getAttrFromNewIdx(newIdx),
+                  )
+                    ? '-'
+                    : '+'
                 }}
               </button>
             </div>

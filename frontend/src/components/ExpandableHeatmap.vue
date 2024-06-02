@@ -2,6 +2,7 @@
 import { nextTick, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 import ExpRowComponent from './ExpRowComponent.vue'
+import InformationIcon from '@assets/information-icon.svg'
 
 import {
   ColoringHeatmapEnum,
@@ -598,9 +599,31 @@ onMounted(async () => {
                 height: '100%',
               }"
             >
-              <strong style="font-size: 20px">{{
-                heatmapStore.getActiveDataTable?.dimReductionAlgo
-              }}</strong>
+              <div :style="{ display: 'flex', gap: '5px', alignItems: 'center' }">
+                <strong style="font-size: 20px">{{
+                  heatmapStore.getActiveDataTable?.dimReductionAlgo
+                }}</strong>
+                <div class="self-tooltip">
+                  <span class="tooltiptext-right"
+                    ><div>
+                      This is the dimensionality reduction visual. It is a mirror of the visible
+                      heatmap. The points with a black border represent a group of items and points
+                      without a border are individual items.
+                    </div>
+                    <div>
+                      When points are spatially close together it is an indication, that they are
+                      similar based on the attributes.
+                    </div>
+                    <div>Left click on a Bubble/Group in the visual to expand it</div>
+                    <div>Right click on a Bubble/Group in the visual to collapse it</div>
+                    <div>
+                      You can change the algorithm used for this visual in the "Dim Reduction"
+                      Settings
+                    </div>
+                  </span>
+                  <InformationIcon :style="{ height: '15px', width: '15px' }" />
+                </div>
+              </div>
               <DimReductionVisual style="border: 1px solid black" :width="dimReductionWidth" />
             </div>
             <CollectionSelector />
@@ -632,9 +655,49 @@ onMounted(async () => {
 
               height: COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px',
               width: ROW_LABELS_WIDTH + SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
+
+              display: 'flex',
             }"
             class="grid-corner"
-          ></div>
+          >
+            <div style="position: absolute; top: 50%; right: 5%" class="self-tooltip">
+              <span class="tooltiptext-right"
+                ><div>
+                  Here are the attributes of the heatmap. You can click on the + icon to make an
+                  attribute of interest "sticky".
+                </div>
+                <div>
+                  Once there are sticky attribute, the grouping behavior of the items can be changed
+                  to be based solely on the sticky attributes. This setting can be found in "Items
+                  Grouping".
+                </div>
+                <div>
+                  The attributes are by default sorted by how much they deviate across all items.
+                  The sorting behavior of the attributes can be changed in the setting "Attributes".
+                </div>
+              </span>
+              <InformationIcon :style="{ height: '15px', width: '15px' }" />
+            </div>
+
+            <div style="position: absolute; bottom: 5%; left: 10%" class="self-tooltip">
+              <span class="tooltiptext-right"
+                ><div>
+                  Here are the items of the heatmap. You can click on the + icon to make an item of
+                  interest "sticky".
+                </div>
+                <div>
+                  Once there are sticky items, the sorting behavior of the attributes can be changed
+                  to be based solely on the sticky items. This setting can be found in "Attributes".
+                </div>
+
+                <div>
+                  The grouping of the items, and if they should be first grouped by collections, can
+                  be controlled through the setting "Items Grouping".
+                </div>
+              </span>
+              <InformationIcon :style="{ height: '15px', width: '15px' }" />
+            </div>
+          </div>
 
           <div
             class="grid-row-labels"
@@ -809,6 +872,36 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.self-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.self-tooltip .tooltiptext-right {
+  visibility: hidden;
+  width: 300px;
+  background-color: darkgray;
+  color: black;
+  padding: 8px;
+  border-radius: 6px;
+  top: 0%;
+  left: 105%;
+  text-wrap: pretty;
+  hyphens: auto;
+  font-size: 16px;
+
+  position: absolute;
+  z-index: 10000000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.self-tooltip:hover .tooltiptext-right {
+  visibility: visible;
+}
+
 .highlight-overlay {
   box-sizing: content-box;
   position: absolute;

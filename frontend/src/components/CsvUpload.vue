@@ -489,7 +489,7 @@ onMounted(async () => {
                     maxWidth: MAX_CELL_WIDTH - 2 * TABLE_PADDING + 'px',
                   }"
                 >
-                  <div style="z-index: 99999" class="dropdown dropdown-end">
+                  <div :style="{ zIndex: 99999 - index }" class="dropdown dropdown-end">
                     <div
                       :style="{
                         margin: '0px',
@@ -507,37 +507,83 @@ onMounted(async () => {
                       class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
                     >
                       <li>
-                        <a :style="{ display: 'flex', gap: '5px' }">
-                          <p>Item Name Column?</p>
-                          <input
-                            @click.stop="updateItemNamesColumn(columnName)"
-                            type="checkbox"
-                            class="toggle"
-                            :checked="
-                              heatmapStore.getActiveDataTable?.itemNamesColumnName === columnName
-                            "
-                          />
-                        </a>
-                      </li>
-                      <li>
-                        <a :style="{ display: 'flex', gap: '5px' }">
-                          <p>Grouping Layer:</p>
-                          <select
-                            @change="updateHierarchyLayer($event, columnName)"
-                            @click.stop
-                            class="select select-primary max-w-xs"
+                        <div class="self-tooltip">
+                          <span class="tooltiptext-right">
+                            <div>
+                              This setting decides which column will be used to name the individual
+                              items.
+                            </div>
+                            <div>Only one column can be selected as the "Item Name Column".</div>
+                          </span>
+                          <a
+                            :style="{
+                              display: 'flex',
+                              gap: '5px',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }"
                           >
-                            <option
-                              :selected="
-                                getColumnCollectionHierarchy(columnName) === hierarchyLayer
+                            <p>Item Name Column?</p>
+                            <input
+                              @click.stop="updateItemNamesColumn(columnName)"
+                              type="checkbox"
+                              class="toggle"
+                              :checked="
+                                heatmapStore.getActiveDataTable?.itemNamesColumnName === columnName
                               "
-                              v-for="hierarchyLayer in hierarchyLayers"
-                              :key="hierarchyLayer"
+                            />
+                          </a>
+                        </div>
+                      </li>
+
+                      <li>
+                        <div class="self-tooltip">
+                          <span class="tooltiptext-right">
+                            <div>
+                              This setting decides which columns of the data table should be used as
+                              the "Collection" columns
+                            </div>
+                            <div>
+                              When enabling the setting "By collections" under "Items Grouping" the
+                              items will first be grouped by the first "Collection Layer" then by
+                              the second, third and fourth.
+                            </div>
+                            <div>
+                              The coloring of the items will be based on the first level "Collection
+                              Layer".
+                            </div>
+                            <div>
+                              When setting the "Collection Layers" you can compare individual items
+                              against entire collections and collections against other collections.
+                              Additionally outliers inside a collection can be detected easily.
+                            </div>
+                          </span>
+                          <a
+                            :style="{
+                              display: 'flex',
+                              gap: '5px',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                            }"
+                          >
+                            <p>Collection Layer:</p>
+                            <select
+                              @change="updateHierarchyLayer($event, columnName)"
+                              @click.stop
+                              class="select select-primary max-w-xs"
                             >
-                              {{ hierarchyLayer }}
-                            </option>
-                          </select>
-                        </a>
+                              <option
+                                :selected="
+                                  getColumnCollectionHierarchy(columnName) === hierarchyLayer
+                                "
+                                v-for="hierarchyLayer in hierarchyLayers"
+                                :key="hierarchyLayer"
+                              >
+                                {{ hierarchyLayer }}
+                              </option>
+                            </select>
+                          </a>
+                        </div>
                       </li>
                     </ul>
                   </div>
@@ -606,6 +652,37 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.self-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.self-tooltip .tooltiptext-right {
+  visibility: hidden;
+  width: 300px;
+  background-color: darkgray;
+  color: black;
+  padding: 8px;
+  border-radius: 6px;
+  top: -150%;
+  left: 105%;
+  text-wrap: pretty;
+  hyphens: auto;
+  font-size: 16px;
+  font-weight: normal;
+
+  position: absolute;
+  z-index: 10000000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.self-tooltip:hover .tooltiptext-right {
+  visibility: visible;
+}
+
 .content-grid {
   border-top: 1px solid black;
   margin-left: 10px;

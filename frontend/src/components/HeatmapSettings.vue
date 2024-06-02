@@ -234,11 +234,13 @@ function getMiddleColorScaleValue() {
           <div class="self-tooltip">
             <span class="tooltiptext-right">
               <div>
-                Determines if the grouping should initially be based on the selected grouping layers
+                Determines if the grouping should initially be based on the selected collection
+                layers.
               </div>
               <div>
                 Enable this if you want to compare single items against the aggregation of an entire
-                group and if you want to see outliers inside a group easily
+                collection, compare collections against other collections and if you want to see
+                outliers inside a collection easily
               </div>
               <div>Disable this if you want to find global outliers</div>
             </span>
@@ -483,7 +485,10 @@ function getMiddleColorScaleValue() {
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right">
-              Type to search for an item name and select it to see the item in the heatmap
+              <div>
+                Type to search for an item name and select it to see the item in the heatmap
+              </div>
+              <div>Additionally the selected item will be added to the "sticky items" section</div>
             </span>
             <a
               ><select

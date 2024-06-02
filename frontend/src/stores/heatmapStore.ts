@@ -725,6 +725,48 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         }
       }
     },
+    getAllChildrenRecursively(item: ItemNameAndData): ItemNameAndData[] {
+      const leafNodes: ItemNameAndData[] = []
+      if (item.children && item.children.length > 0) {
+        for (const child of item.children) {
+          if (!child.children || child.children.length === 0) {
+            leafNodes.push(child)
+          }
+          leafNodes.push(...this.getAllChildrenRecursively(child))
+        }
+      }
+      return leafNodes
+    },
+
+    getAllItems(): ItemNameAndData[] {
+      if (!this.heatmap) {
+        return []
+      }
+      const leafNodes: ItemNameAndData[] = []
+      for (const item of this.heatmap.itemNamesAndData) {
+        if (!item.children || item.children.length === 0) {
+          leafNodes.push(item)
+        }
+        if (item.children && item.children.length > 0) {
+          leafNodes.push(...this.getAllChildrenRecursively(item))
+        }
+      }
+      return leafNodes
+    },
+
+    expandItemAndAllParents(item: ItemNameAndData | null) {
+      if (!item) {
+        return
+      }
+      let parent = item.parent
+      while (parent) {
+        parent.isOpen = true
+        parent = parent.parent
+      }
+      item.isOpen = true
+      this.highlightedRow = item
+      this.changeHeatmap()
+    },
   },
 })
 

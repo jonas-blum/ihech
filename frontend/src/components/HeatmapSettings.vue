@@ -8,54 +8,17 @@ import {
   mapColoringHeatmapEnum,
   mapSortOderAttributesEnum,
   mapScalingEnum,
+  type ItemNameAndData,
 } from '@/helpers/helpers'
-
-import type { ItemNameAndData } from '@/helpers/helpers'
 import { getHeatmapColor } from '@/helpers/helpers'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import SettingsIcon from '@assets/settings.svg'
+import { ref } from 'vue'
 
 const heatmapStore = useHeatmapStore()
 
-function findRowRecursively(row: ItemNameAndData, rowName: string): ItemNameAndData | undefined {
-  if (row.itemName === rowName) {
-    return row
-  }
-  if (row.children) {
-    for (const child of row.children) {
-      const foundRow = findRowRecursively(child, rowName)
-      if (foundRow) {
-        return foundRow
-      }
-    }
-  }
-}
-
-function findRowAndOpenIt(event: Event) {
-  if (!(event.target instanceof HTMLSelectElement)) {
-    console.error('Event target is not an HTMLSelectElement:', event.target)
-    return
-  }
-  let foundRow: ItemNameAndData | undefined = undefined
-  for (const row of heatmapStore.getHeatmap.itemNamesAndData) {
-    foundRow = findRowRecursively(row, event.target.value)
-    if (foundRow) {
-      break
-    }
-  }
-
-  if (foundRow) {
-    let parent = foundRow.parent
-    while (parent) {
-      heatmapStore.expandRow(parent)
-      parent = parent.parent
-    }
-    heatmapStore.setHighlightedRow(foundRow)
-    heatmapStore.changeHeatmap()
-  } else {
-    console.error('Row not found:', event.target.value)
-  }
-}
+const selectedItem = ref<ItemNameAndData | null>(null)
+const showOptions = ref(false)
 
 async function updateScaling(scaling: ScalingEnum) {
   heatmapStore.setScaling(scaling)
@@ -506,6 +469,33 @@ function getMiddleColorScaleValue() {
                   >
                 </li>
               </ul>
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="self-tooltip">
+            <span class="tooltiptext-right">
+              Type to search for an item name and select it to see the item in the heatmap
+            </span>
+            <a
+              ><select
+                @change="heatmapStore.expandItemAndAllParents(selectedItem)"
+                class="select select-bordered w-full max-w-xs"
+                v-model="selectedItem"
+                @focus="showOptions = true"
+                @blur="showOptions = false"
+              >
+                <!-- eslint-disable vue/no-use-v-if-with-v-for -->
+                <option
+                  v-for="item in heatmapStore.getAllItems()"
+                  v-if="showOptions === true"
+                  :value="item"
+                  :key="item.index ?? 0"
+                >
+                  {{ item.itemName }}
+                </option>
+                <!-- eslint-enable vue/no-use-v-if-with-v-for -->
+              </select>
             </a>
           </div>
         </li>

@@ -190,17 +190,24 @@ function drawScatterplot() {
         .append('path')
         .attr('d', arc)
         .style('fill', (_, i) => itemColors[i])
-        .style('stroke', row.children ? 'black' : 'none')
+        .style('stroke-width', 0)
+        .style('opacity', isParentHighlighted(row) ? 1 : 0.6)
+
+      d3.select(this)
+        .append('circle')
+        .attr('r', radius)
+        .attr('fill', 'none')
+        .attr('stroke', 'black')
         .style('stroke-width', () => {
+          if (row.children === null) {
+            return 0
+          }
           if (!isRowCollapsible(row)) {
             return 4
           }
-          if (row.children) {
-            return 2
-          }
-          return 0
+
+          return 2
         })
-        .style('opacity', isParentHighlighted(row) ? 1 : 0.6)
     })
     .style('cursor', 'pointer')
     .style('z-index', (row: ItemNameAndData) => row.amountOfDataPoints)

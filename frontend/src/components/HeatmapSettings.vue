@@ -119,7 +119,7 @@ function getMiddleColorScaleValue() {
   <div class="settings-container">
     <div style="z-index: 99999999" class="dropdown dropdown-bottom">
       <div class="self-tooltip">
-        <span class="tooltiptext"
+        <span class="tooltiptext-right"
           >Here are the settings regarding the Dimensionality Reduction visual on the left
           side</span
         >
@@ -186,7 +186,7 @@ function getMiddleColorScaleValue() {
 
     <div style="z-index: 99999998" class="dropdown dropdown-bottom">
       <div class="self-tooltip">
-        <span class="tooltiptext">
+        <span class="tooltiptext-right">
           <div>
             Here are the settings on how the items (rows) of the heatmap are grouped together
           </div>
@@ -345,7 +345,7 @@ function getMiddleColorScaleValue() {
 
     <div style="z-index: 99999997" class="dropdown dropdown-bottom">
       <div class="self-tooltip">
-        <span class="tooltiptext">
+        <span class="tooltiptext-right">
           <div>Here are the settings on how the attributes (columns) of the heatmap are sorted</div>
         </span>
         <div tabindex="0" role="button" class="btn m-1">
@@ -420,7 +420,7 @@ function getMiddleColorScaleValue() {
       </ul>
     </div>
 
-    <div style="z-index: 99999997" class="dropdown dropdown-bottom">
+    <div style="z-index: 99999996" class="dropdown dropdown-bottom">
       <div tabindex="0" role="button" class="btn m-1">
         <SettingsIcon style="height: 20px; width: 20px" />
         <p>Other</p>

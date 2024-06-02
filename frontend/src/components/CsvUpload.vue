@@ -400,7 +400,7 @@ onMounted(async () => {
 
         <h1
           v-if="heatmapStore.getActiveDataTable"
-          class="font-bold text-3xl"
+          class="font-bold text-2xl"
           :style="{
             overflow: 'hidden',
             textAlign: 'left',

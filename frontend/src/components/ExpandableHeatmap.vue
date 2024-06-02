@@ -558,6 +558,7 @@ onMounted(async () => {
             ? SETTINGS_HEIGHT + 'px'
             : CSV_UPLOAD_COLLAPSED_HEIGHT + 'px',
           alignItems: 'center',
+          justifyContent: 'space-between',
           gap: '20px',
         }"
       >
@@ -574,8 +575,8 @@ onMounted(async () => {
         <div
           :style="{
             width: dimReductionWidth + 'px',
-            minHeight: entireVisibleHeatmapHeight - 20 + 'px',
             backgroundColor: 'white',
+            marginTop: '30px',
           }"
         >
           <div
@@ -597,7 +598,9 @@ onMounted(async () => {
                 height: '100%',
               }"
             >
-              <p style="height: 25px">{{ heatmapStore.getActiveDataTable?.dimReductionAlgo }}</p>
+              <strong style="font-size: 20px">{{
+                heatmapStore.getActiveDataTable?.dimReductionAlgo
+              }}</strong>
               <DimReductionVisual style="border: 1px solid black" :width="dimReductionWidth" />
             </div>
             <CollectionSelector />

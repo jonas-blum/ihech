@@ -99,6 +99,14 @@ function reloadHeatmap() {
   heatmapStore.fetchHeatmap()
 }
 
+function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
+  if (!item) return
+  if (!heatmapStore.getStickyItems.includes(item)) {
+    heatmapStore.toggleStickyItem(item)
+  }
+  heatmapStore.expandItemAndAllParents(item)
+}
+
 function getMiddleColorScaleValue() {
   if (heatmapStore.isColorScaleNotShown) {
     return 0
@@ -479,7 +487,7 @@ function getMiddleColorScaleValue() {
             </span>
             <a
               ><select
-                @change="heatmapStore.expandItemAndAllParents(selectedItem)"
+                @change="makeItemStickyAndExpandItem(selectedItem)"
                 class="select select-bordered w-full max-w-xs"
                 v-model="selectedItem"
                 @focus="showOptions = true"

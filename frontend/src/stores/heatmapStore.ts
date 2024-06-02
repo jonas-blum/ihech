@@ -751,7 +751,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           leafNodes.push(...this.getAllChildrenRecursively(item))
         }
       }
-      return leafNodes
+      return leafNodes.sort((a, b) => a.itemName.localeCompare(b.itemName))
     },
 
     expandItemAndAllParents(item: ItemNameAndData | null) {

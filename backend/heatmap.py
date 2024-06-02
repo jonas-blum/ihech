@@ -119,14 +119,17 @@ def filter_attributes_and_items(
 
 
 def do_scaling(
-    original_filtered_df: pd.DataFrame, settings: HeatmapSettings
+    original_filtered_df: pd.DataFrame,
+    all_data_df: pd.DataFrame,
+    settings: HeatmapSettings,
 ) -> pd.DataFrame:
 
     if settings.scaling == "NO_SCALING":
         return original_filtered_df
     elif settings.scaling == "STANDARDIZING":
         scaler = StandardScaler()
-        scaled_df = scaler.fit_transform(original_filtered_df)
+        fitted_scaler = scaler.fit(all_data_df)
+        scaled_df = fitted_scaler.transform(original_filtered_df)
         scaled_df = pd.DataFrame(
             scaled_df,
             index=original_filtered_df.index,
@@ -158,7 +161,11 @@ def create_heatmap(
         settings.collectionColumnNames,
     )
 
-    scaled_filtered_df = do_scaling(original_filtered_dropped, settings)
+    all_data_df = original_df[original_filtered_dropped.columns]
+    all_data_df_medians = all_data_df.median()
+    all_data_df = all_data_df.fillna(all_data_df_medians)
+
+    scaled_filtered_df = do_scaling(original_filtered_dropped, all_data_df, settings)
 
     original_filtered_df, scaled_filtered_df = sort_attributes(
         original_filtered_df, scaled_filtered_df, settings

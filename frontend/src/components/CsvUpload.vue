@@ -521,7 +521,7 @@ onMounted(async () => {
                       </li>
                       <li>
                         <a :style="{ display: 'flex', gap: '5px' }">
-                          <p>Set hierarchy Layer:</p>
+                          <p>Grouping Layer:</p>
                           <select
                             @change="updateHierarchyLayer($event, columnName)"
                             @click.stop

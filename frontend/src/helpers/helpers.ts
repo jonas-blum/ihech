@@ -37,6 +37,52 @@ export function getDistinctColor(index: number, colorList = COLORS): string {
   return selectedColor
 }
 
+export function mapSortOderAttributesEnum(sortOrderAttributes: SortOrderAttributes): string {
+  switch (sortOrderAttributes) {
+    case SortOrderAttributes.STDEV:
+      return 'Standard Deviation'
+    case SortOrderAttributes.ASC:
+      return 'Ascending'
+    case SortOrderAttributes.DESC:
+      return 'Descending'
+    case SortOrderAttributes.ALPHABETICAL:
+      return 'Alphabetical'
+  }
+}
+
+export function mapScalingEnum(scaling: ScalingEnum): string {
+  switch (scaling) {
+    case ScalingEnum.NO_SCALING:
+      return 'No Scaling'
+    case ScalingEnum.STANDARDIZING:
+      return 'Standardizing'
+  }
+}
+
+export function mapDimReductionAlgoEnum(dimReductionAlgo: DimReductionAlgoEnum): string {
+  switch (dimReductionAlgo) {
+    case DimReductionAlgoEnum.PCA:
+      return 'PCA'
+    case DimReductionAlgoEnum.UMAP:
+      return 'UMAP'
+    case DimReductionAlgoEnum.TSNE:
+      return 't-SNE'
+  }
+}
+
+export function mapColoringHeatmapEnum(coloringHeatmap: ColoringHeatmapEnum): string {
+  switch (coloringHeatmap) {
+    case ColoringHeatmapEnum.ABSOLUTE:
+      return 'Absolute'
+    case ColoringHeatmapEnum.LOGARITHMIC:
+      return 'Logarithmic'
+    case ColoringHeatmapEnum.ITEM_RELATIVE:
+      return 'Item Relative'
+    case ColoringHeatmapEnum.ATTRIBUTE_RELATIVE:
+      return 'Attribute Relative'
+  }
+}
+
 export enum SortOrderAttributes {
   STDEV = 'STDEV',
   ASC = 'ASC',
@@ -51,8 +97,8 @@ export enum ScalingEnum {
 
 export enum DimReductionAlgoEnum {
   PCA = 'PCA',
-  UMAP = 'UMAP',
   TSNE = 'TSNE',
+  UMAP = 'UMAP',
 }
 
 export enum ColoringHeatmapEnum {

@@ -94,7 +94,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
 
     clusterSize: 6,
     dimReductionAlgo: DimReductionAlgoEnum.PCA,
-    clusterAfterDimRed: true,
+    clusterAfterDimRed: false,
 
     scaling: ScalingEnum.STANDARDIZING,
 

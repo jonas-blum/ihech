@@ -581,7 +581,7 @@ function getMiddleColorScaleValue() {
 }
 
 .self-tooltip .tooltiptext-right {
-  visibility: hidden;
+  display: none;
   width: 300px;
   background-color: darkgray;
   color: black;
@@ -596,17 +596,16 @@ function getMiddleColorScaleValue() {
   position: absolute;
   z-index: 10000000;
 
-  display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .self-tooltip:hover .tooltiptext-right {
-  visibility: visible;
+  display: flex;
 }
 
 .self-tooltip:hover .tooltiptext {
-  visibility: visible;
+  display: flex;
 }
 
 .settings-container {

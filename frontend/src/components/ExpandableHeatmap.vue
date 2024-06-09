@@ -154,8 +154,6 @@ function updateEntireVisibleHeatmapHeight() {
     SPACE_BETWEEN_COL_LABELS_AND_HEATMAP +
     2 * HEATMAP_BORDER_BOTTOM_RIGHT
 
-  nonScrollableHeight = Math.max(nonScrollableHeight, 450)
-
   entireVisibleHeatmapHeight.value = Math.min(scrollableHeight, nonScrollableHeight)
 }
 
@@ -665,20 +663,25 @@ onMounted(async () => {
             }"
             class="grid-corner"
           >
-            <div style="position: absolute; top: 50%; right: 5%" class="self-tooltip">
+            <div style="position: absolute; top: 25%; right: 5%" class="self-tooltip">
               <span class="tooltiptext-right"
                 ><div>
                   Here are the attributes of the heatmap. You can click on the + icon to make an
                   attribute of interest "sticky".
                 </div>
                 <div>
-                  Once there are sticky attribute, the grouping behavior of the items can be changed
-                  to be based solely on the sticky attributes. This setting can be found in "Items
-                  Grouping".
+                  Once there are sticky attributes, the grouping behavior of the items can be
+                  changed to be based solely on the sticky attributes. This setting can be found in
+                  "Items Grouping".
                 </div>
                 <div>
-                  The attributes are by default sorted by how much they deviate across all items.
+                  By default, the attributes are sorted by how much they deviate across all items.
                   The sorting behavior of the attributes can be changed in the setting "Attributes".
+                </div>
+                <div>
+                  The grey bars behind the attributes indicate how much the attribute deviates
+                  across all items (or across all sticky items when "Sort based on Sticky Items" is
+                  selected)
                 </div>
               </span>
               <InformationIcon :style="{ height: '15px', width: '15px' }" />
@@ -883,8 +886,8 @@ onMounted(async () => {
 }
 
 .self-tooltip .tooltiptext-right {
-  visibility: hidden;
-  width: 300px;
+  display: none;
+  width: 500px;
   background-color: darkgray;
   color: black;
   padding: 8px;
@@ -898,13 +901,12 @@ onMounted(async () => {
   position: absolute;
   z-index: 10000000;
 
-  display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
 .self-tooltip:hover .tooltiptext-right {
-  visibility: visible;
+  display: flex;
 }
 
 .highlight-overlay {

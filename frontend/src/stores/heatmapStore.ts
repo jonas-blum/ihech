@@ -566,10 +566,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       if (this.activeDataTable.collectionColumnNames.length === 0) {
         let topMostParent = item
-        while (topMostParent.parent !== null) {
+        while (topMostParent.parent !== null && topMostParent.parent.parent !== null) {
           topMostParent = topMostParent.parent
         }
-        const index = this.getNonStickyItems.indexOf(topMostParent)
+        const index = this.getNonStickyItems[0].children.indexOf(topMostParent)
         return [getDistinctColor(index)]
       }
 

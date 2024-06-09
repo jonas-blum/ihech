@@ -28,8 +28,40 @@ def cluster_items_recursively(
     item_names_column_name: str,
     cluster_by_collections: bool,
     collection_column_names: List[str],
-    level: int = 0,
+    level: int,
 ) -> Union[List[ItemNameAndData], None]:
+    if level == 0:
+        tag_data_0_aggregated_mean = original_df_dropped.mean()
+        tag_data_0_aggregated = tag_data_0_aggregated_mean.tolist()
+        dim_reduction_0_aggregated = dim_red_df.mean().tolist()
+
+        new_item_name_0 = str(original_df.shape[0])
+
+        children_0 = cluster_items_recursively(
+            original_df,
+            original_df_dropped,
+            scaled_df,
+            dim_red_df,
+            cluster_size,
+            item_names_column_name,
+            cluster_by_collections,
+            collection_column_names,
+            level + 1,
+        )
+
+        new_aggregated_item_name_and_data = ItemNameAndData(
+            index=None,
+            itemName=new_item_name_0,
+            isOpen=True,
+            data=tag_data_0_aggregated,
+            amountOfDataPoints=original_df.shape[0],
+            dimReductionX=dim_reduction_0_aggregated[0],
+            dimReductionY=dim_reduction_0_aggregated[1],
+            children=children_0,
+        )
+
+        return [new_aggregated_item_name_and_data]
+
     is_open = False
 
     if cluster_by_collections and len(collection_column_names) > 0:

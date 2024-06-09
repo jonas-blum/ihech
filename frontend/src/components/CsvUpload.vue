@@ -10,7 +10,6 @@ import {
   ColoringHeatmapEnum,
   getDistinctColor,
   CSV_UPLOAD_COLLAPSED_HEIGHT,
-  CSV_UPLOAD_EXPANDED_HEIGHT,
   CSV_UPLOAD_CONTENT_HEIGHT,
 } from '@/helpers/helpers'
 import SettingsIcon from '@assets/settings.svg'
@@ -30,8 +29,6 @@ const hierarchyLayers: ('None' | number)[] = ['None', 1, 2, 3, 4]
 
 const fileInput = ref<HTMLInputElement | null>(null)
 
-const oldStateDataTable = ref<CsvDataTableProfile | null>(null)
-
 function toggleAccordion() {
   heatmapStore.setCsvUploadOpen(!heatmapStore.isCsvUploadOpen)
 }
@@ -45,11 +42,31 @@ function triggerFileInput() {
   heatmapStore.setCsvUploadOpen(true)
 }
 
+function isNumeric(value: any): boolean {
+  return !isNaN(parseFloat(value)) && isFinite(value)
+}
+
 function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap = true) {
-  const df: dataForge.IDataFrame = dataForge
+  let df: dataForge.IDataFrame = dataForge
     .fromCSV(contents, { skipEmptyLines: true })
     .resetIndex()
     .bake()
+
+  const firstRow = df.first()
+
+  let numericColumns = []
+  let nonNumericColumns = []
+
+  for (const column of df.getColumnNames()) {
+    const firstValue = firstRow[column]
+    if (isNumeric(firstValue)) {
+      numericColumns.push(column)
+    } else {
+      nonNumericColumns.push(column)
+    }
+  }
+
+  df = df.subset(nonNumericColumns.concat(numericColumns))
 
   const csvFile = df.toCSV()
   let fileNameNoExtension = fileName.split('.').slice(0, -1).join('.')
@@ -245,89 +262,6 @@ function toggleAttribute(attribute: string) {
   }
   heatmapStore.setIsOutOfSync(true)
 }
-
-//Currently Not used -> Feature to Save Table or Discard Table Changes
-
-// function saveDataTable() {
-//   if (heatmapStore.getActiveDataTable === null) {
-//     return
-//   }
-//   heatmapStore.saveDataTable(heatmapStore.getActiveDataTable)
-// }
-
-// function discardChanges() {
-//   resetToOldStateDataTable()
-// }
-
-// function resetToOldStateDataTable() {
-//   if (oldStateDataTable.value === null) {
-//     return
-//   }
-//   heatmapStore.setActiveDataTable(oldStateDataTable.value)
-// }
-
-// function copyDataTableState() {
-//   if (heatmapStore.getActiveDataTable === null) {
-//     oldStateDataTable.value = null
-//   } else {
-//     const copiedItemCollectionMap: Record<number, string> = {}
-//     for (const key in heatmapStore.getActiveDataTable.itemCollectionMap) {
-//       copiedItemCollectionMap[key] = heatmapStore.getActiveDataTable.itemCollectionMap[key]
-//     }
-
-//     oldStateDataTable.value = {
-//       tableName: heatmapStore.getActiveDataTable.tableName,
-//       df: heatmapStore.getActiveDataTable.df,
-
-//       nanColumns: [...heatmapStore.getActiveDataTable.nanColumns],
-//       nonNanColumns: [...heatmapStore.getActiveDataTable.nonNanColumns],
-
-//       collectionColorMap: { ...heatmapStore.getActiveDataTable.collectionColorMap },
-//       itemCollectionMap: copiedItemCollectionMap,
-//       firstLayerCollectionNames: [...heatmapStore.getActiveDataTable.firstLayerCollectionNames],
-//       selectedFirstLayerCollections: [
-//         ...heatmapStore.getActiveDataTable.selectedFirstLayerCollections,
-//       ],
-
-//       showOnlyStickyItemsInDimReduction:
-//         heatmapStore.getActiveDataTable.showOnlyStickyItemsInDimReduction,
-
-//       csvFile: heatmapStore.getActiveDataTable.csvFile,
-
-//       itemNamesColumnName: heatmapStore.getActiveDataTable.itemNamesColumnName,
-//       collectionColumnNames: [...heatmapStore.getActiveDataTable.collectionColumnNames],
-
-//       selectedItemIndexes: [...heatmapStore.getActiveDataTable.selectedItemIndexes],
-//       selectedAttributes: [...heatmapStore.getActiveDataTable.selectedAttributes],
-
-//       stickyAttributes: [...heatmapStore.getActiveDataTable.stickyAttributes],
-//       sortAttributesBasedOnStickyItems:
-//         heatmapStore.getActiveDataTable.sortAttributesBasedOnStickyItems,
-//       sortOrderAttributes: heatmapStore.getActiveDataTable.sortOrderAttributes,
-
-//       stickyItemIndexes: [...heatmapStore.getActiveDataTable.stickyItemIndexes],
-//       clusterItemsBasedOnStickyAttributes:
-//         heatmapStore.getActiveDataTable.clusterItemsBasedOnStickyAttributes,
-
-//       clusterByCollections: heatmapStore.getActiveDataTable.clusterByCollections,
-
-//       clusterSize: heatmapStore.getActiveDataTable.clusterSize,
-//       dimReductionAlgo: heatmapStore.getActiveDataTable.dimReductionAlgo,
-//       clusterAfterDimRed: heatmapStore.getActiveDataTable.clusterAfterDimRed,
-
-//       scaling: heatmapStore.getActiveDataTable.scaling,
-
-//       coloringHeatmap: heatmapStore.getActiveDataTable.coloringHeatmap,
-//     }
-//   }
-// }
-
-// watch(
-//   () => heatmapStore.getActiveDataTable,
-//   () => {
-//     copyDataTableState()
-//   },
-// )
 
 async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
   const response = await fetch(fileName)

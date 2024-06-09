@@ -3,7 +3,7 @@ import time
 from typing import List, Tuple, Union
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
 from sklearn.exceptions import ConvergenceWarning
 from helpers import drop_columns
 from heatmap_types import ItemNameAndData
@@ -148,8 +148,8 @@ def cluster_items_recursively(
         return new_item_names_and_data_to_return
 
     else:
-        kmeans = KMeans(n_clusters=cluster_size, random_state=9283, n_init=5)
-        labels = kmeans.fit_predict(scaled_df)
+        hierarchical = AgglomerativeClustering(n_clusters=cluster_size, linkage="ward")
+        labels = hierarchical.fit_predict(scaled_df)
 
         new_clustered_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
 

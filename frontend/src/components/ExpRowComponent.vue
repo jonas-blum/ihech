@@ -54,10 +54,7 @@ const rightClickButton = (e: MouseEvent) => {
 function applyMultipleColors(colors: string[]) {
   if (!rowTextElement.value) return
   const text = rowTextElement.value.innerText
-  let coloredText = `<span  style="color: ${colors[0]}; max-width:${Math.max(
-    15,
-    props.rowLabelsWidth - props.depth * 30,
-  )}px; overflow: hidden; text-overflow: ellipsis;">${text}</span>`
+  let coloredText = `<span  style="color: ${colors[0]}">${text}</span>`
 
   if (colors.length > 1) {
     coloredText += `<span style="display: flex;gap: 2px; margin-left:5px">`
@@ -215,6 +212,9 @@ onUpdated(() => {
               fontWeight: isRowHighlighted ? 900 : 'normal',
               height: props.cellHeight - props.gapHeight + 'px',
               fontSize: props.cellHeight * 0.9 - props.gapHeight + 'px',
+              width: props.rowLabelsWidth - props.depth * 30 + 'px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
             }"
             class="text-div"
           >

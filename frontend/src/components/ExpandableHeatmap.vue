@@ -752,6 +752,7 @@ onMounted(async () => {
               :style="{
                 display: 'flex',
                 flexDirection: 'column',
+                zIndex: 99,
               }"
               :key="index"
               v-for="(row, index) in heatmapStore.getHeatmap.itemNamesAndData"

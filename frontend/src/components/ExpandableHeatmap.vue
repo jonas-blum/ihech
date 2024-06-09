@@ -743,6 +743,7 @@ onMounted(async () => {
               paddingRight: SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
 
               backgroundColor: 'white',
+              zIndex: 5000,
             }"
           >
             <div
@@ -783,7 +784,7 @@ onMounted(async () => {
               position: 'sticky',
               top: '0px',
               left: '0px',
-              zIndex: 100,
+              zIndex: 5000,
 
               paddingLeft: BORDER_WIDTH + 'px',
               paddingRight: BORDER_WIDTH + 'px',

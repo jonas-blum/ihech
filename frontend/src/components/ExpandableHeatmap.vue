@@ -152,7 +152,7 @@ function updateEntireVisibleHeatmapHeight() {
     SPACE_BETWEEN_COL_LABELS_AND_HEATMAP +
     30
 
-  entireVisibleHeatmapHeight.value = Math.min(scrollableHeight, nonScrollableHeight)
+  entireVisibleHeatmapHeight.value = scrollableHeight
 }
 
 function updateHeatmapHeight() {

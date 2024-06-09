@@ -867,6 +867,7 @@ onMounted(async () => {
               height: heatmapHeight + 2 * BORDER_WIDTH + 'px',
               width: heatmapWidth + 2 * BORDER_WIDTH + 'px',
               border: BORDER_WIDTH + 'px solid black',
+              zIndex: 100,
             }"
             :width="heatmapWidth"
             :height="heatmapHeight"

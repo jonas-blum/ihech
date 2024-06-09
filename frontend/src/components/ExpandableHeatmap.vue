@@ -29,6 +29,8 @@ const SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP = 10
 const MIN_CELL_HEIGHT = 17
 const GAP_HEIGHT = 2
 
+const HEATMAP_BORDER_BOTTOM_RIGHT = 15
+
 const MIN_DIM_REDUCTION_WIDTH = 250
 
 const MIN_COL_LABELS_WIDTH = 15
@@ -63,7 +65,7 @@ const heatmapWidth = ref<number>(0)
 const entireVisibleHeatmapWidth = ref<number>(0)
 const cellWidth = ref<number>(0)
 const heatmapHeight = ref<number>(0)
-const entireVisibleHeatmapHeight = ref<number>(window.innerHeight - 20)
+const entireVisibleHeatmapHeight = ref<number>(0)
 const cellHeight = ref<number>(0)
 
 const editionNames = ref<string[]>([])
@@ -135,7 +137,7 @@ function updateEntireVisibleHeatmapWidth() {
     STICKY_GAP +
     ROW_LABELS_WIDTH +
     SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP +
-    30
+    2 * HEATMAP_BORDER_BOTTOM_RIGHT
 
   entireVisibleHeatmapWidth.value = Math.min(scrollableWidth, nonScrollableWidth)
 }
@@ -144,15 +146,17 @@ function updateEntireVisibleHeatmapHeight() {
   const scrollableHeight =
     window.innerHeight - MARGIN_TOP - MARGIN_BOTTOM - CSV_UPLOAD_COLLAPSED_HEIGHT - GAP_CSV_HEATMAP
 
-  const nonScrollableHeight =
+  let nonScrollableHeight =
     heatmapHeight.value +
     2 * BORDER_WIDTH +
     stickyItemsGap.value +
     COL_LABELS_HEIGHT +
     SPACE_BETWEEN_COL_LABELS_AND_HEATMAP +
-    30
+    2 * HEATMAP_BORDER_BOTTOM_RIGHT
 
-  entireVisibleHeatmapHeight.value = scrollableHeight
+  nonScrollableHeight = Math.max(nonScrollableHeight, 450)
+
+  entireVisibleHeatmapHeight.value = Math.min(scrollableHeight, nonScrollableHeight)
 }
 
 function updateHeatmapHeight() {
@@ -561,6 +565,7 @@ onMounted(async () => {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: '20px',
+          marginBottom: GAP_SETTINGS_HEATMAP + 'px',
         }"
       >
         <HeatmapSettings />
@@ -577,7 +582,6 @@ onMounted(async () => {
           :style="{
             width: dimReductionWidth + 'px',
             backgroundColor: 'white',
-            marginTop: '30px',
           }"
         >
           <div
@@ -632,7 +636,6 @@ onMounted(async () => {
 
         <div
           :style="{
-            marginTop: GAP_SETTINGS_HEATMAP + 'px',
             overflow: 'auto',
             position: 'relative',
             display: heatmapStore.heatmap.itemNamesAndData.length !== 0 ? 'grid' : 'none',
@@ -641,6 +644,8 @@ onMounted(async () => {
             gridTemplateRows: COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px auto',
             width: entireVisibleHeatmapWidth + 'px',
             height: entireVisibleHeatmapHeight + 'px',
+            paddingBottom: HEATMAP_BORDER_BOTTOM_RIGHT + 'px',
+            paddingRight: HEATMAP_BORDER_BOTTOM_RIGHT + 'px',
           }"
         >
           <div
@@ -713,7 +718,7 @@ onMounted(async () => {
               flexDirection: 'column',
               gap: GAP_HEIGHT + 'px',
 
-              height: heatmapHeight + 2 * BORDER_WIDTH + 'px',
+              height: heatmapHeight + 2 * BORDER_WIDTH + 1 + 'px',
               width: ROW_LABELS_WIDTH + SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px',
 
               paddingTop: BORDER_WIDTH + 'px',

@@ -195,19 +195,24 @@ def create_heatmap(
     logger.info("Starting dim reduction...")
     start = time.perf_counter()
 
-    if settings.dimReductionAlgo == "UMAP":
-        dim_reduction = UMAP(n_components=2, random_state=42)
-    elif settings.dimReductionAlgo == "TSNE":
-        dim_reduction = TSNE(n_components=2, random_state=42)
-    elif settings.dimReductionAlgo == "PCA":
-        dim_reduction = PCA(n_components=2, random_state=42)
-    else:
-        raise ValueError("Invalid dim reduction algorithm")
-
     if scaled_filtered_df.shape[1] == 1:
         scaled_filtered_df["null_col"] = 1
 
-    dim_red_df = dim_reduction.fit_transform(scaled_filtered_df)
+    if settings.dimReductionAlgo == "UMAP":
+        dim_reduction = UMAP(n_components=2, random_state=42)
+        dim_red_df = dim_reduction.fit_transform(scaled_filtered_df)
+    elif settings.dimReductionAlgo == "TSNE":
+        dim_reduction = TSNE(n_components=2, random_state=42)
+        dim_red_df = dim_reduction.fit_transform(scaled_filtered_df)
+    elif settings.dimReductionAlgo == "PCA":
+        dim_reduction = PCA(n_components=2, random_state=42)
+        dim_red_df = dim_reduction.fit_transform(scaled_filtered_df)
+        explained_variance = dim_reduction.explained_variance_ratio_
+        logger.info(f"Explained variance by component: {explained_variance}")
+        logger.info(f"Total variance explained: {sum(explained_variance) * 100:.2f}%")
+    else:
+        raise ValueError("Invalid dim reduction algorithm")
+
     dim_red_df = pd.DataFrame(dim_red_df, index=original_filtered_df.index)
 
     original_filtered_df_dropped = drop_columns(

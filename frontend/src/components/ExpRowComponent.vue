@@ -57,7 +57,7 @@ function applyMultipleColors(colors: string[]) {
   let coloredText = `<span  style="color: ${colors[0]}; max-width:${Math.max(
     15,
     props.rowLabelsWidth - props.depth * 30,
-  )}px">${text}</span>`
+  )}px; overflow: hidden; text-overflow: ellipsis;">${text}</span>`
 
   if (colors.length > 1) {
     coloredText += `<span style="display: flex;gap: 2px; margin-left:5px">`
@@ -178,7 +178,7 @@ onUpdated(() => {
             display: 'flex',
             alignItems: 'center',
             height: props.cellHeight - props.gapHeight + 'px',
-            maxWidth: '110px',
+            gap: '3px',
           }"
         >
           <button
@@ -190,11 +190,21 @@ onUpdated(() => {
             @click="heatmapStore.toggleStickyItem(props.row)"
             v-if="!props.row.children"
           >
-            {{
-              heatmapStore?.getActiveDataTable?.stickyItemIndexes.includes(props.row.index ?? -1)
-                ? '-'
-                : '+'
-            }}
+            <div
+              :style="{
+                width: buttonSize,
+                height: buttonSize,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }"
+            >
+              {{
+                heatmapStore?.getActiveDataTable?.stickyItemIndexes.includes(props.row.index ?? -1)
+                  ? '-'
+                  : '+'
+              }}
+            </div>
           </button>
 
           <div
@@ -296,7 +306,6 @@ onUpdated(() => {
 .text-div {
   display: flex;
   align-items: center;
-  max-width: 110px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

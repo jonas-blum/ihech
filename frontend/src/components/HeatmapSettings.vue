@@ -490,8 +490,9 @@ function getMiddleColorScaleValue() {
               </div>
               <div>Additionally the selected item will be added to the "sticky items" section</div>
             </span>
-            <a
-              ><select
+            <a>
+              <div>Search Item:</div>
+              <select
                 @change="makeItemStickyAndExpandItem(selectedItem)"
                 class="select select-bordered w-full max-w-xs"
                 v-model="selectedItem"

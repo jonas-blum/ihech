@@ -648,6 +648,64 @@ onMounted(async () => {
         >
           <div
             :style="{
+              position: 'absolute',
+              top: COL_LABELS_HEIGHT / 4 + 'px',
+              left: ROW_LABELS_WIDTH - 20 + 'px',
+              zIndex: 20000,
+            }"
+            class="self-tooltip"
+          >
+            <span class="tooltiptext-right"
+              ><div>
+                Here are the attributes of the heatmap. You can click on the + icon to make an
+                attribute of interest "sticky".
+              </div>
+              <div>
+                Once there are sticky attributes, the grouping behavior of the items can be changed
+                to be based solely on the sticky attributes. This setting can be found in "Items
+                Grouping".
+              </div>
+              <div>
+                By default, the attributes are sorted by how much they deviate across all items. The
+                sorting behavior of the attributes can be changed in the setting "Attributes".
+              </div>
+              <div>
+                The grey bars behind the attributes indicate how much the attribute deviates across
+                all items (or across all sticky items when "Sort based on Sticky Items" is selected)
+              </div>
+            </span>
+            <InformationIcon :style="{ height: '15px', width: '15px' }" />
+          </div>
+
+          <div
+            :style="{
+              position: 'absolute',
+              top: COL_LABELS_HEIGHT - 20 + 'px',
+              left: 20 + 'px',
+              zIndex: 20000,
+            }"
+            class="self-tooltip"
+          >
+            <span class="tooltiptext-right"
+              ><div>
+                Here are the items of the heatmap. You can click on the + icon to make an item of
+                interest "sticky".
+              </div>
+              <div>
+                Once there are sticky items, the sorting behavior of the attributes can be changed
+                to be based solely on the sticky items. This setting can be found in "Attributes".
+              </div>
+
+              <div>
+                The grouping of the items, and if they should be first grouped by collections, can
+                be controlled through the setting "Items Grouping".
+              </div>
+            </span>
+            <InformationIcon :style="{ height: '15px', width: '15px' }" />
+          </div>
+
+          <div
+            :style="{
               top: '0px',
               left: '0px',
               position: 'sticky',
@@ -662,51 +720,7 @@ onMounted(async () => {
               display: 'flex',
             }"
             class="grid-corner"
-          >
-            <div style="position: absolute; top: 25%; right: 5%" class="self-tooltip">
-              <span class="tooltiptext-right"
-                ><div>
-                  Here are the attributes of the heatmap. You can click on the + icon to make an
-                  attribute of interest "sticky".
-                </div>
-                <div>
-                  Once there are sticky attributes, the grouping behavior of the items can be
-                  changed to be based solely on the sticky attributes. This setting can be found in
-                  "Items Grouping".
-                </div>
-                <div>
-                  By default, the attributes are sorted by how much they deviate across all items.
-                  The sorting behavior of the attributes can be changed in the setting "Attributes".
-                </div>
-                <div>
-                  The grey bars behind the attributes indicate how much the attribute deviates
-                  across all items (or across all sticky items when "Sort based on Sticky Items" is
-                  selected)
-                </div>
-              </span>
-              <InformationIcon :style="{ height: '15px', width: '15px' }" />
-            </div>
-
-            <div style="position: absolute; bottom: 5%; left: 10%" class="self-tooltip">
-              <span class="tooltiptext-right"
-                ><div>
-                  Here are the items of the heatmap. You can click on the + icon to make an item of
-                  interest "sticky".
-                </div>
-                <div>
-                  Once there are sticky items, the sorting behavior of the attributes can be changed
-                  to be based solely on the sticky items. This setting can be found in "Attributes".
-                </div>
-
-                <div>
-                  The grouping of the items, and if they should be first grouped by collections, can
-                  be controlled through the setting "Items Grouping".
-                </div>
-              </span>
-              <InformationIcon :style="{ height: '15px', width: '15px' }" />
-            </div>
-          </div>
-
+          ></div>
           <div
             class="grid-row-labels"
             :key="'row-label-' + heatmapStore.getDataChanging"

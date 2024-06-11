@@ -197,10 +197,33 @@ def cluster_items_recursively(
             dim_red_cluster_df = dim_red_df.loc[indices]
             original_cluster_df = original_df.loc[indices]
 
-            if (
-                original_cluster_df.shape[0] <= 0
-                or original_cluster_df.shape[0] == original_df.shape[0]
-            ):
+            if original_cluster_df.shape[0] <= 0:
+                continue
+
+            if original_cluster_df.shape[0] == original_df.shape[0]:
+                new__cluster_item_names = (
+                    original_cluster_df[item_names_column_name].astype(str).tolist()
+                )
+                dimReductionsX = dim_red_cluster_df[0].tolist()
+                dimReductionsY = dim_red_cluster_df[1].tolist()
+                all_data = original_cluster_df_dropped.values.tolist()
+                scaled_df_list = scaled_cluster_df.values.tolist()
+
+                for i in range(original_cluster_df.shape[0]):
+                    new_item_name_and_data = ItemNameAndData(
+                        index=original_cluster_df.index[i],
+                        itemName=new__cluster_item_names[i],
+                        isOpen=is_open,
+                        data=all_data[i],
+                        amountOfDataPoints=1,
+                        dimReductionX=dimReductionsX[i],
+                        dimReductionY=dimReductionsY[i],
+                        children=None,
+                    )
+
+                    new_clustered_item_names_and_data.append(
+                        (new_item_name_and_data, scaled_df_list[i])
+                    )
                 continue
 
             if original_cluster_df.shape[0] == 1:

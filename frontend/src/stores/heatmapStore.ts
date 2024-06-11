@@ -307,6 +307,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         )
         this.recomputeAttributeMap()
 
+        this.openAllStickyItems()
+
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
         nextTick(() => {
@@ -770,6 +772,20 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       item.isOpen = true
       this.highlightedRow = item
       this.changeHeatmap()
+    },
+
+    openAllStickyItems() {
+      if (this.getStickyItems.length > 3) {
+        return
+      }
+      for (const item of this.getStickyItems) {
+        item.isOpen = true
+        let parent: ItemNameAndData | null = item.parent
+        while (parent !== null) {
+          parent.isOpen = true
+          parent = parent.parent
+        }
+      }
     },
   },
 })

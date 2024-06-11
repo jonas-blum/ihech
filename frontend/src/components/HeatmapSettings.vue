@@ -14,6 +14,7 @@ import { getHeatmapColor } from '@/helpers/helpers'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import SettingsIcon from '@assets/settings.svg'
 import { ref } from 'vue'
+import SingleSelect from './SingleSelect.vue'
 
 const heatmapStore = useHeatmapStore()
 
@@ -491,25 +492,11 @@ function getMiddleColorScaleValue() {
               <div>Additionally the selected item will be added to the "sticky items" section</div>
             </span>
             <a>
-              <div>Search Item:</div>
-              <select
-                @change="makeItemStickyAndExpandItem(selectedItem)"
-                class="select select-bordered w-full max-w-xs"
-                v-model="selectedItem"
-                @focus="showOptions = true"
-                @blur="showOptions = false"
-              >
-                <!-- eslint-disable vue/no-use-v-if-with-v-for -->
-                <option
-                  v-for="item in heatmapStore.getAllItems()"
-                  v-if="showOptions === true"
-                  :value="item"
-                  :key="item.index ?? 0"
-                >
-                  {{ item.itemName }}
-                </option>
-                <!-- eslint-enable vue/no-use-v-if-with-v-for -->
-              </select>
+              <SingleSelect
+                :options="heatmapStore.getAllItems()"
+                :selected="selectedItem"
+                @select="makeItemStickyAndExpandItem"
+              />
             </a>
           </div>
         </li>

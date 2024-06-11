@@ -569,7 +569,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         while (topMostParent.parent !== null && topMostParent.parent.parent !== null) {
           topMostParent = topMostParent.parent
         }
-        const index = this.getNonStickyItems[0].children.indexOf(topMostParent)
+        const childrenOfTopmostItem = this.getNonStickyItems[0]?.children
+        if (childrenOfTopmostItem === null || childrenOfTopmostItem === undefined) {
+          return ['black']
+        }
+        const index = childrenOfTopmostItem.indexOf(topMostParent)
         return [getDistinctColor(index)]
       }
 
@@ -743,7 +747,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return []
       }
       const leafNodes: ItemNameAndData[] = []
-      for (const item of this.heatmap.itemNamesAndData) {
+      for (const item of this.getNonStickyItems) {
         if (!item.children || item.children.length === 0) {
           leafNodes.push(item)
         }

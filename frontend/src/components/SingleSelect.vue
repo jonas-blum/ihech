@@ -104,7 +104,7 @@ onUnmounted(() => {
 .dropdown-list {
   position: absolute;
   width: 100%;
-  min-height: 50px;
+  min-height: 20px;
   max-height: 200px;
   overflow-y: auto;
   background: white;

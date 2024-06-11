@@ -27,7 +27,7 @@ const isRowHighlighted = ref(false)
 
 const rowTextElement = ref<HTMLElement | null>(null)
 
-const buttonSize = computed(() => props.cellHeight - props.gapHeight + 'px')
+const buttonSize = computed(() => props.cellHeight - props.gapHeight)
 
 const isTooltipVisible = ref(false)
 
@@ -51,12 +51,24 @@ const rightClickButton = (e: MouseEvent) => {
   toggleOpen()
 }
 
+const marginLeft = computed(() => {
+  return 0.7 * buttonSize.value
+})
+
+const remainingWidth = computed(() => {
+  return Math.max(props.rowLabelsWidth - props.depth * marginLeft.value, 20)
+})
+
+const remainingTextWidth = computed(() => {
+  return remainingWidth.value - buttonSize.value - 3
+})
+
 function applyMultipleColors(colors: string[]) {
   if (!rowTextElement.value) return
   const text = rowTextElement.value.innerText
-  let coloredText = `<span  style="color: ${colors[0]}">${text}</span>`
+  let coloredText = `<span style="color: ${colors[0]};text-overflow:ellipsis;overflow: hidden;max-width: ${remainingTextWidth.value}px">${text}</span>`
 
-  if (colors.length > 1) {
+  if (colors.length > 1 && props.depth > 1) {
     coloredText += `<span style="display: flex;gap: 2px; margin-left:5px">`
     for (let i = 0; i < colors.length; i++) {
       coloredText += `<span style="background-color: ${colors[i]}; width: ${
@@ -135,9 +147,13 @@ onUpdated(() => {
     class="children-container"
     :style="{
       gap: props.gapHeight + 'px',
-      marginLeft: buttonSize,
+      marginLeft: marginLeft + 'px',
       marginTop: marginTop + 'px',
       backgroundColor: 'white',
+      width: remainingWidth + 'px',
+      textOverflow: 'ellipsis',
+      overflow: 'hidden',
+      whiteSpace: 'nowrap',
     }"
   >
     <div
@@ -151,8 +167,9 @@ onUpdated(() => {
       <div class="row-div">
         <button
           :style="{
-            height: buttonSize,
-            width: buttonSize,
+            height: buttonSize + 'px',
+            width: buttonSize + 'px',
+            gap: 3 + 'px',
           }"
           v-if="props.row.children"
           @click="toggleOpen"
@@ -163,8 +180,8 @@ onUpdated(() => {
             <ChevronRight
               :style="{
                 transform: props.row.isOpen ? 'rotate(90deg)' : '',
-                height: buttonSize,
-                width: buttonSize,
+                height: buttonSize + 'px',
+                width: buttonSize + 'px',
               }"
             />
           </div>
@@ -175,13 +192,12 @@ onUpdated(() => {
             display: 'flex',
             alignItems: 'center',
             height: props.cellHeight - props.gapHeight + 'px',
-            gap: '3px',
           }"
         >
           <button
             :style="{
-              width: buttonSize,
-              height: buttonSize,
+              width: buttonSize + 'px',
+              height: buttonSize + 'px',
             }"
             class="sticky-button"
             @click="heatmapStore.toggleStickyItem(props.row)"
@@ -189,8 +205,8 @@ onUpdated(() => {
           >
             <div
               :style="{
-                width: buttonSize,
-                height: buttonSize,
+                width: buttonSize + 'px',
+                height: buttonSize + 'px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -212,9 +228,6 @@ onUpdated(() => {
               fontWeight: isRowHighlighted ? 900 : 'normal',
               height: props.cellHeight - props.gapHeight + 'px',
               fontSize: props.cellHeight * 0.9 - props.gapHeight + 'px',
-              width: props.rowLabelsWidth - props.depth * 30 + 'px',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
             }"
             class="text-div"
           >
@@ -256,7 +269,6 @@ onUpdated(() => {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 3px;
 }
 
 .sticky-button {

@@ -472,6 +472,21 @@ function updateTooltip(e: MouseEvent) {
   }
 }
 
+function getMiddleColorScaleValue() {
+  if (heatmapStore.isColorScaleNotShown) {
+    return 0
+  }
+  if (heatmapStore.activeDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC) {
+    return (
+      Math.sqrt(
+        (heatmapStore.getHeatmapMinValue + heatmapStore.getLogShiftValue) *
+          (heatmapStore.getHeatmapMaxValue + heatmapStore.getLogShiftValue),
+      ) - heatmapStore.getLogShiftValue
+    )
+  }
+  return (heatmapStore.getHeatmapMinValue + heatmapStore.getHeatmapMaxValue) / 2
+}
+
 watch(
   () => heatmapStore.getDataChanging,
   () => {
@@ -664,6 +679,37 @@ onMounted(async () => {
             class="grid-corner"
           >
             <div
+              v-if="!heatmapStore.isColorScaleNotShown"
+              id="color-scale-container"
+              :style="{ marginBottom: cellWidth + 'px' }"
+            >
+              <div class="color-scale-labels">
+                <span class="min-label">{{
+                  parseFloat(heatmapStore.getHeatmapMinValue.toFixed(3))
+                }}</span>
+                <span class="middle-label">{{
+                  parseFloat(getMiddleColorScaleValue().toFixed(3))
+                }}</span>
+                <span class="max-label">{{
+                  parseFloat(heatmapStore.getHeatmapMaxValue.toFixed(3))
+                }}</span>
+              </div>
+              <div
+                :style="{
+                  background:
+                    'linear-gradient(to right, ' +
+                    getHeatmapColor(0, 0, 1) +
+                    ', ' +
+                    getHeatmapColor(1, 0, 1) +
+                    ')',
+                }"
+                class="color-scale"
+              >
+                <div class="middle-marker"></div>
+              </div>
+            </div>
+
+            <!-- <div
               :style="{
                 position: 'absolute',
                 top: COL_LABELS_HEIGHT / 4 + 'px',
@@ -720,7 +766,7 @@ onMounted(async () => {
                 </div>
               </span>
               <InformationIcon :style="{ height: '15px', width: '15px' }" />
-            </div>
+            </div> -->
           </div>
           <div
             class="grid-row-labels"
@@ -987,5 +1033,70 @@ onMounted(async () => {
 .sticky-col-button:hover {
   background-color: grey;
   outline: none;
+}
+
+#color-scale-container {
+  width: 100%;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: auto;
+
+  position: relative;
+  padding-left: 1px;
+  padding-right: 1px;
+}
+
+.color-scale {
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(to right, #f00, #ff0, #0f0);
+  margin-top: 10px;
+}
+
+.color-scale:before,
+.color-scale:after,
+.color-scale .middle-marker {
+  content: '';
+  position: absolute;
+  top: 19px;
+  width: 4px;
+  height: 15px;
+  background-color: #000;
+}
+
+.color-scale:before {
+  left: 1px;
+}
+
+.color-scale:after {
+  right: 1px;
+}
+
+.color-scale .middle-marker {
+  left: 50%;
+}
+
+.color-scale-labels {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+
+  margin-bottom: 2px;
+}
+
+.color-scale-labels span {
+  position: relative;
+  font-size: 15px;
+  font-weight: bold;
+  width: 60px;
+  text-align: center;
+}
+
+.color-scale-labels span:first-child {
+  text-align: start;
+}
+
+.color-scale-labels span:last-child {
+  text-align: end;
 }
 </style>

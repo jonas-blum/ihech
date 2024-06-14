@@ -107,21 +107,6 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
   }
   heatmapStore.expandItemAndAllParents(item)
 }
-
-function getMiddleColorScaleValue() {
-  if (heatmapStore.isColorScaleNotShown) {
-    return 0
-  }
-  if (heatmapStore.activeDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC) {
-    return (
-      Math.sqrt(
-        (heatmapStore.getHeatmapMinValue + heatmapStore.getLogShiftValue) *
-          (heatmapStore.getHeatmapMaxValue + heatmapStore.getLogShiftValue),
-      ) - heatmapStore.getLogShiftValue
-    )
-  }
-  return (heatmapStore.getHeatmapMinValue + heatmapStore.getHeatmapMaxValue) / 2
-}
 </script>
 
 <template>
@@ -139,27 +124,6 @@ function getMiddleColorScaleValue() {
       </div>
 
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-70">
-        <li>
-          <div class="self-tooltip">
-            <span class="tooltiptext-right">
-              <div>
-                Determines if only the selected "sticky items" should be shown in the dimensionality
-                reduction visual (needs at least 3 "sticky items" selected)
-              </div>
-            </span>
-            <a>
-              <div class="toggle-container">
-                <p>Only sticky items?</p>
-                <input
-                  @click="updateOnlyDimReductionBasedOnStickyItems($event)"
-                  type="checkbox"
-                  class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
-                />
-              </div>
-            </a>
-          </div>
-        </li>
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right">
@@ -190,6 +154,28 @@ function getMiddleColorScaleValue() {
             </a>
           </div>
         </li>
+
+        <li>
+          <div class="self-tooltip">
+            <span class="tooltiptext-right">
+              <div>
+                Determines if only the selected "sticky items" should be shown in the dimensionality
+                reduction visual (needs at least 3 "sticky items" selected)
+              </div>
+            </span>
+            <a>
+              <div class="toggle-container">
+                <p>Only sticky items?</p>
+                <input
+                  @click="updateOnlyDimReductionBasedOnStickyItems($event)"
+                  type="checkbox"
+                  class="toggle"
+                  :checked="heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
+                />
+              </div>
+            </a>
+          </div>
+        </li>
       </ul>
     </div>
 
@@ -206,7 +192,7 @@ function getMiddleColorScaleValue() {
         </div>
       </div>
 
-      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+      <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-62">
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right">
@@ -288,32 +274,6 @@ function getMiddleColorScaleValue() {
             </a>
           </div>
         </li>
-        <li>
-          <div class="self-tooltip">
-            <span class="tooltiptext-right">
-              <div>
-                Determines if the items should be grouped based on only the selected "sticky
-                attributes"
-              </div>
-              <div>
-                Enable this if you are only interested in comparing the items based on the selected
-                "sticky attributes"
-              </div>
-              <div>Disable this if you want to compare the items based on all attributes</div>
-            </span>
-            <a>
-              <div class="toggle-container">
-                <p>Based on sticky Attributes?</p>
-                <input
-                  @click="updateClusterBasedOnStickyAttributes($event)"
-                  type="checkbox"
-                  class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
-                />
-              </div>
-            </a>
-          </div>
-        </li>
 
         <li>
           <div class="self-tooltip">
@@ -351,17 +311,46 @@ function getMiddleColorScaleValue() {
             </a>
           </div>
         </li>
+
+        <li>
+          <div class="self-tooltip">
+            <span class="tooltiptext-right">
+              <div>
+                Determines if the items should be grouped based on only the selected "sticky
+                attributes"
+              </div>
+              <div>
+                Enable this if you are only interested in comparing the items based on the selected
+                "sticky attributes"
+              </div>
+              <div>Disable this if you want to compare the items based on all attributes</div>
+            </span>
+            <a>
+              <div class="toggle-container">
+                <p>Based on sticky Attributes?</p>
+                <input
+                  @click="updateClusterBasedOnStickyAttributes($event)"
+                  type="checkbox"
+                  class="toggle"
+                  :checked="heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
+                />
+              </div>
+            </a>
+          </div>
+        </li>
       </ul>
     </div>
 
     <div style="z-index: 99999997" class="dropdown dropdown-bottom">
       <div class="self-tooltip">
         <span class="tooltiptext-right">
-          <div>Here are the settings on how the attributes (columns) of the heatmap are sorted</div>
+          <div>
+            Here are the settings on how the attributes (columns) of the heatmap are ordered
+          </div>
         </span>
         <div tabindex="0" role="button" class="btn m-1">
           <SettingsIcon style="height: 20px; width: 20px" />
-          <p>Attributes</p>
+          <p>Attributes Ordering</p>
         </div>
       </div>
 
@@ -369,7 +358,7 @@ function getMiddleColorScaleValue() {
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right"
-              ><div>Determines the order in which the attributes should be sorted</div>
+              ><div>Determines the order in which the attributes should be ordered</div>
               <div>
                 <strong>Standard Deviation:</strong> The attribute which has the highest standard
                 deviation across all items is in the first position
@@ -379,7 +368,7 @@ function getMiddleColorScaleValue() {
                 all items is in the first position
               </div>
               <div><strong>Descending:</strong> The reversed version of "Ascending"</div>
-              <div><strong>Alphabetical:</strong> The attributes are sorted alphabetically</div>
+              <div><strong>Alphabetical:</strong> The attributes are ordered alphabetically</div>
             </span>
             <a class="toggle-container">
               <div>Order:</div>
@@ -417,7 +406,7 @@ function getMiddleColorScaleValue() {
             </span>
             <a>
               <div class="toggle-container">
-                <p>Sort based on sticky items?</p>
+                <p>Order based on sticky items?</p>
                 <input
                   @click="updateSortAttributesBasedOnStickyItems"
                   type="checkbox"
@@ -503,30 +492,8 @@ function getMiddleColorScaleValue() {
       </ul>
     </div>
 
-    <div v-if="!heatmapStore.isColorScaleNotShown" id="color-scale-container">
-      <div class="color-scale-labels">
-        <span class="min-label">{{ parseFloat(heatmapStore.getHeatmapMinValue.toFixed(3)) }}</span>
-        <span class="middle-label">{{ parseFloat(getMiddleColorScaleValue().toFixed(3)) }}</span>
-        <span class="max-label">{{ parseFloat(heatmapStore.getHeatmapMaxValue.toFixed(3)) }}</span>
-      </div>
-      <div
-        :style="{
-          background:
-            'linear-gradient(to right, ' +
-            getHeatmapColor(0, 0, 1) +
-            ', ' +
-            getHeatmapColor(1, 0, 1) +
-            ')',
-        }"
-        class="color-scale"
-      >
-        <div class="middle-marker"></div>
-      </div>
-    </div>
-
     <button
       @click="reloadHeatmap()"
-      :style="{ marginLeft: '30px' }"
       :class="{
         btn: true,
         'btn-success': !heatmapStore.isOutOfSync,
@@ -598,6 +565,7 @@ function getMiddleColorScaleValue() {
 
 .settings-container {
   display: flex;
+  align-items: center;
   gap: 10px;
 
   li:not(:last-child) {
@@ -638,66 +606,5 @@ function getMiddleColorScaleValue() {
 
 .toggle-container-bold {
   font-weight: bold;
-}
-
-#color-scale-container {
-  width: 180px;
-  position: relative;
-  padding-left: 1px;
-  padding-right: 1px;
-}
-
-.color-scale {
-  width: 100%;
-  height: 20px;
-  background: linear-gradient(to right, #f00, #ff0, #0f0);
-  margin-top: 10px;
-}
-
-.color-scale:before,
-.color-scale:after,
-.color-scale .middle-marker {
-  content: '';
-  position: absolute;
-  top: 19px;
-  width: 4px;
-  height: 15px;
-  background-color: #000;
-}
-
-.color-scale:before {
-  left: 1px;
-}
-
-.color-scale:after {
-  right: 1px;
-}
-
-.color-scale .middle-marker {
-  left: 50%;
-}
-
-.color-scale-labels {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-
-  margin-bottom: 2px;
-}
-
-.color-scale-labels span {
-  position: relative;
-  font-size: 15px;
-  font-weight: bold;
-  width: 60px;
-  text-align: center;
-}
-
-.color-scale-labels span:first-child {
-  text-align: start;
-}
-
-.color-scale-labels span:last-child {
-  text-align: end;
 }
 </style>

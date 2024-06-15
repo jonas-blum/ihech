@@ -126,7 +126,7 @@ function drawScatterplot() {
     return
   }
 
-  var margin = { top: 15, right: 15, bottom: 15, left: 15 },
+  var margin = { top: 30, right: 30, bottom: 30, left: 30 },
     width = props.width - margin.left - margin.right,
     height = props.width - margin.top - margin.bottom
 

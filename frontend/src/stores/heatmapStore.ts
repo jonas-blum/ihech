@@ -241,7 +241,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.loading = true
         const startTime = new Date().getTime()
         const settings: HeatmapSettings = this.getCurrentHeatmapSettings()
-        console.log('settings', settings)
 
         const requestInit: RequestInit = {
           method: 'POST',
@@ -249,7 +248,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           body: JSON.stringify({ settings }),
         }
 
-        console.log(import.meta.env.VITE_API_URL)
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, requestInit)
         if (!response.body) {
           console.error('Error during fetching heatmap', response)
@@ -281,8 +279,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         const newResponse = new Response(stream)
         const receivedHeatmap = await newResponse.json()
-
-        console.log('receivedHeatmap', receivedHeatmap)
 
         if (!receivedHeatmap) {
           console.error('No heatmap data received.')

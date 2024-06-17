@@ -382,13 +382,14 @@ onMounted(async () => {
                   'btn-active': heatmapStore.getActiveDataTable?.tableName === dataTable.tableName,
                 }"
                 @click.stop="selectDataTable(dataTable)"
+                :style="{ width: '220px' }"
               >
                 <div
                   :style="{
                     overflow: 'hidden',
                     textAlign: 'left',
                     textOverflow: 'ellipsis',
-                    width: '200px',
+                    width: '100%',
                   }"
                 >
                   {{ dataTable.tableName }}

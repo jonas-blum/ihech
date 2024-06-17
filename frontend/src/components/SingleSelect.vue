@@ -80,7 +80,11 @@ onUnmounted(() => {
       class="dropdown-input"
     />
     <ul v-if="dropdownOpen" class="dropdown-list">
-      <li v-for="(option, key) in filteredOptions" :key="key" @click="selectOption(option)">
+      <li
+        v-for="(option, key) in filteredOptions.slice(0, 5000)"
+        :key="key"
+        @click="selectOption(option)"
+      >
         {{ option.itemName }}
       </li>
     </ul>

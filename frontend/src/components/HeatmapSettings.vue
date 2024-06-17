@@ -482,7 +482,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
             </span>
             <a>
               <SingleSelect
-                :options="heatmapStore.getAllItems()"
+                :options="heatmapStore.getAllItems"
                 :selected="selectedItem"
                 @select="makeItemStickyAndExpandItem"
               />

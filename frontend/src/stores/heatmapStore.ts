@@ -23,6 +23,10 @@ export interface HeatmapStoreState {
   //From the "newIdx" -> original Index (of the heatmap.attributeNames)
   attributeMap: Map<number, number>
 
+  rowCollectionsMap: Map<ItemNameAndData, Set<string>>
+
+  allItems: ItemNameAndData[]
+
   dataChanging: number
   loading: boolean
   timer: number
@@ -54,6 +58,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     highlightedRow: null,
 
     attributeMap: new Map(),
+
+    rowCollectionsMap: new Map(),
+
+    allItems: [],
 
     dataChanging: 1,
     loading: false,
@@ -113,6 +121,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       return state.heatmap.itemNamesAndData.slice(state.activeDataTable.stickyItemIndexes.length)
     },
+
+    getAllItems: (state) => state.allItems,
 
     getLogShiftValue: (state) => state.heatmap.minHeatmapValue + 1,
 
@@ -308,6 +318,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.recomputeAttributeMap()
 
         this.openAllStickyItems()
+        this.buildRowCollectionsMap()
+        this.setAllItems()
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
@@ -443,30 +455,37 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       console.log('changing heatmap', this.dataChanging)
     },
 
-    getCollectionNamesOfItemRecursively(item: ItemNameAndData): string[] {
-      if (!this.activeDataTable) {
-        return []
+    buildRowCollectionsMapRecursively(item: ItemNameAndData): Set<string> {
+      let collectionOfItem = undefined
+      if (item.index !== null) {
+        collectionOfItem = this.activeDataTable?.itemCollectionMap[item.index]
       }
-      if (item.children === null) {
-        if (item.index !== null) {
-          return [this.activeDataTable.itemCollectionMap[item.index]]
+      const allCollections = new Set<string>()
+      if (collectionOfItem !== undefined) {
+        allCollections.add(collectionOfItem)
+      }
+      if (item.children) {
+        for (const child of item.children) {
+          this.buildRowCollectionsMapRecursively(child).forEach((collection) => {
+            allCollections.add(collection)
+          })
         }
-        return []
       }
-      const collections = []
-      for (const child of item.children) {
-        collections.push(...this.getCollectionNamesOfItemRecursively(child))
+      this.rowCollectionsMap.set(item, allCollections)
+      return allCollections
+    },
+    buildRowCollectionsMap(): void {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
       }
-      return collections
+      this.heatmap.itemNamesAndData.forEach((item) => {
+        this.buildRowCollectionsMapRecursively(item)
+      })
     },
 
     getCollectionNamesOfItem(item: ItemNameAndData): string[] {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return []
-      }
-      const collectionColumnNames = this.getCollectionNamesOfItemRecursively(item)
-      return [...new Set(collectionColumnNames)]
+      return Array.from(this.rowCollectionsMap.get(item) ?? [])
     },
     updateSelectedItemIndexesBasedOnSelectedCollections(): void {
       if (!this.activeDataTable) {
@@ -744,9 +763,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return leafNodes
     },
 
-    getAllItems(): ItemNameAndData[] {
+    setAllItems(): void {
       if (!this.heatmap) {
-        return []
+        return
       }
       const leafNodes: ItemNameAndData[] = []
       for (const item of this.getNonStickyItems) {
@@ -757,7 +776,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           leafNodes.push(...this.getAllChildrenRecursively(item))
         }
       }
-      return leafNodes.sort((a, b) => a.itemName.localeCompare(b.itemName))
+      leafNodes.sort((a, b) => a.itemName.localeCompare(b.itemName))
+      this.allItems = leafNodes
     },
 
     expandItemAndAllParents(item: ItemNameAndData | null) {

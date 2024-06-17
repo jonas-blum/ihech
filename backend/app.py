@@ -8,10 +8,12 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from io import StringIO
 import logging
+from flask_compress import Compress
 
 
 app = Flask(__name__)
 CORS(app)
+Compress(app)
 
 logger = logging.getLogger("IHECH Logger")
 logger.setLevel(logging.DEBUG)
@@ -80,19 +82,13 @@ def get_heatmap():
         )
         logger.info("Starting Filtering...")
 
-        return_string = create_heatmap(original_df, heatmap_settings)
-
-        logger.info(f"Starting compression...")
-        start_compression = time.perf_counter()
-        compressed_json = compress_json(return_string)
-        logger.info(
-            f"Compressing Done: {round(time.perf_counter() - start_compression,3 )}\n"
-        )
-
+        return_json = create_heatmap(original_df, heatmap_settings)
+        
         logger.info(
             f"Time to generate entire heatmap: {round(time.perf_counter() - start,3 )}\n"
         )
-        return compressed_json
+        
+        return return_json
     except Exception as e:
 
         logger.error(f"Error: {traceback.format_exc()}")

@@ -8,7 +8,7 @@ warnings.filterwarnings(
 )
 
 import logging
-from typing import Tuple
+from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
@@ -143,7 +143,7 @@ def do_scaling(
 def create_heatmap(
     original_df: pd.DataFrame,
     settings: HeatmapSettings,
-) -> str:
+) -> Dict[str, any]:
     start = time.perf_counter()
 
     settings.stickyAttributes = [
@@ -312,8 +312,8 @@ def create_heatmap(
     logger.info("Starting to generate json...")
     start = time.perf_counter()
 
-    heatmap_json_str = heatmap_json.generate_json()
+    heatmap_json = heatmap_json.generate_json()
 
     logger.info(f"Generating JSON Done: {round(time.perf_counter() - start, 3)}")
 
-    return heatmap_json_str
+    return heatmap_json

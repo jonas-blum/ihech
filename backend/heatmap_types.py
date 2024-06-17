@@ -99,7 +99,7 @@ class ItemNameAndData:
 
 
 def custom_encoder(obj):
-    if isinstance(obj, np.float32):  # type: ignore
+    if isinstance(obj, np.float32):
         return float(obj)
     elif isinstance(obj, np.integer):
         return int(obj)

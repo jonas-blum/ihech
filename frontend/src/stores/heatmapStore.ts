@@ -231,16 +231,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.reloadingScheduled = true
         return
       }
-      function concatenateUint8Arrays(chunks: any[]) {
-        const totalLength = chunks.reduce((acc, value) => acc + value.length, 0)
-        const result = new Uint8Array(totalLength)
-        let length = 0
-        for (const array of chunks) {
-          result.set(array, length)
-          length += array.length
-        }
-        return result
-      }
+
       try {
         if (!this.activeDataTable) {
           console.error('No active data table')
@@ -261,22 +252,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         console.log(import.meta.env.VITE_API_URL)
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, requestInit)
 
-        const blob = await response.blob()
-        const ds = new DecompressionStream('gzip')
-        const decompressedStream = blob.stream().pipeThrough(ds)
-        const reader = decompressedStream.getReader()
-
-        let receivedHeatmap: HeatmapJSON | null = null
-        const chunks = []
-        let result
-        while (!(result = await reader.read()).done) {
-          chunks.push(result.value)
-        }
-
-        const concatenatedChunks = concatenateUint8Arrays(chunks)
-        receivedHeatmap = JSON.parse(
-          JSON.parse(new TextDecoder('utf-8').decode(concatenatedChunks)),
-        )
+        const receivedHeatmap: HeatmapJSON | null = await response.json()
 
         if (!receivedHeatmap) {
           console.error('No heatmap data received.')

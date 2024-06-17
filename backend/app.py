@@ -54,7 +54,7 @@ def get_heatmap():
     try:
         isComputing = True
         logger.info("Starting to build heatmap...")
-        start = time.perf_counter()
+        start_heatmap = time.perf_counter()
 
         heatmap_settings = HeatmapSettings(request.json["settings"])
         csv_file = StringIO(heatmap_settings.csvFile)
@@ -78,13 +78,13 @@ def get_heatmap():
             heatmap_settings.itemNamesColumnName = new_item_names_column_name
 
         logger.info(
-            f"Finished reading csv file: {round(time.perf_counter() - start, 3)}"
+            f"Finished reading csv file: {round(time.perf_counter() - start_heatmap, 2)}"
         )
 
         return_json = create_heatmap(original_df, heatmap_settings)
 
         logger.info(
-            f"Time to generate entire heatmap: {round(time.perf_counter() - start,3 )}\n"
+            f"Time to generate entire heatmap: {round(time.perf_counter() - start_heatmap, 2)}\n"
         )
 
         return return_json

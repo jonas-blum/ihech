@@ -145,7 +145,7 @@ def create_heatmap(
     settings: HeatmapSettings,
 ) -> str:
     logger.info("Starting Filtering...")
-    start = time.perf_counter()
+    start_filtering = time.perf_counter()
 
     settings.stickyAttributes = [
         attr for attr in settings.stickyAttributes if attr in original_df.columns
@@ -184,7 +184,9 @@ def create_heatmap(
         else:
             logger.warning("No sticky attributes found in cleaned dataframe")
 
-    logger.info(f"Filtering and sorting done: {round(time.perf_counter() - start, 3)}")
+    logger.info(
+        f"Filtering and sorting done: {round(time.perf_counter() - start_filtering, 2)}"
+    )
     logger.info(
         "Number of attributes before filtering selected: "
         + str(len(settings.selectedAttributes))
@@ -202,7 +204,7 @@ def create_heatmap(
     )
 
     logger.info("Starting dim reduction...")
-    start = time.perf_counter()
+    start_dim_red = time.perf_counter()
 
     if scaled_filtered_df.shape[1] == 1:
         scaled_filtered_df["null_col"] = 1
@@ -286,8 +288,9 @@ def create_heatmap(
         )
         filtered_collection_column_names = []
 
-    logger.info(f"Dim reduction done: {round(time.perf_counter() - start,3 )}")
+    logger.info(f"Dim reduction done: {round(time.perf_counter() - start_dim_red, 2)}")
     logger.info("Starting clustering...")
+    start_clustering = time.perf_counter()
 
     cluster_column = pd.DataFrame(
         {"cluster": [-1] * len(original_filtered_df)}, index=original_filtered_df.index
@@ -317,12 +320,12 @@ def create_heatmap(
 
     heatmap_json.itemNamesAndData = item_names_and_data
 
-    logger.info(f"Clustering done: {round(time.perf_counter() - start, 3)}")
+    logger.info(f"Clustering done: {round(time.perf_counter() - start_clustering, 2)}")
     logger.info("Starting to generate json...")
-    start = time.perf_counter()
+    start_json = time.perf_counter()
 
     heatmap_json = heatmap_json.generate_json()
 
-    logger.info(f"Generating JSON Done: {round(time.perf_counter() - start, 3)}")
+    logger.info(f"Generating JSON Done: {round(time.perf_counter() - start_json, 2)}")
 
     return heatmap_json

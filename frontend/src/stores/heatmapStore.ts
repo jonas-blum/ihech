@@ -251,8 +251,38 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         console.log(import.meta.env.VITE_API_URL)
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/heatmap`, requestInit)
+        if (!response.body) {
+          console.error('Error during fetching heatmap', response)
+          this.setIsOutOfSync(true)
+          return
+        }
 
-        const receivedHeatmap: HeatmapJSON | null = await response.json()
+        const reader = response.body.getReader()
+        let receivedData = new Uint8Array()
+
+        const stream = new ReadableStream({
+          async start(controller) {
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) {
+                controller.close()
+                break
+              }
+              // Accumulate the chunks
+              const newData = new Uint8Array(receivedData.length + value.length)
+              newData.set(receivedData)
+              newData.set(value, receivedData.length)
+              receivedData = newData
+
+              controller.enqueue(value)
+            }
+          },
+        })
+
+        const newResponse = new Response(stream)
+        const receivedHeatmap = await newResponse.json()
+
+        console.log('receivedHeatmap', receivedHeatmap)
 
         if (!receivedHeatmap) {
           console.error('No heatmap data received.')
@@ -733,32 +763,34 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         }
       }
     },
-    getAllChildrenRecursively(item: ItemNameAndData): ItemNameAndData[] {
-      const leafNodes: ItemNameAndData[] = []
-      if (item.children && item.children.length > 0) {
-        for (const child of item.children) {
-          if (!child.children || child.children.length === 0) {
-            leafNodes.push(child)
-          }
-          leafNodes.push(...this.getAllChildrenRecursively(child))
+    getAllChildrenIteratively(items: ItemNameAndData[]): ItemNameAndData[] {
+      const allLeafNodes: ItemNameAndData[] = []
+      const stack: ItemNameAndData[] = []
+
+      items.forEach((item) => stack.push(item))
+
+      while (stack.length > 0) {
+        const currentItem = stack.pop()
+        if (!currentItem) {
+          continue
+        }
+
+        if (currentItem.children && currentItem.children.length > 0) {
+          currentItem.children.forEach((child) => stack.push(child))
+        } else {
+          allLeafNodes.push(currentItem)
         }
       }
-      return leafNodes
+
+      return allLeafNodes
     },
 
     setAllItems(): void {
       if (!this.heatmap) {
         return
       }
-      const leafNodes: ItemNameAndData[] = []
-      for (const item of this.getNonStickyItems) {
-        if (!item.children || item.children.length === 0) {
-          leafNodes.push(item)
-        }
-        if (item.children && item.children.length > 0) {
-          leafNodes.push(...this.getAllChildrenRecursively(item))
-        }
-      }
+      const leafNodes = this.getAllChildrenIteratively(this.getNonStickyItems)
+
       leafNodes.sort((a, b) => a.itemName.localeCompare(b.itemName))
       this.allItems = leafNodes
     },

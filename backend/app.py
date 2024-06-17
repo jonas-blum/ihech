@@ -1,10 +1,11 @@
+import json
 import time
 import traceback
 import pandas as pd
 from helpers import compress_json
 from heatmap import create_heatmap
-from heatmap_types import HeatmapSettings
-from flask import Flask, request, jsonify
+from heatmap_types import HeatmapSettings, custom_encoder
+from flask import Flask, request, jsonify, Response, stream_with_context
 from flask_cors import CORS
 from io import StringIO
 import logging
@@ -81,13 +82,29 @@ def get_heatmap():
             f"Finished reading csv file: {round(time.perf_counter() - start_heatmap, 2)}"
         )
 
-        return_json = create_heatmap(original_df, heatmap_settings)
+        heatmap_json = create_heatmap(original_df, heatmap_settings)
+
+        logger.info("Starting to generate json...")
+        start_json = time.perf_counter()
+
+        def generate():
+            chunk_counter = 0
+            for chunk in json.JSONEncoder(default=custom_encoder).iterencode(
+                heatmap_json
+            ):
+                chunk_counter += 1
+                yield chunk
+            print(f"Total chunks sent: {chunk_counter}")
+
+        logger.info(
+            f"Generating JSON Done: {round(time.perf_counter() - start_json, 2)}"
+        )
 
         logger.info(
             f"Time to generate entire heatmap: {round(time.perf_counter() - start_heatmap, 2)}\n"
         )
 
-        return return_json
+        return Response(stream_with_context(generate()), mimetype="application/json")
     except Exception as e:
 
         logger.error(f"Error: {traceback.format_exc()}")

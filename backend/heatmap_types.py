@@ -145,9 +145,6 @@ class HeatmapJSON:
     def add_cluster(self, cluster: ItemNameAndData):
         self.itemNamesAndData.append(cluster)
 
-    def generate_json(self):
-        return json.dumps(self, default=custom_encoder, indent=4)
-
 
 class HeatmapSettings:
     csvFile: str

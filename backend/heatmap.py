@@ -143,7 +143,7 @@ def do_scaling(
 def create_heatmap(
     original_df: pd.DataFrame,
     settings: HeatmapSettings,
-) -> str:
+) -> HeatmapJSON:
     logger.info("Starting Filtering...")
     start_filtering = time.perf_counter()
 
@@ -321,11 +321,5 @@ def create_heatmap(
     heatmap_json.itemNamesAndData = item_names_and_data
 
     logger.info(f"Clustering done: {round(time.perf_counter() - start_clustering, 2)}")
-    logger.info("Starting to generate json...")
-    start_json = time.perf_counter()
-
-    heatmap_json = heatmap_json.generate_json()
-
-    logger.info(f"Generating JSON Done: {round(time.perf_counter() - start_json, 2)}")
 
     return heatmap_json

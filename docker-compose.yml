@@ -3,7 +3,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
       - FLASK_ENV=production
 
@@ -11,8 +11,8 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: ${VITE_API_URL}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5001}
     ports:
-      - "5173:5173"
+      - "5173:80"
     environment:
       - VITE_API_URL=${VITE_API_URL}

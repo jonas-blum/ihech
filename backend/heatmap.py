@@ -143,7 +143,8 @@ def do_scaling(
 def create_heatmap(
     original_df: pd.DataFrame,
     settings: HeatmapSettings,
-) -> Dict[str, any]:
+) -> str:
+    logger.info("Starting Filtering...")
     start = time.perf_counter()
 
     settings.stickyAttributes = [
@@ -185,13 +186,21 @@ def create_heatmap(
 
     logger.info(f"Filtering and sorting done: {round(time.perf_counter() - start, 3)}")
     logger.info(
-        "Number of attributes selected: " + str(len(settings.selectedAttributes))
+        "Number of attributes before filtering selected: "
+        + str(len(settings.selectedAttributes))
     )
     logger.info(
         "Number of attributes after filtering: "
         + str(original_filtered_df.shape[1] - len(settings.collectionColumnNames) - 1)
     )
-    logger.info("Number of items: " + str(original_filtered_df.shape[0]))
+    logger.info(
+        "Number of items before filtering selected: "
+        + str(len(settings.selectedItemIndexes))
+    )
+    logger.info(
+        "Number of items after filtering: " + str(original_filtered_df.shape[0])
+    )
+
     logger.info("Starting dim reduction...")
     start = time.perf_counter()
 

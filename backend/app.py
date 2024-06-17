@@ -80,14 +80,13 @@ def get_heatmap():
         logger.info(
             f"Finished reading csv file: {round(time.perf_counter() - start, 3)}"
         )
-        logger.info("Starting Filtering...")
 
         return_json = create_heatmap(original_df, heatmap_settings)
-        
+
         logger.info(
             f"Time to generate entire heatmap: {round(time.perf_counter() - start,3 )}\n"
         )
-        
+
         return return_json
     except Exception as e:
 

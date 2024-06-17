@@ -688,6 +688,13 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       row.isOpen = true
       this.changeHeatmap()
     },
+
+    closeRow(row: ItemNameAndData) {
+      row.isOpen = false
+      this.closeChildRowsRecursively(row)
+      this.changeHeatmap()
+    },
+
     closeNearestOpenParent(targetRow: ItemNameAndData) {
       if (targetRow.isOpen) {
         targetRow.isOpen = false
@@ -705,17 +712,17 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       this.changeHeatmap()
     },
-    closeRow(row: ItemNameAndData) {
-      row.isOpen = false
-      this.closeChildRowsRecursively(row)
-      this.changeHeatmap()
-    },
+
     closeChildRowsRecursively(row: ItemNameAndData) {
       row.isOpen = false
-      row.children?.forEach((child) => {
-        this.closeChildRowsRecursively(child)
-      })
+      const areAllChildRowsClosed = row.children?.every((child) => !child.isOpen)
+      if (!areAllChildRowsClosed) {
+        row.children?.forEach((child) => {
+          this.closeChildRowsRecursively(child)
+        })
+      }
     },
+
     toggleOpenRow(row: ItemNameAndData) {
       if (row.isOpen) {
         this.closeRow(row)

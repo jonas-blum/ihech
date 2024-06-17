@@ -14,6 +14,8 @@ warnings.simplefilter("ignore", ConvergenceWarning)
 
 logger = logging.getLogger("IHECH Logger")
 
+rounding_precision = 3
+
 
 def all_rows_same(df):
     return (df == df.iloc[0]).all().all()
@@ -32,8 +34,12 @@ def cluster_items_recursively(
 ) -> Union[List[ItemNameAndData], None]:
     if level == 0:
         tag_data_0_aggregated_mean = original_df_dropped.mean()
-        tag_data_0_aggregated = tag_data_0_aggregated_mean.tolist()
-        dim_reduction_0_aggregated = dim_red_df.mean().tolist()
+        tag_data_0_aggregated = np.round(
+            tag_data_0_aggregated_mean, rounding_precision
+        ).tolist()
+        dim_reduction_0_aggregated = np.round(
+            dim_red_df.mean(), rounding_precision
+        ).tolist()
 
         new_item_name_0 = str(original_df.shape[0])
 
@@ -77,9 +83,13 @@ def cluster_items_recursively(
             original_temp_df_dropped = original_df_dropped.loc[original_group_df.index]
             original_temp_df = original_group_df.drop(collection_column_name, axis=1)
 
-            tag_data_aggregated = original_temp_df_dropped.mean().tolist()
+            tag_data_aggregated = np.round(
+                original_temp_df_dropped.mean(), rounding_precision
+            ).tolist()
 
-            dim_reduction_aggregated = dim_red_temp_df.mean().tolist()
+            dim_reduction_aggregated = np.round(
+                dim_red_temp_df.mean(), rounding_precision
+            ).tolist()
             new_item_name = str(collection) + " " + str(original_group_df.shape[0])
 
             if (
@@ -87,11 +97,10 @@ def cluster_items_recursively(
                 and len(remaining_collection_column_names) == 0
             ):
                 solo_child_name = str(original_group_df.iloc[0][item_names_column_name])
-                solo_child_data = (
-                    original_group_df.drop(collection_column_name, axis=1)
-                    .iloc[0]
-                    .tolist()
-                )
+                solo_child_data = np.round(
+                    original_group_df.drop(collection_column_name, axis=1).iloc[0],
+                    rounding_precision,
+                ).tolist()
                 new_children = [
                     ItemNameAndData(
                         index=original_group_df.index[0],
@@ -99,12 +108,14 @@ def cluster_items_recursively(
                         isOpen=is_open,
                         data=solo_child_data,
                         amountOfDataPoints=1,
-                        dimReductionX=dim_red_df.loc[original_group_df.index].iloc[0][
-                            0
-                        ],
-                        dimReductionY=dim_red_df.loc[original_group_df.index].iloc[0][
-                            1
-                        ],
+                        dimReductionX=np.round(
+                            dim_red_df.loc[original_group_df.index].iloc[0][0],
+                            rounding_precision,
+                        ),
+                        dimReductionY=np.round(
+                            dim_red_df.loc[original_group_df.index].iloc[0][1],
+                            rounding_precision,
+                        ),
                         children=None,
                     )
                 ]
@@ -153,9 +164,9 @@ def cluster_items_recursively(
 
         new_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
         new_item_names = original_df[item_names_column_name].astype(str).tolist()
-        dimReductionsX = dim_red_df[0].tolist()
-        dimReductionsY = dim_red_df[1].tolist()
-        all_data = original_df_dropped.values.tolist()
+        dimReductionsX = np.round(dim_red_df[0], rounding_precision).tolist()
+        dimReductionsY = np.round(dim_red_df[1], rounding_precision).tolist()
+        all_data = np.round(original_df_dropped.values, rounding_precision).tolist()
         scaled_df_list = scaled_df.values.tolist()
 
         for i in range(original_df.shape[0]):
@@ -210,9 +221,15 @@ def cluster_items_recursively(
                 new__cluster_item_names = (
                     original_cluster_df[item_names_column_name].astype(str).tolist()
                 )
-                dimReductionsX = dim_red_cluster_df[0].tolist()
-                dimReductionsY = dim_red_cluster_df[1].tolist()
-                all_data = original_cluster_df_dropped.values.tolist()
+                dimReductionsX = np.round(
+                    dim_red_cluster_df[0], rounding_precision
+                ).tolist()
+                dimReductionsY = np.round(
+                    dim_red_cluster_df[1], rounding_precision
+                ).tolist()
+                all_data = np.round(
+                    original_cluster_df_dropped.values, rounding_precision
+                ).tolist()
                 scaled_df_list = scaled_cluster_df.values.tolist()
 
                 for i in range(original_cluster_df.shape[0]):
@@ -237,15 +254,21 @@ def cluster_items_recursively(
                     original_cluster_df[item_names_column_name].astype(str).iat[0]
                 )
                 mean_value_scaled_df = scaled_cluster_df.mean().mean()
-                new_data = original_cluster_df_dropped.iloc[0].tolist()
+                new_data = np.round(
+                    original_cluster_df_dropped.iloc[0], rounding_precision
+                ).tolist()
                 new_item_name_and_data = ItemNameAndData(
                     index=original_cluster_df.index[0],
                     itemName=new_item_name,
                     isOpen=is_open,
                     data=new_data,
                     amountOfDataPoints=1,
-                    dimReductionX=dim_red_cluster_df.iloc[0][0],
-                    dimReductionY=dim_red_cluster_df.iloc[0][1],
+                    dimReductionX=np.round(
+                        dim_red_cluster_df.iloc[0][0], rounding_precision
+                    ),
+                    dimReductionY=np.round(
+                        dim_red_cluster_df.iloc[0][1], rounding_precision
+                    ),
                     children=None,
                 )
                 new_clustered_item_names_and_data.append(
@@ -255,9 +278,13 @@ def cluster_items_recursively(
 
             tag_data_aggregated_mean = original_cluster_df_dropped.mean()
 
-            tag_data_aggregated = tag_data_aggregated_mean.tolist()
+            tag_data_aggregated = np.round(
+                tag_data_aggregated_mean, rounding_precision
+            ).tolist()
 
-            dim_reduction_aggregated = dim_red_cluster_df.mean().tolist()
+            dim_reduction_aggregated = np.round(
+                dim_red_cluster_df.mean(), rounding_precision
+            ).tolist()
 
             mean_value_scaled_df = scaled_cluster_df.mean().mean()
 

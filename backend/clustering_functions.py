@@ -97,10 +97,7 @@ def cluster_items_recursively(
                 and len(remaining_collection_column_names) == 0
             ):
                 solo_child_name = str(original_group_df.iloc[0][item_names_column_name])
-                solo_child_data = np.round(
-                    original_group_df.drop(collection_column_name, axis=1).iloc[0],
-                    rounding_precision,
-                ).tolist()
+                solo_child_data = np.round(original_temp_df_dropped.iloc[0],rounding_precision).tolist()
                 new_children = [
                     ItemNameAndData(
                         index=original_group_df.index[0],

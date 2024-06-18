@@ -204,13 +204,16 @@ function resetCollectionColorMap(): void {
   heatmapStore.getActiveDataTable.collectionColorMap = colorMap
 }
 
-function updateHierarchyLayer(event: Event, columnName: string) {
+function handleHierarchyLayerInput(event: Event, columnName: string) {
   if (!(event.target instanceof HTMLSelectElement)) {
     console.error('Event target is not an HTMLSelectElement:', event.target)
     return
   }
   const selectedHierarchyLayer = event.target.value
+  updateHierarchyLayer(selectedHierarchyLayer, columnName)
+}
 
+function updateHierarchyLayer(selectedHierarchyLayer: string, columnName: string) {
   if (heatmapStore.getActiveDataTable === null) {
     return
   }
@@ -275,20 +278,33 @@ async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
 onMounted(async () => {
   if (heatmapStore.getAllDataTableNames.length === 0) {
     await fetchCsvFileByFileName('amount_different_attributes.csv', false)
+    updateHierarchyLayer('1', 'edition')
     await fetchCsvFileByFileName('length_of_content_inside_tag.csv', false)
+    updateHierarchyLayer('1', 'edition')
     await fetchCsvFileByFileName('tag_count.csv', false)
+    updateHierarchyLayer('1', 'edition')
     await fetchCsvFileByFileName('tag_depth.csv', false)
+    updateHierarchyLayer('1', 'edition')
     // await fetchCsvFileByFileName('frauen_stimmbeteiligung.csv', false)
     // await fetchCsvFileByFileName('stadt_zuerich_abstimmungen.csv', false)
     // await fetchCsvFileByFileName('zeitreihen_parteien.csv', true)
     await fetchCsvFileByFileName('2019_neue_fahrzeuge_absolute.csv', false)
+    updateHierarchyLayer('1', 'Kanton')
     await fetchCsvFileByFileName('2019_neue_fahrzeuge_relative.csv', false)
+    updateHierarchyLayer('1', 'Kanton')
     await fetchCsvFileByFileName('Beteiligung_in_Prozent_Volksabstimmungen.csv', false)
+    updateHierarchyLayer('1', 'Kanton')
     await fetchCsvFileByFileName('Ja_in_Prozent_Volksabstimmungen.csv', false)
+    updateHierarchyLayer('1', 'Kanton')
     await fetchCsvFileByFileName('2019_staatsangehörigkeit_absolute.csv', false)
+    updateHierarchyLayer('1', 'Kanton')
     await fetchCsvFileByFileName('2019_staatsangehörigkeit_relative.csv', false)
+    updateHierarchyLayer('1', 'Kanton')
     await fetchCsvFileByFileName('2019_altersklassen_absolute.csv', false)
-    await fetchCsvFileByFileName('2019_altersklassen_relative.csv', true)
+    updateHierarchyLayer('1', 'Kanton')
+    await fetchCsvFileByFileName('2019_altersklassen_relative.csv', false)
+    updateHierarchyLayer('1', 'Kanton')
+    await heatmapStore.fetchHeatmap()
   }
 })
 </script>
@@ -503,7 +519,7 @@ onMounted(async () => {
                           >
                             <p>Collection Layer:</p>
                             <select
-                              @change="updateHierarchyLayer($event, columnName)"
+                              @change="handleHierarchyLayerInput($event, columnName)"
                               @click.stop
                               class="select select-primary max-w-xs"
                             >

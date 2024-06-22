@@ -10,16 +10,15 @@ import {
   mapScalingEnum,
   type ItemNameAndData,
 } from '@/helpers/helpers'
-import { getHeatmapColor } from '@/helpers/helpers'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import SettingsIcon from '@assets/settings.svg'
 import { ref } from 'vue'
 import SingleSelect from './SingleSelect.vue'
+import HelpModal from './HelpModal.vue'
 
 const heatmapStore = useHeatmapStore()
 
 const selectedItem = ref<ItemNameAndData | null>(null)
-const showOptions = ref(false)
 
 async function updateScaling(scaling: ScalingEnum) {
   heatmapStore.setScaling(scaling)
@@ -505,6 +504,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
       <span v-if="heatmapStore.isOutOfSync">(unsaved changes!)</span>
       <span v-if="heatmapStore.isLoading" class="loading loading-spinner"></span>
     </button>
+    <HelpModal />
   </div>
 </template>
 

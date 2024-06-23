@@ -15,6 +15,7 @@ import { useHeatmapStore } from '@stores/heatmapStore'
 
 import DimReductionVisual from './DimReductionVisual.vue'
 import CollectionSelector from './CollectionSelector.vue'
+import HelpModal from './HelpModal.vue'
 
 import HeatmapSettings from './HeatmapSettings.vue'
 import CsvUpload from './CsvUpload.vue'
@@ -582,11 +583,15 @@ onMounted(async () => {
         }"
       >
         <HeatmapSettings />
-        <div
-          v-if="!heatmapStore.isCsvUploadOpen"
-          :style="{ height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px' }"
-        >
-          <CsvUpload />
+
+        <div :style="{ display: 'flex', gap: '20px', alignItems: 'center' }">
+          <div
+            v-if="!heatmapStore.isCsvUploadOpen"
+            :style="{ height: CSV_UPLOAD_COLLAPSED_HEIGHT + 'px' }"
+          >
+            <CsvUpload />
+          </div>
+          <HelpModal />
         </div>
       </div>
 

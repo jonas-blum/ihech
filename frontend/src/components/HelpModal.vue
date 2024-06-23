@@ -37,9 +37,12 @@ onMounted(() => {
       <h1 class="font-bold text-3xl">IHECH Guide</h1>
       <h2 class="font-bold text-xl mt-5">What is IHECH?</h2>
       <p>
-        Interactive Hierarchically Expandable Cluster Heatmap is a special kind of heatmap in
-        combination with a dimensionality reduction visual which allows users to analyze high
-        dimensional hierarchical data.
+        The Interactive Hierarchically Expandable Cluster Heatmap (IHECH) is a combination of a
+        heatmap and a dimensionality reduction visual which aims to support users in their
+        explorative data analysis of large volumes of hierarchical multi dimensional data. <br />
+        The IHECH specifically allows for the identification of clusters, outliers, the comparison
+        of items across attributes on different granularity levels and the comparison of attributes
+        across items of different granularity levels.
       </p>
       <h2 class="font-bold text-xl mt-5">Terms</h2>
       <p>

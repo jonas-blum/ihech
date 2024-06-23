@@ -14,7 +14,6 @@ import { useHeatmapStore } from '@/stores/heatmapStore'
 import SettingsIcon from '@assets/settings.svg'
 import { ref } from 'vue'
 import SingleSelect from './SingleSelect.vue'
-import HelpModal from './HelpModal.vue'
 
 const heatmapStore = useHeatmapStore()
 
@@ -196,7 +195,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
           <div class="self-tooltip">
             <span class="tooltiptext-right">
               <div>Determines how many sub-groups are directly inside a group</div>
-              <div>Use a small value like 2 to get a very concise view of the data</div>
+              <div>Use a small value like 2 to get an aggregated view of the data</div>
               <div>
                 Use a large value like 30 to get a broader view of the data to detect outliers more
                 easily
@@ -504,7 +503,6 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
       <span v-if="heatmapStore.isOutOfSync">(unsaved changes!)</span>
       <span v-if="heatmapStore.isLoading" class="loading loading-spinner"></span>
     </button>
-    <HelpModal />
   </div>
 </template>
 

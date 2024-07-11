@@ -37,4 +37,4 @@ The IHECH was developed as part of the Bachelor Thesis of Jonas Blum (07.02.2024
 
 ## Component Diagram
 
-<img src="data/component_diagram.png" alt="Component Diagram" width="1000"/>
+<img src="thesis-plots/component_diagram.png" alt="Component Diagram" width="1000"/>

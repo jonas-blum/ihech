@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHeatmapStore } from '@/stores/heatmapStore'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import * as dataForge from 'data-forge'
 import {
   ScalingEnum,
@@ -28,6 +28,8 @@ const heatmapStore = useHeatmapStore()
 const hierarchyLayers: ('None' | number)[] = ['None', 1, 2, 3, 4]
 
 const fileInput = ref<HTMLInputElement | null>(null)
+
+const dataTablesList = ref<HTMLUListElement | null>(null)
 
 function toggleAccordion() {
   heatmapStore.setCsvUploadOpen(!heatmapStore.isCsvUploadOpen)
@@ -275,6 +277,27 @@ async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
   uploadCsvFileFromFile(csvText, fileName, fetchHeatmap)
 }
 
+function focusActiveDataTable() {
+  const activeDataTableName = heatmapStore.getActiveDataTable.tableName
+  if (activeDataTableName && dataTablesList.value) {
+    const activeDataTableElement = dataTablesList.value.querySelector(
+      `#dataTableEntry-${activeDataTableName}`,
+    )
+    if (activeDataTableElement) {
+      activeDataTableElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    } else {
+      console.error('DataTable element not found:', activeDataTableName)
+    }
+  }
+}
+
+watch(
+  () => heatmapStore.isCsvUploadOpen,
+  () => {
+    focusActiveDataTable()
+  },
+)
+
 onMounted(async () => {
   if (heatmapStore.getAllDataTableNames.length === 0) {
     await fetchCsvFileByFileName('amount_different_attributes.csv', false)
@@ -304,6 +327,9 @@ onMounted(async () => {
     updateHierarchyLayer('1', 'Kanton')
     await fetchCsvFileByFileName('2019_altersklassen_relative.csv', false)
     updateHierarchyLayer('1', 'Kanton')
+
+    focusActiveDataTable()
+
     await heatmapStore.fetchHeatmap()
   }
 })
@@ -380,6 +406,7 @@ onMounted(async () => {
         >
           <h3 :style="{ height: '32px' }" class="text-2xl">Saved Data Tables:</h3>
           <ul
+            ref="dataTablesList"
             :style="{
               display: 'flex',
               padding: '10px 0px',
@@ -389,7 +416,11 @@ onMounted(async () => {
               overflowY: 'auto',
             }"
           >
-            <li :key="index" v-for="(dataTable, index) in heatmapStore.getAllDataTables">
+            <li
+              :key="index"
+              v-for="(dataTable, index) in heatmapStore.getAllDataTables"
+              :id="`dataTableEntry-${dataTable.tableName}`"
+            >
               <button
                 :class="{
                   btn: true,

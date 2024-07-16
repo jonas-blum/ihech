@@ -277,26 +277,19 @@ async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
   uploadCsvFileFromFile(csvText, fileName, fetchHeatmap)
 }
 
-function focusActiveDataTable() {
-  const activeDataTableName = heatmapStore.getActiveDataTable.tableName
+function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
+  const activeDataTableName = heatmapStore.getActiveDataTable?.tableName
   if (activeDataTableName && dataTablesList.value) {
     const activeDataTableElement = dataTablesList.value.querySelector(
       `#dataTableEntry-${activeDataTableName}`,
     )
     if (activeDataTableElement) {
-      activeDataTableElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      activeDataTableElement.scrollIntoView({ behavior: scrollBehavior, block: 'end' })
     } else {
       console.error('DataTable element not found:', activeDataTableName)
     }
   }
 }
-
-watch(
-  () => heatmapStore.isCsvUploadOpen,
-  () => {
-    focusActiveDataTable()
-  },
-)
 
 onMounted(async () => {
   if (heatmapStore.getAllDataTableNames.length === 0) {
@@ -328,9 +321,11 @@ onMounted(async () => {
     await fetchCsvFileByFileName('2019_altersklassen_relative.csv', false)
     updateHierarchyLayer('1', 'Kanton')
 
-    focusActiveDataTable()
+    focusActiveDataTable('smooth')
 
     await heatmapStore.fetchHeatmap()
+  } else {
+    focusActiveDataTable()
   }
 })
 </script>

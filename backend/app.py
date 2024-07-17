@@ -86,25 +86,16 @@ def get_heatmap():
 
         logger.info("Starting to generate json...")
         start_json = time.perf_counter()
-
+        
         def generate():
-            chunk_counter = 0
-            for chunk in json.JSONEncoder(default=custom_encoder).iterencode(
-                heatmap_json
-            ):
-                chunk_counter += 1
+            for chunk in json.JSONEncoder(default=custom_encoder).iterencode(heatmap_json):
                 yield chunk
-            print(f"Total chunks sent: {chunk_counter}")
+            logger.info(f"Generating JSON Done: {round(time.perf_counter() - start_json, 2)} seconds")
+            logger.info(f"Time to generate entire heatmap: {round(time.perf_counter() - start_heatmap, 2)} seconds")
 
-        logger.info(
-            f"Generating JSON Done: {round(time.perf_counter() - start_json, 2)}"
-        )
-
-        logger.info(
-            f"Time to generate entire heatmap: {round(time.perf_counter() - start_heatmap, 2)}\n"
-        )
-
-        return Response(stream_with_context(generate()), mimetype="application/json")
+        response = Response(stream_with_context(generate()), mimetype="application/json")
+        
+        return response
     except Exception as e:
 
         logger.error(f"Error: {traceback.format_exc()}")

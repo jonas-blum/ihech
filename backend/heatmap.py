@@ -67,7 +67,7 @@ def sort_attributes(
     elif settings.sortOrderAttributes == "ALPHABETICAL":
         scaled_df = scaled_df.sort_index(axis=1)
         original_df = original_df.sort_index(axis=1)
-    elif settings.sortOrderAttributes == "STDEV":
+    elif settings.sortOrderAttributes == "HETEROGENIC":
         if original_df_to_sort.shape[0] < 2:
             original_df_to_sort = original_dropped_df
         std_devs = original_df_to_sort.std()
@@ -75,6 +75,17 @@ def sort_attributes(
             col: std_val for col, std_val in zip(original_df_to_sort.columns, std_devs)
         }
         sorted_columns = sorted(col_std_map, key=col_std_map.get, reverse=True)
+
+        scaled_df = scaled_df[sorted_columns]
+        original_df = original_df[list(sorted_columns) + additional_columns]
+    elif settings.sortOrderAttributes == "HOMOGENIC":
+        if original_df_to_sort.shape[0] < 2:
+            original_df_to_sort = original_dropped_df
+        std_devs = original_df_to_sort.std()
+        col_std_map = {
+            col: std_val for col, std_val in zip(original_df_to_sort.columns, std_devs)
+        }
+        sorted_columns = sorted(col_std_map, key=col_std_map.get, reverse=False)
 
         scaled_df = scaled_df[sorted_columns]
         original_df = original_df[list(sorted_columns) + additional_columns]

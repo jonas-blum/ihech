@@ -39,8 +39,10 @@ export function getDistinctColor(index: number, colorList = COLORS): string {
 
 export function mapSortOderAttributesEnum(sortOrderAttributes: SortOrderAttributes): string {
   switch (sortOrderAttributes) {
-    case SortOrderAttributes.STDEV:
-      return 'Standard Deviation'
+    case SortOrderAttributes.HOMOGENIC:
+      return 'Homogeneity'
+    case SortOrderAttributes.HETEROGENIC:
+      return 'Heterogeneity'
     case SortOrderAttributes.ASC:
       return 'Ascending'
     case SortOrderAttributes.DESC:
@@ -84,9 +86,10 @@ export function mapColoringHeatmapEnum(coloringHeatmap: ColoringHeatmapEnum): st
 }
 
 export enum SortOrderAttributes {
-  STDEV = 'STDEV',
-  ASC = 'ASC',
+  HETEROGENIC = 'HETEROGENIC',
+  HOMOGENIC = 'HOMOGENIC',
   DESC = 'DESC',
+  ASC = 'ASC',
   ALPHABETICAL = 'ALPHABETICAL',
 }
 

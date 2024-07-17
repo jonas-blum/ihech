@@ -104,7 +104,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
 
     stickyAttributes: [],
     sortAttributesBasedOnStickyItems: false,
-    sortOrderAttributes: SortOrderAttributes.STDEV,
+    sortOrderAttributes: SortOrderAttributes.HETEROGENIC,
 
     stickyItemIndexes: [],
     clusterItemsBasedOnStickyAttributes: false,

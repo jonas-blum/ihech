@@ -26,11 +26,11 @@ StructuralFeatureType = Literal[
 ]
 
 SortOrderAttributes = Literal[
-    "STDEV",
-    "ASC",
-    "DESC",
-    "CLUSTER",
-    "ALPHABETICAL",
+  "HETEROGENIC",
+  "HOMOGENIC",
+  "DESC",
+  "ASC",
+  "ALPHABETICAL"
 ]
 
 

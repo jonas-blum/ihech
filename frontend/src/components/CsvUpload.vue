@@ -522,15 +522,15 @@ onMounted(async () => {
                             </div>
                             <div>
                               When enabling the setting "By collections" under "Items Grouping" the
-                              items will first be grouped by the first "Collection Layer" then by
-                              the second, third and fourth.
+                              items will first be grouped by the first "Hierarchy Layer" then by the
+                              second, third and fourth.
                             </div>
                             <div>
-                              The coloring of the items will be based on the first level "Collection
+                              The coloring of the items will be based on the first "Hierarchy
                               Layer".
                             </div>
                             <div>
-                              When setting the "Collection Layers" you can compare individual items
+                              When setting the "Hierarchy Layers" you can compare individual items
                               against entire collections and collections against other collections.
                               Additionally outliers inside a collection can be detected easily.
                             </div>
@@ -543,7 +543,7 @@ onMounted(async () => {
                               justifyContent: 'space-between',
                             }"
                           >
-                            <p>Collection Layer:</p>
+                            <p>Hierarchy Layer:</p>
                             <select
                               @change="handleHierarchyLayerInput($event, columnName)"
                               @click.stop

@@ -125,6 +125,28 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right">
+              <div>
+                Determines if only the selected "sticky items" should be shown in the dimensionality
+                reduction visual (needs at least 3 "sticky items" selected)
+              </div>
+            </span>
+            <a>
+              <div class="toggle-container">
+                <p>Only sticky Items?</p>
+                <input
+                  @click="updateOnlyDimReductionBasedOnStickyItems($event)"
+                  type="checkbox"
+                  class="toggle"
+                  :checked="heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
+                />
+              </div>
+            </a>
+          </div>
+        </li>
+
+        <li>
+          <div class="self-tooltip">
+            <span class="tooltiptext-right">
               <div>Determines the algorithm used for the Dimensionality Reduction Visual</div>
               <div><strong>PCA:</strong> Principal Component Analysis</div>
               <div><strong>t-SNE:</strong> t-Distributed Stochastic Neighbor Embedding</div>
@@ -152,28 +174,6 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
             </a>
           </div>
         </li>
-
-        <li>
-          <div class="self-tooltip">
-            <span class="tooltiptext-right">
-              <div>
-                Determines if only the selected "sticky items" should be shown in the dimensionality
-                reduction visual (needs at least 3 "sticky items" selected)
-              </div>
-            </span>
-            <a>
-              <div class="toggle-container">
-                <p>Only sticky items?</p>
-                <input
-                  @click="updateOnlyDimReductionBasedOnStickyItems($event)"
-                  type="checkbox"
-                  class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
-                />
-              </div>
-            </a>
-          </div>
-        </li>
       </ul>
     </div>
 
@@ -191,6 +191,33 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
       </div>
 
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-62">
+        <li>
+          <div class="self-tooltip">
+            <span class="tooltiptext-right">
+              <div>
+                Determines if the items should be grouped based on only the selected "sticky
+                attributes"
+              </div>
+              <div>
+                Enable this if you are only interested in comparing the items based on the selected
+                "sticky attributes"
+              </div>
+              <div>Disable this if you want to compare the items based on all attributes</div>
+            </span>
+            <a>
+              <div class="toggle-container">
+                <p>Based on sticky Attributes?</p>
+                <input
+                  @click="updateClusterBasedOnStickyAttributes($event)"
+                  type="checkbox"
+                  class="toggle"
+                  :checked="heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
+                />
+              </div>
+            </a>
+          </div>
+        </li>
+
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right">
@@ -215,6 +242,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
             </a>
           </div>
         </li>
+
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right">
@@ -243,6 +271,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
             </a>
           </div>
         </li>
+
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right">
@@ -309,33 +338,6 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
             </a>
           </div>
         </li>
-
-        <li>
-          <div class="self-tooltip">
-            <span class="tooltiptext-right">
-              <div>
-                Determines if the items should be grouped based on only the selected "sticky
-                attributes"
-              </div>
-              <div>
-                Enable this if you are only interested in comparing the items based on the selected
-                "sticky attributes"
-              </div>
-              <div>Disable this if you want to compare the items based on all attributes</div>
-            </span>
-            <a>
-              <div class="toggle-container">
-                <p>Based on sticky Attributes?</p>
-                <input
-                  @click="updateClusterBasedOnStickyAttributes($event)"
-                  type="checkbox"
-                  class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
-                />
-              </div>
-            </a>
-          </div>
-        </li>
       </ul>
     </div>
 
@@ -353,6 +355,32 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
       </div>
 
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-72">
+        <li>
+          <div class="self-tooltip">
+            <span class="tooltiptext-right">
+              <div>
+                Determines if the selected attribute "Order" from the setting above should be based
+                only on the selected "sticky items"
+              </div>
+              <div>
+                Enable this if you want to compare only the "sticky items" based on their attributes
+              </div>
+              <div>Disable this if you want to compare all items based on their attributes</div>
+            </span>
+            <a>
+              <div class="toggle-container">
+                <p>Order based on sticky Items?</p>
+                <input
+                  @click="updateSortAttributesBasedOnStickyItems"
+                  type="checkbox"
+                  class="toggle"
+                  :checked="heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems"
+                />
+              </div>
+            </a>
+          </div>
+        </li>
+
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right"
@@ -386,32 +414,6 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   >
                 </li>
               </ul>
-            </a>
-          </div>
-        </li>
-
-        <li>
-          <div class="self-tooltip">
-            <span class="tooltiptext-right">
-              <div>
-                Determines if the selected attribute "Order" from the setting above should be based
-                only on the selected "sticky items"
-              </div>
-              <div>
-                Enable this if you want to compare only the "sticky items" based on their attributes
-              </div>
-              <div>Disable this if you want to compare all items based on their attributes</div>
-            </span>
-            <a>
-              <div class="toggle-container">
-                <p>Order based on sticky items?</p>
-                <input
-                  @click="updateSortAttributesBasedOnStickyItems"
-                  type="checkbox"
-                  class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems"
-                />
-              </div>
             </a>
           </div>
         </li>

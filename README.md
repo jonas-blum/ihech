@@ -21,7 +21,7 @@ The IHECH was developed as part of the Bachelor Thesis of Jonas Blum (07.02.2024
 
 1. `cd backend`
 2. `source projectenv/bin/activate` (after `python -m venv projectenv`, `source projectenv/bin/activate` and `pip install -r requirements.txt`)
-3. `flask run --debug`
+3. `flask run`
 
 ### Frontend
 

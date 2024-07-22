@@ -82,19 +82,27 @@ def get_heatmap():
             f"Finished reading csv file: {round(time.perf_counter() - start_heatmap, 2)}"
         )
 
-        heatmap_json = create_heatmap(original_df, heatmap_settings)
+        heatmap_json = create_heatmap(original_df, heatmap_settings, start_heatmap)
 
         logger.info("Starting to generate json...")
         start_json = time.perf_counter()
-        
-        def generate():
-            for chunk in json.JSONEncoder(default=custom_encoder).iterencode(heatmap_json):
-                yield chunk
-            logger.info(f"Generating JSON Done: {round(time.perf_counter() - start_json, 2)} seconds")
-            logger.info(f"Time to generate entire heatmap: {round(time.perf_counter() - start_heatmap, 2)} seconds")
 
-        response = Response(stream_with_context(generate()), mimetype="application/json")
-        
+        def generate():
+            for chunk in json.JSONEncoder(default=custom_encoder).iterencode(
+                heatmap_json
+            ):
+                yield chunk
+            logger.info(
+                f"Generating JSON Done: {round(time.perf_counter() - start_json, 2)} seconds"
+            )
+            logger.info(
+                f"Time to generate entire heatmap: {round(time.perf_counter() - start_heatmap, 2)} seconds"
+            )
+
+        response = Response(
+            stream_with_context(generate()), mimetype="application/json"
+        )
+
         return response
     except Exception as e:
 

@@ -152,11 +152,10 @@ def do_scaling(
 
 
 def create_heatmap(
-    original_df: pd.DataFrame,
-    settings: HeatmapSettings,
+    original_df: pd.DataFrame, settings: HeatmapSettings, start_heatmap: float
 ) -> HeatmapJSON:
     logger.info("Starting Filtering...")
-    start_filtering = time.perf_counter()
+    start_filtering = start_heatmap
 
     settings.stickyAttributes = [
         attr for attr in settings.stickyAttributes if attr in original_df.columns

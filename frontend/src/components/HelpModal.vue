@@ -34,15 +34,15 @@ onMounted(() => {
       <form method="dialog">
         <button class="btn btn-md btn-circle btn-ghost absolute right-2 top-2">✕</button>
       </form>
-      <h1 class="font-bold text-3xl">IHECH Guide</h1>
-      <h2 class="font-bold text-xl mt-5">What is IHECH?</h2>
+      <h1 class="font-bold text-3xl">The IHECH Guide</h1>
+      <h2 class="font-bold text-xl mt-5">What is the IHECH tool?</h2>
       <p>
-        The Interactive Hierarchically Expandable Cluster Heatmap (IHECH) is a combination of a
+        The Interactive Hierarchically Expandable Cluster Heatmap (IHECH) tool is a combination of a
         heatmap and a dimensionality reduction visual which aims to support users in their
-        explorative data analysis of large volumes of hierarchical multi dimensional data. <br />
-        The IHECH specifically allows for the identification of clusters, outliers, the comparison
-        of items across attributes on different granularity levels and the comparison of attributes
-        across items of different granularity levels.
+        explorative data analysis of large volumes of hierarchical multi-dimensional data. <br />
+        The IHECH tool allows for the identification of clusters, outliers, the comparison of items
+        across attributes on different granularity levels and the comparison of attributes across
+        items of different granularity levels.
       </p>
       <h2 class="font-bold text-xl mt-5">Terms</h2>
       <p>
@@ -52,10 +52,12 @@ onMounted(() => {
       </p>
       <h2 class="font-bold text-xl mt-5">Use Cases / Tasks</h2>
 
-      <h3 class="font-bold text-l mt-4">1. Delineate exploration space by selecting collections</h3>
+      <h3 class="font-bold text-l mt-4">
+        1. Delineate the exploration space by selecting collections
+      </h3>
       <p>
         By using the <i>Collection Selector</i> in the bottom left, specific collections can be
-        unselected.
+        unselected and reselected.
       </p>
       <div class="grid grid-cols-[1fr_auto_1fr] gap-4 items-end mt-3">
         <div class="flex flex-col items-center">
@@ -73,7 +75,7 @@ onMounted(() => {
 
       <div class="divider"></div>
 
-      <h3 class="font-bold text-l">2. Delineate exploration space by selecting attributes</h3>
+      <h3 class="font-bold text-l">2. Delineate the exploration space by selecting attributes</h3>
       <p>
         Attributes which are not of interest can be unselected in the <i>File Upload</i>. <br />
         Attributes of interest can be made sticky by clicking on the <strong>+</strong> icon.
@@ -90,7 +92,8 @@ onMounted(() => {
         <div class="flex flex-col items-center">
           <img class="max-h-[30vh]" :src="stickyAttributes" alt="Collection Few" />
           <span class="text-sm text-gray-600"
-            >Four attributes are selected as sticky attributes.</span
+            >Four attributes are selected as sticky attributes. The sticky attributes are indicated
+            with the "-" in front of the name.</span
           >
         </div>
       </div>
@@ -98,18 +101,18 @@ onMounted(() => {
       <div class="divider"></div>
 
       <h3 class="font-bold text-l">
-        3. Find the most similar items to a specific item based on selected attributes
+        3. Find the items most similar to a specific item based on the selected attributes
       </h3>
 
       <p>
-        The most similar items to an item are the ones which are located in the same group as an
+        The most similar items to an item are the ones that are located in the same group as an
         item.
       </p>
       <div class="grid grid-cols-[1fr_1fr] gap-4 items-end mt-3">
         <div class="flex flex-col items-center">
           <img class="max-h-[30vh]" :src="similarItems" alt="Collection Few" />
           <span class="text-sm text-gray-600"
-            >Three similar items which are located in the same group.</span
+            >Three similar items that are located in the same group.</span
           >
         </div>
       </div>
@@ -117,18 +120,24 @@ onMounted(() => {
       <div class="divider"></div>
 
       <h3 class="font-bold text-l">4. Compare items against items based on selected attributes</h3>
+      Items can be compared against other items by comparing the similarity of color. Another way of
+      comparing items against items is by hovering over them and comparing the values. By making
+      items sticky they can be better compared as they are closer together.
 
       <div class="grid grid-cols-[1fr_1fr] gap-6 items-end mt-3">
         <div class="flex flex-col gap-1 items-center">
           <img class="max-h-[30vh]" :src="stickyItems" alt="Collection All" />
-          <span class="text-sm text-gray-600">Items can be compared by making them sticky.</span>
+          <span class="text-sm text-gray-600"
+            >Items can be compared by making them sticky. By making the the two items sticky, they
+            are close together which helps with the comparison of color or hovering.</span
+          >
         </div>
 
         <div class="flex flex-col gap-1 items-center">
           <img class="max-h-[30vh]" :src="itemsComparing" alt="Collection Few" />
           <span class="text-sm text-gray-600"
-            >Items can also be compared without making them sticky.</span
-          >
+            >Items can also be compared without making them sticky.
+          </span>
         </div>
       </div>
 
@@ -137,6 +146,9 @@ onMounted(() => {
       <h3 class="font-bold text-l">
         5. Compare items against the average of all items based on selected attributes
       </h3>
+      The topmost groups always represent the average of all items. A sticky item is close to the
+      topmost group and therefore can be better compared against the average of all items than
+      non-sticky items.
 
       <div class="grid grid-cols-[1fr_1fr] gap-6 items-end mt-3">
         <div class="flex flex-col gap-1 items-center">
@@ -159,6 +171,8 @@ onMounted(() => {
       <h3 class="font-bold text-l">
         6. Compare items against collections based on selected attributes
       </h3>
+      Collections are formed, when enabling the <i>By Collections?</i> setting. When collections are
+      formed items can be compared against collections.
 
       <div class="grid grid-cols-[1fr_1fr_1fr] gap-6 items-end mt-3">
         <div class="flex flex-col gap-1 items-center">
@@ -188,6 +202,9 @@ onMounted(() => {
       <h3 class="font-bold text-l">
         7. Compare collections against collections based on selected attributes
       </h3>
+
+      Collections are formed, when enabling the <i>By Collections?</i> setting. When collections are
+      formed collections can be compared against collections.
 
       <div class="grid grid-cols-[1fr_1fr] gap-6 items-end mt-3">
         <div class="flex flex-col gap-1 items-center">

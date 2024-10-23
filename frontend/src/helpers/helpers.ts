@@ -113,9 +113,9 @@ export enum ColoringHeatmapEnum {
 
 export interface ItemNameAndData {
   index: number | null
+  dataItemIndex: number
   itemName: string
   isOpen: boolean
-  data: number[]
   amountOfDataPoints: number
   dimReductionX: number
   dimReductionY: number
@@ -124,10 +124,22 @@ export interface ItemNameAndData {
   parent: ItemNameAndData | null
 }
 
+export interface HierarchicalAttribute {
+  dataAttributeIndex: number
+  attributeName: string
+  isOpen: boolean
+  dissimilarity: number
+  amountOfAttributes: number
+  children: HierarchicalAttribute[]
+
+  parent: HierarchicalAttribute | null
+}
+
 export interface HeatmapJSON {
-  attributeNames: string[]
-  attributeDissimilarities: number[]
+  data: number[][]
   itemNamesAndData: ItemNameAndData[]
+  hierarchicalAttributes: HierarchicalAttribute[]
+
   maxHeatmapValue: number
   minHeatmapValue: number
   maxDimRedXValue: number

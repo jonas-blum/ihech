@@ -25,13 +25,7 @@ StructuralFeatureType = Literal[
     "DEPTH_OF_TAG",
 ]
 
-SortOrderAttributes = Literal[
-  "HETEROGENIC",
-  "HOMOGENIC",
-  "DESC",
-  "ASC",
-  "ALPHABETICAL"
-]
+SortOrderAttributes = Literal["HETEROGENIC", "HOMOGENIC", "DESC", "ASC", "ALPHABETICAL"]
 
 
 class ExtendedVectorRepresentation:
@@ -71,7 +65,6 @@ class ItemNameAndData:
     index: Union[int, None]
     itemName: str
     isOpen: bool
-    data: List[float]
     amountOfDataPoints: int
     dimReductionX: float
     dimReductionY: float
@@ -82,7 +75,6 @@ class ItemNameAndData:
         index: Union[int, None],
         itemName: str,
         isOpen: bool,
-        data: List[float],
         amountOfDataPoints: int,
         dimReductionX: float,
         dimReductionY: float,
@@ -91,11 +83,35 @@ class ItemNameAndData:
         self.index: Union[int, None] = index
         self.itemName: str = itemName
         self.isOpen: bool = isOpen
-        self.data: List[float] = data
         self.amountOfDataPoints: int = amountOfDataPoints
         self.dimReductionX: float = dimReductionX
         self.dimReductionY: float = dimReductionY
         self.children: Union[List[ItemNameAndData], None] = children
+
+
+class HierarchicalAttribute:
+    dataAttributeIndex: int
+    attributeName: str
+    isOpen: bool
+    dissimilarity: float
+    amountOfAttributes: int
+    children: Union["List[HierarchicalAttribute]", None]
+
+    def __init__(
+        self,
+        dataAttributeIndex: int,
+        attributeName: str,
+        isOpen: bool,
+        dissimilarity: float,
+        amountOfAttributes: int,
+        children: Union["List[HierarchicalAttribute]", None],
+    ):
+        self.dataAttributeIndex: int = dataAttributeIndex
+        self.attributeName: str = attributeName
+        self.isOpen: bool = isOpen
+        self.dissimilarity: float = dissimilarity
+        self.amountOfAttributes: int = amountOfAttributes
+        self.children: Union[List[HierarchicalAttribute], None] = children
 
 
 def custom_encoder(obj):
@@ -113,7 +129,6 @@ def custom_encoder(obj):
             "index": obj.index,
             "itemName": obj.itemName,
             "isOpen": obj.isOpen,
-            "data": obj.data,
             "amountOfDataPoints": obj.amountOfDataPoints,
             "dimReductionX": obj.dimReductionX,
             "dimReductionY": obj.dimReductionY,
@@ -141,9 +156,6 @@ class HeatmapJSON:
         self.minDimRedYValue: float = 0
         self.minAttributeValues: List[float] = []
         self.maxAttributeValues: List[float] = []
-
-    def add_cluster(self, cluster: ItemNameAndData):
-        self.itemNamesAndData.append(cluster)
 
 
 class HeatmapSettings:

@@ -52,14 +52,18 @@ class PixiApplicationManager {
 
     // add heatmap
     this.heatmap = new Heatmap()
-
     this.app.stage.addChild(this.heatmap.container)
     // TODO: this needs to be moved
     this.heatmap.container.position.set(canvasWidth - 100, 50)
     this.heatmap.render()
 
-    console.log('🧱 PixiApplicationManager constructor')
+    console.log('PixiApplicationManager constructor')
     console.log(this.app, this.app.stage)
+  }
+
+  render() {
+    console.log('PixiApplicationManager render')
+    this.app.render()
   }
 }
 
@@ -275,74 +279,91 @@ function getMaxRowValue(item: ItemNameAndData) {
 }
 
 function drawEverything() {
-  if (!canvas.value) {
+  console.log('🖌️ drawEverything')
+
+  if (!pixiApplicationManager.value) {
+    console.warn('pixiApplicationManager is not set')
     return
   }
-  const ctx = canvas.value.getContext('2d')
-  if (!ctx) {
-    return
-  }
+
+  // draw a rectangle to see if it works
+  const graphics = new Graphics()
+  graphics.rect(100, 900, 50, 50).fill(0xff0000)
+  pixiApplicationManager.value.app.stage.addChild(graphics)
+  console.log('🎨 pixiApplicationManager', pixiApplicationManager.value)
+
+  return
+
+  // render
+  pixiApplicationManager.value.render()
+
+  // if (!canvas.value) {
+  //   return
+  // }
+  // const ctx = canvas.value.getContext('2d')
+  // if (!ctx) {
+  //   return
+  // }
 
   const width = heatmapWidth.value
   const height = heatmapHeight.value
 
-  nextTick(() => {
-    // Clear the canvas
-    ctx.fillStyle = '#000'
-    ctx.fillRect(0, 0, width, height)
+  const heatmapMaxValue = getHeatmapColorMaxValue()
+  const heatmapMinValue = getHeatmapColorMinValue()
 
-    const heatmapMaxValue = getHeatmapColorMaxValue()
-    const heatmapMinValue = getHeatmapColorMinValue()
+  // Iterate over each row (item)
+  for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
+    const item = visibleRows.value[itemIdx]
+    let maxRowValue = getMaxRowValue(item)
 
-    // Iterate over each row (item)
-    for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
-      const item = visibleRows.value[itemIdx]
-      let maxRowValue = getMaxRowValue(item)
+    // Iterate over each attribute in the row
+    for (let attrIdx = 0; attrIdx < item.data.length; attrIdx++) {
+      const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
+      const initialValue = item.data[initialAttrIdx]
 
-      // Iterate over each attribute in the row
-      for (let attrIdx = 0; attrIdx < item.data.length; attrIdx++) {
-        const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
-        const initialValue = item.data[initialAttrIdx]
-
-        let adjustedValue = initialValue
-        // Adjust the value based on the coloring heatmap type
-        if (
-          heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
-        ) {
-          adjustedValue = initialValue / maxRowValue
-        } else if (
-          heatmapStore?.getActiveDataTable?.coloringHeatmap ===
-          ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
-        ) {
-          const maxAttributeValue = heatmapStore.getMaxAttributeValues[initialAttrIdx]
-          const minAttributeValue = heatmapStore.getMinAttributeValues[initialAttrIdx]
-          const difference =
-            maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
-          adjustedValue = (adjustedValue - minAttributeValue) / difference
-        } else if (
-          heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
-        ) {
-          adjustedValue = Math.log(initialValue + heatmapStore.getLogShiftValue)
-        }
-
-        // Calculate the position of the cell
-        let x = attrIdx * cellWidth.value
-        let y = itemIdx * cellHeight.value
-
-        // Adjust position if there are sticky attributes or items
-        if (attrIdx >= heatmapStore.getAmountOfStickyAttributes) {
-          x += stickyAttributesGap.value
-        }
-        if (itemIdx >= heatmapStore.getAmountOfStickyItems) {
-          y += stickyItemsGap.value
-        }
-
-        // Set the fill color and draw the cell
-        ctx.fillStyle = getHeatmapColor(adjustedValue, heatmapMinValue, heatmapMaxValue)
-        ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
+      let adjustedValue = initialValue
+      // Adjust the value based on the coloring heatmap type
+      if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE) {
+        adjustedValue = initialValue / maxRowValue
+      } else if (
+        heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
+      ) {
+        const maxAttributeValue = heatmapStore.getMaxAttributeValues[initialAttrIdx]
+        const minAttributeValue = heatmapStore.getMinAttributeValues[initialAttrIdx]
+        const difference =
+          maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
+        adjustedValue = (adjustedValue - minAttributeValue) / difference
+      } else if (
+        heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
+      ) {
+        adjustedValue = Math.log(initialValue + heatmapStore.getLogShiftValue)
       }
+
+      // Calculate the position of the cell
+      let x = attrIdx * cellWidth.value
+      let y = itemIdx * cellHeight.value
+
+      // Adjust position if there are sticky attributes or items
+      if (attrIdx >= heatmapStore.getAmountOfStickyAttributes) {
+        x += stickyAttributesGap.value
+      }
+      if (itemIdx >= heatmapStore.getAmountOfStickyItems) {
+        y += stickyItemsGap.value
+      }
+
+      // Set the fill color and draw the cell
+      // ctx.fillStyle = getHeatmapColor(adjustedValue, heatmapMinValue, heatmapMaxValue)
+      // ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
+
+      // console.log('🧱 one brick at a time')
+      // pixiApplicationManager.value?.heatmap.container.addChild(
+      //   new Graphics()
+      //     .rect(x, y, cellWidth.value, cellHeight.value)
+      //     .fill(0xff0000),
+      // )
+      // console.log(pixiApplicationManager.value)
     }
-  })
+  }
 }
 
 function resetHoverStyles(resetHighlightedRow = true) {
@@ -582,11 +603,17 @@ onMounted(async () => {
   //   clickCanvas(event, true)
   // })
 
+  // TODO: at this point the size is 0...
+  console.log('heatmapWidth', heatmapWidth.value)
+  console.log('heatmapHeight', heatmapHeight.value)
   pixiApplicationManager.value = new PixiApplicationManager(
     canvas.value,
-    heatmapWidth.value,
-    heatmapHeight.value,
+    // heatmapWidth.value,
+    // heatmapHeight.value,
+    1000,
+    1000
   )
+
   console.log(pixiApplicationManager)
 })
 </script>

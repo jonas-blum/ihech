@@ -1,9 +1,27 @@
 <script setup lang="ts">
-import Heatmap from '@/components/ExpandableHeatmap.vue'
-import HeatmapPixi from '@/components/ExpandableHeatmapPixi.vue'
+import DimReductionVisual from '@/components/DimReductionVisual.vue'
+import ExpandableHeatmap from '@/components/ExpandableHeatmap.vue'
+import Heatmap from '@/components/Heatmap.vue'
+import HeatmapSettings from '@/components/HeatmapSettings.vue'
+import CsvUpload from '@/components/CsvUpload.vue'
 </script>
 
 <template>
-  <!-- <Heatmap /> -->
-  <HeatmapPixi />
+  <div class="w-full h-full flex">
+
+    <div class="w-1/2 h-full border-red-500 border-4">
+      <Heatmap />
+    </div>
+    <div class="w-1/2 h-full flex flex-col border-blue-500 border-4">
+      <div class="w-full h-1/3 border-cyan-500 border-4">
+        <HeatmapSettings />
+        <CsvUpload />
+      </div>
+      <div class="w-full h-2/3 flex border-violet-500 border-4">
+        <!-- <DimReductionVisual /> -->
+      </div>
+    </div>
+  </div>
+
+  <!-- <CsvUpload /> -->
 </template>

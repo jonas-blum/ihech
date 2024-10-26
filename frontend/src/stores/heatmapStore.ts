@@ -37,7 +37,7 @@ export interface HeatmapStoreState {
   csvUploadOpen: boolean
 }
 
-export const useHeatmapStore = defineStore('heatmapStore', {
+export const useHeatmapStore: ReturnType<typeof defineStore> = defineStore('heatmapStore', {
   state: (): HeatmapStoreState => ({
     dataTables: [],
     activeDataTable: null,

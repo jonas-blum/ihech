@@ -1,4 +1,5 @@
 import * as dataForge from 'data-forge'
+import { PixiRow } from './PixiComponents'
 
 export const COLORS = [
   '#FF0000', // Red
@@ -120,8 +121,8 @@ export interface ItemNameAndData {
   dimReductionX: number
   dimReductionY: number
   children: ItemNameAndData[] | null
-
   parent: ItemNameAndData | null
+  pixiRow: PixiRow | null // maps 1:1 to PixiRow
 }
 
 export interface HeatmapJSON {

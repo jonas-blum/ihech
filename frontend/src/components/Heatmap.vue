@@ -10,9 +10,28 @@ const heatmapStore = useHeatmapStore()
 
 class Heatmap {
   public container: Container
+  public cellContainer: Container
+  public rowLabelsContainer: Container
+  public columnLabelsContainer: Container
 
   constructor() {
+    // main container for everything in the heatmap (including the row and column labels)
     this.container = new Container()
+
+    // container for the cells
+    this.cellContainer = new Container()
+    this.cellContainer.position.set(rowLabelsWidth.value, columnLabelsHeight.value)
+
+    // containers for the row and column labels
+    this.rowLabelsContainer = new Container()
+    this.rowLabelsContainer.position.set(0, columnLabelsHeight.value)
+    this.columnLabelsContainer = new Container()
+    this.columnLabelsContainer.position.set(rowLabelsWidth.value, 0)
+
+    // add the containers to the main container
+    this.container.addChild(this.cellContainer)
+    this.container.addChild(this.rowLabelsContainer)
+    this.container.addChild(this.columnLabelsContainer)
   }
 }
 
@@ -51,9 +70,11 @@ const canvas = ref<HTMLCanvasElement | null>(null)
 const visibleRows = ref<ItemNameAndData[]>([])
 
 const heatmapWidth = ref<number>(0)
-const cellWidth = ref<number>(0)
 const heatmapHeight = ref<number>(0)
-const cellHeight = ref<number>(0)
+const cellWidth = ref<number>(15)
+const cellHeight = ref<number>(15)
+const rowLabelsWidth = ref<number>(200)
+const columnLabelsHeight = ref<number>(200)
 
 const stickyAttributesGap = ref<number>(0)
 const stickyItemsGap = ref<number>(0)
@@ -77,8 +98,10 @@ function updateVisibleRows() {
 
 function update() {
   // TODO: this nees to be computed based on available space (?)
-  cellWidth.value = 10
-  cellHeight.value = 10
+  // cellWidth.value = 10
+  // cellHeight.value = 10
+  // rowLabelsWidth.value = 200
+  // columnLabelsHeight.value = 200
 
   updateVisibleRows()
   drawEverything()
@@ -115,7 +138,6 @@ function drawEverything() {
   const heatmapMaxValue = heatmapStore.getHeatmapMaxValue
   const heatmapMinValue = heatmapStore.getHeatmapMinValue
 
-  console.log('🔥 drawEverything', visibleRows.value)
   // Iterate over each row (item)
   for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
     const item = visibleRows.value[itemIdx]
@@ -164,7 +186,7 @@ function drawEverything() {
       let rect = new Graphics().rect(x, y, cellWidth.value, cellHeight.value).fill(color)
       // let rect = new Graphics().rect(100, 100, 400, 400).fill(0xff0000)
 
-      pixiApplicationManager.value?.heatmap.container.addChild(rect)
+      pixiApplicationManager.value?.heatmap.cellContainer.addChild(rect)
     }
   }
 }
@@ -209,7 +231,7 @@ onMounted(async () => {
 
   update()
 
-  console.log(pixiApplicationManager)
+  console.log(pixiApplicationManager.value)
 })
 </script>
 

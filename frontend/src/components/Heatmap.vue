@@ -73,7 +73,7 @@ function drawEverything() {
 
   // Iterate over each visibleRow
   for (const [visibleRowIdx, visibleRow] of visibleRows.value.entries()) {
-    console.log('visibleRow', visibleRow)
+    // console.log('visibleRow', visibleRow)
     let maxRowValue = getMaxRowValue(visibleRow)
 
     // Iterate over each attribute in the visibleRow

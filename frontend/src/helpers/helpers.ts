@@ -122,7 +122,7 @@ export interface ItemNameAndData {
   dimReductionY: number
   children: ItemNameAndData[] | null
   parent: ItemNameAndData | null
-  pixiRow: PixiRow | null // maps 1:1 to PixiRow
+  // pixiRow: PixiRow | null // maps 1:1 to PixiRow
 }
 
 export interface HeatmapJSON {

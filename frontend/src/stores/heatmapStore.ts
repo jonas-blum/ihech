@@ -11,6 +11,7 @@ import {
   ColoringHeatmapEnum,
   getDistinctColor,
 } from '../helpers/helpers'
+import { Tree, Row, ItemRow, AggregatedRow } from '../helpers/classes'
 import { nextTick } from 'vue'
 
 export interface HeatmapStoreState {
@@ -291,37 +292,14 @@ export const useHeatmapStore: ReturnType<typeof defineStore> = defineStore('heat
 
         this.heatmap = receivedHeatmap
 
-        this.heatmap.itemNamesAndData.forEach((row) => {
-          setParentOfRowsRec(row, null)
-        })
+        console.log('Received heatmap:', this.heatmap)
 
-        //Deal with sticky items and correct order
-        const stickyRows: ItemNameAndData[] = []
+        
+        let root = this.heatmap.itemNamesAndData[0]
 
-        for (const stickyRow of this.activeDataTable.stickyItemIndexes) {
-          this.heatmap.itemNamesAndData.forEach((row) => {
-            const foundRow = findRowByIndex(row, stickyRow)
-            if (foundRow) {
-              stickyRows.push(foundRow)
-            }
-          })
-        }
-
-        this.activeDataTable.stickyItemIndexes = stickyRows
-          .map((row) => row.index)
-          .filter((index) => index !== null) as number[]
-
-        this.heatmap.itemNamesAndData = [...stickyRows, ...this.heatmap.itemNamesAndData]
-
-        //Deal with sticky Attributes and correct order
-        this.activeDataTable.stickyAttributes = this.activeDataTable.stickyAttributes.filter(
-          (attr) => this.heatmap.attributeNames.includes(attr),
-        )
-        this.recomputeAttributeMap()
-
-        this.openAllStickyItems()
-        this.buildRowCollectionsMap()
-        this.setAllItems()
+        let tree = new Tree(root)
+        tree.updatePositionsAndDepth()
+        console.log('Tree:', tree)
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)

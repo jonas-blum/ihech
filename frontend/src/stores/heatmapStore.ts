@@ -10,6 +10,7 @@ import {
   type HeatmapSettings,
   ColoringHeatmapEnum,
   getDistinctColor,
+  interpolateColor,
 } from '../helpers/helpers'
 import { Tree } from '../helpers/classes'
 import { nextTick } from 'vue'
@@ -801,12 +802,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         }
       }
     },
-    getHeatmapColor(value: number): string {
+    getHeatmapColor(value: number): number {
       let min = this.getHeatmapMinValue
       let max = this.getHeatmapMaxValue
-      const normalizedValue = (value - min) / (max - min)
-      const l = 90 - normalizedValue * 65
-      return `hsl(215, 100%, ${l}%)`
+      let minColor = 0xffffff
+      let maxColor = 0x0000ff
+      return interpolateColor(minColor, maxColor, value, min, max)
     }
   },
 })

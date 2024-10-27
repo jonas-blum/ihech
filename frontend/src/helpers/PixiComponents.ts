@@ -115,7 +115,8 @@ export class PixiHeatmapCell extends Graphics {
     this.value = value // TODO: not used yet
     this.adjustedValue = adjustedValue
     this.column = column
-    this.draw(18, 18, useHeatmapStore()?.getHeatmapColor(adjustedValue)) // TODO: hardcoded for the moment
+    this.draw(18, 18) // TODO: hardcoded for the moment
+    this.updateTint(useHeatmapStore()?.getHeatmapColor(adjustedValue))
     this.position.x = this.column * 20 // TODO: hardcoded for the moment
 
     // Initialize custom properties within the namespace object
@@ -138,8 +139,12 @@ export class PixiHeatmapCell extends Graphics {
     })
   }
 
-  draw(width: number, height: number, color: number | string) {
-    this.rect(0, 0, width, height).fill(color)
+  draw(width: number, height: number) {
+    this.rect(0, 0, width, height).fill(0xffffff)
+  }
+
+  updateTint(color: number) {
+    this.tint = color
   }
 
   // clearGraphic() {

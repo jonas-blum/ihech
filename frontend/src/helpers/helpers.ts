@@ -32,6 +32,30 @@ export function getDistinctColor(index: number, colorList = COLORS): string {
   return selectedColor
 }
 
+export function interpolateColor(minColor: number, maxColor: number, value: number, min: number, max: number): number {
+  // Normalize `value` to a 0-1 range based on `min` and `max`
+  const normalizedValue = Math.max(0, Math.min(1, (value - min) / (max - min)));
+
+  // Extract RGB components from minColor
+  const minR = (minColor >> 16) & 0xff;
+  const minG = (minColor >> 8) & 0xff;
+  const minB = minColor & 0xff;
+
+  // Extract RGB components from maxColor
+  const maxR = (maxColor >> 16) & 0xff;
+  const maxG = (maxColor >> 8) & 0xff;
+  const maxB = maxColor & 0xff;
+
+  // Interpolate each color component based on normalizedValue
+  const r = Math.round(minR + (maxR - minR) * normalizedValue);
+  const g = Math.round(minG + (maxG - minG) * normalizedValue);
+  const b = Math.round(minB + (maxB - minB) * normalizedValue);
+
+  // Combine RGB components back into a single hex number
+  return (r << 16) | (g << 8) | b;
+}
+
+
 export function mapSortOderAttributesEnum(sortOrderAttributes: SortOrderAttributes): string {
   switch (sortOrderAttributes) {
     case SortOrderAttributes.HOMOGENIC:

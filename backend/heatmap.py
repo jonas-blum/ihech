@@ -100,7 +100,8 @@ def filter_attributes_and_items(
     original_df: pd.DataFrame, settings: HeatmapSettings
 ) -> pd.DataFrame:
 
-    original_df = original_df.loc[settings.selectedItemIndexes]
+    valid_indexes = list(set(settings.selectedItemIndexes).intersection(original_df.index))
+    original_df = original_df.loc[valid_indexes]
 
     extracted_columns = extract_columns(
         original_df,
@@ -156,6 +157,9 @@ def create_heatmap(
 ) -> HeatmapJSON:
     logger.info("Starting Filtering...")
     start_filtering = start_heatmap
+    
+    attribute_hierarchies = original_df.head(5)
+    original_df = original_df.iloc[5:]
 
     settings.stickyAttributes = [
         attr for attr in settings.stickyAttributes if attr in original_df.columns

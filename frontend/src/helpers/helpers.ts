@@ -121,7 +121,7 @@ export interface HierarchicalItem {
   dimReductionY: number
   children: HierarchicalItem[] | null
 
-  parent: HierarchicalItem | null
+  parent: HierarchicalItem | undefined
 }
 
 export interface HeatmapJSON {

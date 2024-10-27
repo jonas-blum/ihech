@@ -18,14 +18,22 @@ export class PixiApplicationManager {
       // autoDensity: true, // not sure what this does
     })
 
+    
     // add heatmap
     this.heatmap = new PixiHeatmap()
     this.app.stage.addChild(this.heatmap.container)
     // TODO: this needs to be moved
     this.heatmap.container.position.set(0, 0)
-
+    
     console.log('PixiApplicationManager constructor')
     console.log(this.app, this.app.stage)
+
+    // add event listeners for drag and drop
+    this.app.stage.eventMode = 'static'
+    // this.app.stage.hitArea = this.app.renderer.screen
+    this.app.stage.on('pointerup', () => {
+      console.log('pointerup')
+    })
   }
 }
 
@@ -68,18 +76,17 @@ export class PixiRow {
 
   constructor(row: Row) {
     this.container = new Container()
-    this.cells = []
     this.row = row
 
     // create all the cells for the row
     for (let value of row.data) {
-      const cell = new PixiHeatmapCell()
-      this.addCell(cell)
+      const cell = new PixiHeatmapCell(value)
+      this.container.addChild(cell)
     }
   }
 
-  addCell(cell: PixiHeatmapCell) {
-    this.container.addChild(cell)
+  updatePosition(x: number, y: number) {
+    this.container.position.set(x, y)
   }
 }
 

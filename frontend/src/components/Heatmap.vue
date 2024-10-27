@@ -5,11 +5,17 @@ import { ref } from 'vue'
 import { ColoringHeatmapEnum, type ItemNameAndData, getHeatmapColor } from '@helpers/helpers'
 import { useHeatmapStore } from '@stores/heatmapStore'
 
-import { PixiApplicationManager, PixiHeatmap, PixiRow, PixiHeatmapCell } from '@helpers/PixiComponents'
+import {
+  PixiApplicationManager,
+  PixiHeatmap,
+  PixiRow,
+  PixiHeatmapCell,
+} from '@helpers/PixiComponents'
+import { Graphics } from 'pixi.js'
 
 const heatmapStore = useHeatmapStore()
 
-const pixiApplicationManager = ref<PixiApplicationManager | null>(null)
+let pixiApplicationManager: PixiApplicationManager | null = null
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 
@@ -27,7 +33,6 @@ const stickyItemsGap = ref<number>(0)
 
 const pixiInitialized = ref(false)
 
-
 function update() {
   // TODO: this nees to be computed based on available space (?)
   // cellWidth.value = 10
@@ -37,12 +42,12 @@ function update() {
 
   // only once I need to init the pixi containers and graphics
   if (!pixiInitialized.value) {
-    if (!pixiApplicationManager.value) {
+    if (!pixiApplicationManager) {
       console.warn('pixiApplicationManager is not set')
       return
     }
 
-    let pixiHeatmap = pixiApplicationManager.value.heatmap
+    let pixiHeatmap = pixiApplicationManager.heatmap
 
     // traverse the tree with all rows and create the pixiRows
     let rows = heatmapStore.tree?.getAllRows()
@@ -52,7 +57,6 @@ function update() {
     }
 
     for (let row of rows) {
-      console.log('row', row)
       let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
       row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
       // TODO: draw ?
@@ -60,11 +64,25 @@ function update() {
     }
 
     pixiInitialized.value = true
-    console.log('💨 pixi rows are initialized', pixiApplicationManager.value)
+    console.log('💨 pixi rows are initialized', pixiApplicationManager)
   }
 
+  // update the position of the rows
+  let rows = heatmapStore.tree?.getAllRows()
+  if (!rows) {
+    console.warn('rows is not set')
+    return
+  }
 
-  drawEverything()
+  for (let row of rows) {
+    let pixiRow = row.pixiRow
+    if (!pixiRow) {
+      console.warn('pixiRow is not set')
+      return
+    }
+
+    pixiRow.updatePosition(0, row.position * cellHeight.value)
+  }
 }
 
 // Function to get the maximum value in a row based on the coloring heatmap type
@@ -77,7 +95,7 @@ function getMaxRowValue(item: ItemNameAndData) {
 function drawEverything() {
   console.log('🖌️ drawEverything')
 
-  if (!pixiApplicationManager.value) {
+  if (!pixiApplicationManager) {
     console.warn('pixiApplicationManager is not set')
     return
   }
@@ -92,7 +110,6 @@ function drawEverything() {
 
     // Iterate over each attribute in the visibleRow
     for (const [attrIdx, attrValue] of visibleRow.data.entries()) {
-
       // because the attributes are not in the same order as in the original data due to sorting / stickyness (?)
       const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
       const initialValue = visibleRow.data[initialAttrIdx]
@@ -136,11 +153,15 @@ function drawEverything() {
 
       let color = getHeatmapColor(adjustedValue, heatmapMinValue, heatmapMaxValue)
 
-      let newHeatmapCell = new PixiHeatmapCell()
-      newHeatmapCell.draw(cellWidth.value, cellHeight.value, color)
-      pixiApplicationManager.value?.heatmap.cellContainer.addChild(newHeatmapCell)
+      // let newHeatmapCell = new PixiHeatmapCell()
+      // newHeatmapCell.draw(cellWidth.value, cellHeight.value, color)
+      // pixiApplicationManager.heatmap.cellContainer.addChild(newHeatmapCell)
     }
   }
+}
+
+function debug() {
+  console.log('🐞', pixiApplicationManager)
 }
 
 watch(
@@ -175,18 +196,22 @@ onMounted(async () => {
   heatmapWidth.value = canvas.value.clientWidth
   heatmapHeight.value = canvas.value.clientHeight
 
-  pixiApplicationManager.value = new PixiApplicationManager(
+  pixiApplicationManager = new PixiApplicationManager(
     canvas.value,
     heatmapWidth.value,
     heatmapHeight.value,
   )
 
-  console.log(pixiApplicationManager.value)
+  console.log(pixiApplicationManager)
 })
 </script>
 
 <template>
-  <canvas class="heatmap-canvas w-full h-full" ref="canvas"></canvas>
+  <div class="w-full h-full">
+    <canvas class="heatmap-canvas w-full h-full" ref="canvas"></canvas>
+    <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
+  </div>
+  
 </template>
 
 <style scoped></style>

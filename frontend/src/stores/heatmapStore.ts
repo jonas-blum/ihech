@@ -11,12 +11,15 @@ import {
   ColoringHeatmapEnum,
   getDistinctColor,
 } from '../helpers/helpers'
-import { Tree, Row, ItemRow, AggregatedRow } from '../helpers/classes'
+import { Tree } from '../helpers/classes'
 import { nextTick } from 'vue'
 
 export interface HeatmapStoreState {
   dataTables: CsvDataTableProfile[]
   activeDataTable: CsvDataTableProfile | null
+
+  // new Tree data structure
+  tree: Tree | null
 
   heatmap: HeatmapJSON
   highlightedRow: ItemNameAndData | null
@@ -38,10 +41,13 @@ export interface HeatmapStoreState {
   csvUploadOpen: boolean
 }
 
-export const useHeatmapStore: ReturnType<typeof defineStore> = defineStore('heatmapStore', {
+// @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
+export const useHeatmapStore = defineStore('heatmapStore', {
   state: (): HeatmapStoreState => ({
     dataTables: [],
     activeDataTable: null,
+
+    tree: null,
 
     heatmap: {
       attributeNames: [],
@@ -294,12 +300,11 @@ export const useHeatmapStore: ReturnType<typeof defineStore> = defineStore('heat
 
         console.log('Received heatmap:', this.heatmap)
 
-        
+        // initialize tree with the data received from the backend, starting at the root
         let root = this.heatmap.itemNamesAndData[0]
-
-        let tree = new Tree(root)
-        tree.updatePositionsAndDepth()
-        console.log('Tree:', tree)
+        this.tree = new Tree(root)
+        this.tree.updatePositionsAndDepth()
+        console.log('Tree:', this.tree)
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)

@@ -25,22 +25,8 @@ const columnLabelsHeight = ref<number>(200)
 const stickyAttributesGap = ref<number>(0)
 const stickyItemsGap = ref<number>(0)
 
-// updates the hierarchical structure of the visibleRows recursively
-function updateVisibleRows() {
-  function getVisibleRowsRecursively(row: ItemNameAndData): ItemNameAndData[] {
-    if (!row.isOpen || row.children === null) {
-      return [row]
-    } else if (row.isOpen && row.children) {
-      return [row].concat(
-        row.children.flatMap((child: ItemNameAndData) => getVisibleRowsRecursively(child)),
-      )
-    }
-    return []
-  }
-  visibleRows.value = heatmapStore.getHeatmap.itemNamesAndData.flatMap((row) =>
-    getVisibleRowsRecursively(row),
-  )
-}
+const pixiInitialized = ref(false)
+
 
 function update() {
   // TODO: this nees to be computed based on available space (?)
@@ -49,7 +35,35 @@ function update() {
   // rowLabelsWidth.value = 200
   // columnLabelsHeight.value = 200
 
-  updateVisibleRows()
+  // only once I need to init the pixi containers and graphics
+  if (!pixiInitialized.value) {
+    if (!pixiApplicationManager.value) {
+      console.warn('pixiApplicationManager is not set')
+      return
+    }
+
+    let pixiHeatmap = pixiApplicationManager.value.heatmap
+
+    // traverse the tree with all rows and create the pixiRows
+    let rows = heatmapStore.tree?.getAllRows()
+    if (!rows) {
+      console.warn('rows is not set')
+      return
+    }
+
+    for (let row of rows) {
+      console.log('row', row)
+      let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
+      row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
+      // TODO: draw ?
+      pixiHeatmap.addRow(pixiRow) // adds the PixiRow to the PixiHeatmap
+    }
+
+    pixiInitialized.value = true
+    console.log('💨 pixi rows are initialized', pixiApplicationManager.value)
+  }
+
+
   drawEverything()
 }
 

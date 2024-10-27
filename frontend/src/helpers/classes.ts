@@ -1,3 +1,5 @@
+import { PixiRow } from './PixiComponents'
+
 interface DimRedPosition {
   x: number
   y: number
@@ -11,49 +13,54 @@ export class Tree {
   }
 
   buildTree(itemNameAndData: any, parent: Row | null = null): Row {
-    let row: Row
+    let row: Row;
+
     if (itemNameAndData.children) {
-      const children = itemNameAndData.children.map((child: any) => this.buildTree(child, row))
+        // Create the row instance first, without children initially
+        row = new AggregatedRow(
+            itemNameAndData.itemName,
+            itemNameAndData.data,
+            { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
+            parent,
+            -1, // Position will be set later
+            -1, // Temporary depth, will be adjusted later
+            null, // prevSibling will be set later
+            null, // nextSibling will be set later
+            itemNameAndData.isOpen,
+            [] // Children will be set later
+        );
 
-      row = new AggregatedRow(
-        itemNameAndData.itemName,
-        itemNameAndData.data,
-        { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
-        parent,
-        -1, // Position will be set later
-        -1, // Temporary depth, will be adjusted later
-        null, // prevSibling will be set later
-        null, // nextSibling will be set later
-        itemNameAndData.isOpen,
-        children,
-      )
+        // Now create children, correctly passing `row` as the parent
+        const children = itemNameAndData.children.map((child: any) => this.buildTree(child, row));
+        // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
+        row.children = children; // Assign children to the row after they've been created
 
-      // set prevSibling and nextSibling for each child
-      // assumption: the order returned by the server is the order in which the children should be displayed
-      for (let i = 0; i < children.length; i++) {
-        if (i > 0) {
-          children[i].prevSibling = children[i - 1]
+        // Set prevSibling and nextSibling for each child
+        for (let i = 0; i < children.length; i++) {
+            if (i > 0) {
+                children[i].prevSibling = children[i - 1];
+            }
+            if (i < children.length - 1) {
+                children[i].nextSibling = children[i + 1];
+            }
         }
-        if (i < children.length - 1) {
-          children[i].nextSibling = children[i + 1]
-        }
-      }
     } else {
-      row = new ItemRow(
-        itemNameAndData.itemName,
-        itemNameAndData.data,
-        { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
-        [],
-        parent,
-        -1, // Position will be set later
-        -1, // Temporary depth, will be adjusted later
-        null, // prevSibling will be set later
-        null, // nextSibling will be set later
-      )
+        row = new ItemRow(
+            itemNameAndData.itemName,
+            itemNameAndData.data,
+            { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
+            [],
+            parent,
+            -1, // Position will be set later
+            -1, // Temporary depth, will be adjusted later
+            null, // prevSibling will be set later
+            null  // nextSibling will be set later
+        );
     }
 
-    return row
-  }
+    return row;
+}
+
 
   updatePositionsAndDepth() {
     let position = 0
@@ -80,6 +87,54 @@ export class Tree {
       }
     }
   }
+
+  getAllRows(): Row[] {
+    const rows: Row[] = []
+    let pointer: Row | null = this.root
+
+    while (pointer !== null) {
+      rows.push(pointer)
+
+      // Traverse to the first child if there is one
+      if (pointer instanceof AggregatedRow && pointer.hasChildren()) {
+        pointer = pointer.findFirstChild()
+      } else {
+        // Move to the next sibling if possible
+        while (pointer !== null && pointer.nextSibling === null) {
+          pointer = pointer.parent // Backtrack to the parent when no next sibling
+        }
+        // Move to the next sibling if available
+        if (pointer !== null) {
+          pointer = pointer.nextSibling
+        }
+      }
+    }
+
+    return rows
+  }
+
+  getVisisbleRows(): Row[] {
+    const rows: Row[] = []
+    let pointer: Row | null = this.root
+
+    while (pointer !== null) {
+      rows.push(pointer)
+
+      // Start traversal of the children if the current row is an aggregated row and is open
+      if (pointer instanceof AggregatedRow && pointer.isOpen && pointer.hasChildren()) {
+        pointer = pointer.findFirstChild()
+      } else {
+        // Traverse to the next sibling, or backtrack to the parent if no siblings are available
+        while (pointer.nextSibling === null && pointer.parent !== null) {
+          pointer = pointer.parent
+        }
+        // Move to the next sibling or set pointer to null if end of traversal
+        pointer = pointer.nextSibling
+      }
+    }
+
+    return rows
+  }
 }
 
 export abstract class Row {
@@ -91,6 +146,7 @@ export abstract class Row {
   depth: number
   prevSibling: Row | null
   nextSibling: Row | null
+  pixiRow: PixiRow | null // reference to the corresponding PixiRow for rendering
 
   protected constructor(
     name: string,
@@ -110,6 +166,7 @@ export abstract class Row {
     this.depth = depth
     this.prevSibling = prevSibling
     this.nextSibling = nextSibling
+    this.pixiRow = null
   }
 
   setPosition(position: number) {
@@ -165,7 +222,7 @@ export class AggregatedRow extends Row {
   }
 
   /**
-   * Finds the first child in the list of children.
+   * Finds the "first" child in the list of children.
    *
    * This method traverses the linked list of children starting from the first child (which is not necessarily the first child in the display order)
    * and returns the first child that has no previous sibling.
@@ -186,5 +243,21 @@ export class AggregatedRow extends Row {
 
   hasChildren(): boolean {
     return this.children.length > 0
+  }
+
+  open() {
+    this.isOpen = true
+    // TODO: trigger update of positions and depth
+  }
+
+  close() {
+    this.isOpen = false
+    // Close all children
+    this.children.forEach((child) => {
+      if (child instanceof AggregatedRow) {
+        child.close()
+      }
+    })
+    // TODO: trigger update of positions and depth
   }
 }

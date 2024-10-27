@@ -1,4 +1,5 @@
 import { Application, Graphics, Container } from 'pixi.js'
+import { Row } from './classes'
 
 export class PixiApplicationManager {
   app: Application
@@ -30,51 +31,54 @@ export class PixiApplicationManager {
 
 export class PixiHeatmap {
   public container: Container
-  public cellContainer: Container
+  public rowContainer: Container
   public rowLabelsContainer: Container
   public columnLabelsContainer: Container
-  public rows: PixiRow[]
 
   constructor() {
     // main container for everything in the heatmap (including the row and column labels)
     this.container = new Container()
-    this.rows = []
 
     // container for the cells, row labels, and column labels
-    this.cellContainer = new Container()
+    this.rowContainer = new Container()
     this.rowLabelsContainer = new Container()
     this.columnLabelsContainer = new Container()
 
     // add the containers to the main container
-    this.container.addChild(this.cellContainer)
+    this.container.addChild(this.rowContainer)
     this.container.addChild(this.rowLabelsContainer)
     this.container.addChild(this.columnLabelsContainer)
 
     // set the position of the containers
     // TODO
-    // this.cellContainer.position.set(rowLabelsWidth.value, columnLabelsHeight.value)
+    // this.rowContainer.position.set(rowLabelsWidth.value, columnLabelsHeight.value)
     // this.rowLabelsContainer.position.set(0, columnLabelsHeight.value)
     // this.columnLabelsContainer.position.set(rowLabelsWidth.value, 0)
   }
 
   addRow(row: PixiRow) {
-    this.rows.push(row)
-    this.container.addChild(row.container)
+    this.rowContainer.addChild(row.container)
   }
 }
 
 // maps 1:1 to ItenNameAndData
 export class PixiRow {
   public container: Container
-  public cells: PixiHeatmapCell[]
+  public row: Row | null // reference to data structure Row
 
-  constructor() {
+  constructor(row: Row) {
     this.container = new Container()
     this.cells = []
+    this.row = row
+
+    // create all the cells for the row
+    for (let value of row.data) {
+      const cell = new PixiHeatmapCell()
+      this.addCell(cell)
+    }
   }
 
   addCell(cell: PixiHeatmapCell) {
-    this.cells.push(cell)
     this.container.addChild(cell)
   }
 }
@@ -82,14 +86,18 @@ export class PixiRow {
 export class PixiHeatmapCell extends Graphics {
   // eventMode: string
   // cursor: string // otherwise typescript complains about it
+  value: number
 
   constructor(
+    value: number,
     // customProperties: CustomCollectionProperties,
     onClick: (heatmapCell: PixiHeatmapCell) => void = () => {},
     onMouseOver: (heatmapCell: PixiHeatmapCell) => void = () => {},
     onMouseOut: (heatmapCell: PixiHeatmapCell) => void = () => {},
   ) {
     super()
+    this.value = value // TODO: not used yet
+    this.draw(10, 10, 0x000000)
 
     // Initialize custom properties within the namespace object
     // this.customProperties = customProperties

@@ -1,4 +1,4 @@
-import { PixiRow } from './PixiComponents'
+import { PixiRow, PixiRowLabel } from './PixiComponents'
 import { useHeatmapStore } from '../stores/heatmapStore'
 import { ColoringHeatmapEnum } from './helpers'
 
@@ -149,6 +149,7 @@ export abstract class Row {
   prevSibling: Row | null
   nextSibling: Row | null
   pixiRow: PixiRow | null // reference to the corresponding PixiRow for rendering
+  pixiRowLabel: PixiRowLabel | null // reference to the corresponding PixiRowLabel for rendering
 
   protected constructor(
     name: string,
@@ -170,6 +171,7 @@ export abstract class Row {
     this.prevSibling = prevSibling
     this.nextSibling = nextSibling
     this.pixiRow = null
+    this.pixiRowLabel = null
   }
 
   static computeAdjustedData(data: number[]): number[] {

@@ -1,4 +1,4 @@
-import { Application, Graphics, Container } from 'pixi.js'
+import { Application, Graphics, Container, Text } from 'pixi.js'
 import { Row } from './classes'
 import { useHeatmapStore } from '../stores/heatmapStore'
 import { ColoringHeatmapEnum } from './helpers'
@@ -39,8 +39,8 @@ export class PixiApplicationManager {
 }
 
 export class PixiHeatmap {
-  public container: Container
-  public rowContainer: Container
+  public container: Container // rowContainer, rowLabelsContainer, columnLabelsContainer as children
+  public rowContainer: Container // PixiRow[] as children
   public rowLabelsContainer: Container
   public columnLabelsContainer: Container
 
@@ -68,11 +68,43 @@ export class PixiHeatmap {
   addRow(row: PixiRow) {
     this.rowContainer.addChild(row.container)
   }
+
+  addRowLabel(rowLabel: PixiRowLabel) {
+    this.rowLabelsContainer.addChild(rowLabel.container)
+  }
+}
+
+export class PixiRowLabel {
+  public container: Container // Text as child
+  public row: Row // reference to data structure Row
+
+  constructor(row: Row) {
+    this.container = new Container()
+    this.row = row
+
+    // create the text for the row label
+    const text = new Text({
+      text: row.name,
+      style: {
+        fill: 0x000000,
+        fontSize: 12,
+        fontFamily: 'Arial',
+      },
+    })
+    this.container.addChild(text)
+    // TODO: icons and other stuff can be added here
+
+    this.updateVerticalPosition()
+  }
+
+  updateVerticalPosition() {
+    this.container.y = this.row.position * 20 // TODO: hardcoded for the moment
+  }
 }
 
 // maps 1:1 to ItenNameAndData
 export class PixiRow {
-  public container: Container
+  public container: Container // PixiHeatmapCell[] as children
   public row: Row // reference to data structure Row
 
   constructor(row: Row) {

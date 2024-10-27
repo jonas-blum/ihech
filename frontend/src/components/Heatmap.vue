@@ -10,6 +10,7 @@ import {
   PixiHeatmap,
   PixiRow,
   PixiHeatmapCell,
+  PixiRowLabel,
 } from '@helpers/PixiComponents'
 import { Graphics } from 'pixi.js'
 
@@ -59,8 +60,11 @@ function update() {
     for (let row of rows) {
       let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
       row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
-      // TODO: draw ?
       pixiHeatmap.addRow(pixiRow) // adds the PixiRow to the PixiHeatmap
+
+      let pixiRowLabel = new PixiRowLabel(row) // create PixiRowLabel with reference to the Row
+      row.pixiRowLabel = pixiRowLabel // set the reference to the PixiRowLabel in the Row
+      pixiHeatmap.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmap
     }
 
     pixiInitialized.value = true

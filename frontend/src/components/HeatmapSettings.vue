@@ -8,7 +8,7 @@ import {
   mapColoringHeatmapEnum,
   mapSortOderAttributesEnum,
   mapScalingEnum,
-  type ItemNameAndData,
+  type HierarchicalItem,
 } from '@/helpers/helpers'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import SettingsIcon from '@assets/settings.svg'
@@ -17,7 +17,7 @@ import SingleSelect from './SingleSelect.vue'
 
 const heatmapStore = useHeatmapStore()
 
-const selectedItem = ref<ItemNameAndData | null>(null)
+const selectedItem = ref<HierarchicalItem | null>(null)
 
 async function updateScaling(scaling: ScalingEnum) {
   heatmapStore.setScaling(scaling)
@@ -98,7 +98,7 @@ function reloadHeatmap() {
   heatmapStore.fetchHeatmap()
 }
 
-function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
+function makeItemStickyAndExpandItem(item: HierarchicalItem | null) {
   if (!item) return
   if (!heatmapStore.getStickyItems.includes(item)) {
     heatmapStore.toggleStickyItem(item)

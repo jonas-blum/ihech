@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import {
   type HeatmapJSON,
-  type ItemNameAndData,
+  type HierarchicalItem,
   findRowByIndex,
   type CsvDataTableProfile,
   ScalingEnum,
@@ -18,14 +18,14 @@ export interface HeatmapStoreState {
   activeDataTable: CsvDataTableProfile | null
 
   heatmap: HeatmapJSON
-  highlightedRow: ItemNameAndData | null
+  highlightedRow: HierarchicalItem | null
 
   //From the "newIdx" -> original Index (of the heatmap.attributeNames)
   attributeMap: Map<number, number>
 
-  rowCollectionsMap: Map<ItemNameAndData, Set<string>>
+  rowCollectionsMap: Map<HierarchicalItem, Set<string>>
 
-  allItems: ItemNameAndData[]
+  allItems: HierarchicalItem[]
 
   dataChanging: number
   loading: boolean
@@ -46,7 +46,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       heatmapData: [],
       attributeNames: [],
       attributeDissimilarities: [],
-      itemNamesAndData: [],
+      hierarchicalItems: [],
       maxHeatmapValue: 100,
       minHeatmapValue: 0,
       maxDimRedXValue: 100,
@@ -113,14 +113,17 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       if (!state.activeDataTable) {
         return []
       }
-      return state.heatmap.itemNamesAndData.slice(0, state.activeDataTable.stickyItemIndexes.length)
+      return state.heatmap.hierarchicalItems.slice(
+        0,
+        state.activeDataTable.stickyItemIndexes.length,
+      )
     },
 
     getNonStickyItems: (state) => {
       if (!state.activeDataTable) {
         return []
       }
-      return state.heatmap.itemNamesAndData.slice(state.activeDataTable.stickyItemIndexes.length)
+      return state.heatmap.hierarchicalItems.slice(state.activeDataTable.stickyItemIndexes.length)
     },
 
     getAllItems: (state) => state.allItems,
@@ -293,15 +296,15 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         this.heatmap = receivedHeatmap
 
-        this.heatmap.itemNamesAndData.forEach((row) => {
+        this.heatmap.hierarchicalItems.forEach((row) => {
           setParentOfRowsRec(row, null)
         })
 
         //Deal with sticky items and correct order
-        const stickyRows: ItemNameAndData[] = []
+        const stickyRows: HierarchicalItem[] = []
 
         for (const stickyRow of this.activeDataTable.stickyItemIndexes) {
-          this.heatmap.itemNamesAndData.forEach((row) => {
+          this.heatmap.hierarchicalItems.forEach((row) => {
             const foundRow = findRowByIndex(row, stickyRow)
             if (foundRow) {
               stickyRows.push(foundRow)
@@ -313,7 +316,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           .map((row) => row.index)
           .filter((index) => index !== null) as number[]
 
-        this.heatmap.itemNamesAndData = [...stickyRows, ...this.heatmap.itemNamesAndData]
+        this.heatmap.hierarchicalItems = [...stickyRows, ...this.heatmap.hierarchicalItems]
 
         //Deal with sticky Attributes and correct order
         this.activeDataTable.stickyAttributes = this.activeDataTable.stickyAttributes.filter(
@@ -412,7 +415,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       this.activeDataTable.dimReductionAlgo = dimReductionAlgo
     },
-    setHighlightedRow(row: ItemNameAndData | null) {
+    setHighlightedRow(row: HierarchicalItem | null) {
       this.highlightedRow = row
     },
     setClusterAfterDimRed(clusterAfterDim: boolean) {
@@ -459,7 +462,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       console.log('changing heatmap', this.dataChanging)
     },
 
-    buildRowCollectionsMapRecursively(item: ItemNameAndData): Set<string> {
+    buildRowCollectionsMapRecursively(item: HierarchicalItem): Set<string> {
       let collectionOfItem = undefined
       if (item.index !== null) {
         collectionOfItem = this.activeDataTable?.itemCollectionMap[item.index]
@@ -483,12 +486,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         console.error('No active data table')
         return
       }
-      this.heatmap.itemNamesAndData.forEach((item) => {
+      this.heatmap.hierarchicalItems.forEach((item) => {
         this.buildRowCollectionsMapRecursively(item)
       })
     },
 
-    getCollectionNamesOfItem(item: ItemNameAndData): string[] {
+    getCollectionNamesOfItem(item: HierarchicalItem): string[] {
       return Array.from(this.rowCollectionsMap.get(item) ?? [])
     },
     updateSelectedItemIndexesBasedOnSelectedCollections(): void {
@@ -584,7 +587,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.outOfSync = outOfSync
     },
 
-    getColorsOfItem(item: ItemNameAndData): string[] {
+    getColorsOfItem(item: HierarchicalItem): string[] {
       if (!this.activeDataTable) {
         console.error('No active data table')
         return ['black']
@@ -636,7 +639,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
       this.activeDataTable.showOnlyStickyItemsInDimReduction = showOnlyStickyItemsInDimRed
     },
-    toggleStickyItem(stickyItem: ItemNameAndData) {
+    toggleStickyItem(stickyItem: HierarchicalItem) {
       if (!this.activeDataTable) {
         console.error('No active data table')
         throw new Error('No active data table')
@@ -648,7 +651,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
       const stickyItems = this.getStickyItems
 
-      const previousNonStickyItems = this.heatmap.itemNamesAndData.slice(
+      const previousNonStickyItems = this.heatmap.hierarchicalItems.slice(
         stickyItems.length,
         undefined,
       )
@@ -658,12 +661,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           (item) => item !== stickyItem.index,
         )
         stickyItems.splice(stickyItems.indexOf(stickyItem), 1)
-        this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
+        this.heatmap.hierarchicalItems = [...stickyItems, ...previousNonStickyItems]
       } else {
         if (stickyItem.index !== null) {
           this.activeDataTable.stickyItemIndexes.push(stickyItem.index)
           stickyItems.push(stickyItem)
-          this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
+          this.heatmap.hierarchicalItems = [...stickyItems, ...previousNonStickyItems]
         }
       }
 
@@ -688,18 +691,18 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.changeHeatmap()
     },
 
-    expandRow(row: ItemNameAndData) {
+    expandRow(row: HierarchicalItem) {
       row.isOpen = true
       this.changeHeatmap()
     },
 
-    closeRow(row: ItemNameAndData) {
+    closeRow(row: HierarchicalItem) {
       row.isOpen = false
       this.closeChildRowsRecursively(row)
       this.changeHeatmap()
     },
 
-    closeNearestOpenParent(targetRow: ItemNameAndData) {
+    closeNearestOpenParent(targetRow: HierarchicalItem) {
       if (targetRow.isOpen) {
         targetRow.isOpen = false
         this.closeChildRowsRecursively(targetRow)
@@ -717,7 +720,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.changeHeatmap()
     },
 
-    closeChildRowsRecursively(row: ItemNameAndData) {
+    closeChildRowsRecursively(row: HierarchicalItem) {
       row.isOpen = false
       const areAllChildRowsClosed = row.children?.every((child) => !child.isOpen)
       if (!areAllChildRowsClosed) {
@@ -727,7 +730,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
     },
 
-    toggleOpenRow(row: ItemNameAndData) {
+    toggleOpenRow(row: HierarchicalItem) {
       if (row.isOpen) {
         this.closeRow(row)
       } else {
@@ -736,8 +739,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     },
     findItemByIndexRecursively(
       index: number,
-      itemNamesAndData: ItemNameAndData,
-    ): ItemNameAndData | undefined {
+      itemNamesAndData: HierarchicalItem,
+    ): HierarchicalItem | undefined {
       if (itemNamesAndData.index === index) {
         return itemNamesAndData
       }
@@ -754,16 +757,16 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       if (!this.heatmap) {
         return
       }
-      for (const item of this.heatmap.itemNamesAndData) {
+      for (const item of this.heatmap.hierarchicalItems) {
         const foundItem = this.findItemByIndexRecursively(index, item)
         if (foundItem) {
           return foundItem
         }
       }
     },
-    getAllChildrenIteratively(items: ItemNameAndData[]): ItemNameAndData[] {
-      const allLeafNodes: ItemNameAndData[] = []
-      const stack: ItemNameAndData[] = []
+    getAllChildrenIteratively(items: HierarchicalItem[]): HierarchicalItem[] {
+      const allLeafNodes: HierarchicalItem[] = []
+      const stack: HierarchicalItem[] = []
 
       items.forEach((item) => stack.push(item))
 
@@ -793,7 +796,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.allItems = leafNodes
     },
 
-    expandItemAndAllParents(item: ItemNameAndData | null) {
+    expandItemAndAllParents(item: HierarchicalItem | null) {
       if (!item) {
         return
       }
@@ -813,7 +816,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       for (const item of this.getStickyItems) {
         item.isOpen = true
-        let parent: ItemNameAndData | null = item.parent
+        let parent: HierarchicalItem | null = item.parent
         while (parent !== null) {
           parent.isOpen = true
           parent = parent.parent
@@ -823,7 +826,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
   },
 })
 
-function setParentOfRowsRec(row: ItemNameAndData, parent: ItemNameAndData | null) {
+function setParentOfRowsRec(row: HierarchicalItem, parent: HierarchicalItem | null) {
   row.parent = parent
   if (row.children) {
     row.children.forEach((child) => {

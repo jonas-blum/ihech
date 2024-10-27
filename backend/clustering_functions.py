@@ -22,6 +22,7 @@ def all_rows_same(df):
 
 
 def cluster_items_recursively(
+    heatmap_data: List[List[float]],
     original_df: pd.DataFrame,
     original_df_dropped: pd.DataFrame,
     scaled_df: pd.DataFrame,
@@ -44,6 +45,7 @@ def cluster_items_recursively(
         new_item_name_0 = str(original_df.shape[0])
 
         children_0 = cluster_items_recursively(
+            heatmap_data,
             original_df,
             original_df_dropped,
             scaled_df,
@@ -54,12 +56,13 @@ def cluster_items_recursively(
             collection_column_names,
             level + 1,
         )
-
+        
+        heatmap_data.append(tag_data_0_aggregated)
         new_aggregated_item_name_and_data = ItemNameAndData(
             index=None,
+            dataItemIndex=len(heatmap_data) -1,
             itemName=new_item_name_0,
             isOpen=True,
-            data=tag_data_0_aggregated,
             amountOfDataPoints=original_df.shape[0],
             dimReductionX=dim_reduction_0_aggregated[0],
             dimReductionY=dim_reduction_0_aggregated[1],
@@ -98,12 +101,14 @@ def cluster_items_recursively(
             ):
                 solo_child_name = str(original_group_df.iloc[0][item_names_column_name])
                 solo_child_data = np.round(original_temp_df_dropped.iloc[0],rounding_precision).tolist()
+                
+                heatmap_data.append(solo_child_data)
                 new_children = [
                     ItemNameAndData(
                         index=original_group_df.index[0],
+                        dataItemIndex=len(heatmap_data)-1,
                         itemName=solo_child_name,
                         isOpen=is_open,
-                        data=solo_child_data,
                         amountOfDataPoints=1,
                         dimReductionX=np.round(
                             dim_red_df.loc[original_group_df.index].iloc[0][0],
@@ -118,6 +123,7 @@ def cluster_items_recursively(
                 ]
             else:
                 new_children = cluster_items_recursively(
+                    heatmap_data,
                     original_temp_df,
                     original_temp_df_dropped,
                     scaled_temp_df,
@@ -129,11 +135,12 @@ def cluster_items_recursively(
                     level + 1,
                 )
 
+            heatmap_data.append(tag_data_aggregated)
             new_item_name_and_data = ItemNameAndData(
                 index=None,
+                dataItemIndex=len(heatmap_data)-1,
                 itemName=new_item_name,
                 isOpen=is_open,
-                data=tag_data_aggregated,
                 amountOfDataPoints=original_group_df.shape[0],
                 dimReductionX=dim_reduction_aggregated[0],
                 dimReductionY=dim_reduction_aggregated[1],
@@ -168,11 +175,12 @@ def cluster_items_recursively(
 
         for i in range(original_df.shape[0]):
 
+            heatmap_data.append(all_data[i])
             new_item_name_and_data = ItemNameAndData(
                 index=original_df.index[i],
+                dataItemIndex=len(heatmap_data)-1,
                 itemName=new_item_names[i],
                 isOpen=is_open,
-                data=all_data[i],
                 amountOfDataPoints=1,
                 dimReductionX=dimReductionsX[i],
                 dimReductionY=dimReductionsY[i],
@@ -230,11 +238,12 @@ def cluster_items_recursively(
                 scaled_df_list = scaled_cluster_df.values.tolist()
 
                 for i in range(original_cluster_df.shape[0]):
+                    heatmap_data.append(all_data[i])
                     new_item_name_and_data = ItemNameAndData(
                         index=original_cluster_df.index[i],
+                        dataItemIndex=len(heatmap_data)-1,
                         itemName=new__cluster_item_names[i],
                         isOpen=is_open,
-                        data=all_data[i],
                         amountOfDataPoints=1,
                         dimReductionX=dimReductionsX[i],
                         dimReductionY=dimReductionsY[i],
@@ -254,11 +263,13 @@ def cluster_items_recursively(
                 new_data = np.round(
                     original_cluster_df_dropped.iloc[0], rounding_precision
                 ).tolist()
+                
+                heatmap_data.append(new_data)
                 new_item_name_and_data = ItemNameAndData(
                     index=original_cluster_df.index[0],
+                    dataItemIndex=len(heatmap_data)-1,
                     itemName=new_item_name,
                     isOpen=is_open,
-                    data=new_data,
                     amountOfDataPoints=1,
                     dimReductionX=np.round(
                         dim_red_cluster_df.iloc[0][0], rounding_precision
@@ -288,6 +299,7 @@ def cluster_items_recursively(
             new_item_name = str(original_cluster_df.shape[0])
 
             children = cluster_items_recursively(
+                heatmap_data,
                 original_cluster_df,
                 original_cluster_df_dropped,
                 scaled_cluster_df,
@@ -299,11 +311,12 @@ def cluster_items_recursively(
                 level + 1,
             )
 
+            heatmap_data.append(tag_data_aggregated)
             new_aggregated_item_name_and_data = ItemNameAndData(
                 index=None,
+                dataItemIndex=len(heatmap_data)-1,
                 itemName=new_item_name,
                 isOpen=is_open,
-                data=tag_data_aggregated,
                 amountOfDataPoints=original_cluster_df.shape[0],
                 dimReductionX=dim_reduction_aggregated[0],
                 dimReductionY=dim_reduction_aggregated[1],

@@ -69,9 +69,9 @@ class ExtendedVectorRepresentation:
 
 class ItemNameAndData:
     index: Union[int, None]
+    dataItemIndex: int
     itemName: str
     isOpen: bool
-    data: List[float]
     amountOfDataPoints: int
     dimReductionX: float
     dimReductionY: float
@@ -80,18 +80,18 @@ class ItemNameAndData:
     def __init__(
         self,
         index: Union[int, None],
+        dataItemIndex: int,
         itemName: str,
         isOpen: bool,
-        data: List[float],
         amountOfDataPoints: int,
         dimReductionX: float,
         dimReductionY: float,
         children: Union["List[ItemNameAndData]", None],
     ):
         self.index: Union[int, None] = index
+        self.dataItemIndex: int = dataItemIndex
         self.itemName: str = itemName
         self.isOpen: bool = isOpen
-        self.data: List[float] = data
         self.amountOfDataPoints: int = amountOfDataPoints
         self.dimReductionX: float = dimReductionX
         self.dimReductionY: float = dimReductionY
@@ -111,9 +111,9 @@ def custom_encoder(obj):
 
         return {
             "index": obj.index,
+            "dataItemIndex": obj.dataItemIndex,
             "itemName": obj.itemName,
             "isOpen": obj.isOpen,
-            "data": obj.data,
             "amountOfDataPoints": obj.amountOfDataPoints,
             "dimReductionX": obj.dimReductionX,
             "dimReductionY": obj.dimReductionY,
@@ -130,6 +130,7 @@ def custom_encoder(obj):
 
 class HeatmapJSON:
     def __init__(self):
+        self.heatmapData: List[List[float]] = []
         self.attributeNames: List[str] = []
         self.attributeDissimilarities: List[List[float]] = []
         self.itemNamesAndData: List[ItemNameAndData] = []

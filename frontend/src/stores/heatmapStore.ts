@@ -47,6 +47,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       attributeNames: [],
       attributeDissimilarities: [],
       hierarchicalItems: [],
+      hierarchicalAttributes: [],
       maxHeatmapValue: 100,
       minHeatmapValue: 0,
       maxDimRedXValue: 100,

@@ -96,6 +96,24 @@ class HierarchicalItem:
         self.dimReductionX: float = dimReductionX
         self.dimReductionY: float = dimReductionY
         self.children: Union[List[HierarchicalItem], None] = children
+        
+class HierarchicalAttribute:
+    attributeName: str
+    dataAttributeIndex: int
+    isOpen: bool
+    children: Union["List[HierarchicalAttribute]", None]
+
+    def __init__(
+        self,
+        attributeName: str,
+        dataAttributeIndex: int,
+        isOpen: bool,
+        children: Union["List[HierarchicalAttribute]", None],
+    ):
+        self.attributeName: str = attributeName
+        self.dataAttributeIndex: int = dataAttributeIndex
+        self.isOpen: bool = isOpen
+        self.children: Union[List[HierarchicalAttribute], None] = children
 
 
 def custom_encoder(obj):
@@ -107,8 +125,8 @@ def custom_encoder(obj):
         return obj.tolist()
     elif isinstance(obj, HeatmapJSON):
         return obj.__dict__
+    
     elif isinstance(obj, HierarchicalItem):
-
         return {
             "index": obj.index,
             "dataItemIndex": obj.dataItemIndex,
@@ -123,6 +141,19 @@ def custom_encoder(obj):
                 else None
             ),
         }
+        
+    elif isinstance(obj, HierarchicalAttribute):
+        return {
+            "attributeName": obj.attributeName,
+            "dataAttributeIndex": obj.dataAttributeIndex,
+            "isOpen": obj.isOpen,
+            "children": (
+                [custom_encoder(child) for child in obj.children]
+                if obj.children
+                else None
+            ),
+        }
+        
     elif hasattr(obj, "__dict__"):
         return obj.__dict__
     raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
@@ -134,6 +165,7 @@ class HeatmapJSON:
         self.attributeNames: List[str] = []
         self.attributeDissimilarities: List[List[float]] = []
         self.hierarchicalItems: List[HierarchicalItem] = []
+        self.hierarchicalAttributes: List[HierarchicalAttribute] = []
         self.maxHeatmapValue: float = 0
         self.minHeatmapValue: float = 0
         self.maxDimRedXValue: float = 0

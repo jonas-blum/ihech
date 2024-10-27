@@ -124,11 +124,21 @@ export interface HierarchicalItem {
   parent: HierarchicalItem | undefined
 }
 
+export interface HierarchicalAttribute {
+  attributeName: string
+  dataAttributeIndex: number
+  isOpen: boolean
+  children: HierarchicalAttribute[] | null
+
+  parent: HierarchicalAttribute | undefined
+}
+
 export interface HeatmapJSON {
   heatmapData: number[][]
   attributeNames: string[]
   attributeDissimilarities: number[]
   hierarchicalItems: HierarchicalItem[]
+  hierarchicalAttributes: HierarchicalAttribute[]
   maxHeatmapValue: number
   minHeatmapValue: number
   maxDimRedXValue: number

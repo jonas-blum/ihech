@@ -1,5 +1,7 @@
 import { Application, Graphics, Container } from 'pixi.js'
 import { Row } from './classes'
+import { useHeatmapStore } from '../stores/heatmapStore'
+import { ColoringHeatmapEnum } from './helpers'
 
 export class PixiApplicationManager {
   app: Application
@@ -18,13 +20,12 @@ export class PixiApplicationManager {
       // autoDensity: true, // not sure what this does
     })
 
-    
     // add heatmap
     this.heatmap = new PixiHeatmap()
     this.app.stage.addChild(this.heatmap.container)
     // TODO: this needs to be moved
     this.heatmap.container.position.set(0, 0)
-    
+
     console.log('PixiApplicationManager constructor')
     console.log(this.app, this.app.stage)
 
@@ -72,31 +73,39 @@ export class PixiHeatmap {
 // maps 1:1 to ItenNameAndData
 export class PixiRow {
   public container: Container
-  public row: Row | null // reference to data structure Row
+  public row: Row // reference to data structure Row
 
   constructor(row: Row) {
     this.container = new Container()
     this.row = row
 
     // create all the cells for the row
-    for (let value of row.data) {
-      const cell = new PixiHeatmapCell(value)
+    for (let i = 0; i < row.data.length; i++) {
+      const value = row.data[i]
+      const adjustedValue = row.dataAdjusted[i]
+      const cell = new PixiHeatmapCell(value, adjustedValue, i)
       this.container.addChild(cell)
     }
+
+    this.updateVerticalPosition()
   }
 
-  updatePosition(x: number, y: number) {
-    this.container.position.set(x, y)
+  updateVerticalPosition() {
+    this.container.y = this.row.position * 20 // TODO: hardcoded for the moment
   }
 }
 
 export class PixiHeatmapCell extends Graphics {
   // eventMode: string
   // cursor: string // otherwise typescript complains about it
-  value: number
+  value: number // the true value of the cell (as received by the backend)
+  adjustedValue: number // the value adjusted for the coloring mode
+  column: number // the column index of the cell
 
   constructor(
     value: number,
+    adjustedValue: number,
+    column: number,
     // customProperties: CustomCollectionProperties,
     onClick: (heatmapCell: PixiHeatmapCell) => void = () => {},
     onMouseOver: (heatmapCell: PixiHeatmapCell) => void = () => {},
@@ -104,7 +113,10 @@ export class PixiHeatmapCell extends Graphics {
   ) {
     super()
     this.value = value // TODO: not used yet
-    this.draw(10, 10, 0x000000)
+    this.adjustedValue = adjustedValue
+    this.column = column
+    this.draw(18, 18, useHeatmapStore()?.getHeatmapColor(adjustedValue)) // TODO: hardcoded for the moment
+    this.position.x = this.column * 20 // TODO: hardcoded for the moment
 
     // Initialize custom properties within the namespace object
     // this.customProperties = customProperties

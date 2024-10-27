@@ -801,6 +801,13 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         }
       }
     },
+    getHeatmapColor(value: number): string {
+      let min = this.getHeatmapMinValue
+      let max = this.getHeatmapMaxValue
+      const normalizedValue = (value - min) / (max - min)
+      const l = 90 - normalizedValue * 65
+      return `hsl(215, 100%, ${l}%)`
+    }
   },
 })
 

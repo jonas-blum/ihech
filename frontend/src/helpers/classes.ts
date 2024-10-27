@@ -1,4 +1,6 @@
 import { PixiRow } from './PixiComponents'
+import { useHeatmapStore } from '../stores/heatmapStore'
+import { ColoringHeatmapEnum } from './helpers'
 
 interface DimRedPosition {
   x: number
@@ -13,54 +15,53 @@ export class Tree {
   }
 
   buildTree(itemNameAndData: any, parent: Row | null = null): Row {
-    let row: Row;
+    let row: Row
 
     if (itemNameAndData.children) {
-        // Create the row instance first, without children initially
-        row = new AggregatedRow(
-            itemNameAndData.itemName,
-            itemNameAndData.data,
-            { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
-            parent,
-            -1, // Position will be set later
-            -1, // Temporary depth, will be adjusted later
-            null, // prevSibling will be set later
-            null, // nextSibling will be set later
-            itemNameAndData.isOpen,
-            [] // Children will be set later
-        );
+      // Create the row instance first, without children initially
+      row = new AggregatedRow(
+        itemNameAndData.itemName,
+        itemNameAndData.data,
+        { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
+        parent,
+        -1, // Position will be set later
+        -1, // Temporary depth, will be adjusted later
+        null, // prevSibling will be set later
+        null, // nextSibling will be set later
+        itemNameAndData.isOpen,
+        [], // Children will be set later
+      )
 
-        // Now create children, correctly passing `row` as the parent
-        const children = itemNameAndData.children.map((child: any) => this.buildTree(child, row));
-        // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
-        row.children = children; // Assign children to the row after they've been created
+      // Now create children, correctly passing `row` as the parent
+      const children = itemNameAndData.children.map((child: any) => this.buildTree(child, row))
+      // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
+      row.children = children // Assign children to the row after they've been created
 
-        // Set prevSibling and nextSibling for each child
-        for (let i = 0; i < children.length; i++) {
-            if (i > 0) {
-                children[i].prevSibling = children[i - 1];
-            }
-            if (i < children.length - 1) {
-                children[i].nextSibling = children[i + 1];
-            }
+      // Set prevSibling and nextSibling for each child
+      for (let i = 0; i < children.length; i++) {
+        if (i > 0) {
+          children[i].prevSibling = children[i - 1]
         }
+        if (i < children.length - 1) {
+          children[i].nextSibling = children[i + 1]
+        }
+      }
     } else {
-        row = new ItemRow(
-            itemNameAndData.itemName,
-            itemNameAndData.data,
-            { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
-            [],
-            parent,
-            -1, // Position will be set later
-            -1, // Temporary depth, will be adjusted later
-            null, // prevSibling will be set later
-            null  // nextSibling will be set later
-        );
+      row = new ItemRow(
+        itemNameAndData.itemName,
+        itemNameAndData.data,
+        { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
+        [],
+        parent,
+        -1, // Position will be set later
+        -1, // Temporary depth, will be adjusted later
+        null, // prevSibling will be set later
+        null, // nextSibling will be set later
+      )
     }
 
-    return row;
-}
-
+    return row
+  }
 
   updatePositionsAndDepth() {
     let position = 0
@@ -140,6 +141,7 @@ export class Tree {
 export abstract class Row {
   name: string
   data: number[]
+  dataAdjusted: number[]
   dimRedPosition: DimRedPosition
   parent: Row | null
   position: number
@@ -160,6 +162,7 @@ export abstract class Row {
   ) {
     this.name = name
     this.data = data
+    this.dataAdjusted = Row.computeAdjustedData(data)
     this.dimRedPosition = dimRedPosition
     this.parent = parent
     this.position = position
@@ -167,6 +170,34 @@ export abstract class Row {
     this.prevSibling = prevSibling
     this.nextSibling = nextSibling
     this.pixiRow = null
+  }
+
+  static computeAdjustedData(data: number[]): number[] {
+    if (
+      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
+    ) {
+      const maxValue = Math.max(...data)
+      return data.map((value) => value / maxValue)
+    } else if (
+      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap ===
+      ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
+    ) {
+      let adjustedData = []
+      for (let i = 0; i < data.length; i++) {
+        const minAttributeValue = useHeatmapStore()?.getMinAttributeValues[i]
+        const maxAttributeValue = useHeatmapStore()?.getMaxAttributeValues[i]
+        const difference =
+          maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
+        adjustedData.push((data[i] - minAttributeValue) / difference)
+      }
+      return adjustedData
+    } else if (
+      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
+    ) {
+      return data.map((value) => Math.log(value + useHeatmapStore()?.getLogShiftValue))
+    } else {
+      return data
+    }
   }
 
   setPosition(position: number) {

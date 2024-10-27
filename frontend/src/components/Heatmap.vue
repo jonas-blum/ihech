@@ -2,7 +2,7 @@
 import { nextTick, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 
-import { ColoringHeatmapEnum, type ItemNameAndData, getHeatmapColor } from '@helpers/helpers'
+import { ColoringHeatmapEnum, type ItemNameAndData } from '@helpers/helpers'
 import { useHeatmapStore } from '@stores/heatmapStore'
 
 import {
@@ -67,22 +67,22 @@ function update() {
     console.log('💨 pixi rows are initialized', pixiApplicationManager)
   }
 
-  // update the position of the rows
-  let rows = heatmapStore.tree?.getAllRows()
-  if (!rows) {
-    console.warn('rows is not set')
-    return
-  }
+  // // update the position of the rows
+  // let rows = heatmapStore.tree?.getAllRows()
+  // if (!rows) {
+  //   console.warn('rows is not set')
+  //   return
+  // }
 
-  for (let row of rows) {
-    let pixiRow = row.pixiRow
-    if (!pixiRow) {
-      console.warn('pixiRow is not set')
-      return
-    }
+  // for (let row of rows) {
+  //   let pixiRow = row.pixiRow
+  //   if (!pixiRow) {
+  //     console.warn('pixiRow is not set')
+  //     return
+  //   }
 
-    pixiRow.updatePosition(0, row.position * cellHeight.value)
-  }
+  //   pixiRow.updatePosition(0, row.position * cellHeight.value)
+  // }
 }
 
 // Function to get the maximum value in a row based on the coloring heatmap type

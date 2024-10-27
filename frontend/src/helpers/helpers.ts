@@ -25,12 +25,6 @@ export const CSV_UPLOAD_COLLAPSED_HEIGHT = 60
 export const CSV_UPLOAD_CONTENT_HEIGHT = 365
 export const CSV_UPLOAD_EXPANDED_HEIGHT = CSV_UPLOAD_COLLAPSED_HEIGHT + CSV_UPLOAD_CONTENT_HEIGHT
 
-export function getHeatmapColor(value: number, min: number, max: number) {
-  const normalizedValue = (value - min) / (max - min)
-  const l = 90 - normalizedValue * 65
-  return `hsl(215, 100%, ${l}%)`
-}
-
 export function getDistinctColor(index: number, colorList = COLORS): string {
   const newIndex = index % colorList.length
   const selectedColor = colorList[newIndex]

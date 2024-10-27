@@ -43,6 +43,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     activeDataTable: null,
 
     heatmap: {
+      heatmapData: [],
       attributeNames: [],
       attributeDissimilarities: [],
       itemNamesAndData: [],
@@ -258,9 +259,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         const reader = response.body.getReader()
         let receivedData = new Uint8Array()
 
+        const runningLoop = true
         const stream = new ReadableStream({
           async start(controller) {
-            while (true) {
+            while (runningLoop) {
               const { done, value } = await reader.read()
               if (done) {
                 controller.close()

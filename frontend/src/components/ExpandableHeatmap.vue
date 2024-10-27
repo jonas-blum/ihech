@@ -245,14 +245,15 @@ function drawEverything() {
 
     for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
       const item = visibleRows.value[itemIdx]
+      const itemData = heatmapStore.getHeatmap.heatmapData[item.dataItemIndex]
       let maxRowValue = 1
       if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE) {
-        maxRowValue = Math.max(...item.data)
+        maxRowValue = Math.max(...itemData)
       }
 
-      for (let attrIdx = 0; attrIdx < item.data.length; attrIdx++) {
+      for (let attrIdx = 0; attrIdx < itemData.length; attrIdx++) {
         const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
-        const initialValue = item.data[initialAttrIdx]
+        const initialValue = itemData[initialAttrIdx]
 
         let adjustedValue = initialValue
         if (
@@ -425,8 +426,8 @@ function updateTooltip(e: MouseEvent) {
   if (heatmapStore.getHighlightedRow !== selectedRow) {
     heatmapStore.setHighlightedRow(selectedRow)
   }
-
-  let dataValue = selectedRow.data[initialColIdx]
+  const itemData = heatmapStore.getHeatmap.heatmapData[selectedRow.dataItemIndex]
+  let dataValue = itemData[initialColIdx]
 
   let overlayX = colIdx * cellWidth.value + rect.left + scrollX
   let overlayY = rowIdx * cellHeight.value + rect.top + scrollY

@@ -63,10 +63,20 @@ export class Tree {
     return row
   }
 
-  updatePositionsAndDepth() {
-    let position = 0
-    let pointer: Row | null = this.root
-    let depth = 0 // Initialize depth to 0 for the root level
+  expandRow(row: AggregatedRow) {
+    row.open()
+    this.updatePositionsAndDepth(row)
+  }
+
+  closeRow(row: AggregatedRow) {
+    row.close()
+    this.updatePositionsAndDepth(row)
+  }
+
+  updatePositionsAndDepth(startRow: Row = this.root) {
+    let pointer: Row | null = startRow // By default start at the root, otherwise start traversal at the specified row
+    let position = pointer.position
+    let depth = pointer.depth
 
     while (pointer !== null) {
       pointer.setPosition(position)
@@ -144,7 +154,7 @@ export abstract class Row {
   dataAdjusted: number[]
   dimRedPosition: DimRedPosition
   parent: Row | null
-  position: number
+  position: number // position in the list of rows; -1 if not visible
   depth: number
   prevSibling: Row | null
   nextSibling: Row | null
@@ -173,6 +183,8 @@ export abstract class Row {
     this.pixiRow = null
     this.pixiRowLabel = null
   }
+
+  abstract hasChildren(): boolean
 
   static computeAdjustedData(data: number[]): number[] {
     if (
@@ -204,13 +216,21 @@ export abstract class Row {
 
   setPosition(position: number) {
     this.position = position
+    console.log('🪂 setPOsition')
+    // rendering side effects
+    this.pixiRow?.updatePosition()
+    this.pixiRow?.updateVisibility()
+    this.pixiRowLabel?.updatePosition()
+    this.pixiRowLabel?.updateVisibility()
   }
 
   setDepth(depth: number) {
     this.depth = depth
-  }
 
-  abstract hasChildren(): boolean
+    // rendering side effects
+    this.pixiRow?.updatePosition()
+    this.pixiRowLabel?.updatePosition()
+  }
 }
 
 export class ItemRow extends Row {
@@ -280,17 +300,18 @@ export class AggregatedRow extends Row {
 
   open() {
     this.isOpen = true
-    // TODO: trigger update of positions and depth
   }
 
   close() {
     this.isOpen = false
     // Close all children
     this.children.forEach((child) => {
+      // set position to -1 to not render it anymore
+      child.setPosition(-1)
       if (child instanceof AggregatedRow) {
+        // recursively close all children
         child.close()
       }
     })
-    // TODO: trigger update of positions and depth
   }
 }

@@ -12,7 +12,7 @@ import {
   getDistinctColor,
   interpolateColor,
 } from '../helpers/helpers'
-import { Tree } from '../helpers/classes'
+import { Row, Tree, AggregatedRow, ItemRow } from '../helpers/classes'
 import { nextTick } from 'vue'
 
 export interface HeatmapStoreState {
@@ -805,9 +805,31 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getHeatmapColor(value: number): number {
       let min = this.getHeatmapMinValue
       let max = this.getHeatmapMaxValue
-      let minColor = 0xffffff
+      let minColor = 0xC3C3F2
       let maxColor = 0x0000ff
       return interpolateColor(minColor, maxColor, value, min, max)
+    },
+
+
+    /**
+     * Handles the event when a cell in the heatmap is clicked.
+     *
+     * @param row - The row data structure object where the cell is located.
+     * @param column - The column index of the clicked cell.
+     */
+    cellClickEvent(row: Row, column: number) {
+      console.log('clicked on a cell in row', row, 'column', column)
+
+      // If the row is an aggregated row and is currently closed, expand it
+      if (row instanceof AggregatedRow && !row.isOpen) {
+        this.tree?.expandRow(row)
+        return
+      }
+      // if the row is an aggregated row and is currently open, close it
+      if (row instanceof AggregatedRow && row.isOpen) {
+        this.tree?.closeRow(row)
+        return
+      }
     }
   },
 })

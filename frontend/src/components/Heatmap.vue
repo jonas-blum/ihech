@@ -154,9 +154,7 @@ function drawEverything() {
       if (visibleRowIdx >= heatmapStore.getAmountOfStickyItems) {
         y += stickyItemsGap.value
       }
-
-      let color = getHeatmapColor(adjustedValue, heatmapMinValue, heatmapMaxValue)
-
+      
       // let newHeatmapCell = new PixiHeatmapCell()
       // newHeatmapCell.draw(cellWidth.value, cellHeight.value, color)
       // pixiApplicationManager.heatmap.cellContainer.addChild(newHeatmapCell)

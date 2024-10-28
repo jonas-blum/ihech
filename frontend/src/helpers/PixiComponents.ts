@@ -26,15 +26,9 @@ export class PixiApplicationManager {
     // TODO: this needs to be moved
     this.heatmap.container.position.set(0, 0)
 
-    console.log('PixiApplicationManager constructor')
-    console.log(this.app, this.app.stage)
-
     // add event listeners for drag and drop
     this.app.stage.eventMode = 'static'
     // this.app.stage.hitArea = this.app.renderer.screen
-    this.app.stage.on('pointerup', () => {
-      console.log('pointerup')
-    })
   }
 }
 
@@ -94,11 +88,17 @@ export class PixiRowLabel {
     this.container.addChild(text)
     // TODO: icons and other stuff can be added here
 
-    this.updateVerticalPosition()
+    this.updatePosition()
+    this.updateVisibility()
   }
 
-  updateVerticalPosition() {
+  updatePosition() {
     this.container.y = this.row.position * 20 // TODO: hardcoded for the moment
+    this.container.x = this.row.depth * 10 // TODO: hardcoded for the moment
+  }
+
+  updateVisibility() {
+    this.container.visible = this.row.position !== -1
   }
 }
 
@@ -115,15 +115,24 @@ export class PixiRow {
     for (let i = 0; i < row.data.length; i++) {
       const value = row.data[i]
       const adjustedValue = row.dataAdjusted[i]
-      const cell = new PixiHeatmapCell(value, adjustedValue, i)
+      const cell = new PixiHeatmapCell(value, adjustedValue, i, this.onCellClick.bind(this))
       this.container.addChild(cell)
     }
 
-    this.updateVerticalPosition()
+    this.updatePosition()
+    this.updateVisibility()
   }
 
-  updateVerticalPosition() {
+  updatePosition() {
     this.container.y = this.row.position * 20 // TODO: hardcoded for the moment
+  }
+
+  updateVisibility() {
+    this.container.visible = this.row.position !== -1
+  }
+
+  onCellClick(pixiHeatmapCell: PixiHeatmapCell) {
+    useHeatmapStore()?.cellClickEvent(this.row, pixiHeatmapCell.column)
   }
 }
 
@@ -139,9 +148,9 @@ export class PixiHeatmapCell extends Graphics {
     adjustedValue: number,
     column: number,
     // customProperties: CustomCollectionProperties,
-    onClick: (heatmapCell: PixiHeatmapCell) => void = () => {},
-    onMouseOver: (heatmapCell: PixiHeatmapCell) => void = () => {},
-    onMouseOut: (heatmapCell: PixiHeatmapCell) => void = () => {},
+    onClick: (pixiHeatmapCell: PixiHeatmapCell) => void = () => {},
+    onMouseOver: (pixiHeatmapCell: PixiHeatmapCell) => void = () => {},
+    onMouseOut: (pixiHeatmapCell: PixiHeatmapCell) => void = () => {},
   ) {
     super()
     this.value = value // TODO: not used yet

@@ -17,6 +17,7 @@ import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
 import { AttributeTree } from '@/classes/AttributeTree'
 import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
 import { RowSorter, RowSorterCriteria, RowSorterCriteriaByName, RowSorterCriteriaByHasChildren, RowSorterCriteriaByAmountOfChildren } from '@/classes/RowSorter'
+import { ColumnSorter, ColumnSorterCriteria, ColumnSorterCriteriaByName } from '@/classes/ColumnSorter'
 import { nextTick } from 'vue'
 import { reverse } from 'd3'
 
@@ -315,6 +316,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         let criterion3 = new RowSorterCriteriaByAmountOfChildren()
         let rowSorter = new RowSorter([criterion1, criterion2, criterion3])
 
+        // initialize columnSorter
+        let criterionA = new ColumnSorterCriteriaByName()
+        let columnSorter = new ColumnSorter([criterionA])
+
+
         // initialize itemTree with the data received from the backend, starting at the root
         let itemTreeRoot = this.heatmap.itemNamesAndData[0]
         this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
@@ -328,7 +334,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           this.heatmap.minAttributeValues,
           this.heatmap.maxAttributeValues,
           this.heatmap.attributeDissimilarities,
+          columnSorter
         )
+        this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
         console.log('AttributeTree:', this.attributeTree)
 

@@ -1,7 +1,12 @@
 import { Column, AggregatedColumn, AttributeColumn } from "@/classes/Column"
+import type { ColumnSorter } from "@/classes/ColumnSorter"
 
 export class AttributeTree {
   root: AggregatedColumn
+  columnSorter: ColumnSorter
+  // this mapping will allow the rows to do a O(1) lookup of the updated cell position
+  // TODO: this mapping is updated every time the columns are reordered (??? necessary ???)
+  originalIndexToColumn: Map<number, Column> = new Map()
 
   // TODO: for now I just roll with the current data structure. this will likely change later.
   constructor(
@@ -9,28 +14,27 @@ export class AttributeTree {
     minAttributeValues: number[],
     maxAttributeValues: number[],
     attributeDissimilarities: number[],
+    columnSorter: ColumnSorter,
   ) {
+    this.columnSorter = columnSorter
     this.root = new AggregatedColumn('age_groups')
     this.root.isOpen = true
 
     // TODO: this is just a hacky placeholder until the attributes are hierarchical
     // TODO: this.root = this.buildAttributeTree(...)
-    let prevSibling: Column | null = null
-    let nextSibling: Column | null = null
     for (let i = 0; i < attributeNames.length; i++) {
       const attributeColumn: AttributeColumn = new AttributeColumn(
         attributeNames[i],
         this.root,
         -1,
         -1,
-        prevSibling,
-        nextSibling,
+        null,
+        null,
       )
-      if (prevSibling) {
-        prevSibling.nextSibling = attributeColumn
-      }
-      prevSibling = attributeColumn
       this.root.children.push(attributeColumn)
+
+      // add to mapping
+      this.originalIndexToColumn.set(i, attributeColumn)
     }
   }
 
@@ -138,4 +142,30 @@ export class AttributeTree {
 
     return columns
   }
+
+    // NOTE: should only be called when the columnSorter changed! for other operations, the updatePositionsAndDepth method should be used
+    // apply the columnSorter to all columns on the same depth level
+    sort(parent: AggregatedColumn = this.root) {
+      if (!parent.hasChildren()) {
+        return
+      }
+
+      // apply the columnSorter
+      const childrenSorted = this.columnSorter.sort(parent.children)
+
+      // Set prevSibling and nextSibling for each child
+      for (let i = 0; i < childrenSorted.length; i++) {
+        if (i > 0) {
+          childrenSorted[i].prevSibling = childrenSorted[i - 1]
+        }
+        if (i < childrenSorted.length - 1) {
+          childrenSorted[i].nextSibling = childrenSorted[i + 1]
+        }
+
+        // recursively sort children
+        if (childrenSorted[i] instanceof AggregatedColumn) {
+          this.sort(childrenSorted[i] as AggregatedColumn)
+        }
+      }
+    }
 }

@@ -1,5 +1,5 @@
 import { Container, Text } from 'pixi.js'
-import { Row } from '@/classes/ItemTree'
+import { Row } from '@/classes/Row'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export class PixiRowLabel {

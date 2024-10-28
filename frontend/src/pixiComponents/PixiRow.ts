@@ -1,5 +1,5 @@
 import { Container } from 'pixi.js'
-import { Row } from '@/classes/ItemTree'
+import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 

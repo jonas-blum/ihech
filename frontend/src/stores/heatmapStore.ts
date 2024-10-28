@@ -12,8 +12,10 @@ import {
   getDistinctColor,
   interpolateColor,
 } from '@/helpers/helpers'
-import { ItemTree, Row, AggregatedRow, ItemRow } from '@/classes/ItemTree'
-import { AttributeTree, Column, AggregatedColumn, AttributeColumn } from '@/classes/AttributeTree'
+import { ItemTree } from '@/classes/ItemTree'
+import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
+import { AttributeTree } from '@/classes/AttributeTree'
+import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
 import { nextTick } from 'vue'
 
 export interface HeatmapStoreState {

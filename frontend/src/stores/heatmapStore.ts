@@ -16,7 +16,9 @@ import { ItemTree } from '@/classes/ItemTree'
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
 import { AttributeTree } from '@/classes/AttributeTree'
 import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
+import { RowSorter, RowSorterCriteria, RowSorterCriteriaByName, RowSorterCriteriaByHasChildren, RowSorterCriteriaByAmountOfChildren } from '@/classes/RowSorter'
 import { nextTick } from 'vue'
+import { reverse } from 'd3'
 
 export interface HeatmapStoreState {
   dataTables: CsvDataTableProfile[]
@@ -306,9 +308,17 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         console.log('Received heatmap:', this.heatmap)
 
+        // initialize rowSorter
+        // TODO: I should probably store the rowSorter in the store, otherwise the settings are reset when the heatmap is refetched..
+        let criterion1 = new RowSorterCriteriaByName()
+        let criterion2 = new RowSorterCriteriaByHasChildren()
+        let criterion3 = new RowSorterCriteriaByAmountOfChildren()
+        let rowSorter = new RowSorter([criterion1, criterion2, criterion3])
+
         // initialize itemTree with the data received from the backend, starting at the root
         let itemTreeRoot = this.heatmap.itemNamesAndData[0]
-        this.itemTree = new ItemTree(itemTreeRoot)
+        this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
+        this.itemTree.sort()
         this.itemTree.updatePositionsAndDepth()
         console.log('ItemTree:', this.itemTree)
 

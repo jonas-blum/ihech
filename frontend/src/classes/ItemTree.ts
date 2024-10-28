@@ -1,10 +1,13 @@
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
+import { RowSorter } from '@/classes/RowSorter'
 
 export class ItemTree {
   root: AggregatedRow
+  rowSorter: RowSorter
 
-  constructor(itemNameAndData: any) {
+  constructor(itemNameAndData: any, rowSorter: RowSorter) {
     this.root = this.buildItemTree(itemNameAndData) as AggregatedRow
+    this.rowSorter = rowSorter
   }
 
   buildItemTree(itemNameAndData: any, parent: Row | null = null): Row {
@@ -30,15 +33,15 @@ export class ItemTree {
       // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
       row.children = children // Assign children to the row after they've been created
 
-      // Set prevSibling and nextSibling for each child
-      for (let i = 0; i < children.length; i++) {
-        if (i > 0) {
-          children[i].prevSibling = children[i - 1]
-        }
-        if (i < children.length - 1) {
-          children[i].nextSibling = children[i + 1]
-        }
-      }
+      // // Set prevSibling and nextSibling for each child
+      // for (let i = 0; i < children.length; i++) {
+      //   if (i > 0) {
+      //     children[i].prevSibling = children[i - 1]
+      //   }
+      //   if (i < children.length - 1) {
+      //     children[i].nextSibling = children[i + 1]
+      //   }
+      // }
     } else {
       row = new ItemRow(
         itemNameAndData.itemName,
@@ -152,7 +155,29 @@ export class ItemTree {
     return rows
   }
 
-  sort() {
-    // TODO
+  // NOTE: should only be called when the rowSorter changed! for other operations, the updatePositionsAndDepth method should be used
+  // apply the rowSorter to all rows on the same depth level
+  sort(parent: AggregatedRow = this.root) {
+    if (!parent.hasChildren()) {
+      return
+    }
+
+    // apply the rowSorter
+    const childrensSorted = this.rowSorter.sort(parent.children)
+
+    // Set prevSibling and nextSibling for each child
+    for (let i = 0; i < childrensSorted.length; i++) {
+      if (i > 0) {
+        childrensSorted[i].prevSibling = childrensSorted[i - 1]
+      }
+      if (i < childrensSorted.length - 1) {
+        childrensSorted[i].nextSibling = childrensSorted[i + 1]
+      }
+
+      // recursively sort children
+      if (childrensSorted[i] instanceof AggregatedRow) {
+        this.sort(childrensSorted[i] as AggregatedRow)
+      }
+    }
   }
 }

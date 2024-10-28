@@ -1,4 +1,4 @@
-import { Graphics} from 'pixi.js'
+import { Graphics } from 'pixi.js'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export class PixiHeatmapCell extends Graphics {
@@ -6,7 +6,7 @@ export class PixiHeatmapCell extends Graphics {
   // cursor: string // otherwise typescript complains about it
   value: number // the true value of the cell (as received by the backend)
   adjustedValue: number // the value adjusted for the coloring mode
-  column: number // the column index of the cell
+  column: number // the column index of the cell; super important in combination with the sibling pointer implementation! the row data array as well as the attributes never change the order - and this column index allows the correct access to the data
 
   constructor(
     value: number,

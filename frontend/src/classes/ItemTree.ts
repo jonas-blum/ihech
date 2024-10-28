@@ -71,6 +71,7 @@ export class ItemTree {
   expandRow(row: AggregatedRow) {
     row.open()
     this.updatePositionsAndDepth(row)
+    this.updateCellPositions(row)
   }
 
   closeRow(row: AggregatedRow) {
@@ -103,6 +104,27 @@ export class ItemTree {
         while (pointer.nextSibling === null && pointer.parent !== null) {
           pointer = pointer.parent
           depth--
+        }
+        // Move to the next sibling or set pointer to null if end of traversal
+        pointer = pointer.nextSibling
+      }
+    }
+  }
+
+  // traverses through the tree and calls the updateCellPositions method for each row (which is open for efficiency reasons)
+  updateCellPositions(startRow: Row = this.root) {
+    let pointer: Row | null = startRow
+
+    while (pointer !== null) {
+      pointer.pixiRow?.updateCellPositions()
+
+      // Start traversal of the children if the current row is an aggregated row and is open
+      if (pointer instanceof AggregatedRow && pointer.isOpen && pointer.hasChildren()) {
+        pointer = pointer.findFirstChild()
+      } else {
+        // Traverse to the next sibling, or backtrack to the parent if no siblings are available
+        while (pointer.nextSibling === null && pointer.parent !== null) {
+          pointer = pointer.parent
         }
         // Move to the next sibling or set pointer to null if end of traversal
         pointer = pointer.nextSibling

@@ -16,8 +16,18 @@ import { ItemTree } from '@/classes/ItemTree'
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
 import { AttributeTree } from '@/classes/AttributeTree'
 import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
-import { RowSorter, RowSorterCriteria, RowSorterCriteriaByName, RowSorterCriteriaByHasChildren, RowSorterCriteriaByAmountOfChildren } from '@/classes/RowSorter'
-import { ColumnSorter, ColumnSorterCriteria, ColumnSorterCriteriaByName } from '@/classes/ColumnSorter'
+import {
+  RowSorter,
+  RowSorterCriteria,
+  RowSorterCriteriaByName,
+  RowSorterCriteriaByHasChildren,
+  RowSorterCriteriaByAmountOfChildren,
+} from '@/classes/RowSorter'
+import {
+  ColumnSorter,
+  ColumnSorterCriteria,
+  ColumnSorterCriteriaByName,
+} from '@/classes/ColumnSorter'
 import { nextTick } from 'vue'
 import { reverse } from 'd3'
 
@@ -320,7 +330,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         let criterionA = new ColumnSorterCriteriaByName()
         let columnSorter = new ColumnSorter([criterionA])
 
-
         // initialize itemTree with the data received from the backend, starting at the root
         let itemTreeRoot = this.heatmap.itemNamesAndData[0]
         this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
@@ -334,7 +343,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
           this.heatmap.minAttributeValues,
           this.heatmap.maxAttributeValues,
           this.heatmap.attributeDissimilarities,
-          columnSorter
+          columnSorter,
         )
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
@@ -713,11 +722,18 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
     // used as a trigger from the RowSorter to re-sort the rows
     sortRows() {
-      console.log('sorting rows')
       if (this.itemTree) {
         this.itemTree.sort()
-        console.log(this.itemTree)
         this.itemTree.updatePositionsAndDepth()
+      }
+    },
+
+    // used as a trigger from the ColumnSorter to re-sort the columns
+    sortColumns() {
+      if (this.attributeTree) {
+        this.attributeTree.sort()
+        this.attributeTree.updatePositionsAndDepth()
+        this.itemTree?.updateCellPositions()
       }
     },
 

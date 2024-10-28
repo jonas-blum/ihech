@@ -5,17 +5,20 @@ import Heatmap from '@/components/Heatmap.vue'
 import HeatmapSettings from '@/components/HeatmapSettings.vue'
 import CsvUpload from '@/components/CsvUpload.vue'
 import RowSorterSettings from '@/components/RowSorterSettings.vue'
+import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
 </script>
 
 <template>
   <div class="w-full h-full flex">
-
     <div class="w-1/2 h-full border-red-500 border-4">
       <Heatmap />
     </div>
     <div class="w-1/2 h-full flex flex-col border-blue-500 border-4">
       <div class="w-full h-1/3 border-cyan-500 border-4">
-        <RowSorterSettings />
+        <div class="flex gap-2">
+          <RowSorterSettings />
+          <ColumnSorterSettings />
+        </div>
         <CsvUpload />
         <HeatmapSettings />
       </div>

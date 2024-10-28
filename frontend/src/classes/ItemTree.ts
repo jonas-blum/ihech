@@ -17,6 +17,7 @@ export class ItemTree {
       // Create the row instance first, without children initially
       row = new AggregatedRow(
         itemNameAndData.itemName,
+        itemNameAndData.amountOfDataPoints,
         itemNameAndData.data,
         { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
         parent,
@@ -45,6 +46,7 @@ export class ItemTree {
     } else {
       row = new ItemRow(
         itemNameAndData.itemName,
+        itemNameAndData.amountOfDataPoints,
         itemNameAndData.data,
         { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
         parent,
@@ -77,6 +79,7 @@ export class ItemTree {
   }
 
   updatePositionsAndDepth(startRow: Row = this.root) {
+    console.log('updatePositionsAndDepth')
     let pointer: Row | null = startRow // By default start at the root, otherwise start traversal at the specified row
     let position = pointer.position
     let depth = pointer.depth
@@ -162,21 +165,20 @@ export class ItemTree {
       return
     }
 
-    // apply the rowSorter
+    // Apply the rowSorter to get the sorted array of children
     const childrensSorted = this.rowSorter.sort(parent.children)
 
-    // Set prevSibling and nextSibling for each child
+    // Set `prevSibling` and `nextSibling` pointers while looping through sorted children
     for (let i = 0; i < childrensSorted.length; i++) {
-      if (i > 0) {
-        childrensSorted[i].prevSibling = childrensSorted[i - 1]
-      }
-      if (i < childrensSorted.length - 1) {
-        childrensSorted[i].nextSibling = childrensSorted[i + 1]
-      }
+      const child = childrensSorted[i]
 
-      // recursively sort children
-      if (childrensSorted[i] instanceof AggregatedRow) {
-        this.sort(childrensSorted[i] as AggregatedRow)
+      // Set `prevSibling` and `nextSibling` for each child
+      child.prevSibling = i > 0 ? childrensSorted[i - 1] : null
+      child.nextSibling = i < childrensSorted.length - 1 ? childrensSorted[i + 1] : null
+
+      // Recursively sort children if they are AggregatedRows
+      if (child instanceof AggregatedRow) {
+        this.sort(child as AggregatedRow)
       }
     }
   }

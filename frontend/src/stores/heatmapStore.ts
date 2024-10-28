@@ -711,6 +711,16 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return interpolateColor(minColor, maxColor, value, min, max)
     },
 
+    // used as a trigger from the RowSorter to re-sort the rows
+    sortRows() {
+      console.log('sorting rows')
+      if (this.itemTree) {
+        this.itemTree.sort()
+        console.log(this.itemTree)
+        this.itemTree.updatePositionsAndDepth()
+      }
+    },
+
     /**
      * Handles the event when a cell in the heatmap is clicked.
      *

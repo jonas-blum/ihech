@@ -1,5 +1,5 @@
-import { Column, AggregatedColumn, AttributeColumn } from "@/classes/Column"
-import type { ColumnSorter } from "@/classes/ColumnSorter"
+import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
+import type { ColumnSorter } from '@/classes/ColumnSorter'
 
 export class AttributeTree {
   root: AggregatedColumn
@@ -143,29 +143,28 @@ export class AttributeTree {
     return columns
   }
 
-    // NOTE: should only be called when the columnSorter changed! for other operations, the updatePositionsAndDepth method should be used
-    // apply the columnSorter to all columns on the same depth level
-    sort(parent: AggregatedColumn = this.root) {
-      if (!parent.hasChildren()) {
-        return
-      }
+  // NOTE: should only be called when the columnSorter changed! for other operations, the updatePositionsAndDepth method should be used
+  // apply the columnSorter to all columns on the same depth level
+  sort(parent: AggregatedColumn = this.root) {
+    if (!parent.hasChildren()) {
+      return
+    }
 
-      // apply the columnSorter
-      const childrenSorted = this.columnSorter.sort(parent.children)
+    // Apply the columnSorter to get the sorted array of children
+    const childrenSorted = this.columnSorter.sort(parent.children)
 
-      // Set prevSibling and nextSibling for each child
-      for (let i = 0; i < childrenSorted.length; i++) {
-        if (i > 0) {
-          childrenSorted[i].prevSibling = childrenSorted[i - 1]
-        }
-        if (i < childrenSorted.length - 1) {
-          childrenSorted[i].nextSibling = childrenSorted[i + 1]
-        }
+    // Set `prevSibling` and `nextSibling` pointers while looping through sorted children
+    for (let i = 0; i < childrenSorted.length; i++) {
+      const child = childrenSorted[i]
 
-        // recursively sort children
-        if (childrenSorted[i] instanceof AggregatedColumn) {
-          this.sort(childrenSorted[i] as AggregatedColumn)
-        }
+      // Set `prevSibling` and `nextSibling` for each child
+      child.prevSibling = i > 0 ? childrenSorted[i - 1] : null
+      child.nextSibling = i < childrenSorted.length - 1 ? childrenSorted[i + 1] : null
+
+      // Recursively sort children if they are AggregatedColumns
+      if (child instanceof AggregatedColumn) {
+        this.sort(child as AggregatedColumn)
       }
     }
+  }
 }

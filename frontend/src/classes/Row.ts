@@ -10,6 +10,7 @@ interface DimRedPosition {
 
 export abstract class Row {
     name: string
+    totalChildrenCount: number // corresponds to the 'amountOfDataPoints' in the backend data
     data: number[]
     dataAdjusted: number[]
     dimRedPosition: DimRedPosition
@@ -23,6 +24,7 @@ export abstract class Row {
   
     protected constructor(
       name: string,
+      totalChildrenCount: number,
       data: number[],
       dimRedPosition: DimRedPosition,
       parent: Row | null = null,
@@ -32,6 +34,7 @@ export abstract class Row {
       nextSibling: Row | null = null,
     ) {
       this.name = name
+      this.totalChildrenCount = totalChildrenCount
       this.data = data
       this.dataAdjusted = Row.computeAdjustedData(data)
       this.dimRedPosition = dimRedPosition
@@ -96,6 +99,7 @@ export abstract class Row {
   export class ItemRow extends Row {
     constructor(
       name: string,
+      totalChildrenCount: number,
       data: number[],
       dimRedPosition: DimRedPosition,
       parent?: Row | null,
@@ -104,7 +108,7 @@ export abstract class Row {
       prevSibling?: Row | null,
       nextSibling?: Row | null,
     ) {
-      super(name, data, dimRedPosition, parent, position, depth, prevSibling, nextSibling)
+      super(name, totalChildrenCount, data, dimRedPosition, parent, position, depth, prevSibling, nextSibling)
     }
   
     hasChildren(): boolean {
@@ -118,6 +122,7 @@ export abstract class Row {
   
     constructor(
       name: string,
+      totalChildrenCount: number,
       data: number[],
       dimRedPosition: DimRedPosition,
       parent?: Row | null,
@@ -128,7 +133,7 @@ export abstract class Row {
       isOpen: boolean = false, // only used for aggregated rows
       children: Row[] = [],
     ) {
-      super(name, data, dimRedPosition, parent, position, depth, prevSibling, nextSibling)
+      super(name, totalChildrenCount, data, dimRedPosition, parent, position, depth, prevSibling, nextSibling)
       this.isOpen = isOpen
       this.children = children
     }

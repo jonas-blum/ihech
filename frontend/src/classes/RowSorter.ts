@@ -1,4 +1,5 @@
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
+import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export class RowSorter {
     private criteria: RowSorterCriteria[];
@@ -34,9 +35,15 @@ export class RowSorter {
     public moveCriterion(technicalName: string, newIndex: number) {
       const index = this.criteria.findIndex(criterion => criterion.technicalName === technicalName);
       if (index === -1) return; // Criterion not found
-  
+
+      // Ensure newIndex is within bounds
+      if (newIndex < 0 || newIndex >= this.criteria.length) return;
+
       const [criterion] = this.criteria.splice(index, 1); // Remove criterion
       this.criteria.splice(newIndex, 0, criterion);       // Insert at the new index
+
+      // trigger re-sorting of the rows
+      useHeatmapStore().sortRows()
     }
   
     // Retrieve all criteria (useful for displaying current order)
@@ -63,6 +70,14 @@ export abstract class RowSorterCriteria {
   // Apply reverse sorting if the `reverse` flag is true
   protected applyReverse(value: number): number {
     return this.reverse ? -value : value
+  }
+
+  // toggle the reverse flag
+  public toggleReverse() {
+    this.reverse = !this.reverse
+
+    // trigger re-sorting of the rows
+    useHeatmapStore().sortRows()
   }
 }
 
@@ -95,13 +110,11 @@ export class RowSorterCriteriaByHasChildren extends RowSorterCriteria {
 
 export class RowSorterCriteriaByAmountOfChildren extends RowSorterCriteria {
   constructor(reverse: boolean = false) {
-    super('Amount of Children', 'amountOfChildren', reverse)
+    super('Children Amount', 'amountOfChildren', reverse)
   }
 
   compare(row1: Row, row2: Row): number {
-    const row1ChildrenAmount = row1.hasChildren() ? (row1 as AggregatedRow).children.length : 0
-    const row2ChildrenAmount = row2.hasChildren() ? (row2 as AggregatedRow).children.length : 0
-    const result = row1ChildrenAmount - row2ChildrenAmount
+    const result = row1.totalChildrenCount - row2.totalChildrenCount
     return this.applyReverse(result)
   }
 }

@@ -4,6 +4,7 @@ import ExpandableHeatmap from '@/components/ExpandableHeatmap.vue'
 import Heatmap from '@/components/Heatmap.vue'
 import HeatmapSettings from '@/components/HeatmapSettings.vue'
 import CsvUpload from '@/components/CsvUpload.vue'
+import RowSorterSettings from '@/components/RowSorterSettings.vue'
 </script>
 
 <template>
@@ -14,8 +15,9 @@ import CsvUpload from '@/components/CsvUpload.vue'
     </div>
     <div class="w-1/2 h-full flex flex-col border-blue-500 border-4">
       <div class="w-full h-1/3 border-cyan-500 border-4">
-        <HeatmapSettings />
+        <RowSorterSettings />
         <CsvUpload />
+        <HeatmapSettings />
       </div>
       <div class="w-full h-2/3 flex border-violet-500 border-4">
         <!-- <DimReductionVisual /> -->

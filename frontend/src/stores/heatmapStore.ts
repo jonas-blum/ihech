@@ -805,11 +805,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getHeatmapColor(value: number): number {
       let min = this.getHeatmapMinValue
       let max = this.getHeatmapMaxValue
-      let minColor = 0xC3C3F2
+      let minColor = 0xefefff
       let maxColor = 0x0000ff
       return interpolateColor(minColor, maxColor, value, min, max)
     },
-
 
     /**
      * Handles the event when a cell in the heatmap is clicked.
@@ -820,17 +819,18 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     cellClickEvent(row: Row, column: number) {
       console.log('clicked on a cell in row', row, 'column', column)
 
-      // If the row is an aggregated row and is currently closed, expand it
-      if (row instanceof AggregatedRow && !row.isOpen) {
-        this.tree?.expandRow(row)
-        return
+      if (row instanceof AggregatedRow) {
+        this.tree?.toggleRowExpansion(row)
       }
-      // if the row is an aggregated row and is currently open, close it
-      if (row instanceof AggregatedRow && row.isOpen) {
-        this.tree?.closeRow(row)
-        return
+    },
+
+    rowLabelClickEvent(row: Row) {
+      console.log('clicked the label of', row)
+
+      if (row instanceof AggregatedRow) {
+        this.tree?.toggleRowExpansion(row)
       }
-    }
+    },
   },
 })
 

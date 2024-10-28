@@ -63,6 +63,14 @@ export class Tree {
     return row
   }
 
+  toggleRowExpansion(row: AggregatedRow) {
+    if (row.isOpen) {
+      this.closeRow(row)
+    } else {
+      this.expandRow(row)
+    }
+  }
+
   expandRow(row: AggregatedRow) {
     row.open()
     this.updatePositionsAndDepth(row)
@@ -216,7 +224,7 @@ export abstract class Row {
 
   setPosition(position: number) {
     this.position = position
-    console.log('🪂 setPOsition')
+
     // rendering side effects
     this.pixiRow?.updatePosition()
     this.pixiRow?.updateVisibility()

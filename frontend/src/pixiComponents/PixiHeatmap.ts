@@ -2,6 +2,7 @@ import { Container } from 'pixi.js'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { useHeatmapStore } from '@/stores/heatmapStore'
+import type { PixiColumnLabel } from './PixiColumnLabel'
 
 export class PixiHeatmap {
   public container: Container // rowContainer, rowLabelsContainer, columnLabelsContainer as children
@@ -36,5 +37,9 @@ export class PixiHeatmap {
 
   addRowLabel(rowLabel: PixiRowLabel) {
     this.rowLabelsContainer.addChild(rowLabel.container)
+  }
+
+  addColumnLabel(columnLabel: PixiColumnLabel) {
+    this.columnLabelsContainer.addChild(columnLabel.container)
   }
 }

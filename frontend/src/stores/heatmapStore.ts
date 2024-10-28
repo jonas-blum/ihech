@@ -12,15 +12,17 @@ import {
   getDistinctColor,
   interpolateColor,
 } from '@/helpers/helpers'
-import { Row, ItemTree, AggregatedRow, ItemRow } from '@/classes/ItemTree'
+import { ItemTree, Row, AggregatedRow, ItemRow } from '@/classes/ItemTree'
+import { AttributeTree, Column, AggregatedColumn, AttributeColumn } from '@/classes/AttributeTree'
 import { nextTick } from 'vue'
 
 export interface HeatmapStoreState {
   dataTables: CsvDataTableProfile[]
   activeDataTable: CsvDataTableProfile | null
 
-  // new ItemTree data structure
+  // new data structure classes
   itemTree: ItemTree | null
+  attributeTree: AttributeTree | null
 
   heatmap: HeatmapJSON
   highlightedRow: ItemNameAndData | null
@@ -49,6 +51,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     activeDataTable: null,
 
     itemTree: null,
+    attributeTree: null,
 
     heatmap: {
       attributeNames: [],
@@ -301,11 +304,21 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         console.log('Received heatmap:', this.heatmap)
 
-        // initialize tree with the data received from the backend, starting at the root
-        let root = this.heatmap.itemNamesAndData[0]
-        this.itemTree = new ItemTree(root)
+        // initialize itemTree with the data received from the backend, starting at the root
+        let itemTreeRoot = this.heatmap.itemNamesAndData[0]
+        this.itemTree = new ItemTree(itemTreeRoot)
         this.itemTree.updatePositionsAndDepth()
         console.log('ItemTree:', this.itemTree)
+
+        // initialize attributeTree with the data received from the backend
+        this.attributeTree = new AttributeTree(
+          this.heatmap.attributeNames,
+          this.heatmap.minAttributeValues,
+          this.heatmap.maxAttributeValues,
+          this.heatmap.attributeDissimilarities,
+        )
+        this.attributeTree.updatePositionsAndDepth()
+        console.log('AttributeTree:', this.attributeTree)
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
@@ -697,6 +710,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
       if (row instanceof AggregatedRow) {
         this.itemTree?.toggleRowExpansion(row)
+      }
+    },
+
+    columnLabelClickEvent(column: Column) {
+      console.log('clicked the label of', column)
+
+      if (column instanceof AggregatedColumn) {
+        this.attributeTree?.toggleColumnExpansion(column)
       }
     },
   },

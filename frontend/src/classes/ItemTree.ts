@@ -52,7 +52,6 @@ export class ItemTree {
         itemNameAndData.itemName,
         itemNameAndData.data,
         { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
-        [],
         parent,
         -1, // Position will be set later
         -1, // Temporary depth, will be adjusted later
@@ -86,6 +85,11 @@ export class ItemTree {
     let pointer: Row | null = startRow // By default start at the root, otherwise start traversal at the specified row
     let position = pointer.position
     let depth = pointer.depth
+
+    if (pointer === this.root) {
+      position = 0
+      depth = 0
+    }
 
     while (pointer !== null) {
       pointer.setPosition(position)
@@ -175,8 +179,8 @@ export abstract class Row {
     data: number[],
     dimRedPosition: DimRedPosition,
     parent: Row | null = null,
-    position: number = 0,
-    depth: number = 0,
+    position: number = -1,
+    depth: number = -1,
     prevSibling: Row | null = null,
     nextSibling: Row | null = null,
   ) {
@@ -247,7 +251,6 @@ export class ItemRow extends Row {
     name: string,
     data: number[],
     dimRedPosition: DimRedPosition,
-    children?: Row[],
     parent?: Row | null,
     position?: number,
     depth?: number,
@@ -283,6 +286,10 @@ export class AggregatedRow extends Row {
     this.children = children
   }
 
+  hasChildren(): boolean {
+    return this.children.length > 0
+  }
+
   /**
    * Finds the "first" child in the list of children.
    *
@@ -301,10 +308,6 @@ export class AggregatedRow extends Row {
       }
     }
     return null
-  }
-
-  hasChildren(): boolean {
-    return this.children.length > 0
   }
 
   open() {

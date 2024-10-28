@@ -8,6 +8,7 @@ import { useHeatmapStore } from '@stores/heatmapStore'
 import { PixiApplicationManager } from '@/pixiComponents/PixiApplicationManager'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
+import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 
 const heatmapStore = useHeatmapStore()
 
@@ -62,8 +63,21 @@ function update() {
       pixiHeatmap.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmap
     }
 
+    // traverse the attribute tree with all columns and create the pixiColumnLabels
+    let columns = heatmapStore.attributeTree?.getAllColumns()
+    if (!columns) {
+      console.warn('columns is not set')
+      return
+    }
+
+    for (let column of columns) {
+      let pixiColumnLabel = new PixiColumnLabel(column) // create PixiColumnLabel with reference to the Column
+      column.pixiColumnLabel = pixiColumnLabel // set the reference to the PixiColumnLabel in the Column
+      pixiHeatmap.addColumnLabel(pixiColumnLabel) // adds the PixiColumnLabel to the PixiHeatmap
+    }
+
     pixiInitialized.value = true
-    console.log('💨 pixi rows are initialized', pixiApplicationManager)
+    console.log('💨 pixi components are initialized', pixiApplicationManager)
   }
 }
 

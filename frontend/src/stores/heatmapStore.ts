@@ -47,6 +47,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       attributeNames: [],
       attributeDissimilarities: [],
       hierarchicalItems: [],
+      hierarchicalAttributes: [],
       maxHeatmapValue: 100,
       minHeatmapValue: 0,
       maxDimRedXValue: 100,
@@ -297,7 +298,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.heatmap = receivedHeatmap
 
         this.heatmap.hierarchicalItems.forEach((row) => {
-          setParentOfRowsRec(row, null)
+          setParentOfRowsRec(row, undefined)
         })
 
         //Deal with sticky items and correct order
@@ -594,7 +595,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       if (this.activeDataTable.collectionColumnNames.length === 0) {
         let topMostParent = item
-        while (topMostParent.parent !== null && topMostParent.parent.parent !== null) {
+        while (topMostParent.parent !== null && topMostParent?.parent?.parent !== undefined) {
           topMostParent = topMostParent.parent
         }
         const childrenOfTopmostItem = this.getNonStickyItems[0]?.children
@@ -816,8 +817,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       for (const item of this.getStickyItems) {
         item.isOpen = true
-        let parent: HierarchicalItem | null = item.parent
-        while (parent !== null) {
+        let parent: HierarchicalItem | undefined = item.parent
+        while (parent !== undefined) {
           parent.isOpen = true
           parent = parent.parent
         }
@@ -826,7 +827,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
   },
 })
 
-function setParentOfRowsRec(row: HierarchicalItem, parent: HierarchicalItem | null) {
+function setParentOfRowsRec(row: HierarchicalItem, parent: HierarchicalItem | undefined) {
   row.parent = parent
   if (row.children) {
     row.children.forEach((child) => {

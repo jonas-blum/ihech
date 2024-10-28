@@ -121,7 +121,16 @@ export interface HierarchicalItem {
   dimReductionY: number
   children: HierarchicalItem[] | null
 
-  parent: HierarchicalItem | null
+  parent: HierarchicalItem | undefined
+}
+
+export interface HierarchicalAttribute {
+  attributeName: string
+  dataAttributeIndex: number
+  isOpen: boolean
+  children: HierarchicalAttribute[] | null
+
+  parent: HierarchicalAttribute | undefined
 }
 
 export interface HeatmapJSON {
@@ -129,6 +138,7 @@ export interface HeatmapJSON {
   attributeNames: string[]
   attributeDissimilarities: number[]
   hierarchicalItems: HierarchicalItem[]
+  hierarchicalAttributes: HierarchicalAttribute[]
   maxHeatmapValue: number
   minHeatmapValue: number
   maxDimRedXValue: number

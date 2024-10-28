@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { type ItemNameAndData } from '@helpers/helpers'
+import { type HierarchicalItem } from '@helpers/helpers'
 
 import * as d3 from 'd3'
 import { useHeatmapStore } from '@stores/heatmapStore'
@@ -13,16 +13,16 @@ const props = defineProps<{
 
 const heatmapStore = useHeatmapStore()
 
-function getVisibleRowsRecursively(row: ItemNameAndData): ItemNameAndData[] {
+function getVisibleRowsRecursively(row: HierarchicalItem): HierarchicalItem[] {
   if (!row.isOpen || row.children === null) {
     return [row]
   } else if (row.isOpen && row.children) {
-    return row.children.flatMap((child: ItemNameAndData) => getVisibleRowsRecursively(child))
+    return row.children.flatMap((child: HierarchicalItem) => getVisibleRowsRecursively(child))
   }
   return []
 }
 
-function getAllVisibleRows(): ItemNameAndData[] {
+function getAllVisibleRows(): HierarchicalItem[] {
   if (
     heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction &&
     heatmapStore.getAmountOfStickyItems > 2
@@ -30,18 +30,18 @@ function getAllVisibleRows(): ItemNameAndData[] {
     return heatmapStore.getStickyItems
   }
   return (
-    heatmapStore.getHeatmap?.itemNamesAndData.flatMap((row: ItemNameAndData) =>
+    heatmapStore.getHeatmap?.hierarchicalItems.flatMap((row: HierarchicalItem) =>
       getVisibleRowsRecursively(row),
     ) || []
   )
 }
 
-function getMaxMinRecursively(row: ItemNameAndData, max: boolean, x: boolean): number {
+function getMaxMinRecursively(row: HierarchicalItem, max: boolean, x: boolean): number {
   if (row.children === null) {
     return x ? row.dimReductionX : row.dimReductionY
   }
   return row.children.reduce(
-    (acc: number, child: ItemNameAndData) => {
+    (acc: number, child: HierarchicalItem) => {
       const value = getMaxMinRecursively(child, max, x)
       if (max) {
         return Math.max(acc, value)
@@ -56,7 +56,7 @@ function getMaxMinRecursively(row: ItemNameAndData, max: boolean, x: boolean): n
 function getMaxMinStickyItems(max: boolean, x: boolean): number {
   const startingNumber = max ? Number.MIN_VALUE : Number.MAX_VALUE
 
-  return heatmapStore.getStickyItems.reduce((acc: number, row: ItemNameAndData) => {
+  return heatmapStore.getStickyItems.reduce((acc: number, row: HierarchicalItem) => {
     const value = getMaxMinRecursively(row, max, x)
     if (max) {
       return Math.max(acc, value)
@@ -66,11 +66,11 @@ function getMaxMinStickyItems(max: boolean, x: boolean): number {
   }, startingNumber)
 }
 
-function isRowCollapsible(row: ItemNameAndData) {
-  return !heatmapStore.getHeatmap.itemNamesAndData.includes(row)
+function isRowCollapsible(row: HierarchicalItem) {
+  return !heatmapStore.getHeatmap.hierarchicalItems.includes(row)
 }
 
-function isRowChildOfRow(row: ItemNameAndData, parent: ItemNameAndData): boolean {
+function isRowChildOfRow(row: HierarchicalItem, parent: HierarchicalItem): boolean {
   if (row === parent) {
     return true
   }
@@ -80,14 +80,14 @@ function isRowChildOfRow(row: ItemNameAndData, parent: ItemNameAndData): boolean
   return false
 }
 
-function isParentHighlighted(row: ItemNameAndData): boolean {
+function isParentHighlighted(row: HierarchicalItem): boolean {
   if (row === heatmapStore.getHighlightedRow) {
     return true
   }
   if (!row?.parent) {
     return false
   }
-  let parent: ItemNameAndData | null = row.parent
+  let parent: HierarchicalItem | null = row.parent
   while (parent) {
     if (parent === heatmapStore.getHighlightedRow) {
       return true
@@ -99,7 +99,7 @@ function isParentHighlighted(row: ItemNameAndData): boolean {
 
 function updateCirclesOpacity() {
   const groups = d3.selectAll('g')
-  groups.each(function (row: ItemNameAndData) {
+  groups.each(function (row: HierarchicalItem) {
     d3.select(this)
       .selectAll('path')
       .style('opacity', isParentHighlighted(row) ? 1 : 0.6)
@@ -170,9 +170,9 @@ function drawScatterplot() {
     .append('g')
     .attr(
       'transform',
-      (row: ItemNameAndData) => `translate(${x(row.dimReductionX)},${y(row.dimReductionY)})`,
+      (row: HierarchicalItem) => `translate(${x(row.dimReductionX)},${y(row.dimReductionY)})`,
     )
-    .each(function (row: ItemNameAndData) {
+    .each(function (row: HierarchicalItem) {
       const itemColors = heatmapStore.getColorsOfItem(row)
       const pie = d3.pie()(itemColors.map(() => 1))
       let radius = Math.log10(Math.sqrt(row.amountOfDataPoints)) * 20 + 5
@@ -210,8 +210,8 @@ function drawScatterplot() {
         })
     })
     .style('cursor', 'pointer')
-    .style('z-index', (row: ItemNameAndData) => row.amountOfDataPoints)
-    .on('click', function (event, row: ItemNameAndData) {
+    .style('z-index', (row: HierarchicalItem) => row.amountOfDataPoints)
+    .on('click', function (event, row: HierarchicalItem) {
       event.stopPropagation()
       event.preventDefault()
 
@@ -221,14 +221,14 @@ function drawScatterplot() {
         heatmapStore.expandRow(row)
       }
     })
-    .on('contextmenu', function (event, row: ItemNameAndData) {
+    .on('contextmenu', function (event, row: HierarchicalItem) {
       heatmapStore.closeNearestOpenParent(row)
     })
-    .on('mouseover', function (event, row: ItemNameAndData) {
+    .on('mouseover', function (event, row: HierarchicalItem) {
       heatmapStore.setHighlightedRow(row)
     })
     .on('mousemove', function (event) {})
-    .on('mouseleave', function (event, row: ItemNameAndData) {
+    .on('mouseleave', function (event, row: HierarchicalItem) {
       heatmapStore.setHighlightedRow(null)
     })
     .append('title')

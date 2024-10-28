@@ -67,35 +67,35 @@ class ExtendedVectorRepresentation:
         self.edition: str = ""
 
 
-class ItemNameAndData:
+class HierarchicalItem:
     index: Union[int, None]
+    dataItemIndex: int
     itemName: str
     isOpen: bool
-    data: List[float]
     amountOfDataPoints: int
     dimReductionX: float
     dimReductionY: float
-    children: Union["List[ItemNameAndData]", None]
+    children: Union["List[HierarchicalItem]", None]
 
     def __init__(
         self,
         index: Union[int, None],
+        dataItemIndex: int,
         itemName: str,
         isOpen: bool,
-        data: List[float],
         amountOfDataPoints: int,
         dimReductionX: float,
         dimReductionY: float,
-        children: Union["List[ItemNameAndData]", None],
+        children: Union["List[HierarchicalItem]", None],
     ):
         self.index: Union[int, None] = index
+        self.dataItemIndex: int = dataItemIndex
         self.itemName: str = itemName
         self.isOpen: bool = isOpen
-        self.data: List[float] = data
         self.amountOfDataPoints: int = amountOfDataPoints
         self.dimReductionX: float = dimReductionX
         self.dimReductionY: float = dimReductionY
-        self.children: Union[List[ItemNameAndData], None] = children
+        self.children: Union[List[HierarchicalItem], None] = children
 
 
 def custom_encoder(obj):
@@ -107,13 +107,13 @@ def custom_encoder(obj):
         return obj.tolist()
     elif isinstance(obj, HeatmapJSON):
         return obj.__dict__
-    elif isinstance(obj, ItemNameAndData):
+    elif isinstance(obj, HierarchicalItem):
 
         return {
             "index": obj.index,
+            "dataItemIndex": obj.dataItemIndex,
             "itemName": obj.itemName,
             "isOpen": obj.isOpen,
-            "data": obj.data,
             "amountOfDataPoints": obj.amountOfDataPoints,
             "dimReductionX": obj.dimReductionX,
             "dimReductionY": obj.dimReductionY,
@@ -130,9 +130,10 @@ def custom_encoder(obj):
 
 class HeatmapJSON:
     def __init__(self):
+        self.heatmapData: List[List[float]] = []
         self.attributeNames: List[str] = []
         self.attributeDissimilarities: List[List[float]] = []
-        self.itemNamesAndData: List[ItemNameAndData] = []
+        self.hierarchicalItems: List[HierarchicalItem] = []
         self.maxHeatmapValue: float = 0
         self.minHeatmapValue: float = 0
         self.maxDimRedXValue: float = 0
@@ -142,8 +143,8 @@ class HeatmapJSON:
         self.minAttributeValues: List[float] = []
         self.maxAttributeValues: List[float] = []
 
-    def add_cluster(self, cluster: ItemNameAndData):
-        self.itemNamesAndData.append(cluster)
+    def add_cluster(self, cluster: HierarchicalItem):
+        self.hierarchicalItems.append(cluster)
 
 
 class HeatmapSettings:

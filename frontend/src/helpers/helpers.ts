@@ -111,23 +111,24 @@ export enum ColoringHeatmapEnum {
   ATTRIBUTE_RELATIVE = 'ATTRIBUTE_RELATIVE',
 }
 
-export interface ItemNameAndData {
+export interface HierarchicalItem {
   index: number | null
+  dataItemIndex: number
   itemName: string
   isOpen: boolean
-  data: number[]
   amountOfDataPoints: number
   dimReductionX: number
   dimReductionY: number
-  children: ItemNameAndData[] | null
+  children: HierarchicalItem[] | null
 
-  parent: ItemNameAndData | null
+  parent: HierarchicalItem | null
 }
 
 export interface HeatmapJSON {
+  heatmapData: number[][]
   attributeNames: string[]
   attributeDissimilarities: number[]
-  itemNamesAndData: ItemNameAndData[]
+  hierarchicalItems: HierarchicalItem[]
   maxHeatmapValue: number
   minHeatmapValue: number
   maxDimRedXValue: number
@@ -204,7 +205,7 @@ export interface CsvDataTableProfile {
   scaling: ScalingEnum
 }
 
-export function findRowByIndex(row: ItemNameAndData, index: number): ItemNameAndData | null {
+export function findRowByIndex(row: HierarchicalItem, index: number): HierarchicalItem | null {
   if (row.index === index) {
     return row
   }

@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { type ItemNameAndData } from '@/helpers/helpers'
+import { type HierarchicalItem } from '@/helpers/helpers'
 
 const props = withDefaults(
   defineProps<{
-    options: ItemNameAndData[]
-    selected: ItemNameAndData | null
+    options: HierarchicalItem[]
+    selected: HierarchicalItem | null
   }>(),
   {},
 )
 
-const emit = defineEmits<(e: 'select', option: ItemNameAndData | null) => void>()
+const emit = defineEmits<(e: 'select', option: HierarchicalItem | null) => void>()
 
 const singleSelectRef = ref<HTMLElement | null>(null)
 
@@ -29,7 +29,7 @@ const filteredOptions = computed(() => {
   )
 })
 
-const selectOption = (option: ItemNameAndData) => {
+const selectOption = (option: HierarchicalItem) => {
   inputModel.value = option.itemName
   emit('select', option)
   nextTick(() => {

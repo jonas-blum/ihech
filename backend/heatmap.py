@@ -313,7 +313,9 @@ def create_heatmap(
     scaled_filtered_df = scaled_filtered_df.copy()
     dim_red_df = dim_red_df.copy()
 
+    heatmap_data=[]
     item_names_and_data = cluster_items_recursively(
+        heatmap_data,
         original_filtered_df,
         original_filtered_df_dropped,
         scaled_filtered_df,
@@ -328,7 +330,8 @@ def create_heatmap(
     if item_names_and_data is None:
         raise Exception("No items in cluster")
 
-    heatmap_json.itemNamesAndData = item_names_and_data
+    heatmap_json.hierarchicalItems = item_names_and_data
+    heatmap_json.heatmapData = heatmap_data
 
     logger.info(f"Clustering done: {round(time.perf_counter() - start_clustering, 2)}")
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { defineProps, ref, computed, watch, nextTick, onUpdated, onMounted } from 'vue'
-import { type ItemNameAndData } from '@helpers/helpers'
+import { type HierarchicalItem } from '@helpers/helpers'
 import ChevronRight from '@assets/chevron-right.svg'
 
 import { useHeatmapStore } from '@stores/heatmapStore'
 
 const props = defineProps<{
-  row: ItemNameAndData
+  row: HierarchicalItem
   cellHeight: number
   gapHeight: number
   depth: number

@@ -7,7 +7,7 @@ import InformationIcon from '@assets/information-icon.svg'
 import {
   ColoringHeatmapEnum,
   getHeatmapColor,
-  type ItemNameAndData,
+  type HierarchicalItem,
   CSV_UPLOAD_COLLAPSED_HEIGHT,
   CSV_UPLOAD_EXPANDED_HEIGHT,
 } from '@helpers/helpers'
@@ -58,7 +58,7 @@ const highlightOverlay = ref<HTMLElement | null>(null)
 const canvas = ref<HTMLCanvasElement | null>(null)
 const dimRedCollections = ref<HTMLElement | null>(null)
 
-const visibleRows = ref<ItemNameAndData[]>([])
+const visibleRows = ref<HierarchicalItem[]>([])
 
 const dimReductionWidth = ref<number>(MIN_DIM_REDUCTION_WIDTH)
 
@@ -76,17 +76,17 @@ const stickyItemsGap = ref<number>(0)
 // Updates every time the heatmap changes
 
 function updateVisibleRows() {
-  function getVisibleRowsRecursively(row: ItemNameAndData): ItemNameAndData[] {
+  function getVisibleRowsRecursively(row: HierarchicalItem): HierarchicalItem[] {
     if (!row.isOpen || row.children === null) {
       return [row]
     } else if (row.isOpen && row.children) {
       return [row].concat(
-        row.children.flatMap((child: ItemNameAndData) => getVisibleRowsRecursively(child)),
+        row.children.flatMap((child: HierarchicalItem) => getVisibleRowsRecursively(child)),
       )
     }
     return []
   }
-  visibleRows.value = heatmapStore.getHeatmap.itemNamesAndData.flatMap((row) =>
+  visibleRows.value = heatmapStore.getHeatmap.hierarchicalItems.flatMap((row) =>
     getVisibleRowsRecursively(row),
   )
 }
@@ -164,7 +164,7 @@ function updateHeatmapHeight() {
 }
 
 function updateEditionNames() {
-  editionNames.value = heatmapStore.getHeatmap.itemNamesAndData.map((row) => row.itemName)
+  editionNames.value = heatmapStore.getHeatmap.hierarchicalItems.map((row) => row.itemName)
 }
 
 function updateDimReductionWidth() {
@@ -245,14 +245,15 @@ function drawEverything() {
 
     for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
       const item = visibleRows.value[itemIdx]
+      const itemData = heatmapStore.getHeatmap.heatmapData[item.dataItemIndex]
       let maxRowValue = 1
       if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE) {
-        maxRowValue = Math.max(...item.data)
+        maxRowValue = Math.max(...itemData)
       }
 
-      for (let attrIdx = 0; attrIdx < item.data.length; attrIdx++) {
+      for (let attrIdx = 0; attrIdx < itemData.length; attrIdx++) {
         const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
-        const initialValue = item.data[initialAttrIdx]
+        const initialValue = itemData[initialAttrIdx]
 
         let adjustedValue = initialValue
         if (
@@ -425,8 +426,8 @@ function updateTooltip(e: MouseEvent) {
   if (heatmapStore.getHighlightedRow !== selectedRow) {
     heatmapStore.setHighlightedRow(selectedRow)
   }
-
-  let dataValue = selectedRow.data[initialColIdx]
+  const itemData = heatmapStore.getHeatmap.heatmapData[selectedRow.dataItemIndex]
+  let dataValue = itemData[initialColIdx]
 
   let overlayX = colIdx * cellWidth.value + rect.left + scrollX
   let overlayY = rowIdx * cellHeight.value + rect.top + scrollY
@@ -656,7 +657,7 @@ onMounted(async () => {
           :style="{
             overflow: 'auto',
             position: 'relative',
-            display: heatmapStore.heatmap.itemNamesAndData.length !== 0 ? 'grid' : 'none',
+            display: heatmapStore.heatmap.hierarchicalItems.length !== 0 ? 'grid' : 'none',
             gridTemplateColumns:
               ROW_LABELS_WIDTH + SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP + 'px auto',
             gridTemplateRows: COL_LABELS_HEIGHT + SPACE_BETWEEN_COL_LABELS_AND_HEATMAP + 'px auto',
@@ -806,7 +807,7 @@ onMounted(async () => {
                 zIndex: 99,
               }"
               :key="index"
-              v-for="(row, index) in heatmapStore.getHeatmap.itemNamesAndData"
+              v-for="(row, index) in heatmapStore.getHeatmap.hierarchicalItems"
             >
               <ExpRowComponent
                 :gap-height="GAP_HEIGHT"

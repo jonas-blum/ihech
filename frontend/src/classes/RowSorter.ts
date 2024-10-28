@@ -2,9 +2,9 @@ import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export class RowSorter {
-    private criteria: RowSorterCriteria[];
+    private criteria: RowSorterCriterion[];
   
-    constructor(criteria: RowSorterCriteria[] = []) {
+    constructor(criteria: RowSorterCriterion[] = []) {
       this.criteria = criteria;
     }
   
@@ -22,7 +22,7 @@ export class RowSorter {
     }
   
     // Add a criterion to the list
-    public addCriterion(criterion: RowSorterCriteria) {
+    public addCriterion(criterion: RowSorterCriterion) {
       this.criteria.push(criterion);
     }
   
@@ -47,13 +47,13 @@ export class RowSorter {
     }
   
     // Retrieve all criteria (useful for displaying current order)
-    public getCriteria(): RowSorterCriteria[] {
+    public getCriteria(): RowSorterCriterion[] {
       return this.criteria;
     }
   }
   
 
-export abstract class RowSorterCriteria {
+export abstract class RowSorterCriterion {
   humanReadableName: string
   technicalName: string
   reverse: boolean
@@ -81,7 +81,7 @@ export abstract class RowSorterCriteria {
   }
 }
 
-export class RowSorterCriteriaByName extends RowSorterCriteria {
+export class RowSorterCriterionByName extends RowSorterCriterion {
   constructor(reverse: boolean = false) {
     super('Name', 'name', reverse)
   }
@@ -92,7 +92,7 @@ export class RowSorterCriteriaByName extends RowSorterCriteria {
   }
 }
 
-export class RowSorterCriteriaByHasChildren extends RowSorterCriteria {
+export class RowSorterCriterionByHasChildren extends RowSorterCriterion {
   constructor(reverse: boolean = false) {
     super('Has Children', 'hasChildren', reverse)
   }
@@ -108,7 +108,7 @@ export class RowSorterCriteriaByHasChildren extends RowSorterCriteria {
   }
 }
 
-export class RowSorterCriteriaByAmountOfChildren extends RowSorterCriteria {
+export class RowSorterCriterionByAmountOfChildren extends RowSorterCriterion {
   constructor(reverse: boolean = false) {
     super('Children Amount', 'amountOfChildren', reverse)
   }

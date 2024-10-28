@@ -18,15 +18,16 @@ import { AttributeTree } from '@/classes/AttributeTree'
 import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
 import {
   RowSorter,
-  RowSorterCriteria,
-  RowSorterCriteriaByName,
-  RowSorterCriteriaByHasChildren,
-  RowSorterCriteriaByAmountOfChildren,
+  RowSorterCriterion,
+  RowSorterCriterionByName,
+  RowSorterCriterionByHasChildren,
+  RowSorterCriterionByAmountOfChildren,
 } from '@/classes/RowSorter'
 import {
   ColumnSorter,
-  ColumnSorterCriteria,
-  ColumnSorterCriteriaByName,
+  ColumnSorterCriterion,
+  ColumnSorterCriterionByName,
+  ColumnSorterCriterionByStandardDeviation,
 } from '@/classes/ColumnSorter'
 import { nextTick } from 'vue'
 import { reverse } from 'd3'
@@ -321,14 +322,15 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         // initialize rowSorter
         // TODO: I should probably store the rowSorter in the store, otherwise the settings are reset when the heatmap is refetched..
-        let criterion1 = new RowSorterCriteriaByName()
-        let criterion2 = new RowSorterCriteriaByHasChildren()
-        let criterion3 = new RowSorterCriteriaByAmountOfChildren()
+        let criterion1 = new RowSorterCriterionByName()
+        let criterion2 = new RowSorterCriterionByHasChildren()
+        let criterion3 = new RowSorterCriterionByAmountOfChildren()
         let rowSorter = new RowSorter([criterion1, criterion2, criterion3])
 
         // initialize columnSorter
-        let criterionA = new ColumnSorterCriteriaByName()
-        let columnSorter = new ColumnSorter([criterionA])
+        let criterionA = new ColumnSorterCriterionByName()
+        let criterionB = new ColumnSorterCriterionByStandardDeviation()
+        let columnSorter = new ColumnSorter([criterionA, criterionB])
 
         // initialize itemTree with the data received from the backend, starting at the root
         let itemTreeRoot = this.heatmap.itemNamesAndData[0]

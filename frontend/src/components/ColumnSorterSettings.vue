@@ -10,10 +10,10 @@ const columnSorter = computed(() => heatmapStore.attributeTree?.columnSorter)
 
 <template>
   <div class="dropdown dropdown-hover">
-    <div tabindex="0" role="button" class="btn btn-md">Column Sorter</div>
+    <div tabindex="1" role="button" class="btn btn-md">Column Sorter</div>
     <div
       v-if="columnSorter"
-      tabindex="0"
+      tabindex="1"
       class="dropdown-content bg-base-100 z-[1] w-64 p-2 rounded-sm shadow text-xs"
     >
       <p class="font-bold">Sort Columns by:</p>

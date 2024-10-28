@@ -2,6 +2,7 @@ import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 
 export abstract class Column {
     name: string
+    standardDeviation: number // corresponds to the 'heterogeneity' in the backend data
     parent: Column | null
     position: number
     depth: number
@@ -11,6 +12,7 @@ export abstract class Column {
   
     protected constructor(
       name: string,
+      standardDeviation: number,
       parent: Column | null = null,
       position: number = -1,
       depth: number = -1,
@@ -18,6 +20,7 @@ export abstract class Column {
       nextSibling: Column | null = null,
     ) {
       this.name = name
+      this.standardDeviation = standardDeviation
       this.parent = parent
       this.position = position
       this.depth = depth
@@ -47,13 +50,14 @@ export abstract class Column {
   export class AttributeColumn extends Column {
     constructor(
       name: string,
+      standardDeviation: number,
       parent?: Column | null,
       position?: number,
       depth?: number,
       prevSibling?: Column | null,
       nextSibling?: Column | null,
     ) {
-      super(name, parent, position, depth, prevSibling, nextSibling)
+      super(name, standardDeviation, parent, position, depth, prevSibling, nextSibling)
     }
   
     hasChildren(): boolean {
@@ -67,6 +71,7 @@ export abstract class Column {
   
     constructor(
       name: string,
+      standardDeviation: number,
       parent?: Column | null,
       position?: number,
       depth?: number,
@@ -75,7 +80,7 @@ export abstract class Column {
       isOpen: boolean = false,
       children: Column[] = [],
     ) {
-      super(name, parent, position, depth, prevSibling, nextSibling)
+      super(name, standardDeviation, parent, position, depth, prevSibling, nextSibling)
       this.isOpen = isOpen
       this.children = children
     }

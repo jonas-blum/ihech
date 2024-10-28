@@ -2,9 +2,9 @@ import { Column } from '@/classes/Column'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export class ColumnSorter {
-  private criteria: ColumnSorterCriteria[]
+  private criteria: ColumnSorterCriterion[]
 
-  constructor(criteria: ColumnSorterCriteria[] = []) {
+  constructor(criteria: ColumnSorterCriterion[] = []) {
     this.criteria = criteria
   }
 
@@ -22,7 +22,7 @@ export class ColumnSorter {
   }
 
   // Add a criterion to the list
-  public addCriterion(criterion: ColumnSorterCriteria) {
+  public addCriterion(criterion: ColumnSorterCriterion) {
     this.criteria.push(criterion)
   }
 
@@ -44,12 +44,12 @@ export class ColumnSorter {
   }
 
   // Retrieve all criteria (useful for displaying current order)
-  public getCriteria(): ColumnSorterCriteria[] {
+  public getCriteria(): ColumnSorterCriterion[] {
     return this.criteria
   }
 }
 
-export abstract class ColumnSorterCriteria {
+export abstract class ColumnSorterCriterion {
   humanReadableName: string
   technicalName: string
   reverse: boolean
@@ -77,13 +77,24 @@ export abstract class ColumnSorterCriteria {
   }
 }
 
-export class ColumnSorterCriteriaByName extends ColumnSorterCriteria {
+export class ColumnSorterCriterionByName extends ColumnSorterCriterion {
   constructor(reverse: boolean = false) {
     super('Name', 'name', reverse)
   }
 
   compare(column1: Column, column2: Column): number {
     const result = column1.name.localeCompare(column2.name)
+    return this.applyReverse(result)
+  }
+}
+
+export class ColumnSorterCriterionByStandardDeviation extends ColumnSorterCriterion {
+  constructor(reverse: boolean = false) {
+    super('Standard Deviation', 'standardDeviation', reverse)
+  }
+
+  compare(column1: Column, column2: Column): number {
+    const result = column1.standardDeviation - column2.standardDeviation
     return this.applyReverse(result)
   }
 }

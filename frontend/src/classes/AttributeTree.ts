@@ -25,6 +25,7 @@ export class AttributeTree {
     for (let i = 0; i < attributeNames.length; i++) {
       const attributeColumn: AttributeColumn = new AttributeColumn(
         attributeNames[i],
+        attributeDissimilarities[i],
         this.root,
         -1,
         -1,

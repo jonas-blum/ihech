@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import { nextTick, onMounted, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { ref } from 'vue'
 
 import { ColoringHeatmapEnum, type ItemNameAndData } from '@helpers/helpers'
 import { useHeatmapStore } from '@stores/heatmapStore'
 
-import {
-  PixiApplicationManager,
-  PixiHeatmap,
-  PixiRow,
-  PixiHeatmapCell,
-  PixiRowLabel,
-} from '@helpers/PixiComponents'
-import { Graphics } from 'pixi.js'
+import { PixiApplicationManager } from '@/pixiComponents/PixiApplicationManager'
+import { PixiRow } from '@/pixiComponents/PixiRow'
+import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 
 const heatmapStore = useHeatmapStore()
 
@@ -50,8 +45,8 @@ function update() {
 
     let pixiHeatmap = pixiApplicationManager.heatmap
 
-    // traverse the tree with all rows and create the pixiRows
-    let rows = heatmapStore.tree?.getAllRows()
+    // traverse the item tree with all rows and create the pixiRows
+    let rows = heatmapStore.itemTree?.getAllRows()
     if (!rows) {
       console.warn('rows is not set')
       return
@@ -70,23 +65,6 @@ function update() {
     pixiInitialized.value = true
     console.log('💨 pixi rows are initialized', pixiApplicationManager)
   }
-
-  // // update the position of the rows
-  // let rows = heatmapStore.tree?.getAllRows()
-  // if (!rows) {
-  //   console.warn('rows is not set')
-  //   return
-  // }
-
-  // for (let row of rows) {
-  //   let pixiRow = row.pixiRow
-  //   if (!pixiRow) {
-  //     console.warn('pixiRow is not set')
-  //     return
-  //   }
-
-  //   pixiRow.updatePosition(0, row.position * cellHeight.value)
-  // }
 }
 
 // Function to get the maximum value in a row based on the coloring heatmap type
@@ -154,7 +132,7 @@ function drawEverything() {
       if (visibleRowIdx >= heatmapStore.getAmountOfStickyItems) {
         y += stickyItemsGap.value
       }
-      
+
       // let newHeatmapCell = new PixiHeatmapCell()
       // newHeatmapCell.draw(cellWidth.value, cellHeight.value, color)
       // pixiApplicationManager.heatmap.cellContainer.addChild(newHeatmapCell)

@@ -1,20 +1,21 @@
-import { PixiRow, PixiRowLabel } from './PixiComponents'
-import { useHeatmapStore } from '../stores/heatmapStore'
-import { ColoringHeatmapEnum } from './helpers'
+import { PixiRow } from '@/pixiComponents/PixiRow'
+import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
+import { useHeatmapStore } from '@/stores/heatmapStore'
+import { ColoringHeatmapEnum } from '@/helpers/helpers'
 
 interface DimRedPosition {
   x: number
   y: number
 }
 
-export class Tree {
+export class ItemTree {
   root: AggregatedRow
 
   constructor(itemNameAndData: any) {
-    this.root = this.buildTree(itemNameAndData) as AggregatedRow
+    this.root = this.buildItemTree(itemNameAndData) as AggregatedRow
   }
 
-  buildTree(itemNameAndData: any, parent: Row | null = null): Row {
+  buildItemTree(itemNameAndData: any, parent: Row | null = null): Row {
     let row: Row
 
     if (itemNameAndData.children) {
@@ -33,7 +34,7 @@ export class Tree {
       )
 
       // Now create children, correctly passing `row` as the parent
-      const children = itemNameAndData.children.map((child: any) => this.buildTree(child, row))
+      const children = itemNameAndData.children.map((child: any) => this.buildItemTree(child, row))
       // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
       row.children = children // Assign children to the row after they've been created
 

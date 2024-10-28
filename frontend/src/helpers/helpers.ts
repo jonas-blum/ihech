@@ -1,5 +1,4 @@
 import * as dataForge from 'data-forge'
-import { PixiRow } from './PixiComponents'
 
 export const COLORS = [
   '#FF0000', // Red

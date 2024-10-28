@@ -11,16 +11,16 @@ import {
   ColoringHeatmapEnum,
   getDistinctColor,
   interpolateColor,
-} from '../helpers/helpers'
-import { Row, Tree, AggregatedRow, ItemRow } from '../helpers/classes'
+} from '@/helpers/helpers'
+import { Row, ItemTree, AggregatedRow, ItemRow } from '@/classes/ItemTree'
 import { nextTick } from 'vue'
 
 export interface HeatmapStoreState {
   dataTables: CsvDataTableProfile[]
   activeDataTable: CsvDataTableProfile | null
 
-  // new Tree data structure
-  tree: Tree | null
+  // new ItemTree data structure
+  itemTree: ItemTree | null
 
   heatmap: HeatmapJSON
   highlightedRow: ItemNameAndData | null
@@ -48,7 +48,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     dataTables: [],
     activeDataTable: null,
 
-    tree: null,
+    itemTree: null,
 
     heatmap: {
       attributeNames: [],
@@ -303,9 +303,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         // initialize tree with the data received from the backend, starting at the root
         let root = this.heatmap.itemNamesAndData[0]
-        this.tree = new Tree(root)
-        this.tree.updatePositionsAndDepth()
-        console.log('Tree:', this.tree)
+        this.itemTree = new ItemTree(root)
+        this.itemTree.updatePositionsAndDepth()
+        console.log('ItemTree:', this.itemTree)
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
@@ -670,138 +670,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.changeHeatmap()
     },
 
-    expandRow(row: ItemNameAndData) {
-      row.isOpen = true
-      this.changeHeatmap()
-    },
-
-    closeRow(row: ItemNameAndData) {
-      row.isOpen = false
-      this.closeChildRowsRecursively(row)
-      this.changeHeatmap()
-    },
-
-    closeNearestOpenParent(targetRow: ItemNameAndData) {
-      if (targetRow.isOpen) {
-        targetRow.isOpen = false
-        this.closeChildRowsRecursively(targetRow)
-        this.changeHeatmap()
-        return
-      }
-      const parent = targetRow.parent
-
-      if (parent?.isOpen) {
-        parent.isOpen = false
-        this.closeChildRowsRecursively(parent)
-        this.changeHeatmap()
-        return
-      }
-      this.changeHeatmap()
-    },
-
-    closeChildRowsRecursively(row: ItemNameAndData) {
-      row.isOpen = false
-      const areAllChildRowsClosed = row.children?.every((child) => !child.isOpen)
-      if (!areAllChildRowsClosed) {
-        row.children?.forEach((child) => {
-          this.closeChildRowsRecursively(child)
-        })
-      }
-    },
-
-    toggleOpenRow(row: ItemNameAndData) {
-      if (row.isOpen) {
-        this.closeRow(row)
-      } else {
-        this.expandRow(row)
-      }
-    },
-    findItemByIndexRecursively(
-      index: number,
-      itemNamesAndData: ItemNameAndData,
-    ): ItemNameAndData | undefined {
-      if (itemNamesAndData.index === index) {
-        return itemNamesAndData
-      }
-      if (itemNamesAndData.children) {
-        for (const child of itemNamesAndData.children) {
-          const foundItem = this.findItemByIndexRecursively(index, child)
-          if (foundItem) {
-            return foundItem
-          }
-        }
-      }
-    },
-    findItemByIndex(index: number) {
-      if (!this.heatmap) {
-        return
-      }
-      for (const item of this.heatmap.itemNamesAndData) {
-        const foundItem = this.findItemByIndexRecursively(index, item)
-        if (foundItem) {
-          return foundItem
-        }
-      }
-    },
-    getAllChildrenIteratively(items: ItemNameAndData[]): ItemNameAndData[] {
-      const allLeafNodes: ItemNameAndData[] = []
-      const stack: ItemNameAndData[] = []
-
-      items.forEach((item) => stack.push(item))
-
-      while (stack.length > 0) {
-        const currentItem = stack.pop()
-        if (!currentItem) {
-          continue
-        }
-
-        if (currentItem.children && currentItem.children.length > 0) {
-          currentItem.children.forEach((child) => stack.push(child))
-        } else {
-          allLeafNodes.push(currentItem)
-        }
-      }
-
-      return allLeafNodes
-    },
-
-    setAllItems(): void {
-      if (!this.heatmap) {
-        return
-      }
-      const leafNodes = this.getAllChildrenIteratively(this.getNonStickyItems)
-
-      leafNodes.sort((a, b) => a.itemName.localeCompare(b.itemName))
-      this.allItems = leafNodes
-    },
-
-    expandItemAndAllParents(item: ItemNameAndData | null) {
-      if (!item) {
-        return
-      }
-      let parent = item.parent
-      while (parent) {
-        parent.isOpen = true
-        parent = parent.parent
-      }
-      item.isOpen = true
-      this.highlightedRow = item
-      this.changeHeatmap()
-    },
-
-    openAllStickyItems() {
-      if (this.getStickyItems.length > 3) {
-        return
-      }
-      for (const item of this.getStickyItems) {
-        item.isOpen = true
-        let parent: ItemNameAndData | null = item.parent
-        while (parent !== null) {
-          parent.isOpen = true
-          parent = parent.parent
-        }
-      }
-    },
     getHeatmapColor(value: number): number {
       let min = this.getHeatmapMinValue
       let max = this.getHeatmapMaxValue
@@ -820,7 +688,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       console.log('clicked on a cell in row', row, 'column', column)
 
       if (row instanceof AggregatedRow) {
-        this.tree?.toggleRowExpansion(row)
+        this.itemTree?.toggleRowExpansion(row)
       }
     },
 
@@ -828,7 +696,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       console.log('clicked the label of', row)
 
       if (row instanceof AggregatedRow) {
-        this.tree?.toggleRowExpansion(row)
+        this.itemTree?.toggleRowExpansion(row)
       }
     },
   },

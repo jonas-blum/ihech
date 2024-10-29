@@ -83,8 +83,8 @@ export abstract class Row {
       // rendering side effects
       this.pixiRow?.updatePosition()
       this.pixiRow?.updateVisibility()
-      this.pixiRowLabel?.updatePosition()
-      this.pixiRowLabel?.updateVisibility()
+      // this.pixiRowLabel?.updatePosition()
+      // this.pixiRowLabel?.updateVisibility()
     }
   
     setDepth(depth: number) {
@@ -92,7 +92,7 @@ export abstract class Row {
   
       // rendering side effects
       this.pixiRow?.updatePosition()
-      this.pixiRowLabel?.updatePosition()
+      // this.pixiRowLabel?.updatePosition()
     }
   }
   

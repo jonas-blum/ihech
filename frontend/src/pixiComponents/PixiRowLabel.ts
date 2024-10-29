@@ -23,7 +23,6 @@ export class PixiRowLabel {
     // TODO: icons and other stuff can be added here
     
     this.updatePosition()
-    this.updateVisibility()
     
     // event listeners
     this.container.eventMode = 'static'
@@ -35,11 +34,6 @@ export class PixiRowLabel {
   }
 
   updatePosition() {
-    this.container.y = this.row.position * 20 // TODO: hardcoded for the moment
     this.container.x = this.row.depth * 10 // TODO: hardcoded for the moment
-  }
-
-  updateVisibility() {
-    this.container.visible = this.row.position !== -1
   }
 }

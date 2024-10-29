@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
-import { ref } from 'vue'
+import { onMounted, watch, ref } from 'vue'
 
 import { ColoringHeatmapEnum, type ItemNameAndData } from '@helpers/helpers'
 import { useHeatmapStore } from '@stores/heatmapStore'
@@ -9,6 +8,7 @@ import { PixiApplicationManager } from '@/pixiComponents/PixiApplicationManager'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
+import { Row } from '@/classes/Row'
 
 const heatmapStore = useHeatmapStore()
 
@@ -29,6 +29,51 @@ const stickyAttributesGap = ref<number>(0)
 const stickyItemsGap = ref<number>(0)
 
 const pixiInitialized = ref(false)
+
+// watch for changes in the stickyRows (itemTree.stickyRows)
+watch(
+  () => heatmapStore.itemTree?.stickyRows.length,
+  (newLength, oldLength) => {
+    console.log('stickyRows length changed from', oldLength, 'to', newLength)
+
+    // TODO: create new pixiRow and pixiRowLabel for each new sticky row
+    // TODO: add/remove sticky rows 
+    if (!pixiApplicationManager) {
+      console.warn('pixiApplicationManager is not set')
+      return
+    }
+
+    // destroy all PixiRow instances of the sticky rows (this is a bit brute force, but pragmatic)
+    pixiApplicationManager.heatmap.destroyStickyRows()
+
+    if (newLength == undefined) {
+      console.warn('newLength is not set')
+      return
+    }
+
+    // create a new PixiRow for each sticky row
+    for (let i = 0; i < newLength; i++) {
+      let row = heatmapStore.itemTree?.stickyRows[i] as Row
+      if (!row) {
+        console.warn('row is not set')
+        return
+      }
+
+      let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
+      pixiRow.container.position.y = i * 20 // otherwise they are positoned based on the row.position from the Row class
+      if (pixiRow.pixiRowLabel) {
+        pixiRow.pixiRowLabel.container.position.x = 0 // otherwise they are positoned based on the row.depth from the Row class
+      }
+      pixiApplicationManager.heatmap.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmap
+    }
+
+    // need to update the vertical position of the row container (because the space needed for the sticky rows changed)
+    pixiApplicationManager.heatmap.rowContainer.position.y = 200 + newLength * 20 // TODO: hardcoded for now
+
+    console.log('🪡 added sticky rows', pixiApplicationManager)
+  }
+)
+
 
 function update() {
   // TODO: this nees to be computed based on available space (?)
@@ -57,10 +102,6 @@ function update() {
       let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
       row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
       pixiHeatmap.addRow(pixiRow) // adds the PixiRow to the PixiHeatmap
-
-      let pixiRowLabel = new PixiRowLabel(row) // create PixiRowLabel with reference to the Row
-      row.pixiRowLabel = pixiRowLabel // set the reference to the PixiRowLabel in the Row
-      pixiHeatmap.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmap
     }
 
     // traverse the attribute tree with all columns and create the pixiColumnLabels
@@ -205,7 +246,6 @@ onMounted(async () => {
     <canvas class="heatmap-canvas w-full h-full" ref="canvas"></canvas>
     <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
   </div>
-  
 </template>
 
 <style scoped></style>

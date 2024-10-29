@@ -4,6 +4,7 @@ import { RowSorter } from '@/classes/RowSorter'
 export class ItemTree {
   root: AggregatedRow
   rowSorter: RowSorter
+  stickyRows: ItemRow[] = [] // for now we only allow sticky rows to be ItemRows; might change in the future
 
   constructor(itemNameAndData: any, rowSorter: RowSorter) {
     this.root = this.buildItemTree(itemNameAndData) as AggregatedRow
@@ -203,5 +204,23 @@ export class ItemTree {
         this.sort(child as AggregatedRow)
       }
     }
+  }
+
+  toggleStickyRow(row: ItemRow) {
+    console.log('toggleStickyRow')
+    if (this.stickyRows.includes(row)) {
+      this.removeStickyRow(row)
+    } else {
+      this.addStickyRow(row)
+    }
+    console.log(this.stickyRows)
+  }
+
+  addStickyRow(row: ItemRow) {
+    this.stickyRows.push(row)
+  }
+
+  removeStickyRow(row: ItemRow) {
+    this.stickyRows = this.stickyRows.filter(stickyRow => stickyRow !== row)
   }
 }

@@ -748,9 +748,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     cellClickEvent(row: Row, column: number) {
       console.log('clicked on a cell in row', row, 'column', column)
 
-      if (row instanceof AggregatedRow) {
-        this.itemTree?.toggleRowExpansion(row)
-      }
+      this.rowLabelClickEvent(row)
+
+      // here I could handle the click event for the individual cell (if needed in the future)
+      
     },
 
     rowLabelClickEvent(row: Row) {
@@ -758,6 +759,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
       if (row instanceof AggregatedRow) {
         this.itemTree?.toggleRowExpansion(row)
+      } else if (row instanceof ItemRow) {
+        this.itemTree?.toggleStickyRow(row)
       }
     },
 

@@ -84,6 +84,7 @@ function update() {
     for (let row of rows) {
       let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
       row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
+      pixiRow.updatePosition()
       pixiHeatmap.addRow(pixiRow) // adds the PixiRow to the PixiHeatmap
     }
 

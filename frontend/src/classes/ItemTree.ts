@@ -208,9 +208,8 @@ export class ItemTree {
       this.addStickyRow(row)
     }
 
-    // TODO: sort them
-    const sortedStickyRows = this.rowSorter.sort(this.stickyRows)
-    this.stickyRows = sortedStickyRows as ItemRow[]
+    // sort the sticky
+    this.rowSorter.sort(this.stickyRows)
 
     console.log(this.stickyRows)
   }

@@ -15,6 +15,7 @@ export abstract class Row {
     dimRedPosition: DimRedPosition
     parent: Row | null
     position: number = -1 // position in the list of rows; -1 if not visible
+    oldPosition: number = -1 // used for animations
     depth: number = -1 // indentation level in the tree
     prevSibling: Row | null = null
     nextSibling: Row | null = null

@@ -11,7 +11,9 @@ export const useLayoutStore = defineStore('layout', {
     rowLabelDepthIndent: 10, // indent for each depth level in the row labels
     columnLabelDepthIndent: 10, // indent for each depth level in the row labels
     heatmapLeftMargin: 5, // prevent the heatmap from touching the left border
-    heatmapTopMargin: 5 // prevent the heatmap from touching the top border
+    heatmapTopMargin: 5, // prevent the heatmap from touching the top border
+
+    animationDuration: 0.3, // duration of animations in seconds
   }),
   getters: {
     // Define your getters here

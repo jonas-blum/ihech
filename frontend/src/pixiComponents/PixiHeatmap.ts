@@ -1,7 +1,6 @@
 import { Container } from 'pixi.js'
 import { PixiRow } from '@/pixiComponents/PixiRow'
-import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useLayoutStore } from '@/stores/layoutStore'
 import type { PixiColumnLabel } from './PixiColumnLabel'
 
 export class PixiHeatmap {
@@ -17,10 +16,9 @@ export class PixiHeatmap {
     this.container.addChild(this.columnLabelsContainer)
 
     // set the position of the containers
-    // TODO
-    this.rowContainer.position.set(0, 200)
-    this.stickyRowContainer.position.set(0, 200)
-    this.columnLabelsContainer.position.set(200, 0)
+    this.rowContainer.position.set(0, useLayoutStore().columnLabelHeight)
+    this.stickyRowContainer.position.set(0, useLayoutStore().columnLabelHeight)
+    this.columnLabelsContainer.position.set(useLayoutStore().rowLabelWidth, 0)
   }
 
   addRow(row: PixiRow) {

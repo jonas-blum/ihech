@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from 'vue'
 
-import { ColoringHeatmapEnum, type ItemNameAndData } from '@helpers/helpers'
 import { useHeatmapStore } from '@stores/heatmapStore'
+import { useLayoutStore } from '@stores/layoutStore'
 
 import { PixiApplicationManager } from '@/pixiComponents/PixiApplicationManager'
 import { PixiRow } from '@/pixiComponents/PixiRow'
@@ -11,22 +11,14 @@ import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { Row } from '@/classes/Row'
 
 const heatmapStore = useHeatmapStore()
+const layoutStore = useLayoutStore()
 
 let pixiApplicationManager: PixiApplicationManager | null = null
 
 const canvas = ref<HTMLCanvasElement | null>(null)
 
-const visibleRows = ref<ItemNameAndData[]>([])
-
 const heatmapWidth = ref<number>(0)
 const heatmapHeight = ref<number>(0)
-const cellWidth = ref<number>(15)
-const cellHeight = ref<number>(15)
-const rowLabelsWidth = ref<number>(200)
-const columnLabelsHeight = ref<number>(200)
-
-const stickyAttributesGap = ref<number>(0)
-const stickyItemsGap = ref<number>(0)
 
 const pixiInitialized = ref(false)
 
@@ -60,7 +52,7 @@ watch(
       }
 
       let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
-      pixiRow.container.position.y = i * 20 // otherwise they are positoned based on the row.position from the Row class
+      pixiRow.container.position.y = i * layoutStore.rowHeight // otherwise they are positoned based on the row.position from the Row class
       if (pixiRow.pixiRowLabel) {
         pixiRow.pixiRowLabel.container.position.x = 0 // otherwise they are positoned based on the row.depth from the Row class
       }
@@ -68,7 +60,7 @@ watch(
     }
 
     // need to update the vertical position of the row container (because the space needed for the sticky rows changed)
-    pixiApplicationManager.heatmap.rowContainer.position.y = 200 + newLength * 20 // TODO: hardcoded for now
+    pixiApplicationManager.heatmap.rowContainer.position.y = layoutStore.columnLabelHeight + layoutStore.gapAfterStickyRows + newLength * layoutStore.rowHeight
 
     console.log('🪡 added sticky rows', pixiApplicationManager)
   }
@@ -76,12 +68,6 @@ watch(
 
 
 function update() {
-  // TODO: this nees to be computed based on available space (?)
-  // cellWidth.value = 10
-  // cellHeight.value = 10
-  // rowLabelsWidth.value = 200
-  // columnLabelsHeight.value = 200
-
   // only once I need to init the pixi containers and graphics
   if (!pixiInitialized.value) {
     if (!pixiApplicationManager) {
@@ -119,79 +105,6 @@ function update() {
 
     pixiInitialized.value = true
     console.log('💨 pixi components are initialized', pixiApplicationManager)
-  }
-}
-
-// Function to get the maximum value in a row based on the coloring heatmap type
-function getMaxRowValue(item: ItemNameAndData) {
-  return heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
-    ? Math.max(...item.data) // If ITEM_RELATIVE, return the maximum value in the row
-    : 1 // Otherwise, return 1
-}
-
-function drawEverything() {
-  console.log('🖌️ drawEverything')
-
-  if (!pixiApplicationManager) {
-    console.warn('pixiApplicationManager is not set')
-    return
-  }
-
-  const heatmapMaxValue = heatmapStore.getHeatmapMaxValue
-  const heatmapMinValue = heatmapStore.getHeatmapMinValue
-
-  // Iterate over each visibleRow
-  for (const [visibleRowIdx, visibleRow] of visibleRows.value.entries()) {
-    // console.log('visibleRow', visibleRow)
-    let maxRowValue = getMaxRowValue(visibleRow)
-
-    // Iterate over each attribute in the visibleRow
-    for (const [attrIdx, attrValue] of visibleRow.data.entries()) {
-      // because the attributes are not in the same order as in the original data due to sorting / stickyness (?)
-      const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
-      const initialValue = visibleRow.data[initialAttrIdx]
-
-      let adjustedValue = initialValue
-      // Adjust the value based on the coloring heatmap type
-      if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE) {
-        // if ITEM_RELATIVE, adjust the value based on the maximum value in the row
-        adjustedValue = initialValue / maxRowValue
-      } else if (
-        heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
-      ) {
-        // if ATTRIBUTE_RELATIVE, do a column-wise lookup for min and max values
-        // do a column-wise lookup for min and max values
-        const maxAttributeValue = heatmapStore.getMaxAttributeValues[initialAttrIdx]
-        const minAttributeValue = heatmapStore.getMinAttributeValues[initialAttrIdx]
-        // Calculate the difference between the max and min values
-        const difference =
-          maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
-        // Adjust the value based on the min and max values
-        adjustedValue = (adjustedValue - minAttributeValue) / difference
-      } else if (
-        heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
-      ) {
-        // if LOGARITHMIC, adjust the value based on the logarithm of the value
-        // NOTE: this seems a bit counterintuitive, because applying a log should be an independent option ?!
-        adjustedValue = Math.log(initialValue + heatmapStore.getLogShiftValue)
-      }
-
-      // Calculate the position of the cell
-      let x = attrIdx * cellWidth.value
-      let y = visibleRowIdx * cellHeight.value
-
-      // Adjust position if there are sticky attributes or items
-      if (attrIdx >= heatmapStore.getAmountOfStickyAttributes) {
-        x += stickyAttributesGap.value
-      }
-      if (visibleRowIdx >= heatmapStore.getAmountOfStickyItems) {
-        y += stickyItemsGap.value
-      }
-
-      // let newHeatmapCell = new PixiHeatmapCell()
-      // newHeatmapCell.draw(cellWidth.value, cellHeight.value, color)
-      // pixiApplicationManager.heatmap.cellContainer.addChild(newHeatmapCell)
-    }
   }
 }
 

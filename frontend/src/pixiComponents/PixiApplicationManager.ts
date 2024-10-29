@@ -1,6 +1,6 @@
 import { Application } from 'pixi.js'
 import { PixiHeatmap } from '@/pixiComponents/PixiHeatmap'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useLayoutStore } from '@/stores/layoutStore'
 
 export class PixiApplicationManager {
   app: Application
@@ -23,7 +23,7 @@ export class PixiApplicationManager {
     this.heatmap = new PixiHeatmap()
     this.app.stage.addChild(this.heatmap.container)
     // TODO: this needs to be moved
-    this.heatmap.container.position.set(0, 0)
+    this.heatmap.container.position.set(useLayoutStore().heatmapLeftMargin, useLayoutStore().heatmapTopMargin)
 
     // add event listeners for drag and drop
     this.app.stage.eventMode = 'static'

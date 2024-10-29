@@ -1,5 +1,7 @@
 import { Graphics } from 'pixi.js'
 import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useLayoutStore } from '@/stores/layoutStore'
+
 
 export class PixiHeatmapCell extends Graphics {
   // eventMode: string
@@ -21,9 +23,9 @@ export class PixiHeatmapCell extends Graphics {
     this.value = value // TODO: not used yet
     this.adjustedValue = adjustedValue
     this.column = column
-    this.draw(18, 18) // TODO: hardcoded for the moment
+    this.draw(useLayoutStore().columnWidth - useLayoutStore().cellPadding, useLayoutStore().rowHeight - useLayoutStore().cellPadding)
     this.updateTint(useHeatmapStore()?.getHeatmapColor(adjustedValue))
-    this.position.x = this.column * 20 // TODO: hardcoded for the moment
+    this.position.x = this.column * useLayoutStore().columnWidth
 
     // Initialize custom properties within the namespace object
     // this.customProperties = customProperties

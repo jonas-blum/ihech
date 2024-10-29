@@ -1,6 +1,8 @@
 import { Container, Text } from 'pixi.js'
 import { Column } from '@/classes/Column'
 import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useLayoutStore } from '@/stores/layoutStore'
+
 
 export class PixiColumnLabel {
   public container: Container // Text as child
@@ -21,10 +23,10 @@ export class PixiColumnLabel {
     })
 
     // rotate the text if it has no children
-    if (!this.column.hasChildren()) {
+    // if (!this.column.hasChildren()) {
         // text.rotation = -Math.PI / 4 // Rotate -45 degrees
-        text.rotation = -Math.PI / 2 // Rotate -90 degrees    
-    }
+        text.rotation = -Math.PI / 2 // Rotate -90 degrees
+    // }
 
     this.container.addChild(text)
     // TODO: icons and other stuff can be added here
@@ -42,8 +44,11 @@ export class PixiColumnLabel {
   }
 
   updatePosition() {
-    this.container.x = this.column.position * 20 // TODO: hardcoded for the moment
-    this.container.y = 100 + this.column.depth * 90 // TODO: this is a super ugly quick fix.. needs better logic 
+    this.container.x = this.column.position * useLayoutStore().columnWidth
+    let maxDepth = 1 + 1// TODO: fetch dynamically
+    
+    this.container.y = useLayoutStore().columnLabelHeight - (maxDepth - this.column.depth) * useLayoutStore().columnLabelDepthIndent
+    // this.container.y = this.container.children[0].width + this.column.depth * useLayoutStore().columnLabelDepthIndent
   }
 
   updateVisibility() {

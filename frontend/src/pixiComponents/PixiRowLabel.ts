@@ -1,6 +1,8 @@
 import { Container, Text } from 'pixi.js'
 import { Row } from '@/classes/Row'
 import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useLayoutStore } from '@/stores/layoutStore'
+
 
 export class PixiRowLabel {
   public container: Container // Text as child
@@ -34,6 +36,6 @@ export class PixiRowLabel {
   }
 
   updatePosition() {
-    this.container.x = this.row.depth * 10 // TODO: hardcoded for the moment
+    this.container.x = this.row.depth * useLayoutStore().rowLabelDepthIndent
   }
 }

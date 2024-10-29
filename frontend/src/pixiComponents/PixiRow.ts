@@ -3,6 +3,8 @@ import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useLayoutStore } from '@/stores/layoutStore'
+
 
 // maps 1:1 to ItenNameAndData
 export class PixiRow {
@@ -18,7 +20,7 @@ export class PixiRow {
     this.container.addChild(this.pixiHeatmapCellsContainer)
     this.container.addChild(this.pixiRowLabel.container)
 
-    this.pixiHeatmapCellsContainer.position.set(200, 0) // TODO: hardcoded for the moment
+    this.pixiHeatmapCellsContainer.position.set(useLayoutStore().rowLabelWidth, 0)
 
     // create all the cells for the row
     for (let i = 0; i < row.data.length; i++) {
@@ -34,7 +36,7 @@ export class PixiRow {
   }
 
   updatePosition() {
-    this.container.y = this.row.position * 20 // TODO: hardcoded for the moment
+    this.container.y = this.row.position * useLayoutStore().rowHeight
     this.pixiRowLabel?.updatePosition()
   }
 
@@ -44,7 +46,7 @@ export class PixiRow {
 
       // lookup the position of the cell
       const columnIndex = useHeatmapStore()?.attributeTree?.originalIndexToColumn.get(i)?.position ?? -1
-      cell.x = columnIndex * 20 // TODO: hardcoded for the moment
+      cell.x = columnIndex * useLayoutStore().columnWidth
     }
   }
 

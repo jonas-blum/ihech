@@ -751,7 +751,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.rowLabelClickEvent(row)
 
       // here I could handle the click event for the individual cell (if needed in the future)
-      
     },
 
     rowLabelClickEvent(row: Row) {
@@ -773,12 +772,3 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     },
   },
 })
-
-function setParentOfRowsRec(row: ItemNameAndData, parent: ItemNameAndData | null) {
-  row.parent = parent
-  if (row.children) {
-    row.children.forEach((child) => {
-      setParentOfRowsRec(child, row)
-    })
-  }
-}

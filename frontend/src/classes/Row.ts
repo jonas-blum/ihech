@@ -1,5 +1,4 @@
 import { PixiRow } from '@/pixiComponents/PixiRow'
-import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
 
@@ -19,8 +18,8 @@ export abstract class Row {
     depth: number
     prevSibling: Row | null
     nextSibling: Row | null
-    pixiRow: PixiRow | null // reference to the corresponding PixiRow for rendering
-    pixiRowLabel: PixiRowLabel | null // reference to the corresponding PixiRowLabel for rendering
+    pixiRow: PixiRow | null = null // reference to the corresponding PixiRow for rendering
+    stickyPixiRow: PixiRow | null = null // reference to the corresponding (sticky!) PixiRow for rendering
   
     protected constructor(
       name: string,
@@ -43,8 +42,6 @@ export abstract class Row {
       this.depth = depth
       this.prevSibling = prevSibling
       this.nextSibling = nextSibling
-      this.pixiRow = null
-      this.pixiRowLabel = null
     }
   
     abstract hasChildren(): boolean
@@ -83,8 +80,6 @@ export abstract class Row {
       // rendering side effects
       this.pixiRow?.updatePosition()
       this.pixiRow?.updateVisibility()
-      // this.pixiRowLabel?.updatePosition()
-      // this.pixiRowLabel?.updateVisibility()
     }
   
     setDepth(depth: number) {
@@ -92,7 +87,6 @@ export abstract class Row {
   
       // rendering side effects
       this.pixiRow?.updatePosition()
-      // this.pixiRowLabel?.updatePosition()
     }
   }
   

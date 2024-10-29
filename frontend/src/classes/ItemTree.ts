@@ -131,6 +131,9 @@ export class ItemTree {
         pointer = pointer.nextSibling
       }
     }
+
+    // also update the sticky rows
+    this.stickyRows.forEach(stickyRow => stickyRow.stickyPixiRow?.updateCellPositions())
   }
 
   getAllRows(): Row[] {
@@ -213,6 +216,11 @@ export class ItemTree {
     } else {
       this.addStickyRow(row)
     }
+
+    // TODO: sort them
+    const sortedStickyRows = this.rowSorter.sort(this.stickyRows)
+    this.stickyRows = sortedStickyRows as ItemRow[]
+
     console.log(this.stickyRows)
   }
 
@@ -222,5 +230,6 @@ export class ItemTree {
 
   removeStickyRow(row: ItemRow) {
     this.stickyRows = this.stickyRows.filter(stickyRow => stickyRow !== row)
+    row.stickyPixiRow = null
   }
 }

@@ -27,9 +27,7 @@ watch(
   () => heatmapStore.itemTree?.stickyRows.length,
   (newLength, oldLength) => {
     console.log('stickyRows length changed from', oldLength, 'to', newLength)
-
-    // TODO: create new pixiRow and pixiRowLabel for each new sticky row
-    // TODO: add/remove sticky rows 
+ 
     if (!pixiApplicationManager) {
       console.warn('pixiApplicationManager is not set')
       return
@@ -52,6 +50,7 @@ watch(
       }
 
       let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
+      row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiRow.container.position.y = i * layoutStore.rowHeight // otherwise they are positoned based on the row.position from the Row class
       if (pixiRow.pixiRowLabel) {
         pixiRow.pixiRowLabel.container.position.x = 0 // otherwise they are positoned based on the row.depth from the Row class
@@ -61,8 +60,6 @@ watch(
 
     // need to update the vertical position of the row container (because the space needed for the sticky rows changed)
     pixiApplicationManager.heatmap.rowContainer.position.y = layoutStore.columnLabelHeight + layoutStore.gapAfterStickyRows + newLength * layoutStore.rowHeight
-
-    console.log('🪡 added sticky rows', pixiApplicationManager)
   }
 )
 

@@ -4,29 +4,20 @@ export abstract class Column {
     name: string
     standardDeviation: number // corresponds to the 'heterogeneity' in the backend data
     parent: Column | null
-    position: number
-    depth: number
-    prevSibling: Column | null
-    nextSibling: Column | null
-    pixiColumnLabel: PixiColumnLabel | null
+    position: number = -1
+    depth: number = -1
+    prevSibling: Column | null = null
+    nextSibling: Column | null = null
+    pixiColumnLabel: PixiColumnLabel | null = null
   
     protected constructor(
       name: string,
       standardDeviation: number,
       parent: Column | null = null,
-      position: number = -1,
-      depth: number = -1,
-      prevSibling: Column | null = null,
-      nextSibling: Column | null = null,
     ) {
       this.name = name
       this.standardDeviation = standardDeviation
       this.parent = parent
-      this.position = position
-      this.depth = depth
-      this.prevSibling = prevSibling
-      this.nextSibling = nextSibling
-      this.pixiColumnLabel = null
     }
   
     abstract hasChildren(): boolean
@@ -52,12 +43,8 @@ export abstract class Column {
       name: string,
       standardDeviation: number,
       parent?: Column | null,
-      position?: number,
-      depth?: number,
-      prevSibling?: Column | null,
-      nextSibling?: Column | null,
     ) {
-      super(name, standardDeviation, parent, position, depth, prevSibling, nextSibling)
+      super(name, standardDeviation, parent)
     }
   
     hasChildren(): boolean {
@@ -73,14 +60,10 @@ export abstract class Column {
       name: string,
       standardDeviation: number,
       parent?: Column | null,
-      position?: number,
-      depth?: number,
-      prevSibling?: Column | null,
-      nextSibling?: Column | null,
       isOpen: boolean = false,
       children: Column[] = [],
     ) {
-      super(name, standardDeviation, parent, position, depth, prevSibling, nextSibling)
+      super(name, standardDeviation, parent)
       this.isOpen = isOpen
       this.children = children
     }

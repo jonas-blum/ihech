@@ -14,10 +14,10 @@ export abstract class Row {
     dataAdjusted: number[]
     dimRedPosition: DimRedPosition
     parent: Row | null
-    position: number // position in the list of rows; -1 if not visible
-    depth: number
-    prevSibling: Row | null
-    nextSibling: Row | null
+    position: number = -1 // position in the list of rows; -1 if not visible
+    depth: number = -1 // indentation level in the tree
+    prevSibling: Row | null = null
+    nextSibling: Row | null = null
     pixiRow: PixiRow | null = null // reference to the corresponding PixiRow for rendering
     stickyPixiRow: PixiRow | null = null // reference to the corresponding (sticky!) PixiRow for rendering
   
@@ -27,10 +27,6 @@ export abstract class Row {
       data: number[],
       dimRedPosition: DimRedPosition,
       parent: Row | null = null,
-      position: number = -1,
-      depth: number = -1,
-      prevSibling: Row | null = null,
-      nextSibling: Row | null = null,
     ) {
       this.name = name
       this.totalChildrenCount = totalChildrenCount
@@ -38,10 +34,6 @@ export abstract class Row {
       this.dataAdjusted = Row.computeAdjustedData(data)
       this.dimRedPosition = dimRedPosition
       this.parent = parent
-      this.position = position
-      this.depth = depth
-      this.prevSibling = prevSibling
-      this.nextSibling = nextSibling
     }
   
     abstract hasChildren(): boolean
@@ -75,6 +67,7 @@ export abstract class Row {
     }
   
     setPosition(position: number) {
+      this.oldPosition = this.position
       this.position = position
   
       // rendering side effects
@@ -97,12 +90,8 @@ export abstract class Row {
       data: number[],
       dimRedPosition: DimRedPosition,
       parent?: Row | null,
-      position?: number,
-      depth?: number,
-      prevSibling?: Row | null,
-      nextSibling?: Row | null,
     ) {
-      super(name, totalChildrenCount, data, dimRedPosition, parent, position, depth, prevSibling, nextSibling)
+      super(name, totalChildrenCount, data, dimRedPosition, parent)
     }
   
     hasChildren(): boolean {
@@ -112,7 +101,7 @@ export abstract class Row {
   
   export class AggregatedRow extends Row {
     isOpen: boolean
-    children: Row[]
+    children: Row[] = []
   
     constructor(
       name: string,
@@ -120,16 +109,10 @@ export abstract class Row {
       data: number[],
       dimRedPosition: DimRedPosition,
       parent?: Row | null,
-      position?: number,
-      depth?: number,
-      prevSibling?: Row | null,
-      nextSibling?: Row | null,
       isOpen: boolean = false, // only used for aggregated rows
-      children: Row[] = [],
     ) {
-      super(name, totalChildrenCount, data, dimRedPosition, parent, position, depth, prevSibling, nextSibling)
+      super(name, totalChildrenCount, data, dimRedPosition, parent)
       this.isOpen = isOpen
-      this.children = children
     }
   
     hasChildren(): boolean {

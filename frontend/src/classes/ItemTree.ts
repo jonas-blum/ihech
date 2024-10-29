@@ -22,12 +22,7 @@ export class ItemTree {
         itemNameAndData.data,
         { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
         parent,
-        -1, // Position will be set later
-        -1, // Temporary depth, will be adjusted later
-        null, // prevSibling will be set later
-        null, // nextSibling will be set later
         itemNameAndData.isOpen,
-        [], // Children will be set later
       )
 
       // Now create children, correctly passing `row` as the parent
@@ -51,10 +46,6 @@ export class ItemTree {
         itemNameAndData.data,
         { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
         parent,
-        -1, // Position will be set later
-        -1, // Temporary depth, will be adjusted later
-        null, // prevSibling will be set later
-        null, // nextSibling will be set later
       )
     }
 

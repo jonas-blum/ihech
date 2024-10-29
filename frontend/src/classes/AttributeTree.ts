@@ -17,7 +17,7 @@ export class AttributeTree {
     columnSorter: ColumnSorter,
   ) {
     this.columnSorter = columnSorter
-    this.root = new AggregatedColumn('age_groups', 0, null, -1, -1, null, null)
+    this.root = new AggregatedColumn('age_groups', 0, null)
     this.root.isOpen = true
 
     // TODO: this is just a hacky placeholder until the attributes are hierarchical
@@ -27,10 +27,6 @@ export class AttributeTree {
         attributeNames[i],
         attributeDissimilarities[i],
         this.root,
-        -1,
-        -1,
-        null,
-        null,
       )
       this.root.children.push(attributeColumn)
 

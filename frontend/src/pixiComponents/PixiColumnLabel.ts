@@ -2,6 +2,7 @@ import { Container, Text } from 'pixi.js'
 import { Column } from '@/classes/Column'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useLayoutStore } from '@/stores/layoutStore'
+import { gsap } from 'gsap'
 
 
 export class PixiColumnLabel {
@@ -43,10 +44,19 @@ export class PixiColumnLabel {
     })
   }
 
-  updatePosition() {
-    this.container.x = this.column.position * useLayoutStore().columnWidth
+  updatePosition(animate: boolean = true) {
+    // if the oldPosition is -1, we want to animate from the parent column position (if available)
+    let startPosition = this.column.oldPosition === -1 ? (this.column.parent?.position ?? 0) : this.column.oldPosition
+    gsap.fromTo(
+      this.container,
+      { x: startPosition * useLayoutStore().columnWidth },
+      {
+        x: this.column.position * useLayoutStore().columnWidth,
+        duration: animate ? useLayoutStore().animationDuration : 0,
+      },
+    )
+
     let maxDepth = 1 + 1// TODO: fetch dynamically
-    
     this.container.y = useLayoutStore().columnLabelHeight - (maxDepth - this.column.depth) * useLayoutStore().columnLabelDepthIndent
     // this.container.y = this.container.children[0].width + this.column.depth * useLayoutStore().columnLabelDepthIndent
   }

@@ -5,6 +5,7 @@ export abstract class Column {
     standardDeviation: number // corresponds to the 'heterogeneity' in the backend data
     parent: Column | null
     position: number = -1
+    oldPosition: number = -1
     depth: number = -1
     prevSibling: Column | null = null
     nextSibling: Column | null = null
@@ -23,6 +24,7 @@ export abstract class Column {
     abstract hasChildren(): boolean
   
     setPosition(position: number) {
+      this.oldPosition = this.position
       this.position = position
   
       // rendering side effects

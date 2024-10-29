@@ -4,6 +4,7 @@ import { RowSorter } from '@/classes/RowSorter'
 export class ItemTree {
   root: AggregatedRow
   rowSorter: RowSorter
+  // NOTE: to detect changes in the sticky rows via shallow watchers, always replace the array instead of modifying it
   stickyRows: ItemRow[] = [] // for now we only allow sticky rows to be ItemRows; might change in the future
 
   constructor(itemNameAndData: any, rowSorter: RowSorter) {
@@ -215,11 +216,17 @@ export class ItemTree {
   }
 
   addStickyRow(row: ItemRow) {
-    this.stickyRows.push(row)
+    this.stickyRows = [...this.stickyRows, row]
   }
 
   removeStickyRow(row: ItemRow) {
-    this.stickyRows = this.stickyRows.filter(stickyRow => stickyRow !== row)
-    row.stickyPixiRow = null
+    const index = this.stickyRows.indexOf(row)
+    if (index > -1) {
+      this.stickyRows = [
+      ...this.stickyRows.slice(0, index),
+      ...this.stickyRows.slice(index + 1)
+      ]
+    }
+    // row.stickyPixiRow = null
   }
 }

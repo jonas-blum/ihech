@@ -29,8 +29,9 @@ export class PixiHeatmap {
     this.stickyRowContainer.addChild(row.container)
   }
 
-  destroyStickyRows() {
-    this.stickyRowContainer.removeChildren()
+  removeStickyRow(row: PixiRow) {
+    this.stickyRowContainer.removeChild(row.container)
+    row.container.destroy()
   }
 
   addColumnLabel(columnLabel: PixiColumnLabel) {

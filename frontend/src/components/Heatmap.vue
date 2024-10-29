@@ -22,47 +22,59 @@ const heatmapHeight = ref<number>(0)
 
 const pixiInitialized = ref(false)
 
-// watch for changes in the stickyRows (itemTree.stickyRows)
+// Watch for deep changes in the stickyRows array
 watch(
-  () => heatmapStore.itemTree?.stickyRows.length,
-  (newLength, oldLength) => {
-    console.log('stickyRows length changed from', oldLength, 'to', newLength)
- 
+  () => heatmapStore.itemTree?.stickyRows,
+  (newStickyRows, oldStickyRows) => {
+    console.log('stickyRows changed from', oldStickyRows, 'to', newStickyRows)
+
     if (!pixiApplicationManager) {
       console.warn('pixiApplicationManager is not set')
       return
     }
 
-    // destroy all PixiRow instances of the sticky rows (this is a bit brute force, but pragmatic)
-    pixiApplicationManager.heatmap.destroyStickyRows()
+    // find difference between old and new sticky rows
+    let stickyRowsToRemove = oldStickyRows?.filter(
+      (oldStickyRow) => !newStickyRows?.includes(oldStickyRow),
+    )
+    console.log('stickyRowsToRemove', stickyRowsToRemove)
 
-    if (newLength == undefined) {
-      console.warn('newLength is not set')
-      return
-    }
+    // find new sticky rows
+    let stickyRowsToAdd = newStickyRows?.filter(
+      (newStickyRow) => !oldStickyRows?.includes(newStickyRow),
+    )
+    console.log('stickyRowsToAdd', stickyRowsToAdd)
 
-    // create a new PixiRow for each sticky row
-    for (let i = 0; i < newLength; i++) {
-      let row = heatmapStore.itemTree?.stickyRows[i] as Row
-      if (!row) {
-        console.warn('row is not set')
-        return
+    // loop over the sticky rows to remove
+    stickyRowsToRemove?.forEach((row) => {
+      // remove the PixiRow from the PixiHeatmap.stickyRowsContainer
+      if (row?.stickyPixiRow) {
+        pixiApplicationManager?.heatmap.removeStickyRow(row.stickyPixiRow)
       }
+    })
 
-      let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
+    // add new sticky rows
+    stickyRowsToAdd?.forEach((row, index) => {
+      const pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
-      pixiRow.container.position.y = i * layoutStore.rowHeight // otherwise they are positoned based on the row.position from the Row class
-      if (pixiRow.pixiRowLabel) {
-        pixiRow.pixiRowLabel.container.position.x = 0 // otherwise they are positoned based on the row.depth from the Row class
+      pixiApplicationManager?.heatmap.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmap.stickyRowsContainer
+    })
+
+    // update the position of all rows
+    newStickyRows?.forEach((row, index) => {
+      if (row.stickyPixiRow) {
+        row.stickyPixiRow.container.position.y = index * layoutStore.rowHeight // Set position based on index
+        row.stickyPixiRow.pixiRowLabel.container.position.x = 0 // otherwise the row.depth would be used 
       }
-      pixiApplicationManager.heatmap.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmap
-    }
+    })
 
-    // need to update the vertical position of the row container (because the space needed for the sticky rows changed)
-    pixiApplicationManager.heatmap.rowContainer.position.y = layoutStore.columnLabelHeight + layoutStore.gapAfterStickyRows + newLength * layoutStore.rowHeight
-  }
+    // Update the vertical position of the row container to account for sticky rows
+    pixiApplicationManager.heatmap.rowContainer.position.y =
+      layoutStore.columnLabelHeight +
+      layoutStore.gapAfterStickyRows +
+      newStickyRows.length * layoutStore.rowHeight
+  },
 )
-
 
 function update() {
   // only once I need to init the pixi containers and graphics

@@ -2,6 +2,7 @@ import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 
 export abstract class Column {
     name: string
+    originalIndex: number// corresponds to the 'index' in the backend data; useful for finding the correct PixiHeatmapCell in the PixiRow.pixiHeatmapCellsContainer
     standardDeviation: number // corresponds to the 'heterogeneity' in the backend data
     parent: Column | null
     position: number = -1
@@ -13,10 +14,12 @@ export abstract class Column {
   
     protected constructor(
       name: string,
+      originalIndex: number,
       standardDeviation: number,
       parent: Column | null = null,
     ) {
       this.name = name
+      this.originalIndex = originalIndex
       this.standardDeviation = standardDeviation
       this.parent = parent
     }
@@ -43,10 +46,11 @@ export abstract class Column {
   export class AttributeColumn extends Column {
     constructor(
       name: string,
+      originalIndex: number,
       standardDeviation: number,
       parent?: Column | null,
     ) {
-      super(name, standardDeviation, parent)
+      super(name, originalIndex, standardDeviation, parent)
     }
   
     hasChildren(): boolean {
@@ -60,12 +64,13 @@ export abstract class Column {
   
     constructor(
       name: string,
+      originalIndex: number,
       standardDeviation: number,
       parent?: Column | null,
       isOpen: boolean = false,
       children: Column[] = [],
     ) {
-      super(name, standardDeviation, parent)
+      super(name, originalIndex, standardDeviation, parent)
       this.isOpen = isOpen
       this.children = children
     }

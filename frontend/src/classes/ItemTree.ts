@@ -227,6 +227,9 @@ export class ItemTree {
       ...this.stickyRows.slice(index + 1)
       ]
     }
-    // row.stickyPixiRow = null
+  }
+
+  getVisibleRowsCount(): number {
+    return this.getVisisbleRows().length
   }
 }

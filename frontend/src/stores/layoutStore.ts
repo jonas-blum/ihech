@@ -1,3 +1,4 @@
+import { difference } from 'd3'
 import { defineStore } from 'pinia'
 
 export const useLayoutStore = defineStore('layout', {
@@ -16,7 +17,9 @@ export const useLayoutStore = defineStore('layout', {
     animationDuration: 0.3, // duration of animations in seconds
   }),
   getters: {
-    // Define your getters here
+    differenceBetweenRowHeights(): number {
+      return this.heatmapTopMargin
+    }
   },
   actions: {
     // Define your actions here

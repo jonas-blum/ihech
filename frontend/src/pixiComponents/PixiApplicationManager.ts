@@ -21,9 +21,9 @@ export class PixiApplicationManager {
 
     // add heatmap
     this.heatmap = new PixiHeatmap()
-    this.app.stage.addChild(this.heatmap.container)
+    this.app.stage.addChild(this.heatmap)
     // TODO: this needs to be moved
-    this.heatmap.container.position.set(useLayoutStore().heatmapLeftMargin, useLayoutStore().heatmapTopMargin)
+    this.heatmap.position.set(useLayoutStore().heatmapLeftMargin, useLayoutStore().heatmapTopMargin)
 
     // add event listeners for drag and drop
     this.app.stage.eventMode = 'static'

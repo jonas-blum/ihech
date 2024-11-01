@@ -3,39 +3,45 @@ import { Row } from '@/classes/Row'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useLayoutStore } from '@/stores/layoutStore'
 
-
-export class PixiRowLabel {
-  public container: Container // Text as child
+export class PixiRowLabel extends Container {
   public row: Row // reference to data structure Row
 
   constructor(row: Row) {
-    this.container = new Container()
+    super()
     this.row = row
-    
+
     // create the text for the row label
     const text = new Text({
-        text: row.name,
-        style: {
-            fill: 0x000000,
-            fontSize: 12,
-            fontFamily: 'Arial',
-        },
+      text: row.name,
+      style: {
+        fill: 0x000000,
+        fontSize: 12,
+        fontFamily: 'Arial',
+      },
     })
-    this.container.addChild(text)
+    this.addChild(text)
     // TODO: icons and other stuff can be added here
-    
+
     this.updatePosition()
-    
+
     // event listeners
-    this.container.eventMode = 'static'
-    this.container.cursor = 'pointer'
+    this.eventMode = 'static'
+    this.cursor = 'pointer'
     // @ts-ignore: Property 'on' does not exist on type 'CollectionGraphics'
-    this.container.on('click', () => {
-      useHeatmapStore()?.rowLabelClickEvent(this.row)
+    this.on('click', () => {
+      useHeatmapStore()?.rowLabelClickEvent(this)
+    })
+    // @ts-ignore: Property 'on' does not exist
+    this.on('mouseover', () => {
+      useHeatmapStore()?.setHoveredPixiRowLabel(this)
+    })
+    // @ts-ignore: Property 'on' does not exist
+    this.on('mouseout', () => {
+      useHeatmapStore()?.setHoveredPixiRowLabel(null)
     })
   }
 
   updatePosition() {
-    this.container.x = this.row.depth * useLayoutStore().rowLabelDepthIndent
+    this.x = this.row.depth * useLayoutStore().rowLabelDepthIndent
   }
 }

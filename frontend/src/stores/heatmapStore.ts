@@ -29,60 +29,39 @@ import {
   ColumnSorterCriterionByName,
   ColumnSorterCriterionByStandardDeviation,
 } from '@/classes/ColumnSorter'
+import { Container } from 'pixi.js'
+import { PixiRow } from '@/pixiComponents/PixiRow'
+import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
+import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
+import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { nextTick } from 'vue'
-import { reverse } from 'd3'
-
-export interface HeatmapStoreState {
-  dataTables: CsvDataTableProfile[]
-  activeDataTable: CsvDataTableProfile | null
-
-  // new data structure classes
-  itemTree: ItemTree | null
-  attributeTree: AttributeTree | null
-
-  heatmap: HeatmapJSON
-  highlightedRow: ItemNameAndData | null
-
-  //From the "newIdx" -> original Index (of the heatmap.attributeNames)
-  attributeMap: Map<number, number>
-
-  rowCollectionsMap: Map<ItemNameAndData, Set<string>>
-
-  allItems: ItemNameAndData[]
-
-  dataChanging: number
-  loading: boolean
-  timer: number
-
-  outOfSync: boolean
-  reloadingScheduled: boolean
-
-  csvUploadOpen: boolean
-}
 
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
 export const useHeatmapStore = defineStore('heatmapStore', {
-  state: (): HeatmapStoreState => ({
-    dataTables: [],
-    activeDataTable: null,
+  state: () => ({
+    dataTables: [] as CsvDataTableProfile[],
+    activeDataTable: null as CsvDataTableProfile | null,
 
-    itemTree: null,
-    attributeTree: null,
+    itemTree: null as ItemTree | null,
+    attributeTree: null as AttributeTree | null,
+
+    hoveredPixiHeatmapCell: null as PixiHeatmapCell | null,
+    hoveredPixiRowLabel: null as PixiRowLabel | null,
+    hoveredPixiColumnLabel: null as PixiColumnLabel | null,
 
     heatmap: {
-      attributeNames: [],
-      attributeDissimilarities: [],
-      itemNamesAndData: [],
-      maxHeatmapValue: 100,
-      minHeatmapValue: 0,
-      maxDimRedXValue: 100,
-      maxDimRedYValue: 0,
-      minDimRedXValue: 0,
-      minDimRedYValue: 100,
-      maxAttributeValues: [],
-      minAttributeValues: [],
+      attributeNames: [] as string[],
+      attributeDissimilarities: [] as number[],
+      itemNamesAndData: [] as ItemNameAndData[],
+      maxHeatmapValue: 100 as number,
+      minHeatmapValue: 0 as number,
+      maxDimRedXValue: 100 as number,
+      maxDimRedYValue: 0 as number,
+      minDimRedXValue: 0 as number,
+      minDimRedYValue: 100 as number,
+      maxAttributeValues: [] as number[],
+      minAttributeValues: [] as number[],
     },
-    highlightedRow: null,
 
     attributeMap: new Map(),
 
@@ -100,6 +79,36 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     csvUploadOpen: true,
   }),
   getters: {
+    highlightedPixiRow(): PixiRow | null {
+      if (this.hoveredPixiRowLabel) {
+        // if row label (which is child of pixiRow) is currently hovered, we can return the pixiRow
+        return this.hoveredPixiRowLabel.parent as PixiRow
+      }
+      if (this.hoveredPixiHeatmapCell) {
+        // if heatmap cell (which is child of a pixiRow) is hovered, this parent row is highlighted
+        return this.hoveredPixiHeatmapCell.parent.parent as PixiRow
+      }
+      // if none of the above is the case, no row is highlighted
+      return null
+    },
+
+    highlightedRow(): Row | null {
+      const highlightedPixiRow = this.highlightedPixiRow
+      return highlightedPixiRow?.row ?? null
+    },
+
+    highlightedColumn(): Column | null {
+      if (this.hoveredPixiColumnLabel) {
+        return this.hoveredPixiColumnLabel.column as Column
+      }
+      if (this.hoveredPixiHeatmapCell) {
+        let originalColumnIndex: number = this.hoveredPixiHeatmapCell.column
+        let mappedColumn = this.attributeTree?.originalIndexToColumn?.get(originalColumnIndex) as Column | undefined;
+        return mappedColumn || null
+      }
+      return null
+    },
+
     getAllDataTables: (state) => state.dataTables,
     getAllDataTableNames: (state) => state.dataTables.map((table) => table.tableName),
     getActiveDataTable: (state) => state.activeDataTable,
@@ -113,8 +122,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getDimRedMinYValue: (state) => state.heatmap.minDimRedYValue,
     getMaxAttributeValues: (state) => state.heatmap.maxAttributeValues,
     getMinAttributeValues: (state) => state.heatmap.minAttributeValues,
-
-    getHighlightedRow: (state) => state.highlightedRow,
 
     getAmountOfStickyItems: (state) =>
       state.activeDataTable ? state.activeDataTable.stickyItemIndexes.length : 0,
@@ -438,9 +445,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       this.activeDataTable.dimReductionAlgo = dimReductionAlgo
     },
-    setHighlightedRow(row: ItemNameAndData | null) {
-      this.highlightedRow = row
-    },
     setClusterAfterDimRed(clusterAfterDim: boolean) {
       if (!this.activeDataTable) {
         console.error('No active data table')
@@ -739,28 +743,39 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
     },
 
-    /**
-     * Handles the event when a cell in the heatmap is clicked.
-     *
-     * @param row - The row data structure object where the cell is located.
-     * @param column - The column index of the clicked cell.
-     */
-    cellClickEvent(row: Row, column: number) {
-      console.log('clicked on a cell in row', row, 'column', column)
-
-      this.rowLabelClickEvent(row)
-
-      // here I could handle the click event for the individual cell (if needed in the future)
-    },
-
-    rowLabelClickEvent(row: Row) {
-      console.log('clicked the label of', row)
-
+    handleRowClick(row: Row) {
+      console.log('handleRowClick', row)
       if (row instanceof AggregatedRow) {
         this.itemTree?.toggleRowExpansion(row)
       } else if (row instanceof ItemRow) {
         this.itemTree?.toggleStickyRow(row)
       }
+    },
+
+    setHoveredPixiHeatmapCell(cell: PixiHeatmapCell | null) {
+      console.log('setHoveredPixiHeatmapCell', cell)
+      this.hoveredPixiHeatmapCell = cell
+    },
+
+    setHoveredPixiRowLabel(pixiRowLabel: PixiRowLabel | null) {
+      this.hoveredPixiRowLabel = pixiRowLabel
+    },
+
+    setHoveredPixiColumnLabel(pixiColumnLabel: PixiColumnLabel | null) {
+      this.hoveredPixiColumnLabel = pixiColumnLabel
+    },
+
+    cellClickEvent(cell: PixiHeatmapCell) {
+      console.log('cellClickEvent', cell)
+      let row = (cell.parent.parent as PixiRow).row
+      // let column = cell.column // not used at the moment
+
+      this.handleRowClick(row)
+    },
+
+    rowLabelClickEvent(pixiRowLabel: PixiRowLabel) {
+      let row = (pixiRowLabel.parent as PixiRow).row
+      this.handleRowClick(row)
     },
 
     columnLabelClickEvent(column: Column) {

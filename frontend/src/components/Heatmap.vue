@@ -22,7 +22,68 @@ const heatmapHeight = ref<number>(0)
 
 const pixiInitialized = ref(false)
 
-// Watch for deep changes in the stickyRows array
+// watch for changes is highlightedRow
+watch(
+  () => heatmapStore.highlightedRow,
+  (newRow, oldRow) => {
+    console.log('highlightedRow changed from', oldRow, 'to', newRow)
+
+    if (!pixiApplicationManager) {
+      console.warn('pixiApplicationManager is not set')
+      return
+    }
+
+    // remove the highlight from the old row
+    if (oldRow?.pixiRow) {
+      // oldRow.pixiRow.removeHighlight()
+      oldRow.pixiRow.updateHighlightedDisplay(false)
+    }
+
+    // add the highlight to the new row
+    if (newRow?.pixiRow) {
+      // newRow.pixiRow.addHighlight()
+      newRow.pixiRow.updateHighlightedDisplay(true)
+    }
+
+    pixiApplicationManager.heatmap.updateHighlightBox()
+  },
+)
+
+// watch for changes is highlightedColumn
+watch(
+  () => heatmapStore.highlightedColumn,
+  (newColumn, oldColumn) => {
+    console.log('highlightedColumn changed from', oldColumn, 'to', newColumn)
+
+    if (!pixiApplicationManager) {
+      console.warn('pixiApplicationManager is not set')
+      return
+    }
+
+    // remove the highlight from the old column
+    if (oldColumn?.pixiColumnLabel) {
+      oldColumn.pixiColumnLabel.updateHighlightedDisplay(false)
+    }
+
+    // add the highlight to the new column
+    if (newColumn?.pixiColumnLabel) {
+      newColumn.pixiColumnLabel.updateHighlightedDisplay(true)
+    }
+
+    pixiApplicationManager.heatmap.updateHighlightBox()
+  },
+)
+
+// watch for changes is highlightedCell
+watch(
+  () => heatmapStore.highlightedCell,
+  (newCell, oldCell) => {
+    console.log('highlightedCell changed from', oldCell, 'to', newCell)
+  },
+)
+
+// Watch for changes in the stickyRows array
+// NOTE: shallow watch is enough, because the stickyRows array is always a new array (because deep watch would be too expensive)
 watch(
   () => heatmapStore.itemTree?.stickyRows,
   (newStickyRows, oldStickyRows) => {
@@ -63,8 +124,8 @@ watch(
     // update the position of all rows
     newStickyRows?.forEach((row, index) => {
       if (row.stickyPixiRow) {
-        row.stickyPixiRow.container.position.y = index * layoutStore.rowHeight // Set position based on index
-        row.stickyPixiRow.pixiRowLabel.container.position.x = 0 // otherwise the row.depth would be used 
+        row.stickyPixiRow.position.y = index * layoutStore.rowHeight // Set position based on index
+        row.stickyPixiRow.pixiRowLabel.position.x = 0 // otherwise the row.depth would be used
       }
     })
 
@@ -120,6 +181,12 @@ function update() {
 
 function debug() {
   console.log('🐞', pixiApplicationManager)
+  console.log(heatmapStore.hoveredPixiHeatmapCell)
+  console.log(heatmapStore.hoveredPixiRowLabel)
+  console.log(heatmapStore.hoveredPixiColumnLabel)
+  console.log(heatmapStore.highlightedPixiRow)
+  console.log(heatmapStore.highlightedColumn)
+  console.log(heatmapStore.highlightedRow)
 }
 
 watch(
@@ -168,6 +235,9 @@ onMounted(async () => {
   <div class="w-full h-full">
     <canvas class="heatmap-canvas w-full h-full" ref="canvas"></canvas>
     <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
+
+    {{ heatmapStore.highlightedRow?.name }}
+    {{ heatmapStore.highlightedColumn?.name }}
   </div>
 </template>
 

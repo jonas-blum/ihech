@@ -1,4 +1,4 @@
-import { Container } from 'pixi.js'
+import { Container, Text } from 'pixi.js'
 import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
@@ -6,18 +6,18 @@ import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useLayoutStore } from '@/stores/layoutStore'
 import { gsap } from 'gsap'
 
-export class PixiRow {
-  public container: Container = new Container() // contains pixiHeatmapCellsContainer and pixiRowLabel
+export class PixiRow extends Container {
   public pixiHeatmapCellsContainer: Container = new Container() // PixiHeatmapCell[] as children
   public pixiRowLabel: PixiRowLabel | null // reference to the corresponding PixiRowLabel for rendering
   public row: Row // reference to data structure Row
 
   constructor(row: Row) {
+    super()
     this.row = row
     this.pixiRowLabel = new PixiRowLabel(row)
 
-    this.container.addChild(this.pixiHeatmapCellsContainer)
-    this.container.addChild(this.pixiRowLabel.container)
+    this.addChild(this.pixiHeatmapCellsContainer)
+    this.addChild(this.pixiRowLabel)
 
     this.pixiHeatmapCellsContainer.position.set(useLayoutStore().rowLabelWidth, 0)
 
@@ -25,7 +25,11 @@ export class PixiRow {
     for (let i = 0; i < row.data.length; i++) {
       const value = row.data[i]
       const adjustedValue = row.dataAdjusted[i]
-      const cell = new PixiHeatmapCell(value, adjustedValue, i, this.onCellClick.bind(this))
+      const cell = new PixiHeatmapCell(
+        value,
+        adjustedValue,
+        i,
+      )
       this.pixiHeatmapCellsContainer.addChild(cell)
     }
 
@@ -39,7 +43,7 @@ export class PixiRow {
     let startPosition =
       this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
     gsap.fromTo(
-      this.container,
+      this,
       { y: startPosition * useLayoutStore().rowHeight },
       {
         y: this.row.position * useLayoutStore().rowHeight,
@@ -51,7 +55,7 @@ export class PixiRow {
 
   updateCellPositions(animate: boolean = true) {
     for (let i = 0; i < this.pixiHeatmapCellsContainer.children.length; i++) {
-      const cell = this.pixiHeatmapCellsContainer.children[i] as PixiHeatmapCell
+      const cell = this.pixiHeatmapCellsContainer.children[i] as Container
 
       // lookup the position of the cell
       const columnIndex =
@@ -65,10 +69,15 @@ export class PixiRow {
   }
 
   updateVisibility() {
-    this.container.visible = this.row.position !== -1
+    this.visible = this.row.position !== -1
   }
 
-  onCellClick(pixiHeatmapCell: PixiHeatmapCell) {
-    useHeatmapStore()?.cellClickEvent(this.row, pixiHeatmapCell.column)
+  updateHighlightedDisplay(highlighted: boolean) {
+    // make font bold of text object
+    if (this.pixiRowLabel) {
+      // TODO: this is a bit ugly
+      const textChild = this.pixiRowLabel.children[0] as Text;
+      textChild.style.fontWeight = highlighted ? 'bold' : 'normal';
+    }
   }
 }

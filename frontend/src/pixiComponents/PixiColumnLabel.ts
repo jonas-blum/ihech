@@ -1,4 +1,5 @@
-import { Container, Text } from 'pixi.js'
+import { Container, Text, Graphics } from 'pixi.js'
+import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Column } from '@/classes/Column'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useLayoutStore } from '@/stores/layoutStore'
@@ -6,13 +7,23 @@ import { gsap } from 'gsap'
 
 export class PixiColumnLabel extends Container {
   public column: Column // reference to data structure Column
+  public text: Text
+  public background: Graphics = new Graphics()
 
   constructor(column: Column) {
     super()
     this.column = column
 
+    // background box
+    let backgroundHeight =
+      useLayoutStore().columnLabelHeight - useLayoutStore().columnLabelPaddingBottom
+    this.background
+      .rect(1, 0, useLayoutStore().columnWidth - 2, backgroundHeight)
+      .fill(useLayoutStore().labelBackgroundColor)
+    this.addChild(this.background)
+
     // create the text for the column label
-    const text = new Text({
+    this.text = new Text({
       text: column.name,
       style: {
         fill: 0x000000,
@@ -21,13 +32,15 @@ export class PixiColumnLabel extends Container {
       },
     })
 
-    // rotate the text if it has no children
-    // if (!this.column.hasChildren()) {
-    // text.rotation = -Math.PI / 4 // Rotate -45 degrees
-    text.rotation = -Math.PI / 2 // Rotate -90 degrees
-    // }
+    // rotate and position text
+    this.text.x = (useLayoutStore().columnWidth - this.text.height) / 2
+    this.text.rotation = -Math.PI / 2
+    this.text.y =
+      useLayoutStore().columnLabelHeight -
+      useLayoutStore().columnLabelPaddingBottom -
+      useLayoutStore().columnLabelTextPaddingBottom
 
-    this.addChild(text)
+    this.addChild(this.text)
     // TODO: icons and other stuff can be added here
 
     this.updatePosition()
@@ -64,9 +77,7 @@ export class PixiColumnLabel extends Container {
     )
 
     let maxDepth = 1 + 1 // TODO: fetch dynamically
-    this.y =
-      useLayoutStore().columnLabelHeight -
-      (maxDepth - this.column.depth) * useLayoutStore().columnLabelDepthIndent
+    this.y = this.column.depth * useLayoutStore().columnLabelDepthIndent
     // this.y = this.children[0].width + this.column.depth * useLayoutStore().columnLabelDepthIndent
   }
 
@@ -76,8 +87,13 @@ export class PixiColumnLabel extends Container {
 
   updateHighlightedDisplay(highlighted: boolean) {
     // make font bold of text object
-    // TODO: this is a bit ugly
-    const textChild = this.children[0] as Text
-    textChild.style.fontWeight = highlighted ? 'bold' : 'normal'
+    this.text.style.fontWeight = highlighted ? 'bold' : 'normal'
+
+    // make background of column label glow
+    this.background.filters = highlighted ? [new GlowFilter()] : []
+    // make sure the higlighted column is rendered last, otherwise the glow filter is not visible
+    if (highlighted && this.parent) {
+      this.parent.setChildIndex(this, this.parent.children.length - 1)
+    }
   }
 }

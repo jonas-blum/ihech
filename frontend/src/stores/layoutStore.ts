@@ -6,6 +6,8 @@ export const useLayoutStore = defineStore('layout', {
     rowHeight: 20, // height of a row in the heatmap
     columnWidth: 20, // width of a column in the heatmap
     columnLabelHeight: 120, // top margin until the rows start
+    columnLabelPaddingBottom: 5, // prevent column labels from touching the cells
+    columnLabelTextPaddingBottom: 5, // bottom padding of the column label text compared to the column label background
     rowLabelWidth: 200, // left margin until the columns start
     rowLabelTextPaddingLeft: 5, // left padding of the row label text compared to the row label background
     rowLabelPaddingRight: 5, // prevent row labels from touching the cells
@@ -18,13 +20,9 @@ export const useLayoutStore = defineStore('layout', {
 
     animationDuration: 0.3, // duration of animations in seconds
 
-    labelBackgroundColor: 0xF0ECE1, // background color of the row labels
+    labelBackgroundColor: 0xf0ece1, // background color of the row labels
   }),
-  getters: {
-    differenceBetweenRowHeights(): number {
-      return this.heatmapTopMargin
-    }
-  },
+  getters: {},
   actions: {
     // Define your actions here
   },

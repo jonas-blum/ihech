@@ -140,7 +140,7 @@ watch(
 
     // add new sticky rows
     stickyRowsToAdd?.forEach((row, index) => {
-      const pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
+      const pixiRow = new PixiRow(row, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiApplicationManager?.heatmap.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmap.stickyRowsContainer
     })
@@ -149,9 +149,6 @@ watch(
     newStickyRows?.forEach((row, index) => {
       if (row.stickyPixiRow) {
         row.stickyPixiRow.position.y = index * layoutStore.rowHeight // Set position based on index
-        if (row.stickyPixiRow?.pixiRowLabel) {
-          row.stickyPixiRow.pixiRowLabel.position.x = 0 // otherwise the row.depth would be used
-        }
       }
     })
 

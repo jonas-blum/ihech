@@ -9,13 +9,15 @@ import { gsap } from 'gsap'
 
 export class PixiRow extends Container {
   public pixiHeatmapCellsContainer: Container = new Container() // PixiHeatmapCell[] as children
+  public isSticky: boolean // true for sticky rows
   public pixiRowLabel: PixiRowLabel | null // reference to the corresponding PixiRowLabel for rendering
   public row: Row // reference to data structure Row
 
-  constructor(row: Row) {
+  constructor(row: Row, isSticky: boolean = false) {
     super()
     this.row = row
-    this.pixiRowLabel = new PixiRowLabel(row)
+    this.isSticky = isSticky
+    this.pixiRowLabel = new PixiRowLabel(row, isSticky)
 
     this.addChild(this.pixiHeatmapCellsContainer)
     this.addChild(this.pixiRowLabel)
@@ -26,11 +28,7 @@ export class PixiRow extends Container {
     for (let i = 0; i < row.data.length; i++) {
       const value = row.data[i]
       const adjustedValue = row.dataAdjusted[i]
-      const cell = new PixiHeatmapCell(
-        value,
-        adjustedValue,
-        i,
-      )
+      const cell = new PixiHeatmapCell(value, adjustedValue, i)
       this.pixiHeatmapCellsContainer.addChild(cell)
     }
 
@@ -74,11 +72,12 @@ export class PixiRow extends Container {
   }
 
   updateHighlightedDisplay(highlighted: boolean) {
-    // make font bold of text object
     if (this.pixiRowLabel) {
-      // TODO: this is a bit ugly
-      const textChild = this.pixiRowLabel.children[0] as Text;
-      textChild.style.fontWeight = highlighted ? 'bold' : 'normal';
+      // make font bold of text object
+      this.pixiRowLabel.text.style.fontWeight = highlighted ? 'bold' : 'normal'
+
+      // make background of row label glow
+      this.pixiRowLabel.background.filters = highlighted ? [new GlowFilter()] : []
     }
 
     // make sure the higlighted row is rendered last, otherwise the glow filter is not visible

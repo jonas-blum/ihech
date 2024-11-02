@@ -153,7 +153,7 @@ export class ItemTree {
     return rows
   }
 
-  getVisisbleRows(): Row[] {
+  getVisibleRows(): Row[] {
     const rows: Row[] = []
     let pointer: Row | null = this.root
 
@@ -230,6 +230,6 @@ export class ItemTree {
   }
 
   getVisibleRowsCount(): number {
-    return this.getVisisbleRows().length
+    return this.getVisibleRows().length
   }
 }

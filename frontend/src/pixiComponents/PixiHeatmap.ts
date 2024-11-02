@@ -8,7 +8,6 @@ export class PixiHeatmap extends Container {
   public rowContainer: Container = new Container() // PixiRow[] as children
   public stickyRowContainer: Container = new Container() // PixiRow[] as children
   public columnLabelsContainer: Container = new Container() // PixiColumnLabel[] as children
-  public highlightBox: Graphics = new Graphics()
 
   constructor() {
     super();
@@ -17,16 +16,11 @@ export class PixiHeatmap extends Container {
     this.addChild(this.rowContainer)
     this.addChild(this.stickyRowContainer)
     this.addChild(this.columnLabelsContainer)
-    this.addChild(this.highlightBox)
 
     // set the position of the containers
     this.rowContainer.position.set(0, useLayoutStore().columnLabelHeight)
     this.stickyRowContainer.position.set(0, useLayoutStore().columnLabelHeight)
     this.columnLabelsContainer.position.set(useLayoutStore().rowLabelWidth, 0)
-
-    // draw the highlight box
-    // this.highlightBox.rect(0, 0, 100, 100).fill(0xff0000)
-    // this.highlightBox.rect(0, 0, 100, 100).fill(0x00ff00).stroke({width: 2, color: 0xff0000})
   }
 
   addRow(row: PixiRow) {
@@ -44,34 +38,5 @@ export class PixiHeatmap extends Container {
 
   addColumnLabel(columnLabel: PixiColumnLabel) {
     this.columnLabelsContainer.addChild(columnLabel)
-  }
-
-  updateHighlightBox() {
-    return
-    // by default box is around whole heatmap
-    let x = useLayoutStore().rowLabelWidth
-    let y = useLayoutStore().columnLabelHeight
-    let width =
-      (useHeatmapStore().attributeTree?.getAttributeCount() ?? 0) * useLayoutStore().columnWidth
-    let height =
-      (useHeatmapStore().itemTree?.getVisibleRowsCount() ?? 0) * useLayoutStore().rowHeight
-
-    // now we shrink the vertical size if there is a row highlighted
-    const highlightedRow = useHeatmapStore().highlightedRow
-    if (highlightedRow) {
-      y = useHeatmapStore().getAmountOfStickyItems + useLayoutStore().columnLabelHeight + highlightedRow.position * useLayoutStore().rowHeight
-      height = useLayoutStore().rowHeight
-    }
-
-    // now we shrink the horizontal size if there is a column highlighted
-    const highlightedColumn = useHeatmapStore().highlightedColumn
-    if (highlightedColumn) {
-      x = useLayoutStore().rowLabelWidth + highlightedColumn.position * useLayoutStore().columnWidth
-      width = useLayoutStore().columnWidth
-    }
-
-    this.highlightBox.position.set(x, y)
-    this.highlightBox.width = width
-    this.highlightBox.height = height
   }
 }

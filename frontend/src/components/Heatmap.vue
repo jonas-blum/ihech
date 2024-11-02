@@ -9,6 +9,7 @@ import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { Row } from '@/classes/Row'
+import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 
 const heatmapStore = useHeatmapStore()
 const layoutStore = useLayoutStore()
@@ -46,8 +47,6 @@ watch(
       newRow.pixiRow.updateHighlightedDisplay(true)
       newRow.stickyPixiRow?.updateHighlightedDisplay(true)
     }
-
-    pixiApplicationManager.heatmap.updateHighlightBox()
   },
 )
 
@@ -65,24 +64,29 @@ watch(
     // remove the highlight from the old column
     if (oldColumn?.pixiColumnLabel) {
       oldColumn.pixiColumnLabel.updateHighlightedDisplay(false)
+
+      // TODO: if I would like to highlight all cells of this column, this could be triggered here
+      // however, this is not straightforward, because there is no container column like for the rows
+      // somehow highlighting the individual cells would be possible, but complicated because the PIXI.Filters
+      // would need to applied to the individual cells, resulting in cell highlighting instead of column highlighting
+
       // TODO: once we have sticky attributes, we need to update the stickyColumn as well
     }
 
     // add the highlight to the new column
     if (newColumn?.pixiColumnLabel) {
       newColumn.pixiColumnLabel.updateHighlightedDisplay(true)
+
       // TODO: once we have sticky attributes, we need to update the stickyColumn as well
     }
-
-    pixiApplicationManager.heatmap.updateHighlightBox()
   },
 )
 
 // watch for changes is highlightedCell
 watch(
-  () => heatmapStore.highlightedCell,
+  () => heatmapStore.hoveredPixiHeatmapCell,
   (newCell, oldCell) => {
-    console.log('highlightedCell changed from', oldCell, 'to', newCell)
+    console.log('hoveredPixiHeatmapCell changed from', oldCell, 'to', newCell)
   },
 )
 

@@ -1,4 +1,5 @@
 import { Graphics, Container } from 'pixi.js'
+import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useLayoutStore } from '@/stores/layoutStore'
 
@@ -9,22 +10,22 @@ export class PixiHeatmapCell extends Container {
   // cursor: string // otherwise typescript complains about it
   value: number // the true value of the cell (as received by the backend)
   adjustedValue: number // the value adjusted for the coloring mode
-  column: number // the column index of the cell; super important in combination with the sibling pointer implementation! the row data array as well as the attributes never change the order - and this column index allows the correct access to the data
+  originalColumnIndex: number // the column index of the cell; super important in combination with the sibling pointer implementation! the row data array as well as the attributes never change the order - and this column index allows the correct access to the data
 
   constructor(
     value: number, // TODO: not used yet
     adjustedValue: number,
-    column: number, // TODO: rename to columnIndex or originalColumnIndex ?? otherwise its confusing
+    originalColumnIndex: number,
     // customProperties: CustomCollectionProperties,
   ) {
     super()
     this.value = value 
     this.adjustedValue = adjustedValue
-    this.column = column 
+    this.originalColumnIndex = originalColumnIndex 
     this.addChild(this.cellGraphic)
     this.drawCellGraphic(useLayoutStore().columnWidth - useLayoutStore().cellPadding, useLayoutStore().rowHeight - useLayoutStore().cellPadding)
     this.updateTint(useHeatmapStore()?.getHeatmapColor(adjustedValue))
-    this.position.x = this.column * useLayoutStore().columnWidth
+    this.position.x = this.originalColumnIndex * useLayoutStore().columnWidth
 
     this.eventMode = 'static'
     this.cursor = 'pointer'
@@ -51,17 +52,4 @@ export class PixiHeatmapCell extends Container {
   updateTint(color: number) {
     this.cellGraphic.tint = color
   }
-
-  // clearGraphic() {
-  //     this.clear()
-  //     this.removeChildren()
-  // }
-
-  // updateHighlightedDisplay() {
-  //     if (this.highlighted) {
-  //         this.tint = DARK_GREY
-  //     } else {
-  //         this.tint = NEUTRAL_GREY
-  //     }
-  // }
 }

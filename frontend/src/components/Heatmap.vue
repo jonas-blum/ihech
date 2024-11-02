@@ -27,7 +27,7 @@ const pixiInitialized = ref(false)
 watch(
   () => heatmapStore.highlightedRow,
   (newRow, oldRow) => {
-    console.log('highlightedRow changed from', oldRow, 'to', newRow)
+    // console.log('highlightedRow changed from', oldRow, 'to', newRow)
 
     if (!pixiApplicationManager) {
       console.warn('pixiApplicationManager is not set')
@@ -54,7 +54,7 @@ watch(
 watch(
   () => heatmapStore.highlightedColumn,
   (newColumn, oldColumn) => {
-    console.log('highlightedColumn changed from', oldColumn, 'to', newColumn)
+    // console.log('highlightedColumn changed from', oldColumn, 'to', newColumn)
 
     if (!pixiApplicationManager) {
       console.warn('pixiApplicationManager is not set')
@@ -86,7 +86,7 @@ watch(
 watch(
   () => heatmapStore.hoveredPixiHeatmapCell,
   (newCell, oldCell) => {
-    console.log('hoveredPixiHeatmapCell changed from', oldCell, 'to', newCell)
+    // console.log('hoveredPixiHeatmapCell changed from', oldCell, 'to', newCell)
   },
 )
 
@@ -95,7 +95,7 @@ watch(
 watch(
   () => heatmapStore.itemTree?.stickyRows,
   (newStickyRows, oldStickyRows) => {
-    console.log('stickyRows changed from', oldStickyRows, 'to', newStickyRows)
+    // console.log('stickyRows changed from', oldStickyRows, 'to', newStickyRows)
 
     if (!pixiApplicationManager) {
       console.warn('pixiApplicationManager is not set')
@@ -118,7 +118,9 @@ watch(
     stickyRowsToRemove?.forEach((row) => {
       // remove the PixiRow from the PixiHeatmap.stickyRowsContainer
       if (row?.stickyPixiRow) {
-        pixiApplicationManager?.heatmap.removeStickyRow(row.stickyPixiRow)
+        if (row.stickyPixiRow instanceof PixiRow) {
+          pixiApplicationManager?.heatmap.removeStickyRow(row.stickyPixiRow)
+        }
       }
     })
 
@@ -133,7 +135,9 @@ watch(
     newStickyRows?.forEach((row, index) => {
       if (row.stickyPixiRow) {
         row.stickyPixiRow.position.y = index * layoutStore.rowHeight // Set position based on index
-        row.stickyPixiRow.pixiRowLabel.position.x = 0 // otherwise the row.depth would be used
+        if (row.stickyPixiRow?.pixiRowLabel) {
+          row.stickyPixiRow.pixiRowLabel.position.x = 0 // otherwise the row.depth would be used
+        }
       }
     })
 
@@ -141,7 +145,7 @@ watch(
     pixiApplicationManager.heatmap.rowContainer.position.y =
       layoutStore.columnLabelHeight +
       layoutStore.gapAfterStickyRows +
-      newStickyRows.length * layoutStore.rowHeight
+      (newStickyRows?.length ?? 0) * layoutStore.rowHeight
   },
 )
 

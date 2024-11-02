@@ -102,7 +102,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return this.hoveredPixiColumnLabel.column as Column
       }
       if (this.hoveredPixiHeatmapCell) {
-        let originalColumnIndex: number = this.hoveredPixiHeatmapCell.column
+        let originalColumnIndex: number = this.hoveredPixiHeatmapCell.originalColumnIndex
         let mappedColumn = this.attributeTree?.originalIndexToColumn?.get(originalColumnIndex) as Column | undefined;
         return mappedColumn || null
       }
@@ -753,7 +753,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     },
 
     setHoveredPixiHeatmapCell(cell: PixiHeatmapCell | null) {
-      console.log('setHoveredPixiHeatmapCell', cell)
       this.hoveredPixiHeatmapCell = cell
     },
 

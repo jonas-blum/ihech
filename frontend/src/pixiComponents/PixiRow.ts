@@ -1,4 +1,5 @@
 import { Container, Text } from 'pixi.js'
+import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
@@ -79,5 +80,14 @@ export class PixiRow extends Container {
       const textChild = this.pixiRowLabel.children[0] as Text;
       textChild.style.fontWeight = highlighted ? 'bold' : 'normal';
     }
+
+    // make sure the higlighted row is rendered last, otherwise the glow filter is not visible
+    if (highlighted) {
+      this.parent.setChildIndex(this, this.parent.children.length - 1)
+    }
+
+    // this.pixiHeatmapCellsContainer.filters = highlighted ? [new OutlineFilter()] : []
+    // this.pixiHeatmapCellsContainer.filters = highlighted ? [new DropShadowFilter()] : []
+    this.pixiHeatmapCellsContainer.filters = highlighted ? [new GlowFilter()] : []
   }
 }

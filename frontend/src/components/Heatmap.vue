@@ -37,12 +37,14 @@ watch(
     if (oldRow?.pixiRow) {
       // oldRow.pixiRow.removeHighlight()
       oldRow.pixiRow.updateHighlightedDisplay(false)
+      oldRow.stickyPixiRow?.updateHighlightedDisplay(false)
     }
 
     // add the highlight to the new row
     if (newRow?.pixiRow) {
       // newRow.pixiRow.addHighlight()
       newRow.pixiRow.updateHighlightedDisplay(true)
+      newRow.stickyPixiRow?.updateHighlightedDisplay(true)
     }
 
     pixiApplicationManager.heatmap.updateHighlightBox()
@@ -63,11 +65,13 @@ watch(
     // remove the highlight from the old column
     if (oldColumn?.pixiColumnLabel) {
       oldColumn.pixiColumnLabel.updateHighlightedDisplay(false)
+      // TODO: once we have sticky attributes, we need to update the stickyColumn as well
     }
 
     // add the highlight to the new column
     if (newColumn?.pixiColumnLabel) {
       newColumn.pixiColumnLabel.updateHighlightedDisplay(true)
+      // TODO: once we have sticky attributes, we need to update the stickyColumn as well
     }
 
     pixiApplicationManager.heatmap.updateHighlightBox()

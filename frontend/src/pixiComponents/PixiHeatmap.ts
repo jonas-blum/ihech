@@ -25,8 +25,8 @@ export class PixiHeatmap extends Container {
     this.columnLabelsContainer.position.set(useLayoutStore().rowLabelWidth, 0)
 
     // draw the highlight box
-    this.highlightBox.rect(0, 0, 100, 100).fill(0xff0000)
-    // this.highlightBox.setStrokeStyle({color: 0x000000, width: 1}).rect(0, 0, width, height)
+    // this.highlightBox.rect(0, 0, 100, 100).fill(0xff0000)
+    // this.highlightBox.rect(0, 0, 100, 100).fill(0x00ff00).stroke({width: 2, color: 0xff0000})
   }
 
   addRow(row: PixiRow) {
@@ -47,6 +47,7 @@ export class PixiHeatmap extends Container {
   }
 
   updateHighlightBox() {
+    return
     // by default box is around whole heatmap
     let x = useLayoutStore().rowLabelWidth
     let y = useLayoutStore().columnLabelHeight
@@ -58,7 +59,7 @@ export class PixiHeatmap extends Container {
     // now we shrink the vertical size if there is a row highlighted
     const highlightedRow = useHeatmapStore().highlightedRow
     if (highlightedRow) {
-      y = useLayoutStore().columnLabelHeight + highlightedRow.position * useLayoutStore().rowHeight
+      y = useHeatmapStore().getAmountOfStickyItems + useLayoutStore().columnLabelHeight + highlightedRow.position * useLayoutStore().rowHeight
       height = useLayoutStore().rowHeight
     }
 

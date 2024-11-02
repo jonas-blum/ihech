@@ -19,6 +19,7 @@
     "data-forge": "^1.10.2",
     "gsap": "^3.12.5",
     "pinia": "^2.1.7",
+    "pixi-filters": "^6.0.5",
     "pixi.js": "^8.5.2",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.4.21",

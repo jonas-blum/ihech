@@ -6,7 +6,6 @@ import InformationIcon from '@assets/information-icon.svg'
 
 import {
   ColoringHeatmapEnum,
-  getHeatmapColor,
   type ItemNameAndData,
   CSV_UPLOAD_COLLAPSED_HEIGHT,
   CSV_UPLOAD_EXPANDED_HEIGHT,
@@ -283,7 +282,7 @@ function drawEverything() {
         if (itemIdx >= heatmapStore.getAmountOfStickyItems) {
           y += stickyItemsGap.value
         }
-        ctx.fillStyle = getHeatmapColor(adjustedValue, heatmapMinValue, heatmapMaxValue)
+        ctx.fillStyle = 'red'
         ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
       }
     }
@@ -704,9 +703,9 @@ onMounted(async () => {
                 :style="{
                   background:
                     'linear-gradient(to right, ' +
-                    getHeatmapColor(0, 0, 1) +
+                    'red' +
                     ', ' +
-                    getHeatmapColor(1, 0, 1) +
+                    'red' +
                     ')',
                 }"
                 class="color-scale"

@@ -5,7 +5,6 @@ import { useLayoutStore } from '@/stores/layoutStore'
 
 export class PixiHeatmapCell extends Container {
   cellGraphic: Graphics = new Graphics()
-  borderGraphic: Graphics = new Graphics() // NOTE: not used yet
   // eventMode: string
   // cursor: string // otherwise typescript complains about it
   value: number // the true value of the cell (as received by the backend)
@@ -23,9 +22,7 @@ export class PixiHeatmapCell extends Container {
     this.adjustedValue = adjustedValue
     this.column = column 
     this.addChild(this.cellGraphic)
-    this.addChild(this.borderGraphic)
     this.drawCellGraphic(useLayoutStore().columnWidth - useLayoutStore().cellPadding, useLayoutStore().rowHeight - useLayoutStore().cellPadding)
-    this.drawBorderGraphic(useLayoutStore().columnWidth, useLayoutStore().rowHeight)
     this.updateTint(useHeatmapStore()?.getHeatmapColor(adjustedValue))
     this.position.x = this.column * useLayoutStore().columnWidth
 
@@ -48,11 +45,7 @@ export class PixiHeatmapCell extends Container {
   }
 
   drawCellGraphic(width: number, height: number) {
-    this.cellGraphic.rect(0, 0, width, height).fill(0xffffff)
-  }
-
-  drawBorderGraphic(width: number, height: number) {
-    this.borderGraphic.setStrokeStyle({color: 0x000000, width: 1}).rect(0, 0, width, height)
+    this.cellGraphic.rect(0, 0, width, height).fill(0xffffff)//.stroke({width: 1, color: 0x000000})
   }
 
   updateTint(color: number) {

@@ -1,4 +1,4 @@
-import { Graphics, Container } from 'pixi.js'
+import { Graphics, Container, Rectangle } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useLayoutStore } from '@/stores/layoutStore'
@@ -29,6 +29,8 @@ export class PixiHeatmapCell extends Container {
 
     this.eventMode = 'static'
     this.cursor = 'pointer'
+
+    this.hitArea = new Rectangle(0, 0, useLayoutStore().columnWidth, useLayoutStore().rowHeight)
 
     // event listeners
     // @ts-ignore: Property 'on' does not exist

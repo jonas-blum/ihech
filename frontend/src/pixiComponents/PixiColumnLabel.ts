@@ -77,7 +77,8 @@ export class PixiColumnLabel extends Container {
     )
 
     let maxDepth = 1 + 1 // TODO: fetch dynamically
-    this.y = this.column.depth * useLayoutStore().columnLabelDepthIndent
+    // BIG TODO: I need to figure out how I want to align the hierarchical column labels
+    // this.y = this.column.depth * useLayoutStore().columnLabelDepthIndent
     // this.y = this.children[0].width + this.column.depth * useLayoutStore().columnLabelDepthIndent
   }
 

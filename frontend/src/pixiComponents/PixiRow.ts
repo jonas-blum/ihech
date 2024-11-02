@@ -67,6 +67,14 @@ export class PixiRow extends Container {
     }
   }
 
+  updateCellColoring() {
+    for (let i = 0; i < this.pixiHeatmapCellsContainer.children.length; i++) {
+      const cell = this.pixiHeatmapCellsContainer.children[i] as PixiHeatmapCell
+      const color = useHeatmapStore()?.colorMap?.getColor(cell.adjustedValue)
+      cell.updateTint(color)
+    }
+  }
+
   updateVisibility() {
     this.visible = this.row.position !== -1
   }

@@ -24,7 +24,7 @@ export class PixiHeatmapCell extends Container {
     this.originalColumnIndex = originalColumnIndex 
     this.addChild(this.cellGraphic)
     this.drawCellGraphic(useLayoutStore().columnWidth - useLayoutStore().cellPadding, useLayoutStore().rowHeight - useLayoutStore().cellPadding)
-    this.updateTint(useHeatmapStore()?.getHeatmapColor(adjustedValue))
+    this.updateTint(useHeatmapStore()?.colorMap.getColor(adjustedValue))
     this.position.x = this.originalColumnIndex * useLayoutStore().columnWidth
 
     this.eventMode = 'static'

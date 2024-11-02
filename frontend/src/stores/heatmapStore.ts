@@ -34,6 +34,7 @@ import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
+import { LinearColorMap } from '@/classes/LinearColorMap'
 import { nextTick } from 'vue'
 
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
@@ -48,6 +49,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     hoveredPixiHeatmapCell: null as PixiHeatmapCell | null,
     hoveredPixiRowLabel: null as PixiRowLabel | null,
     hoveredPixiColumnLabel: null as PixiColumnLabel | null,
+
+    colorMap: new LinearColorMap(),
 
     heatmap: {
       attributeNames: [] as string[],
@@ -357,6 +360,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
         console.log('AttributeTree:', this.attributeTree)
+
+
+        // update the colorMap
+        this.colorMap.setMin(this.heatmap.minHeatmapValue)
+        this.colorMap.setMax(this.heatmap.maxHeatmapValue)
+
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
@@ -716,14 +725,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.recomputeAttributeMap()
 
       this.changeHeatmap()
-    },
-
-    getHeatmapColor(value: number): number {
-      let min = this.getHeatmapMinValue
-      let max = this.getHeatmapMaxValue
-      let minColor = 0xefefff
-      let maxColor = 0x0000ff
-      return interpolateColor(minColor, maxColor, value, min, max)
     },
 
     // used as a trigger from the RowSorter to re-sort the rows

@@ -155,9 +155,31 @@ watch(
     // Update the vertical position of the row container to account for sticky rows
     pixiApplicationManager.heatmap.rowContainer.position.y =
       layoutStore.columnLabelHeight +
-      layoutStore.gapAfterStickyRows +
+      (newStickyRows?.length ? layoutStore.gapAfterStickyRows : 0) +
       (newStickyRows?.length ?? 0) * layoutStore.rowHeight
   },
+)
+
+// watch for deep changes in ColorMap
+watch(
+  () => heatmapStore.colorMap,
+  (newColorMap, oldColorMap) => {
+    if (!pixiApplicationManager) {
+      console.warn('pixiApplicationManager is not set')
+      return
+    }
+
+    // update color for each heatmap cell
+    for (let row of heatmapStore.itemTree?.getAllRows() ?? []) {
+      if (row.pixiRow) {
+        row.pixiRow.updateCellColoring()
+      }
+      if (row.stickyPixiRow) {
+        row.stickyPixiRow.updateCellColoring()
+      }
+    }
+  },
+  { deep: true },
 )
 
 function update() {

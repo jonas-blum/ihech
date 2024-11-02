@@ -82,7 +82,7 @@ export class PixiRow extends Container {
     }
 
     // make sure the higlighted row is rendered last, otherwise the glow filter is not visible
-    if (highlighted) {
+    if (highlighted && this.parent) {
       this.parent.setChildIndex(this, this.parent.children.length - 1)
     }
 

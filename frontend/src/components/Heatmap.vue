@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from 'vue'
+import { useMouse } from '@vueuse/core'
 
 import { useHeatmapStore } from '@stores/heatmapStore'
 import { useLayoutStore } from '@stores/layoutStore'
@@ -10,6 +11,19 @@ import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { Row } from '@/classes/Row'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
+
+const { x: mouseX, y: mouseY } = useMouse()
+
+const tooltipStyle = ref({
+  left: '0px',
+  top: '0px',
+})
+
+// Watch mouse coordinates to update tooltip position
+watch([mouseX, mouseY], ([x, y]) => {
+  tooltipStyle.value.left = `${x + 10}px`
+  tooltipStyle.value.top = `${y + 10}px`
+})
 
 const heatmapStore = useHeatmapStore()
 const layoutStore = useLayoutStore()
@@ -248,8 +262,17 @@ onMounted(async () => {
     <canvas class="heatmap-canvas w-full h-full" ref="canvas"></canvas>
     <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
 
-    {{ heatmapStore.highlightedRow?.name }}
-    {{ heatmapStore.highlightedColumn?.name }}
+    <div
+      class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
+      :style="tooltipStyle"
+      v-show="heatmapStore.hoveredPixiHeatmapCell"
+    >
+      <span>{{ heatmapStore.highlightedRow?.name }}</span><br>
+      <span>{{ heatmapStore.highlightedColumn?.name }}</span><br>
+      <span>
+        {{ heatmapStore.hoveredPixiHeatmapCell?.value }}
+      </span>
+    </div>
   </div>
 </template>
 

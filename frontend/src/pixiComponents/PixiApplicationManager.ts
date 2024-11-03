@@ -6,13 +6,13 @@ export class PixiApplicationManager {
   app: Application
   heatmap: PixiHeatmap
 
-  constructor(canvasElement: HTMLCanvasElement, canvasWidth: number, canvasHeight: number) {
+  constructor(canvasElement: HTMLCanvasElement) {
     // init app
     this.app = new Application()
     this.app.init({
       canvas: canvasElement,
-      width: canvasWidth,
-      height: canvasHeight,
+      width: useLayoutStore().canvasWidth,
+      height: useLayoutStore().canvasHeight,
       backgroundColor: 0xffffff,
       antialias: true,
       resolution: 2,
@@ -24,9 +24,5 @@ export class PixiApplicationManager {
     this.app.stage.addChild(this.heatmap)
     // TODO: this needs to be moved
     this.heatmap.position.set(useLayoutStore().heatmapLeftMargin, useLayoutStore().heatmapTopMargin)
-
-    // add event listeners for drag and drop
-    this.app.stage.eventMode = 'static'
-    // this.app.stage.hitArea = this.app.renderer.screen
   }
 }

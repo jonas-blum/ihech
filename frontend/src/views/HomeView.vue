@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DimReductionVisual from '@/components/DimReductionVisual.vue'
-import ExpandableHeatmap from '@/components/ExpandableHeatmap.vue'
+// import ExpandableHeatmap from '@/components/ExpandableHeatmap.vue'
 import Heatmap from '@/components/Heatmap.vue'
 import HeatmapSettings from '@/components/HeatmapSettings.vue'
 import CsvUpload from '@/components/CsvUpload.vue'
@@ -12,7 +12,7 @@ import { useHeatmapStore } from '@stores/heatmapStore'
 
 <template>
   <div class="w-full h-full flex">
-    <div class="w-1/2 h-full border-red-500 border-4">
+    <div class="w-1/2 h-full border-red-500 border-0">
       <Heatmap />
     </div>
     <div class="w-1/2 h-full flex flex-col border-blue-500 border-4">

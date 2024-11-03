@@ -153,10 +153,7 @@ watch(
     })
 
     // Update the vertical position of the row container to account for sticky rows
-    pixiApplicationManager.heatmap.rowContainer.position.y =
-      layoutStore.columnLabelHeight +
-      (newStickyRows?.length ? layoutStore.gapAfterStickyRows : 0) +
-      (newStickyRows?.length ?? 0) * layoutStore.rowHeight
+    pixiApplicationManager.heatmap.rowContainer.position.y = layoutStore.rowsVerticalStartPosition
   },
 )
 
@@ -182,13 +179,49 @@ watch(
   { deep: true },
 )
 
+// watch for requiredHeight changes
+watch(
+  () => layoutStore.requiredHeight,
+  (newRequiredHeight, oldRequiredHeight) => {
+    console.log('requiredHeight changed from', oldRequiredHeight, 'to', newRequiredHeight)
+
+    // update the vertical scrollbar
+    if (pixiApplicationManager) {
+      pixiApplicationManager.heatmap.verticalScrollbar.update()
+    }
+  },
+)
+
+// watch for verticalScrollPosition changes
+watch(
+  () => layoutStore.verticalScrollPosition,
+  (newVerticalScrollPosition, oldVerticalScrollPosition) => {
+    // update the vertical position of the row container
+    if (pixiApplicationManager) {
+      pixiApplicationManager.heatmap.rowContainer.position.y =
+        layoutStore.rowsVerticalStartPosition - newVerticalScrollPosition
+    }
+  },
+)
+
 function update() {
+  console.log('🔄 update')
+  // update the layoutStore with the current canvas dimensions
+  if (canvas.value) {
+    layoutStore.canvasWidth = canvas.value.clientWidth
+    layoutStore.canvasHeight = canvas.value.clientHeight
+    console.log('layoutStore.canvasWidth', layoutStore.canvasWidth)
+    console.log('layoutStore.canvasHeight', layoutStore.canvasHeight)
+  }
+
   // only once I need to init the pixi containers and graphics
   if (!pixiInitialized.value) {
-    if (!pixiApplicationManager) {
-      console.warn('pixiApplicationManager is not set')
+    if (!canvas.value) {
+      console.warn('canvas is not set')
       return
     }
+
+    pixiApplicationManager = new PixiApplicationManager(canvas.value)
 
     let pixiHeatmap = pixiApplicationManager.heatmap
 
@@ -226,12 +259,7 @@ function update() {
 
 function debug() {
   console.log('🐞', pixiApplicationManager)
-  console.log(heatmapStore.hoveredPixiHeatmapCell)
-  console.log(heatmapStore.hoveredPixiRowLabel)
-  console.log(heatmapStore.hoveredPixiColumnLabel)
-  console.log(heatmapStore.highlightedPixiRow)
-  console.log(heatmapStore.highlightedColumn)
-  console.log(heatmapStore.highlightedRow)
+  pixiApplicationManager?.heatmap.rowContainer.position.set(0, 0)
 }
 
 watch(
@@ -242,37 +270,9 @@ watch(
 )
 
 onMounted(async () => {
-  if (!canvas.value) {
-    return
-  }
-
-  // indirecly update heatmap
   window.addEventListener('resize', () => heatmapStore.changeHeatmap())
 
-  // canvas.value.addEventListener('mousemove', updateTooltip)
-  // canvas.value.addEventListener('mouseout', () => {
-  //   resetHoverStyles()
-  // })
-  // canvas.value.addEventListener('contextmenu', (event) => {
-  //   event.preventDefault()
-  //   clickCanvas(event, false)
-  // })
-
-  // canvas.value.addEventListener('click', (event) => {
-  //   clickCanvas(event, true)
-  // })
-
-  // get the width and height of the canvas
-  heatmapWidth.value = canvas.value.clientWidth
-  heatmapHeight.value = canvas.value.clientHeight
-
-  pixiApplicationManager = new PixiApplicationManager(
-    canvas.value,
-    heatmapWidth.value,
-    heatmapHeight.value,
-  )
-
-  console.log(pixiApplicationManager)
+  heatmapStore.changeHeatmap()
 })
 </script>
 
@@ -280,14 +280,17 @@ onMounted(async () => {
   <div class="w-full h-full">
     <canvas class="heatmap-canvas w-full h-full" ref="canvas"></canvas>
     <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
+    <span>{{ layoutStore.requiredHeight }}</span>
 
     <div
       class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
       :style="tooltipStyle"
       v-show="heatmapStore.hoveredPixiHeatmapCell"
     >
-      <span>{{ heatmapStore.highlightedRow?.name }}</span><br>
-      <span>{{ heatmapStore.highlightedColumn?.name }}</span><br>
+      <span>{{ heatmapStore.highlightedRow?.name }}</span
+      ><br />
+      <span>{{ heatmapStore.highlightedColumn?.name }}</span
+      ><br />
       <span>
         {{ heatmapStore.hoveredPixiHeatmapCell?.value }}
       </span>

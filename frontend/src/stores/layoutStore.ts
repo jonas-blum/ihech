@@ -1,8 +1,10 @@
-import { difference } from 'd3'
 import { defineStore } from 'pinia'
+import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export const useLayoutStore = defineStore('layout', {
   state: () => ({
+    canvasWidth: 0, // width of the canvas
+    canvasHeight: 0, // height of the canvas
     rowHeight: 20, // height of a row in the heatmap
     columnWidth: 20, // width of a column in the heatmap
     columnLabelHeight: 120, // top margin until the rows start
@@ -18,12 +20,51 @@ export const useLayoutStore = defineStore('layout', {
     heatmapLeftMargin: 5, // prevent the heatmap from touching the left border
     heatmapTopMargin: 5, // prevent the heatmap from touching the top border
 
+    verticalScrollbarWidth: 30, // width of the vertical scrollbar
+    verticalScrollPosition: 0, // current vertical scroll position
+
     animationDuration: 0.3, // duration of animations in seconds
 
     labelBackgroundColor: 0xf0ece1, // background color of the row labels
+    scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
+    scrollbarThumbColor: 0xE8D8AC, // color of the scrollbar thumb
   }),
-  getters: {},
+  getters: {
+    // how much vertical space is required for the whole heatmap
+    requiredHeight(): number {
+      const heatmapStore = useHeatmapStore()
+      const heightOfVisibleRows =
+        (heatmapStore?.itemTree?.getVisibleRowsCount() ?? 0) * this.rowHeight
+      const heightOfStickyRows = (heatmapStore?.itemTree?.stickyRows.length ?? 0) * this.rowHeight
+      const stickyRowPadding = heightOfStickyRows > 0 ? this.gapAfterStickyRows : 0
+      return this.columnLabelHeight + heightOfVisibleRows + heightOfStickyRows + stickyRowPadding
+    },
+
+    // vertical start position of rows (excluding sticky rows)
+    rowsVerticalStartPosition(): number {
+      const heatmapStore = useHeatmapStore()
+      const stickyRowAmount = heatmapStore?.itemTree?.stickyRows.length ?? 0
+      const stickyRowPadding = stickyRowAmount > 0 ? this.gapAfterStickyRows : 0
+      return this.columnLabelHeight + stickyRowAmount * this.rowHeight + stickyRowPadding
+    },
+
+    verticalScrollbarVisible(): boolean {
+      return this.requiredHeight > this.canvasHeight
+    },
+
+    verticalScrollbarTrackHeight(): number {
+      return this.canvasHeight - this.rowsVerticalStartPosition
+    },
+
+    verticalScrollbarThumbHeight(): number {
+      const visibleRatio = this.verticalScrollbarTrackHeight / this.requiredHeight
+      return visibleRatio * this.verticalScrollbarTrackHeight
+    },
+
+  },
   actions: {
-    // Define your actions here
+    setVerticalScrollPosition(position: number) {
+      this.verticalScrollPosition = position
+    },
   },
 })

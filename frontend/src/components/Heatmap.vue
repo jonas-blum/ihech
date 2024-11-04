@@ -133,7 +133,7 @@ watch(
       // remove the PixiRow from the PixiHeatmap.stickyRowsContainer
       if (row?.stickyPixiRow) {
         if (row.stickyPixiRow instanceof PixiRow) {
-          pixiHeatmapApp?.heatmap.removeStickyRow(row.stickyPixiRow)
+          pixiHeatmapApp?.removeStickyRow(row.stickyPixiRow)
         }
       }
     })
@@ -142,7 +142,7 @@ watch(
     stickyRowsToAdd?.forEach((row, index) => {
       const pixiRow = new PixiRow(row, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
-      pixiHeatmapApp?.heatmap.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmap.stickyRowsContainer
+      pixiHeatmapApp?.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
     })
 
     // update the position of all rows
@@ -153,7 +153,7 @@ watch(
     })
 
     // Update the vertical position of the row container to account for sticky rows
-    pixiHeatmapApp.heatmap.rowContainer.position.y = layoutStore.rowsVerticalStartPosition
+    pixiHeatmapApp.rowContainer.position.y = layoutStore.rowsVerticalStartPosition
   },
 )
 
@@ -187,7 +187,7 @@ watch(
 
     // update the vertical scrollbar
     if (pixiHeatmapApp) {
-      pixiHeatmapApp.heatmap.verticalScrollbar.update()
+      pixiHeatmapApp.verticalScrollbar.update()
     }
   },
 )
@@ -198,7 +198,7 @@ watch(
   (newVerticalScrollPosition, oldVerticalScrollPosition) => {
     // update the vertical position of the row container
     if (pixiHeatmapApp) {
-      pixiHeatmapApp.heatmap.rowContainer.position.y =
+      pixiHeatmapApp.rowContainer.position.y =
         layoutStore.rowsVerticalStartPosition - newVerticalScrollPosition
     }
   },
@@ -223,8 +223,6 @@ function update() {
 
     pixiHeatmapApp = new PixiHeatmapApp(heatmapCanvas.value)
 
-    let pixiHeatmap = pixiHeatmapApp.heatmap
-
     // traverse the item tree with all rows and create the pixiRows
     let rows = heatmapStore.itemTree?.getAllRows()
     if (!rows) {
@@ -236,7 +234,7 @@ function update() {
       let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
       row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
       pixiRow.updatePosition()
-      pixiHeatmap.addRow(pixiRow) // adds the PixiRow to the PixiHeatmap
+      pixiHeatmapApp.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp
     }
 
     // traverse the attribute tree with all columns and create the pixiColumnLabels
@@ -249,7 +247,7 @@ function update() {
     for (let column of columns) {
       let pixiColumnLabel = new PixiColumnLabel(column) // create PixiColumnLabel with reference to the Column
       column.pixiColumnLabel = pixiColumnLabel // set the reference to the PixiColumnLabel in the Column
-      pixiHeatmap.addColumnLabel(pixiColumnLabel) // adds the PixiColumnLabel to the PixiHeatmap
+      pixiHeatmapApp.addColumnLabel(pixiColumnLabel) // adds the PixiColumnLabel to the PixiHeatmapApp
     }
 
     pixiInitialized.value = true
@@ -259,7 +257,7 @@ function update() {
 
 function debug() {
   console.log('🐞', pixiHeatmapApp)
-  pixiHeatmapApp?.heatmap.rowContainer.position.set(0, 0)
+  pixiHeatmapApp?.rowContainer.position.set(0, 0)
 }
 
 watch(

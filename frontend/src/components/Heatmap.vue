@@ -210,6 +210,7 @@ function update() {
   if (heatmapCanvas.value) {
     heatmapLayoutStore.canvasWidth = heatmapCanvas.value.clientWidth
     heatmapLayoutStore.canvasHeight = heatmapCanvas.value.clientHeight
+    // console.log('📏 Heatmap canvas size', heatmapCanvas.value.clientWidth, heatmapCanvas.value.clientHeight)
   }
 
   // only once I need to init the pixi containers and graphics
@@ -274,7 +275,7 @@ onMounted(async () => {
 
 <template>
   <div class="w-full h-full">
-    <canvas class="heatmap-canvas w-full h-full" ref="heatmapCanvas"></canvas>
+    <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
     <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
     <span>{{ heatmapLayoutStore.requiredHeight }}</span>
 

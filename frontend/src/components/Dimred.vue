@@ -24,11 +24,9 @@ function update() {
     return
   }
 
-  // NOTE: not sure if this is needed
-  if (dimredCanvas.value) {
-    dimredLayoutStore.canvasWidth = dimredCanvas.value.width
-    dimredLayoutStore.canvasHeight = dimredCanvas.value.height
-  }
+  dimredLayoutStore.canvasWidth = dimredCanvas.value.clientWidth
+  dimredLayoutStore.canvasHeight = dimredCanvas.value.clientHeight
+  console.log('📏 Dimred canvas size', dimredCanvas.value.width, dimredCanvas.value.height)
 
   // init the pixi containers and graphics (only once)
   if (!pixiDimredInitialized.value) {
@@ -61,7 +59,7 @@ watch(
 )
 
 onMounted(async () => {
-  // window.addEventListener('resize', () => heatmapStore.changeHeatmap())
+  window.addEventListener('resize', () => heatmapStore.changeHeatmap())
 
   update()
 })
@@ -69,7 +67,7 @@ onMounted(async () => {
 
 <template>
   <div class="w-full h-full">
-    <canvas class="heatmap-canvas w-full h-full" ref="dimredCanvas"></canvas>
+    <canvas class="w-full h-full" ref="dimredCanvas"></canvas>
   </div>
 </template>
 

@@ -21,7 +21,7 @@ export class PixiHeatmapApp extends Application {
       height: heatmapLayoutStore.canvasHeight,
       backgroundColor: heatmapLayoutStore.heatmapCanvasBackgroundColor,
       antialias: true,
-      resolution: 2,
+      resolution: 1,
       // autoDensity: true, // not sure what this does
     })
 

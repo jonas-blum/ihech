@@ -5,6 +5,7 @@ import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 import { gsap } from 'gsap'
 
 export class PixiBubble extends Container {
@@ -17,7 +18,7 @@ export class PixiBubble extends Container {
     
     this.addChild(this.bubbleGraphic)
     this.drawBubbleGraphic()
-    this.updateTint(0x123456)
+    this.updateTint()
     // this.position.x = this.originalColumnIndex * useHeatmapLayoutStore().columnWidth
 
     this.eventMode = 'static'
@@ -41,10 +42,29 @@ export class PixiBubble extends Container {
   }
 
   drawBubbleGraphic() {
-    this.bubbleGraphic.circle(Math.random()*300, Math.random()*300, 2).fill(0xffffff)//.stroke({width: 1, color: 0x000000})
+    // TODO: not happy with this implementation, but it works for now
+    // TODO: ideally the backend coordinates should already be normalized to [0, 1] and then multiplied by the dimredSize
+    const heatmapStore = useHeatmapStore()
+    const dimredLayoutStore = useDimredLayoutStore()
+    let maxX = heatmapStore?.getDimRedMaxXValue
+    let maxY = heatmapStore?.getDimRedMaxYValue
+    let minX = heatmapStore?.getDimRedMinXValue
+    let minY = heatmapStore?.getDimRedMinYValue
+
+    let x = this.row.dimRedPosition.x
+    let y = this.row.dimRedPosition.y
+
+    // normalize x and y to be between 0 and 1
+    let xNormalized = (x - minX) / (maxX - minX)
+    let yNormalized = (y - minY) / (maxY - minY)
+
+    this.bubbleGraphic.circle(xNormalized * dimredLayoutStore.dimredSize, yNormalized * dimredLayoutStore.dimredSize, dimredLayoutStore.bubbleSize).fill(0xffffff)//.stroke({width: 1, color: 0x000000})
   }
 
-  updateTint(color: number) {
+  updateTint(color?: number) {
+    if (color === undefined) {
+      color = useDimredLayoutStore().basicBubbleColor
+    }
     this.bubbleGraphic.tint = color
   }
 }

@@ -1,4 +1,4 @@
-import { Container, Text, Graphics } from 'pixi.js'
+import { Container, Text, Graphics, Rectangle } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
@@ -22,7 +22,9 @@ export class PixiVerticalScrollbar extends Container {
     let width = layoutStore.verticalScrollbarWidth
     let height = layoutStore.canvasHeight - layoutStore.columnLabelHeight
 
-    this.track.rect(0, 0, width, height).fill({ color: layoutStore.scrollbarBackgroundColor, alpha: 0.2 })
+    this.track
+      .rect(0, 0, width, height)
+      .fill({ color: layoutStore.scrollbarBackgroundColor, alpha: 0.2 })
     this.addChild(this.track)
 
     this.thumb.rect(0, 0, width, 10).fill({ color: layoutStore.scrollbarThumbColor, alpha: 1 })
@@ -38,6 +40,9 @@ export class PixiVerticalScrollbar extends Container {
       .on('pointerup', this.onDragEnd.bind(this))
       .on('pointerupoutside', this.onDragEnd.bind(this))
       .on('pointermove', this.onDragMove.bind(this))
+
+    // quick fix to increase the hit area of the thumb
+    this.thumb.hitArea = new Rectangle(-20, -20, width + 40, height + 40)
   }
 
   // Drag start event

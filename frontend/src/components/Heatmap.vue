@@ -5,7 +5,7 @@ import { useMouse } from '@vueuse/core'
 import { useHeatmapStore } from '@stores/heatmapStore'
 import { useLayoutStore } from '@stores/layoutStore'
 
-import { PixiApplicationManager } from '@/pixiComponents/PixiApplicationManager'
+import { PixiHeatmapApp } from '@/pixiComponents/PixiHeatmapApp'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
@@ -28,9 +28,9 @@ watch([mouseX, mouseY], ([x, y]) => {
 const heatmapStore = useHeatmapStore()
 const layoutStore = useLayoutStore()
 
-let pixiApplicationManager: PixiApplicationManager | null = null
+let pixiHeatmapApp: PixiHeatmapApp | null = null
 
-const canvas = ref<HTMLCanvasElement | null>(null)
+const heatmapCanvas = ref<HTMLCanvasElement | null>(null)
 
 const heatmapWidth = ref<number>(0)
 const heatmapHeight = ref<number>(0)
@@ -43,8 +43,8 @@ watch(
   (newRow, oldRow) => {
     // console.log('highlightedRow changed from', oldRow, 'to', newRow)
 
-    if (!pixiApplicationManager) {
-      console.warn('pixiApplicationManager is not set')
+    if (!pixiHeatmapApp) {
+      console.warn('pixiHeatmapApp is not set')
       return
     }
 
@@ -70,8 +70,8 @@ watch(
   (newColumn, oldColumn) => {
     // console.log('highlightedColumn changed from', oldColumn, 'to', newColumn)
 
-    if (!pixiApplicationManager) {
-      console.warn('pixiApplicationManager is not set')
+    if (!pixiHeatmapApp) {
+      console.warn('pixiHeatmapApp is not set')
       return
     }
 
@@ -111,8 +111,8 @@ watch(
   (newStickyRows, oldStickyRows) => {
     // console.log('stickyRows changed from', oldStickyRows, 'to', newStickyRows)
 
-    if (!pixiApplicationManager) {
-      console.warn('pixiApplicationManager is not set')
+    if (!pixiHeatmapApp) {
+      console.warn('pixiHeatmapApp is not set')
       return
     }
 
@@ -133,7 +133,7 @@ watch(
       // remove the PixiRow from the PixiHeatmap.stickyRowsContainer
       if (row?.stickyPixiRow) {
         if (row.stickyPixiRow instanceof PixiRow) {
-          pixiApplicationManager?.heatmap.removeStickyRow(row.stickyPixiRow)
+          pixiHeatmapApp?.heatmap.removeStickyRow(row.stickyPixiRow)
         }
       }
     })
@@ -142,7 +142,7 @@ watch(
     stickyRowsToAdd?.forEach((row, index) => {
       const pixiRow = new PixiRow(row, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
-      pixiApplicationManager?.heatmap.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmap.stickyRowsContainer
+      pixiHeatmapApp?.heatmap.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmap.stickyRowsContainer
     })
 
     // update the position of all rows
@@ -153,7 +153,7 @@ watch(
     })
 
     // Update the vertical position of the row container to account for sticky rows
-    pixiApplicationManager.heatmap.rowContainer.position.y = layoutStore.rowsVerticalStartPosition
+    pixiHeatmapApp.heatmap.rowContainer.position.y = layoutStore.rowsVerticalStartPosition
   },
 )
 
@@ -161,8 +161,8 @@ watch(
 watch(
   () => heatmapStore.colorMap,
   (newColorMap, oldColorMap) => {
-    if (!pixiApplicationManager) {
-      console.warn('pixiApplicationManager is not set')
+    if (!pixiHeatmapApp) {
+      console.warn('pixiHeatmapApp is not set')
       return
     }
 
@@ -186,8 +186,8 @@ watch(
     console.log('requiredHeight changed from', oldRequiredHeight, 'to', newRequiredHeight)
 
     // update the vertical scrollbar
-    if (pixiApplicationManager) {
-      pixiApplicationManager.heatmap.verticalScrollbar.update()
+    if (pixiHeatmapApp) {
+      pixiHeatmapApp.heatmap.verticalScrollbar.update()
     }
   },
 )
@@ -197,8 +197,8 @@ watch(
   () => layoutStore.verticalScrollPosition,
   (newVerticalScrollPosition, oldVerticalScrollPosition) => {
     // update the vertical position of the row container
-    if (pixiApplicationManager) {
-      pixiApplicationManager.heatmap.rowContainer.position.y =
+    if (pixiHeatmapApp) {
+      pixiHeatmapApp.heatmap.rowContainer.position.y =
         layoutStore.rowsVerticalStartPosition - newVerticalScrollPosition
     }
   },
@@ -207,23 +207,23 @@ watch(
 function update() {
   console.log('🔄 update')
   // update the layoutStore with the current canvas dimensions
-  if (canvas.value) {
-    layoutStore.canvasWidth = canvas.value.clientWidth
-    layoutStore.canvasHeight = canvas.value.clientHeight
+  if (heatmapCanvas.value) {
+    layoutStore.canvasWidth = heatmapCanvas.value.clientWidth
+    layoutStore.canvasHeight = heatmapCanvas.value.clientHeight
     console.log('layoutStore.canvasWidth', layoutStore.canvasWidth)
     console.log('layoutStore.canvasHeight', layoutStore.canvasHeight)
   }
 
   // only once I need to init the pixi containers and graphics
   if (!pixiInitialized.value) {
-    if (!canvas.value) {
+    if (!heatmapCanvas.value) {
       console.warn('canvas is not set')
       return
     }
 
-    pixiApplicationManager = new PixiApplicationManager(canvas.value)
+    pixiHeatmapApp = new PixiHeatmapApp(heatmapCanvas.value)
 
-    let pixiHeatmap = pixiApplicationManager.heatmap
+    let pixiHeatmap = pixiHeatmapApp.heatmap
 
     // traverse the item tree with all rows and create the pixiRows
     let rows = heatmapStore.itemTree?.getAllRows()
@@ -253,13 +253,13 @@ function update() {
     }
 
     pixiInitialized.value = true
-    console.log('💨 pixi components are initialized', pixiApplicationManager)
+    console.log('💨 pixi components are initialized', pixiHeatmapApp)
   }
 }
 
 function debug() {
-  console.log('🐞', pixiApplicationManager)
-  pixiApplicationManager?.heatmap.rowContainer.position.set(0, 0)
+  console.log('🐞', pixiHeatmapApp)
+  pixiHeatmapApp?.heatmap.rowContainer.position.set(0, 0)
 }
 
 watch(
@@ -278,7 +278,7 @@ onMounted(async () => {
 
 <template>
   <div class="w-full h-full">
-    <canvas class="heatmap-canvas w-full h-full" ref="canvas"></canvas>
+    <canvas class="heatmap-canvas w-full h-full" ref="heatmapCanvas"></canvas>
     <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
     <span>{{ layoutStore.requiredHeight }}</span>
 

@@ -2,7 +2,7 @@ import { Container, Text, Graphics } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Column } from '@/classes/Column'
 import { useHeatmapStore } from '@/stores/heatmapStore'
-import { useLayoutStore } from '@/stores/layoutStore'
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
 export class PixiColumnLabel extends Container {
@@ -16,10 +16,10 @@ export class PixiColumnLabel extends Container {
 
     // background box
     let backgroundHeight =
-      useLayoutStore().columnLabelHeight - useLayoutStore().columnLabelPaddingBottom
+      useHeatmapLayoutStore().columnLabelHeight - useHeatmapLayoutStore().columnLabelPaddingBottom
     this.background
-      .rect(1, 0, useLayoutStore().columnWidth - 2, backgroundHeight)
-      .fill(useLayoutStore().labelBackgroundColor)
+      .rect(1, 0, useHeatmapLayoutStore().columnWidth - 2, backgroundHeight)
+      .fill(useHeatmapLayoutStore().labelBackgroundColor)
     this.addChild(this.background)
 
     // create the text for the column label
@@ -33,12 +33,12 @@ export class PixiColumnLabel extends Container {
     })
 
     // rotate and position text
-    this.text.x = (useLayoutStore().columnWidth - this.text.height) / 2
+    this.text.x = (useHeatmapLayoutStore().columnWidth - this.text.height) / 2
     this.text.rotation = -Math.PI / 2
     this.text.y =
-      useLayoutStore().columnLabelHeight -
-      useLayoutStore().columnLabelPaddingBottom -
-      useLayoutStore().columnLabelTextPaddingBottom
+      useHeatmapLayoutStore().columnLabelHeight -
+      useHeatmapLayoutStore().columnLabelPaddingBottom -
+      useHeatmapLayoutStore().columnLabelTextPaddingBottom
 
     this.addChild(this.text)
     // TODO: icons and other stuff can be added here
@@ -69,17 +69,17 @@ export class PixiColumnLabel extends Container {
       this.column.oldPosition === -1 ? (this.column.parent?.position ?? 0) : this.column.oldPosition
     gsap.fromTo(
       this,
-      { x: startPosition * useLayoutStore().columnWidth },
+      { x: startPosition * useHeatmapLayoutStore().columnWidth },
       {
-        x: this.column.position * useLayoutStore().columnWidth,
-        duration: animate ? useLayoutStore().animationDuration : 0,
+        x: this.column.position * useHeatmapLayoutStore().columnWidth,
+        duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
       },
     )
 
     let maxDepth = 1 + 1 // TODO: fetch dynamically
     // BIG TODO: I need to figure out how I want to align the hierarchical column labels
-    // this.y = this.column.depth * useLayoutStore().columnLabelDepthIndent
-    // this.y = this.children[0].width + this.column.depth * useLayoutStore().columnLabelDepthIndent
+    // this.y = this.column.depth * useHeatmapLayoutStore().columnLabelDepthIndent
+    // this.y = this.children[0].width + this.column.depth * useHeatmapLayoutStore().columnLabelDepthIndent
   }
 
   updateVisibility() {

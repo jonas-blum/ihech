@@ -1,7 +1,7 @@
 import { Graphics, Container, Rectangle } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { useHeatmapStore } from '@/stores/heatmapStore'
-import { useLayoutStore } from '@/stores/layoutStore'
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 
 export class PixiHeatmapCell extends Container {
@@ -23,14 +23,14 @@ export class PixiHeatmapCell extends Container {
     this.adjustedValue = adjustedValue
     this.originalColumnIndex = originalColumnIndex 
     this.addChild(this.cellGraphic)
-    this.drawCellGraphic(useLayoutStore().columnWidth - useLayoutStore().cellPadding, useLayoutStore().rowHeight - useLayoutStore().cellPadding)
+    this.drawCellGraphic(useHeatmapLayoutStore().columnWidth - useHeatmapLayoutStore().cellPadding, useHeatmapLayoutStore().rowHeight - useHeatmapLayoutStore().cellPadding)
     this.updateTint(useHeatmapStore()?.colorMap.getColor(adjustedValue))
-    this.position.x = this.originalColumnIndex * useLayoutStore().columnWidth
+    this.position.x = this.originalColumnIndex * useHeatmapLayoutStore().columnWidth
 
     this.eventMode = 'static'
     this.cursor = 'pointer'
 
-    this.hitArea = new Rectangle(0, 0, useLayoutStore().columnWidth, useLayoutStore().rowHeight)
+    this.hitArea = new Rectangle(0, 0, useHeatmapLayoutStore().columnWidth, useHeatmapLayoutStore().rowHeight)
 
     // event listeners
     // @ts-ignore: Property 'on' does not exist

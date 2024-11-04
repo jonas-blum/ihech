@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 
-export const useLayoutStore = defineStore('layout', {
+export const useHeatmapLayoutStore = defineStore('heatmapLayout', {
   state: () => ({
     canvasWidth: 0, // width of the canvas
     canvasHeight: 0, // height of the canvas

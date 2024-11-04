@@ -3,7 +3,7 @@ import { onMounted, watch, ref } from 'vue'
 import { useMouse } from '@vueuse/core'
 
 import { useHeatmapStore } from '@stores/heatmapStore'
-import { useLayoutStore } from '@stores/layoutStore'
+import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
 import { PixiHeatmapApp } from '@/pixiComponents/PixiHeatmapApp'
 import { PixiRow } from '@/pixiComponents/PixiRow'
@@ -26,7 +26,7 @@ watch([mouseX, mouseY], ([x, y]) => {
 })
 
 const heatmapStore = useHeatmapStore()
-const layoutStore = useLayoutStore()
+const heatmapLayoutStore = useHeatmapLayoutStore()
 
 let pixiHeatmapApp: PixiHeatmapApp | null = null
 
@@ -148,12 +148,12 @@ watch(
     // update the position of all rows
     newStickyRows?.forEach((row, index) => {
       if (row.stickyPixiRow) {
-        row.stickyPixiRow.position.y = index * layoutStore.rowHeight // Set position based on index
+        row.stickyPixiRow.position.y = index * heatmapLayoutStore.rowHeight // Set position based on index
       }
     })
 
     // Update the vertical position of the row container to account for sticky rows
-    pixiHeatmapApp.rowContainer.position.y = layoutStore.rowsVerticalStartPosition
+    pixiHeatmapApp.rowContainer.position.y = heatmapLayoutStore.rowsVerticalStartPosition
   },
 )
 
@@ -181,7 +181,7 @@ watch(
 
 // watch for requiredHeight changes
 watch(
-  () => layoutStore.requiredHeight,
+  () => heatmapLayoutStore.requiredHeight,
   (newRequiredHeight, oldRequiredHeight) => {
     console.log('requiredHeight changed from', oldRequiredHeight, 'to', newRequiredHeight)
 
@@ -194,24 +194,24 @@ watch(
 
 // watch for verticalScrollPosition changes
 watch(
-  () => layoutStore.verticalScrollPosition,
+  () => heatmapLayoutStore.verticalScrollPosition,
   (newVerticalScrollPosition, oldVerticalScrollPosition) => {
     // update the vertical position of the row container
     if (pixiHeatmapApp) {
       pixiHeatmapApp.rowContainer.position.y =
-        layoutStore.rowsVerticalStartPosition - newVerticalScrollPosition
+        heatmapLayoutStore.rowsVerticalStartPosition - newVerticalScrollPosition
     }
   },
 )
 
 function update() {
   console.log('🔄 update')
-  // update the layoutStore with the current canvas dimensions
+  // update the heatmapLayoutStore with the current canvas dimensions
   if (heatmapCanvas.value) {
-    layoutStore.canvasWidth = heatmapCanvas.value.clientWidth
-    layoutStore.canvasHeight = heatmapCanvas.value.clientHeight
-    console.log('layoutStore.canvasWidth', layoutStore.canvasWidth)
-    console.log('layoutStore.canvasHeight', layoutStore.canvasHeight)
+    heatmapLayoutStore.canvasWidth = heatmapCanvas.value.clientWidth
+    heatmapLayoutStore.canvasHeight = heatmapCanvas.value.clientHeight
+    console.log('heatmapLayoutStore.canvasWidth', heatmapLayoutStore.canvasWidth)
+    console.log('heatmapLayoutStore.canvasHeight', heatmapLayoutStore.canvasHeight)
   }
 
   // only once I need to init the pixi containers and graphics
@@ -278,7 +278,7 @@ onMounted(async () => {
   <div class="w-full h-full">
     <canvas class="heatmap-canvas w-full h-full" ref="heatmapCanvas"></canvas>
     <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
-    <span>{{ layoutStore.requiredHeight }}</span>
+    <span>{{ heatmapLayoutStore.requiredHeight }}</span>
 
     <div
       class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"

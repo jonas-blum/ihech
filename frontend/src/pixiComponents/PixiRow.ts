@@ -4,7 +4,7 @@ import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { useHeatmapStore } from '@/stores/heatmapStore'
-import { useLayoutStore } from '@/stores/layoutStore'
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
 export class PixiRow extends Container {
@@ -22,7 +22,7 @@ export class PixiRow extends Container {
     this.addChild(this.pixiHeatmapCellsContainer)
     this.addChild(this.pixiRowLabel)
 
-    this.pixiHeatmapCellsContainer.position.set(useLayoutStore().rowLabelWidth, 0)
+    this.pixiHeatmapCellsContainer.position.set(useHeatmapLayoutStore().rowLabelWidth, 0)
 
     // create all the cells for the row
     for (let i = 0; i < row.data.length; i++) {
@@ -43,10 +43,10 @@ export class PixiRow extends Container {
       this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
     gsap.fromTo(
       this,
-      { y: startPosition * useLayoutStore().rowHeight },
+      { y: startPosition * useHeatmapLayoutStore().rowHeight },
       {
-        y: this.row.position * useLayoutStore().rowHeight,
-        duration: animate ? useLayoutStore().animationDuration : 0,
+        y: this.row.position * useHeatmapLayoutStore().rowHeight,
+        duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
       },
     )
     this.pixiRowLabel?.updatePosition()
@@ -61,8 +61,8 @@ export class PixiRow extends Container {
         useHeatmapStore()?.attributeTree?.originalIndexToColumn.get(i)?.position ?? -1
 
       gsap.to(cell, {
-        x: columnIndex * useLayoutStore().columnWidth,
-        duration: animate ? useLayoutStore().animationDuration : 0,
+        x: columnIndex * useHeatmapLayoutStore().columnWidth,
+        duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
       })
     }
   }

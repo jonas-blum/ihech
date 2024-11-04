@@ -2,7 +2,7 @@ import { Application, Container } from 'pixi.js'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import type { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { PixiVerticalScrollbar } from '@/pixiComponents/PixiVerticalScrollbar'
-import { useLayoutStore } from '@/stores/layoutStore'
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiHeatmapApp extends Application {
   public rowContainer: Container = new Container() // PixiRow[] as children
@@ -11,22 +11,22 @@ export class PixiHeatmapApp extends Application {
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
 
   constructor(canvasElement: HTMLCanvasElement) {
-    const layoutStore = useLayoutStore()
+    const heatmapLayoutStore = useHeatmapLayoutStore()
 
     super()
     // init app
     this.init({
       canvas: canvasElement,
-      width: layoutStore.canvasWidth,
-      height: layoutStore.canvasHeight,
-      backgroundColor: layoutStore.heatmapCanvasBackgroundColor,
+      width: heatmapLayoutStore.canvasWidth,
+      height: heatmapLayoutStore.canvasHeight,
+      backgroundColor: heatmapLayoutStore.heatmapCanvasBackgroundColor,
       antialias: true,
       resolution: 2,
       // autoDensity: true, // not sure what this does
     })
 
     // position the stage (which is the root container)
-    this.stage.position.set(useLayoutStore().heatmapLeftMargin, layoutStore.heatmapTopMargin)
+    this.stage.position.set(useHeatmapLayoutStore().heatmapLeftMargin, heatmapLayoutStore.heatmapTopMargin)
 
     // add the children to the main container
     this.stage.addChild(this.rowContainer)
@@ -35,9 +35,9 @@ export class PixiHeatmapApp extends Application {
     this.stage.addChild(this.verticalScrollbar)
 
     // set the position of the containers
-    this.rowContainer.position.set(0, layoutStore.columnLabelHeight)
-    this.stickyRowContainer.position.set(0, layoutStore.columnLabelHeight)
-    this.columnLabelsContainer.position.set(layoutStore.rowLabelWidth, 0)
+    this.rowContainer.position.set(0, heatmapLayoutStore.columnLabelHeight)
+    this.stickyRowContainer.position.set(0, heatmapLayoutStore.columnLabelHeight)
+    this.columnLabelsContainer.position.set(heatmapLayoutStore.rowLabelWidth, 0)
     this.verticalScrollbar.update()
   }
 

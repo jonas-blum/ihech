@@ -7,6 +7,7 @@ import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 
 import { PixiDimredApp } from '@/pixiComponents/PixiDimredApp'
 import { Row } from '@/classes/Row'
+import { PixiBubble } from '@/pixiComponents/PixiBubble'
 
 const heatmapStore = useHeatmapStore()
 const dimredLayoutStore = useDimredLayoutStore()
@@ -33,7 +34,19 @@ function update() {
   if (!pixiDimredInitialized.value) {
     pixiDimredApp = new PixiDimredApp(dimredCanvas.value)
 
-    // TODO: draw circle for each Row and set pointers
+    // traverse the item tree with all rows and create the pixiBubbles
+    let rows = heatmapStore.itemTree?.getAllRows()
+    if (!rows) {
+      console.warn('rows is not set')
+      return
+    }
+
+    for (let row of rows) {
+      let pixiBubble = new PixiBubble(row) // create PixiBubble with reference to the Row
+      row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
+      // pixiBubble.updatePosition() // TODO: implement updatePosition in PixiBubble
+      pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp
+    }
 
     pixiDimredInitialized.value = true
     console.log('💨 Dimred components are initialized', pixiDimredApp)

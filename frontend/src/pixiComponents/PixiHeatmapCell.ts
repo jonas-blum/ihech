@@ -19,31 +19,35 @@ export class PixiHeatmapCell extends Container {
     // customProperties: CustomCollectionProperties,
   ) {
     super()
+
+    const heatmapStore = useHeatmapStore()
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+
     this.value = value 
     this.adjustedValue = adjustedValue
     this.originalColumnIndex = originalColumnIndex 
     this.addChild(this.cellGraphic)
-    this.drawCellGraphic(useHeatmapLayoutStore().columnWidth - useHeatmapLayoutStore().cellPadding, useHeatmapLayoutStore().rowHeight - useHeatmapLayoutStore().cellPadding)
-    this.updateTint(useHeatmapStore()?.colorMap.getColor(adjustedValue))
-    this.position.x = this.originalColumnIndex * useHeatmapLayoutStore().columnWidth
+    this.drawCellGraphic(heatmapLayoutStore.columnWidth - heatmapLayoutStore.cellPadding, heatmapLayoutStore.rowHeight - heatmapLayoutStore.cellPadding)
+    this.updateTint(heatmapStore?.colorMap.getColor(adjustedValue))
+    this.position.x = this.originalColumnIndex * heatmapLayoutStore.columnWidth
 
     this.eventMode = 'static'
     this.cursor = 'pointer'
 
-    this.hitArea = new Rectangle(0, 0, useHeatmapLayoutStore().columnWidth, useHeatmapLayoutStore().rowHeight)
+    this.hitArea = new Rectangle(0, 0, heatmapLayoutStore.columnWidth, heatmapLayoutStore.rowHeight)
 
     // event listeners
     // @ts-ignore: Property 'on' does not exist
     this.on('click', () => {
-      useHeatmapStore()?.cellClickEvent(this)
+      heatmapStore?.cellClickEvent(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseover', () => {
-      useHeatmapStore()?.setHoveredPixiHeatmapCell(this)
+      heatmapStore?.setHoveredPixiHeatmapCell(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseout', () => {
-      useHeatmapStore()?.setHoveredPixiHeatmapCell(null)
+      heatmapStore?.setHoveredPixiHeatmapCell(null)
     })
   }
 

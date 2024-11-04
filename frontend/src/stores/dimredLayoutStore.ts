@@ -8,7 +8,7 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     
     animationDuration: 0.3, // duration of animations in seconds
 
-    heatmapCanvasBackgroundColor: 0x441111, // background color of the heatmap
+    heatmapCanvasBackgroundColor: 0xdddddd, // background color of the heatmap
     
   }),
   getters: {

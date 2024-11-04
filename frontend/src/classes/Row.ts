@@ -1,6 +1,7 @@
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
+import type { PixiBubble } from '@/pixiComponents/PixiBubble'
 
 interface DimRedPosition {
     x: number
@@ -21,6 +22,7 @@ export abstract class Row {
     nextSibling: Row | null = null
     pixiRow: PixiRow | null = null // reference to the corresponding PixiRow for rendering
     stickyPixiRow: PixiRow | null = null // reference to the corresponding (sticky!) PixiRow for rendering
+    pixiBubble: PixiBubble | null = null // reference to the corresponding PixiBubble for rendering
   
     protected constructor(
       name: string,
@@ -74,6 +76,8 @@ export abstract class Row {
       // rendering side effects
       this.pixiRow?.updatePosition()
       this.pixiRow?.updateVisibility()
+
+      // TODO: update PixiBubble
     }
   
     setDepth(depth: number) {

@@ -35,7 +35,7 @@ const heatmapCanvas = ref<HTMLCanvasElement | null>(null)
 const heatmapWidth = ref<number>(0)
 const heatmapHeight = ref<number>(0)
 
-const pixiInitialized = ref(false)
+const pixiHeatmapInitialized = ref(false)
 
 // watch for changes is highlightedRow
 watch(
@@ -120,13 +120,13 @@ watch(
     let stickyRowsToRemove = oldStickyRows?.filter(
       (oldStickyRow) => !newStickyRows?.includes(oldStickyRow),
     )
-    console.log('stickyRowsToRemove', stickyRowsToRemove)
+    // console.log('stickyRowsToRemove', stickyRowsToRemove)
 
     // find new sticky rows
     let stickyRowsToAdd = newStickyRows?.filter(
       (newStickyRow) => !oldStickyRows?.includes(newStickyRow),
     )
-    console.log('stickyRowsToAdd', stickyRowsToAdd)
+    // console.log('stickyRowsToAdd', stickyRowsToAdd)
 
     // loop over the sticky rows to remove
     stickyRowsToRemove?.forEach((row) => {
@@ -183,7 +183,7 @@ watch(
 watch(
   () => heatmapLayoutStore.requiredHeight,
   (newRequiredHeight, oldRequiredHeight) => {
-    console.log('requiredHeight changed from', oldRequiredHeight, 'to', newRequiredHeight)
+    // console.log('requiredHeight changed from', oldRequiredHeight, 'to', newRequiredHeight)
 
     // update the vertical scrollbar
     if (pixiHeatmapApp) {
@@ -205,17 +205,15 @@ watch(
 )
 
 function update() {
-  console.log('🔄 update')
+  console.log('🔄 Heatmap.vue update')
   // update the heatmapLayoutStore with the current canvas dimensions
   if (heatmapCanvas.value) {
     heatmapLayoutStore.canvasWidth = heatmapCanvas.value.clientWidth
     heatmapLayoutStore.canvasHeight = heatmapCanvas.value.clientHeight
-    console.log('heatmapLayoutStore.canvasWidth', heatmapLayoutStore.canvasWidth)
-    console.log('heatmapLayoutStore.canvasHeight', heatmapLayoutStore.canvasHeight)
   }
 
   // only once I need to init the pixi containers and graphics
-  if (!pixiInitialized.value) {
+  if (!pixiHeatmapInitialized.value) {
     if (!heatmapCanvas.value) {
       console.warn('canvas is not set')
       return
@@ -250,8 +248,8 @@ function update() {
       pixiHeatmapApp.addColumnLabel(pixiColumnLabel) // adds the PixiColumnLabel to the PixiHeatmapApp
     }
 
-    pixiInitialized.value = true
-    console.log('💨 pixi components are initialized', pixiHeatmapApp)
+    pixiHeatmapInitialized.value = true
+    console.log('💨 Heatmap components are initialized', pixiHeatmapApp)
   }
 }
 

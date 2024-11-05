@@ -254,4 +254,8 @@ export class ItemTree {
   getVisibleRowsCount(): number {
     return this.getVisibleRows().length
   }
+
+  getAllRowsCount(): number {
+    return this.getAllRows().length
+  }
 }

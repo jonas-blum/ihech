@@ -91,17 +91,32 @@ export class PixiBubble extends Container {
     this.bubbleGraphic.alpha = alpha
   }
 
-  // depending of the maxDepth, we want to scale the bubbles
   updateSize() {
     if (this.row.position === -1) {
       return
     }
 
-    let maxDepth = useHeatmapStore()?.itemsMaxDepth
+    // NOTE: initially I planned to scale the bubbles based on the depth of the tree
+    // but I think it makes more sense to scale the bubbles based on the number of items.. TBD
 
-    let scaleFactor =
-      (1 + (maxDepth - this.row.depth)) * useDimredLayoutStore().bubbleSizeDepthIncrement
-    // console.log(`maxDepth: ${maxDepth}`)
+    // let maxDepth = useHeatmapStore()?.itemsMaxDepth
+    // let scaleFactor =
+    //   (1 + (maxDepth - this.row.depth)) * useDimredLayoutStore().bubbleSizeDepthIncrement
+    // // console.log(`maxDepth: ${maxDepth}`)
+
+    let itemsTotal = (useHeatmapStore()?.itemTree?.root?.totalChildrenCount ?? 0) + 1
+    let itemsAmount = 1 + this.row.totalChildrenCount
+
+    let maxScaleFactor =
+      useDimredLayoutStore().bubbleSizeMaximal / useDimredLayoutStore().bubbleSize
+
+    // Use logarithmic scaling for itemsAmount and itemsTotal to spread out values
+    let logItemsAmount = Math.log(itemsAmount + 1) // +1 to avoid log(0) if itemsAmount is 1
+    let logItemsTotal = Math.log(itemsTotal + 1)
+
+    // Calculate the scale factor with log-transformed values
+    let scaleFactor = 1 + (maxScaleFactor - 1) * (logItemsAmount / logItemsTotal)
+
     // console.log(`updateSize for bubble ${this.row.name} (${this.row.depth}): ${scaleFactor}`)
     this.bubbleGraphic.scale.set(scaleFactor)
   }

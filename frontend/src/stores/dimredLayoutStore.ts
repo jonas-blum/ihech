@@ -6,6 +6,7 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     canvasWidth: 0, // width of the canvas
     canvasHeight: 0, // height of the canvas
     bubbleSize: 2, // size of the bubbles in the dimred
+    bubbleSizeMaximal: 20, // maximal size of the bubbles in the dimred
     bubbleSizeDepthIncrement: 2, // how much bigger the bubbles get with each depth level (with depth=0 being the largest)
 
     animationDuration: 0.3, // duration of animations in seconds

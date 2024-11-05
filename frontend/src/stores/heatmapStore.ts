@@ -34,8 +34,9 @@ import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
+import { PixiBubble } from '@/pixiComponents/PixiBubble'
 import { LinearColorMap } from '@/classes/LinearColorMap'
-import { nextTick } from 'vue'
+import { nextTick, setDevtoolsHook } from 'vue'
 
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
 export const useHeatmapStore = defineStore('heatmapStore', {
@@ -49,6 +50,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     hoveredPixiHeatmapCell: null as PixiHeatmapCell | null,
     hoveredPixiRowLabel: null as PixiRowLabel | null,
     hoveredPixiColumnLabel: null as PixiColumnLabel | null,
+    hoveredPixiBubble: null as PixiBubble | null,
 
     colorMap: new LinearColorMap(),
 
@@ -82,7 +84,13 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     csvUploadOpen: true,
   }),
   getters: {
-    highlightedPixiRow(): PixiRow | null {
+    // various rendering functions need to know the max depth of the itemTree
+    itemsMaxDepth(): number {
+      return this.itemTree?.maxDepth ?? 0
+    },
+
+    // this getter is needed because the PixiRow consists of the PixiRowLabel and the PixiHeatmapCells
+    hoveredPixiRow(): PixiRow | null {
       if (this.hoveredPixiRowLabel) {
         // if row label (which is child of pixiRow) is currently hovered, we can return the pixiRow
         return this.hoveredPixiRowLabel.parent as PixiRow
@@ -96,8 +104,12 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     },
 
     highlightedRow(): Row | null {
-      const highlightedPixiRow = this.highlightedPixiRow
-      return highlightedPixiRow?.row ?? null
+      if (this.hoveredPixiRow) {
+        return this.hoveredPixiRow?.row ?? null
+      } else if (this.hoveredPixiBubble) {
+        return this.hoveredPixiBubble?.row as Row ?? null
+      }
+      return null
     },
 
     highlightedColumn(): Column | null {
@@ -345,8 +357,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         // initialize itemTree with the data received from the backend, starting at the root
         let itemTreeRoot = this.heatmap.itemNamesAndData[0]
         this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
-        this.itemTree.sort()
-        this.itemTree.updatePositionsAndDepth()
         console.log('ItemTree:', this.itemTree)
 
         // initialize attributeTree with the data received from the backend
@@ -765,6 +775,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.hoveredPixiColumnLabel = pixiColumnLabel
     },
 
+    setHoveredPixiBubble(pixiBubble: PixiBubble | null) {
+      this.hoveredPixiBubble = pixiBubble
+    },
+
     cellClickEvent(cell: PixiHeatmapCell) {
       console.log('cellClickEvent', cell)
       let row = (cell.parent.parent as PixiRow).row
@@ -784,6 +798,13 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       if (column instanceof AggregatedColumn) {
         this.attributeTree?.toggleColumnExpansion(column)
       }
+    },
+
+    bubbleClickEvent(bubble: PixiBubble) {
+      console.log('bubbleClickEvent', bubble)
+      let row = bubble.row
+      // NOTE: the term Row is a bit irritating here, but because the the data structure is conceptualized as Rows and Columns, I will keep it like this for now
+      this.handleRowClick(row)
     },
   },
 })

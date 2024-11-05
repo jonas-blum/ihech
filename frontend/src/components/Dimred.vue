@@ -13,8 +13,70 @@ const heatmapStore = useHeatmapStore()
 const dimredLayoutStore = useDimredLayoutStore()
 const dimredCanvas = ref<HTMLCanvasElement | null>(null)
 
+const { x: mouseX, y: mouseY } = useMouse()
+
+const tooltipStyle = ref({
+  left: '0px',
+  top: '0px',
+})
+
+// Watch mouse coordinates to update tooltip position
+watch([mouseX, mouseY], ([x, y]) => {
+  tooltipStyle.value.left = `${x + 10}px`
+  tooltipStyle.value.top = `${y + 10}px`
+})
+
 let pixiDimredApp: PixiDimredApp | null = null
 const pixiDimredInitialized = ref(false)
+
+// watch for changes is highlightedRow
+// NOTE: I guess having watcher in the Heatmap and Dimred components is not the most efficient way, but for seperation of concerns it is justifiable
+watch(
+  () => heatmapStore.highlightedRow,
+  (newRow, oldRow) => {
+    // console.log('highlightedRow changed from', oldRow, 'to', newRow)
+
+    if (!pixiDimredApp) {
+      console.warn('pixiDimredApp is not set')
+      return
+    }
+
+    // remove the highlight from the old row
+    if (oldRow?.pixiBubble) {
+      // oldRow.pixiRow.removeHighlight()
+      oldRow.pixiBubble.updateHighlightedDisplay(false)
+    }
+
+    // add the highlight to the new row
+    if (newRow?.pixiBubble) {
+      // newRow.pixiRow.addHighlight()
+      newRow.pixiBubble.updateHighlightedDisplay(true)
+    }
+  },
+)
+
+// we need to update the visibility and size of all pixiBubbles when the max depth changes
+watch(
+  () => heatmapStore.itemsMaxDepth,
+  () => {
+    if (!pixiDimredApp) {
+      console.warn('pixiDimredApp is not set')
+      return
+    }
+
+    let rows = heatmapStore.itemTree?.getAllRows()
+    if (!rows) {
+      console.warn('rows is not set')
+      return
+    }
+
+    for (let row of rows) {
+      row.pixiBubble?.updateVisibility()
+      row.pixiBubble?.updateSize()
+    }
+  },
+)
+
 
 function update() {
   console.log('🔄 Dimred.vue update')
@@ -26,7 +88,7 @@ function update() {
 
   dimredLayoutStore.canvasWidth = dimredCanvas.value.clientWidth
   dimredLayoutStore.canvasHeight = dimredCanvas.value.clientHeight
-  console.log('📏 Dimred canvas size', dimredCanvas.value.width, dimredCanvas.value.height)
+  // console.log('📏 Dimred canvas size', dimredCanvas.value.width, dimredCanvas.value.height)
 
   // init the pixi containers and graphics (only once)
   if (!pixiDimredInitialized.value) {
@@ -68,6 +130,19 @@ onMounted(async () => {
 <template>
   <div class="w-full h-full">
     <canvas class="w-full h-full" ref="dimredCanvas"></canvas>
+    <div
+      class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
+      :style="tooltipStyle"
+      v-show="heatmapStore.hoveredPixiBubble"
+    >
+      <!-- <span>{{ heatmapStore.highlightedRow?.name }}</span
+      ><br />
+      <span>{{ heatmapStore.highlightedColumn?.name }}</span
+      ><br /> -->
+      <span>
+        {{ heatmapStore.hoveredPixiBubble?.row.name }}
+      </span>
+    </div>
   </div>
 </template>
 

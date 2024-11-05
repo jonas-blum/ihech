@@ -4,12 +4,17 @@ import { RowSorter } from '@/classes/RowSorter'
 export class ItemTree {
   root: AggregatedRow
   rowSorter: RowSorter
-  // NOTE: to detect changes in the sticky rows via shallow watchers, always replace the array instead of modifying it
+  // NOTE: to allow change detection in the sticky rows via shallow watchers, always replace the array instead of modifying it
   stickyRows: ItemRow[] = [] // for now we only allow sticky rows to be ItemRows; might change in the future
+  maxDepth: number = 0 // keeps track of the maximum depth of the tree; used for several display purposes
 
   constructor(itemNameAndData: any, rowSorter: RowSorter) {
     this.root = this.buildItemTree(itemNameAndData) as AggregatedRow
     this.rowSorter = rowSorter
+
+    this.sort()
+    this.updatePositionsAndDepth()
+    this.calculateMaxDepth()
   }
 
   buildItemTree(itemNameAndData: any, parent: Row | null = null): Row {
@@ -23,7 +28,7 @@ export class ItemTree {
         itemNameAndData.data,
         { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
         parent,
-        itemNameAndData.isOpen,
+        itemNameAndData.isOpen, // NOTE: the backend impacts the initial state of the row (open/closed)
       )
 
       // Now create children, correctly passing `row` as the parent
@@ -65,11 +70,31 @@ export class ItemTree {
     row.open()
     this.updatePositionsAndDepth(row)
     this.updateCellPositions(row)
+
+    // update the maxDepth if necessary
+    if (row.depth >= this.maxDepth) {
+      this.maxDepth = row.depth + 1
+    }
   }
 
   closeRow(row: AggregatedRow) {
     row.close()
     this.updatePositionsAndDepth(row)
+
+    // update the maxDepth if necessary
+    // NOTE: I am not happy how inefficient this is, as we have to traverse the whole tree to find the new maxDepth
+    //      but I don't see a better way right now
+    this.calculateMaxDepth()
+  }
+
+  calculateMaxDepth() {
+    let maxDepth = 0
+    this.getVisibleRows().forEach((row) => {
+      if (row.depth > maxDepth) {
+        maxDepth = row.depth
+      }
+    })
+    this.maxDepth = maxDepth
   }
 
   updatePositionsAndDepth(startRow: Row = this.root) {
@@ -125,7 +150,7 @@ export class ItemTree {
     }
 
     // also update the sticky rows
-    this.stickyRows.forEach(stickyRow => stickyRow.stickyPixiRow?.updateCellPositions())
+    this.stickyRows.forEach((stickyRow) => stickyRow.stickyPixiRow?.updateCellPositions())
   }
 
   getAllRows(): Row[] {
@@ -222,10 +247,7 @@ export class ItemTree {
   removeStickyRow(row: ItemRow) {
     const index = this.stickyRows.indexOf(row)
     if (index > -1) {
-      this.stickyRows = [
-      ...this.stickyRows.slice(0, index),
-      ...this.stickyRows.slice(index + 1)
-      ]
+      this.stickyRows = [...this.stickyRows.slice(0, index), ...this.stickyRows.slice(index + 1)]
     }
   }
 

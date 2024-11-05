@@ -73,18 +73,22 @@ export abstract class Row {
       this.oldPosition = this.position
       this.position = position
   
-      // rendering side effects
+      // update the pixiRow rendering
       this.pixiRow?.updatePosition()
       this.pixiRow?.updateVisibility()
 
-      // TODO: update PixiBubble
+      // update the pixiBubble rendering
+      this.pixiBubble?.updateVisibility()
     }
   
     setDepth(depth: number) {
       this.depth = depth
   
-      // rendering side effects
+      // update the pixiRow rendering
       this.pixiRow?.updatePosition()
+      
+      // update the pixiBubble rendering
+      this.pixiBubble?.updateSize()
     }
   }
   

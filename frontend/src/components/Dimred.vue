@@ -55,28 +55,6 @@ watch(
   },
 )
 
-// we need to update the visibility and size of all pixiBubbles when the max depth changes
-watch(
-  () => heatmapStore.itemsMaxDepth,
-  () => {
-    if (!pixiDimredApp) {
-      console.warn('pixiDimredApp is not set')
-      return
-    }
-
-    let rows = heatmapStore.itemTree?.getAllRows()
-    if (!rows) {
-      console.warn('rows is not set')
-      return
-    }
-
-    for (let row of rows) {
-      row.pixiBubble?.updateVisibility()
-      row.pixiBubble?.updateSize()
-    }
-  },
-)
-
 
 function update() {
   console.log('🔄 Dimred.vue update')
@@ -104,7 +82,6 @@ function update() {
     for (let row of rows) {
       let pixiBubble = new PixiBubble(row) // create PixiBubble with reference to the Row
       row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
-      // pixiBubble.updatePosition() // TODO: implement updatePosition in PixiBubble
       pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp
     }
 

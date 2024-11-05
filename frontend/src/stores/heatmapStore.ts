@@ -357,6 +357,15 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         // initialize itemTree with the data received from the backend, starting at the root
         let itemTreeRoot = this.heatmap.itemNamesAndData[0]
         this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
+
+        // TODO: ideally the backend would provide the dimred coordinates already normalized
+        // normalize the dimRed values
+        this.itemTree.normalizeDimredCoordinates(
+          this.heatmap.minDimRedXValue,
+          this.heatmap.maxDimRedXValue,
+          this.heatmap.minDimRedYValue,
+          this.heatmap.maxDimRedYValue,
+        )
         console.log('ItemTree:', this.itemTree)
 
         // initialize attributeTree with the data received from the backend

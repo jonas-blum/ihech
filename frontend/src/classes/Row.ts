@@ -3,7 +3,7 @@ import { useHeatmapStore } from '@/stores/heatmapStore'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
 import type { PixiBubble } from '@/pixiComponents/PixiBubble'
 
-interface DimRedPosition {
+interface DimredPosition {
     x: number
     y: number
   }
@@ -13,7 +13,7 @@ export abstract class Row {
     totalChildrenCount: number // corresponds to the 'amountOfDataPoints' in the backend data
     data: number[]
     dataAdjusted: number[]
-    dimRedPosition: DimRedPosition
+    dimredPosition: DimredPosition
     parent: Row | null
     position: number = -1 // position in the list of rows; -1 if not visible
     oldPosition: number = -1 // used for animations
@@ -28,14 +28,14 @@ export abstract class Row {
       name: string,
       totalChildrenCount: number,
       data: number[],
-      dimRedPosition: DimRedPosition,
+      dimredPosition: DimredPosition,
       parent: Row | null = null,
     ) {
       this.name = name
       this.totalChildrenCount = totalChildrenCount
       this.data = data
       this.dataAdjusted = Row.computeAdjustedData(data)
-      this.dimRedPosition = dimRedPosition
+      this.dimredPosition = dimredPosition
       this.parent = parent
     }
   
@@ -78,7 +78,7 @@ export abstract class Row {
       this.pixiRow?.updateVisibility()
 
       // update the pixiBubble rendering
-      this.pixiBubble?.updateVisibility()
+      this.pixiBubble?.updatePositionAndVisibility()
     }
   
     setDepth(depth: number) {
@@ -97,10 +97,10 @@ export abstract class Row {
       name: string,
       totalChildrenCount: number,
       data: number[],
-      dimRedPosition: DimRedPosition,
+      dimredPosition: DimredPosition,
       parent?: Row | null,
     ) {
-      super(name, totalChildrenCount, data, dimRedPosition, parent)
+      super(name, totalChildrenCount, data, dimredPosition, parent)
     }
   
     hasChildren(): boolean {
@@ -116,11 +116,11 @@ export abstract class Row {
       name: string,
       totalChildrenCount: number,
       data: number[],
-      dimRedPosition: DimRedPosition,
+      dimredPosition: DimredPosition,
       parent?: Row | null,
       isOpen: boolean = false, // only used for aggregated rows
     ) {
-      super(name, totalChildrenCount, data, dimRedPosition, parent)
+      super(name, totalChildrenCount, data, dimredPosition, parent)
       this.isOpen = isOpen
     }
   

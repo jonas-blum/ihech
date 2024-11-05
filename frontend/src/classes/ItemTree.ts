@@ -265,4 +265,12 @@ export class ItemTree {
       row.dimredPosition.y = (row.dimredPosition.y - minY) / (maxY - minY)
     })
   }
+
+  expandAllRows(){
+    this.getAllRows().forEach((row) => {
+      if (row instanceof AggregatedRow && !row.isOpen) {
+        this.expandRow(row)
+      }
+    })
+  }
 }

@@ -18,7 +18,7 @@ export class PixiDimredApp extends Application {
       height: dimredLayoutStore.canvasHeight,
       backgroundColor: dimredLayoutStore.heatmapCanvasBackgroundColor,
       antialias: true,
-      resolution: 1,
+      resolution: 2,
       // autoDensity: true, // not sure what this does
     })
 

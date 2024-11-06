@@ -43,7 +43,7 @@ def append_average_item_by_attribute_indexes(
     if item_name_and_data is None:
         return
     data = item_name_and_data.data
-    avg_data = np.mean([data[i] for i in indexes])
+    avg_data = np.round(np.mean([data[i] for i in indexes]), rounding_precision)
     item_name_and_data.data.append(avg_data)
     if item_name_and_data.children is None:
         return
@@ -57,6 +57,10 @@ def append_all_average_items_by_attribute_indexes(
 ):
     for item_name_and_data in item_names_and_data:
         append_average_item_by_attribute_indexes(indexes, item_name_and_data)
+
+
+def get_current_data_length(item_names_and_data: List[ItemNameAndData]):
+    return len(item_names_and_data[0].data)
 
 
 def cluster_attributes_recursively(
@@ -99,6 +103,89 @@ def cluster_attributes_recursively(
             )
             remaining_hierarchical_attributes.append(hierarchical_attribute)
         return remaining_hierarchical_attributes
+
+    else:
+        if original_df_rotated.shape[0] > 5000:
+            kmeans = MiniBatchKMeans(n_clusters=cluster_size, n_init=1, random_state=42)
+            labels = kmeans.fit_predict(original_df_rotated_dropped)
+        else:
+            hierarchical = AgglomerativeClustering(
+                n_clusters=cluster_size, linkage="ward"
+            )
+            labels = hierarchical.fit_predict(original_df_rotated_dropped)
+
+        new_clustered_hierarchical_attribute_list: List[HierarchicalAttribute] = []
+
+        cluster_indices = {
+            cluster_id: original_df_rotated.index[labels == cluster_id]
+            for cluster_id in np.unique(labels)
+        }
+
+        for _, indices in cluster_indices.items():
+
+            original_cluster_df = original_df_rotated.loc[indices]
+            original_cluster_df_dropped = original_df_rotated_dropped.loc[indices]
+
+            if original_cluster_df.shape[0] <= 0:
+                continue
+
+            if original_cluster_df.shape[0] == original_df_rotated.shape[0]:
+                new__cluster_attribute_names = (
+                    original_cluster_df["OriginalColumnNames"].astype(str).tolist()
+                )
+
+                for i in range(original_cluster_df.shape[0]):
+                    new_hierarchical_attribute = HierarchicalAttribute(
+                        new__cluster_attribute_names[i],
+                        original_cluster_df.index[i],
+                        False,
+                    )
+
+                    new_clustered_hierarchical_attribute_list.append(
+                        new_hierarchical_attribute
+                    )
+                continue
+
+            if original_cluster_df.shape[0] == 1:
+                new_attribute_name = (
+                    original_cluster_df["OriginalColumnNames"].astype(str).iat[0]
+                )
+
+                new_hierarchical_attribute = HierarchicalAttribute(
+                    new_attribute_name, original_cluster_df.index[0], False, None
+                )
+
+                new_clustered_hierarchical_attribute_list.append(
+                    new_hierarchical_attribute
+                )
+                continue
+            indices_list = list(indices)
+            new_index = get_current_data_length(item_names_and_data)
+            append_all_average_items_by_attribute_indexes(
+                indices_list, item_names_and_data
+            )
+
+            new_attribute_name = str(original_cluster_df.shape[0])
+
+            children = cluster_attributes_recursively(
+                original_cluster_df,
+                original_cluster_df_dropped,
+                cluster_size,
+                cluster_by_collections,
+                collection_column_names,
+                level + 1,
+                item_names_and_data,
+            )
+
+            new_aggregated_hierarchical_attribute = HierarchicalAttribute(
+                new_attribute_name, new_index, False, children
+            )
+
+            new_clustered_hierarchical_attribute_list.append(
+                new_aggregated_hierarchical_attribute
+            )
+
+        return new_clustered_hierarchical_attribute_list
 
 
 def cluster_items_recursively(

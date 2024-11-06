@@ -10,52 +10,63 @@ import {
   type HeatmapSettings,
   ColoringHeatmapEnum,
   getDistinctColor,
-} from '../helpers/helpers'
-import { nextTick } from 'vue'
+  interpolateColor,
+} from '@/helpers/helpers'
+import { ItemTree } from '@/classes/ItemTree'
+import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
+import { AttributeTree } from '@/classes/AttributeTree'
+import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
+import {
+  RowSorter,
+  RowSorterCriterion,
+  RowSorterCriterionByName,
+  RowSorterCriterionByHasChildren,
+  RowSorterCriterionByAmountOfChildren,
+} from '@/classes/RowSorter'
+import {
+  ColumnSorter,
+  ColumnSorterCriterion,
+  ColumnSorterCriterionByName,
+  ColumnSorterCriterionByStandardDeviation,
+} from '@/classes/ColumnSorter'
+import { Container } from 'pixi.js'
+import { PixiRow } from '@/pixiComponents/PixiRow'
+import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
+import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
+import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
+import { PixiBubble } from '@/pixiComponents/PixiBubble'
+import { LinearColorMap } from '@/classes/LinearColorMap'
+import { nextTick, setDevtoolsHook } from 'vue'
 
-export interface HeatmapStoreState {
-  dataTables: CsvDataTableProfile[]
-  activeDataTable: CsvDataTableProfile | null
-
-  heatmap: HeatmapJSON
-  highlightedRow: ItemNameAndData | null
-
-  //From the "newIdx" -> original Index (of the heatmap.attributeNames)
-  attributeMap: Map<number, number>
-
-  rowCollectionsMap: Map<ItemNameAndData, Set<string>>
-
-  allItems: ItemNameAndData[]
-
-  dataChanging: number
-  loading: boolean
-  timer: number
-
-  outOfSync: boolean
-  reloadingScheduled: boolean
-
-  csvUploadOpen: boolean
-}
-
+// @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
 export const useHeatmapStore = defineStore('heatmapStore', {
-  state: (): HeatmapStoreState => ({
-    dataTables: [],
-    activeDataTable: null,
+  state: () => ({
+    dataTables: [] as CsvDataTableProfile[],
+    activeDataTable: null as CsvDataTableProfile | null,
+
+    itemTree: null as ItemTree | null,
+    attributeTree: null as AttributeTree | null,
+
+    hoveredPixiHeatmapCell: null as PixiHeatmapCell | null,
+    hoveredPixiRowLabel: null as PixiRowLabel | null,
+    hoveredPixiColumnLabel: null as PixiColumnLabel | null,
+    hoveredPixiBubble: null as PixiBubble | null,
+
+    colorMap: new LinearColorMap(),
 
     heatmap: {
-      attributeNames: [],
-      attributeDissimilarities: [],
-      itemNamesAndData: [],
-      maxHeatmapValue: 100,
-      minHeatmapValue: 0,
-      maxDimRedXValue: 100,
-      maxDimRedYValue: 0,
-      minDimRedXValue: 0,
-      minDimRedYValue: 100,
-      maxAttributeValues: [],
-      minAttributeValues: [],
+      attributeNames: [] as string[],
+      attributeDissimilarities: [] as number[],
+      itemNamesAndData: [] as ItemNameAndData[],
+      maxHeatmapValue: 100 as number,
+      minHeatmapValue: 0 as number,
+      maxDimRedXValue: 100 as number,
+      maxDimRedYValue: 0 as number,
+      minDimRedXValue: 0 as number,
+      minDimRedYValue: 100 as number,
+      maxAttributeValues: [] as number[],
+      minAttributeValues: [] as number[],
     },
-    highlightedRow: null,
 
     attributeMap: new Map(),
 
@@ -73,6 +84,46 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     csvUploadOpen: true,
   }),
   getters: {
+    // various rendering functions need to know the max depth of the itemTree
+    itemsMaxDepth(): number {
+      return this.itemTree?.maxDepth ?? 0
+    },
+
+    // this getter is needed because the PixiRow consists of the PixiRowLabel and the PixiHeatmapCells
+    hoveredPixiRow(): PixiRow | null {
+      if (this.hoveredPixiRowLabel) {
+        // if row label (which is child of pixiRow) is currently hovered, we can return the pixiRow
+        return this.hoveredPixiRowLabel.parent as PixiRow
+      }
+      if (this.hoveredPixiHeatmapCell) {
+        // if heatmap cell (which is child of a pixiRow) is hovered, this parent row is highlighted
+        return this.hoveredPixiHeatmapCell.parent.parent as PixiRow
+      }
+      // if none of the above is the case, no row is highlighted
+      return null
+    },
+
+    highlightedRow(): Row | null {
+      if (this.hoveredPixiRow) {
+        return this.hoveredPixiRow?.row ?? null
+      } else if (this.hoveredPixiBubble) {
+        return this.hoveredPixiBubble?.row as Row ?? null
+      }
+      return null
+    },
+
+    highlightedColumn(): Column | null {
+      if (this.hoveredPixiColumnLabel) {
+        return this.hoveredPixiColumnLabel.column as Column
+      }
+      if (this.hoveredPixiHeatmapCell) {
+        let originalColumnIndex: number = this.hoveredPixiHeatmapCell.originalColumnIndex
+        let mappedColumn = this.attributeTree?.originalIndexToColumn?.get(originalColumnIndex) as Column | undefined;
+        return mappedColumn || null
+      }
+      return null
+    },
+
     getAllDataTables: (state) => state.dataTables,
     getAllDataTableNames: (state) => state.dataTables.map((table) => table.tableName),
     getActiveDataTable: (state) => state.activeDataTable,
@@ -86,8 +137,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getDimRedMinYValue: (state) => state.heatmap.minDimRedYValue,
     getMaxAttributeValues: (state) => state.heatmap.maxAttributeValues,
     getMinAttributeValues: (state) => state.heatmap.minAttributeValues,
-
-    getHighlightedRow: (state) => state.highlightedRow,
 
     getAmountOfStickyItems: (state) =>
       state.activeDataTable ? state.activeDataTable.stickyItemIndexes.length : 0,
@@ -291,37 +340,51 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         this.heatmap = receivedHeatmap
 
-        this.heatmap.itemNamesAndData.forEach((row) => {
-          setParentOfRowsRec(row, null)
-        })
+        console.log('Received heatmap:', this.heatmap)
 
-        //Deal with sticky items and correct order
-        const stickyRows: ItemNameAndData[] = []
+        // initialize rowSorter
+        // TODO: I should probably store the rowSorter in the store, otherwise the settings are reset when the heatmap is refetched..
+        let criterion1 = new RowSorterCriterionByName()
+        let criterion2 = new RowSorterCriterionByHasChildren()
+        let criterion3 = new RowSorterCriterionByAmountOfChildren()
+        let rowSorter = new RowSorter([criterion1, criterion2, criterion3])
 
-        for (const stickyRow of this.activeDataTable.stickyItemIndexes) {
-          this.heatmap.itemNamesAndData.forEach((row) => {
-            const foundRow = findRowByIndex(row, stickyRow)
-            if (foundRow) {
-              stickyRows.push(foundRow)
-            }
-          })
-        }
+        // initialize columnSorter
+        let criterionA = new ColumnSorterCriterionByName()
+        let criterionB = new ColumnSorterCriterionByStandardDeviation()
+        let columnSorter = new ColumnSorter([criterionA, criterionB])
 
-        this.activeDataTable.stickyItemIndexes = stickyRows
-          .map((row) => row.index)
-          .filter((index) => index !== null) as number[]
+        // initialize itemTree with the data received from the backend, starting at the root
+        let itemTreeRoot = this.heatmap.itemNamesAndData[0]
+        this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
 
-        this.heatmap.itemNamesAndData = [...stickyRows, ...this.heatmap.itemNamesAndData]
-
-        //Deal with sticky Attributes and correct order
-        this.activeDataTable.stickyAttributes = this.activeDataTable.stickyAttributes.filter(
-          (attr) => this.heatmap.attributeNames.includes(attr),
+        // TODO: ideally the backend would provide the dimred coordinates already normalized
+        // normalize the dimRed values
+        this.itemTree.normalizeDimredCoordinates(
+          this.heatmap.minDimRedXValue,
+          this.heatmap.maxDimRedXValue,
+          this.heatmap.minDimRedYValue,
+          this.heatmap.maxDimRedYValue,
         )
-        this.recomputeAttributeMap()
+        console.log('ItemTree:', this.itemTree)
 
-        this.openAllStickyItems()
-        this.buildRowCollectionsMap()
-        this.setAllItems()
+        // initialize attributeTree with the data received from the backend
+        this.attributeTree = new AttributeTree(
+          this.heatmap.attributeNames,
+          this.heatmap.minAttributeValues,
+          this.heatmap.maxAttributeValues,
+          this.heatmap.attributeDissimilarities,
+          columnSorter,
+        )
+        this.attributeTree.sort()
+        this.attributeTree.updatePositionsAndDepth()
+        console.log('AttributeTree:', this.attributeTree)
+
+
+        // update the colorMap
+        this.colorMap.setMin(this.heatmap.minHeatmapValue)
+        this.colorMap.setMax(this.heatmap.maxHeatmapValue)
+
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
@@ -409,9 +472,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return
       }
       this.activeDataTable.dimReductionAlgo = dimReductionAlgo
-    },
-    setHighlightedRow(row: ItemNameAndData | null) {
-      this.highlightedRow = row
     },
     setClusterAfterDimRed(clusterAfterDim: boolean) {
       if (!this.activeDataTable) {
@@ -686,146 +746,74 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.changeHeatmap()
     },
 
-    expandRow(row: ItemNameAndData) {
-      row.isOpen = true
-      this.changeHeatmap()
-    },
-
-    closeRow(row: ItemNameAndData) {
-      row.isOpen = false
-      this.closeChildRowsRecursively(row)
-      this.changeHeatmap()
-    },
-
-    closeNearestOpenParent(targetRow: ItemNameAndData) {
-      if (targetRow.isOpen) {
-        targetRow.isOpen = false
-        this.closeChildRowsRecursively(targetRow)
-        this.changeHeatmap()
-        return
-      }
-      const parent = targetRow.parent
-
-      if (parent?.isOpen) {
-        parent.isOpen = false
-        this.closeChildRowsRecursively(parent)
-        this.changeHeatmap()
-        return
-      }
-      this.changeHeatmap()
-    },
-
-    closeChildRowsRecursively(row: ItemNameAndData) {
-      row.isOpen = false
-      const areAllChildRowsClosed = row.children?.every((child) => !child.isOpen)
-      if (!areAllChildRowsClosed) {
-        row.children?.forEach((child) => {
-          this.closeChildRowsRecursively(child)
-        })
+    // used as a trigger from the RowSorter to re-sort the rows
+    sortRows() {
+      if (this.itemTree) {
+        this.itemTree.sort()
+        this.itemTree.updatePositionsAndDepth()
       }
     },
 
-    toggleOpenRow(row: ItemNameAndData) {
-      if (row.isOpen) {
-        this.closeRow(row)
-      } else {
-        this.expandRow(row)
+    // used as a trigger from the ColumnSorter to re-sort the columns
+    sortColumns() {
+      if (this.attributeTree) {
+        this.attributeTree.sort()
+        this.attributeTree.updatePositionsAndDepth()
+        this.itemTree?.updateCellPositions()
       }
     },
-    findItemByIndexRecursively(
-      index: number,
-      itemNamesAndData: ItemNameAndData,
-    ): ItemNameAndData | undefined {
-      if (itemNamesAndData.index === index) {
-        return itemNamesAndData
-      }
-      if (itemNamesAndData.children) {
-        for (const child of itemNamesAndData.children) {
-          const foundItem = this.findItemByIndexRecursively(index, child)
-          if (foundItem) {
-            return foundItem
-          }
-        }
+
+    handleRowClick(row: Row) {
+      console.log('handleRowClick', row)
+      if (row instanceof AggregatedRow) {
+        this.itemTree?.toggleRowExpansion(row)
+      } else if (row instanceof ItemRow) {
+        this.itemTree?.toggleStickyRow(row)
       }
     },
-    findItemByIndex(index: number) {
-      if (!this.heatmap) {
-        return
-      }
-      for (const item of this.heatmap.itemNamesAndData) {
-        const foundItem = this.findItemByIndexRecursively(index, item)
-        if (foundItem) {
-          return foundItem
-        }
-      }
-    },
-    getAllChildrenIteratively(items: ItemNameAndData[]): ItemNameAndData[] {
-      const allLeafNodes: ItemNameAndData[] = []
-      const stack: ItemNameAndData[] = []
 
-      items.forEach((item) => stack.push(item))
-
-      while (stack.length > 0) {
-        const currentItem = stack.pop()
-        if (!currentItem) {
-          continue
-        }
-
-        if (currentItem.children && currentItem.children.length > 0) {
-          currentItem.children.forEach((child) => stack.push(child))
-        } else {
-          allLeafNodes.push(currentItem)
-        }
-      }
-
-      return allLeafNodes
+    setHoveredPixiHeatmapCell(cell: PixiHeatmapCell | null) {
+      this.hoveredPixiHeatmapCell = cell
     },
 
-    setAllItems(): void {
-      if (!this.heatmap) {
-        return
-      }
-      const leafNodes = this.getAllChildrenIteratively(this.getNonStickyItems)
-
-      leafNodes.sort((a, b) => a.itemName.localeCompare(b.itemName))
-      this.allItems = leafNodes
+    setHoveredPixiRowLabel(pixiRowLabel: PixiRowLabel | null) {
+      this.hoveredPixiRowLabel = pixiRowLabel
     },
 
-    expandItemAndAllParents(item: ItemNameAndData | null) {
-      if (!item) {
-        return
-      }
-      let parent = item.parent
-      while (parent) {
-        parent.isOpen = true
-        parent = parent.parent
-      }
-      item.isOpen = true
-      this.highlightedRow = item
-      this.changeHeatmap()
+    setHoveredPixiColumnLabel(pixiColumnLabel: PixiColumnLabel | null) {
+      this.hoveredPixiColumnLabel = pixiColumnLabel
     },
 
-    openAllStickyItems() {
-      if (this.getStickyItems.length > 3) {
-        return
+    setHoveredPixiBubble(pixiBubble: PixiBubble | null) {
+      this.hoveredPixiBubble = pixiBubble
+    },
+
+    cellClickEvent(cell: PixiHeatmapCell) {
+      console.log('cellClickEvent', cell)
+      let row = (cell.parent.parent as PixiRow).row
+      // let column = cell.column // not used at the moment
+
+      this.handleRowClick(row)
+    },
+
+    rowLabelClickEvent(pixiRowLabel: PixiRowLabel) {
+      let row = (pixiRowLabel.parent as PixiRow).row
+      this.handleRowClick(row)
+    },
+
+    columnLabelClickEvent(column: Column) {
+      console.log('clicked the label of', column)
+
+      if (column instanceof AggregatedColumn) {
+        this.attributeTree?.toggleColumnExpansion(column)
       }
-      for (const item of this.getStickyItems) {
-        item.isOpen = true
-        let parent: ItemNameAndData | null = item.parent
-        while (parent !== null) {
-          parent.isOpen = true
-          parent = parent.parent
-        }
-      }
+    },
+
+    bubbleClickEvent(bubble: PixiBubble) {
+      console.log('bubbleClickEvent', bubble)
+      let row = bubble.row
+      // NOTE: the term Row is a bit irritating here, but because the the data structure is conceptualized as Rows and Columns, I will keep it like this for now
+      this.handleRowClick(row)
     },
   },
 })
-
-function setParentOfRowsRec(row: ItemNameAndData, parent: ItemNameAndData | null) {
-  row.parent = parent
-  if (row.children) {
-    row.children.forEach((child) => {
-      setParentOfRowsRec(child, row)
-    })
-  }
-}

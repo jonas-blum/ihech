@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Application, Graphics, Container } from 'pixi.js'
 import { nextTick, onMounted, watch } from 'vue'
 import { ref } from 'vue'
 import ExpRowComponent from './ExpRowComponent.vue'
@@ -6,6 +7,7 @@ import InformationIcon from '@assets/information-icon.svg'
 
 import {
   ColoringHeatmapEnum,
+  getHeatmapColor,
   type ItemNameAndData,
   CSV_UPLOAD_COLLAPSED_HEIGHT,
   CSV_UPLOAD_EXPANDED_HEIGHT,
@@ -18,6 +20,54 @@ import HelpModal from './HelpModal.vue'
 
 import HeatmapSettings from './HeatmapSettings.vue'
 import CsvUpload from './CsvUpload.vue'
+
+class Heatmap {
+  public container: Container
+
+  constructor() {
+    this.container = new Container()
+  }
+
+  render() {
+    console.log('Heatmap.render()')
+  }
+}
+
+class PixiApplicationManager {
+  app: Application
+  heatmap: Heatmap
+
+  constructor(canvasElement: HTMLCanvasElement, canvasWidth: number, canvasHeight: number) {
+    // init app
+    this.app = new Application()
+    this.app.init({
+      canvas: canvasElement,
+      width: canvasWidth,
+      height: canvasHeight,
+      backgroundColor: 0xffffff,
+      antialias: true,
+      resolution: 2,
+      // autoDensity: true, // not sure what this does
+    })
+
+    // add heatmap
+    this.heatmap = new Heatmap()
+    this.app.stage.addChild(this.heatmap.container)
+    // TODO: this needs to be moved
+    this.heatmap.container.position.set(canvasWidth - 100, 50)
+    this.heatmap.render()
+
+    console.log('PixiApplicationManager constructor')
+    console.log(this.app, this.app.stage)
+  }
+
+  render() {
+    console.log('PixiApplicationManager render')
+    this.app.render()
+  }
+}
+
+const pixiApplicationManager = ref<PixiApplicationManager | null>(null)
 
 const heatmapStore = useHeatmapStore()
 
@@ -46,7 +96,7 @@ const GAP_SETTINGS_HEATMAP = 30
 const SETTINGS_HEIGHT = 60
 
 const STICKY_GAP = 4
-const STICKY_GAP_MULTIPLIER = 1
+const STICKY_GAP_MULTIPLIER = 5
 
 const tooltip = ref<HTMLElement | null>(null)
 const tooltipValue = ref<HTMLElement | null>(null)
@@ -72,8 +122,7 @@ const editionNames = ref<string[]>([])
 const stickyAttributesGap = ref<number>(0)
 const stickyItemsGap = ref<number>(0)
 
-// Updates every time the heatmap changes
-
+// updates the hierarchical structure of the visibleRows recursively
 function updateVisibleRows() {
   function getVisibleRowsRecursively(row: ItemNameAndData): ItemNameAndData[] {
     if (!row.isOpen || row.children === null) {
@@ -91,24 +140,15 @@ function updateVisibleRows() {
 }
 
 function updateStickyAttributesGap() {
-  let stickyAttributesGapTemp = STICKY_GAP
-  if (heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes) {
-    stickyAttributesGapTemp *= STICKY_GAP_MULTIPLIER
-  }
-  stickyAttributesGap.value = heatmapStore.isStickyAttributesGapVisible
-    ? stickyAttributesGapTemp
-    : 0
+  stickyAttributesGap.value = heatmapStore.isStickyAttributesGapVisible ? STICKY_GAP : 0
 }
 
 function updateStickyItemsGap() {
-  let stickyItemsGapTemp = STICKY_GAP
-  if (heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems) {
-    stickyItemsGapTemp *= STICKY_GAP_MULTIPLIER
-  }
-  stickyItemsGap.value = heatmapStore.isStickyItemsGapVisible ? stickyItemsGapTemp : 0
+  stickyItemsGap.value = heatmapStore.isStickyItemsGapVisible ? STICKY_GAP : 0
 }
 
 function updateHeatmapWidth() {
+  // Calculate the available width for the heatmap
   const availableWidth =
     window.innerWidth -
     stickyAttributesGap.value -
@@ -119,18 +159,23 @@ function updateHeatmapWidth() {
     MARGIN_LEFT -
     2 * BORDER_WIDTH
 
-  let cellWidthTemp = Math.max(
-    Math.floor(availableWidth / heatmapStore.getHeatmap.attributeNames.length),
-    MIN_COL_LABELS_WIDTH,
+  // Calculate the cell width based on the available width and constraints (min and max cell width)
+  cellWidth.value = Math.min(
+    Math.max(
+      Math.floor(availableWidth / heatmapStore.getHeatmap.attributeNames.length),
+      MIN_COL_LABELS_WIDTH,
+    ),
+    MAX_COL_LABELS_WIDTH,
   )
-  cellWidthTemp = Math.min(cellWidthTemp, MAX_COL_LABELS_WIDTH)
-  heatmapWidth.value = cellWidthTemp * heatmapStore.getHeatmap.attributeNames.length
-  cellWidth.value = cellWidthTemp
+  // set the heatmap width based on the cell width and the amount of attributes
+  heatmapWidth.value = cellWidth.value * heatmapStore.getHeatmap.attributeNames.length
 }
 
 function updateEntireVisibleHeatmapWidth() {
+  // Calculate the available width for the heatmap
   const scrollableWidth = window.innerWidth - MIN_DIM_REDUCTION_WIDTH - MARGIN_RIGHT - MARGIN_LEFT
 
+  // Calculate the total width required for the heatmap including borders, gaps, and labels
   const nonScrollableWidth =
     heatmapWidth.value +
     2 * BORDER_WIDTH +
@@ -139,13 +184,16 @@ function updateEntireVisibleHeatmapWidth() {
     SPACE_BETWEEN_ITEM_LABELS_AND_HEATMAP +
     2 * HEATMAP_BORDER_BOTTOM_RIGHT
 
+  // Set the entire visible heatmap width to the minimum of the available width and the required width
   entireVisibleHeatmapWidth.value = Math.min(scrollableWidth, nonScrollableWidth)
 }
 
 function updateEntireVisibleHeatmapHeight() {
+  // Calculate the available height for the heatmap
   const scrollableHeight =
     window.innerHeight - MARGIN_TOP - MARGIN_BOTTOM - CSV_UPLOAD_COLLAPSED_HEIGHT - GAP_CSV_HEATMAP
 
+  // Calculate the total height required for the heatmap including borders, gaps, and labels
   let nonScrollableHeight =
     heatmapHeight.value +
     2 * BORDER_WIDTH +
@@ -154,6 +202,7 @@ function updateEntireVisibleHeatmapHeight() {
     SPACE_BETWEEN_COL_LABELS_AND_HEATMAP +
     2 * HEATMAP_BORDER_BOTTOM_RIGHT
 
+  // Set the entire visible heatmap height to the minimum of the available height and the required height
   entireVisibleHeatmapHeight.value = Math.min(scrollableHeight, nonScrollableHeight)
 }
 
@@ -169,7 +218,7 @@ function updateEditionNames() {
 function updateDimReductionWidth() {
   const usingExactlyRemainingSpace =
     window.innerWidth - entireVisibleHeatmapWidth.value - MARGIN_RIGHT - MARGIN_LEFT
-  const maximumWidth = window.innerHeight / 1.5
+  const maximumWidth = window.innerHeight / 1.5 // should be a constant variable
 
   dimReductionWidth.value = Math.min(usingExactlyRemainingSpace, maximumWidth)
 }
@@ -183,12 +232,11 @@ function updateHeatmap() {
   updateEntireVisibleHeatmapWidth()
 
   updateHeatmapHeight()
+  updateEntireVisibleHeatmapHeight()
 
   updateEditionNames()
 
   updateDimReductionWidth()
-
-  updateEntireVisibleHeatmapHeight()
 
   drawEverything()
 }
@@ -223,70 +271,99 @@ function getHeatmapColorMinValue() {
   }
 }
 
+// Function to get the maximum value in a row based on the coloring heatmap type
+function getMaxRowValue(item: ItemNameAndData) {
+  return heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
+    ? Math.max(...item.data) // If ITEM_RELATIVE, return the maximum value in the row
+    : 1 // Otherwise, return 1
+}
+
 function drawEverything() {
-  if (!canvas.value) {
+  console.log('🖌️ drawEverything')
+
+  if (!pixiApplicationManager.value) {
+    console.warn('pixiApplicationManager is not set')
     return
   }
-  const ctx = canvas.value.getContext('2d')
-  if (!ctx) {
-    return
-  }
+
+  // draw a rectangle to see if it works
+  const graphics = new Graphics()
+  graphics.rect(100, 900, 50, 50).fill(0xff0000)
+  pixiApplicationManager.value.app.stage.addChild(graphics)
+  console.log('🎨 pixiApplicationManager', pixiApplicationManager.value)
+
+  return
+
+  // render
+  pixiApplicationManager.value.render()
+
+  // if (!canvas.value) {
+  //   return
+  // }
+  // const ctx = canvas.value.getContext('2d')
+  // if (!ctx) {
+  //   return
+  // }
 
   const width = heatmapWidth.value
   const height = heatmapHeight.value
 
-  nextTick(() => {
-    ctx.fillStyle = '#000'
-    ctx.fillRect(0, 0, width, height)
+  const heatmapMaxValue = getHeatmapColorMaxValue()
+  const heatmapMinValue = getHeatmapColorMinValue()
 
-    const heatmapMaxValue = getHeatmapColorMaxValue()
-    const heatmapMinValue = getHeatmapColorMinValue()
+  // Iterate over each row (item)
+  for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
+    const item = visibleRows.value[itemIdx]
+    let maxRowValue = getMaxRowValue(item)
 
-    for (let itemIdx = 0; itemIdx < visibleRows.value.length; itemIdx++) {
-      const item = visibleRows.value[itemIdx]
-      let maxRowValue = 1
+    // Iterate over each attribute in the row
+    for (let attrIdx = 0; attrIdx < item.data.length; attrIdx++) {
+      const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
+      const initialValue = item.data[initialAttrIdx]
+
+      let adjustedValue = initialValue
+      // Adjust the value based on the coloring heatmap type
       if (heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE) {
-        maxRowValue = Math.max(...item.data)
+        adjustedValue = initialValue / maxRowValue
+      } else if (
+        heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
+      ) {
+        const maxAttributeValue = heatmapStore.getMaxAttributeValues[initialAttrIdx]
+        const minAttributeValue = heatmapStore.getMinAttributeValues[initialAttrIdx]
+        const difference =
+          maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
+        adjustedValue = (adjustedValue - minAttributeValue) / difference
+      } else if (
+        heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
+      ) {
+        adjustedValue = Math.log(initialValue + heatmapStore.getLogShiftValue)
       }
 
-      for (let attrIdx = 0; attrIdx < item.data.length; attrIdx++) {
-        const initialAttrIdx = heatmapStore.getInitialAttrIdx(attrIdx)
-        const initialValue = item.data[initialAttrIdx]
+      // Calculate the position of the cell
+      let x = attrIdx * cellWidth.value
+      let y = itemIdx * cellHeight.value
 
-        let adjustedValue = initialValue
-        if (
-          heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
-        ) {
-          adjustedValue = initialValue / maxRowValue
-        } else if (
-          heatmapStore?.getActiveDataTable?.coloringHeatmap ===
-          ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
-        ) {
-          const maxAttributeValue = heatmapStore.getMaxAttributeValues[initialAttrIdx]
-          const minAttributeValue = heatmapStore.getMinAttributeValues[initialAttrIdx]
-          const difference =
-            maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
-          adjustedValue = (adjustedValue - minAttributeValue) / difference
-        } else if (
-          heatmapStore?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
-        ) {
-          adjustedValue = Math.log(initialValue + heatmapStore.getLogShiftValue)
-        }
-
-        let x = attrIdx * cellWidth.value
-        let y = itemIdx * cellHeight.value
-
-        if (attrIdx >= heatmapStore.getAmountOfStickyAttributes) {
-          x += stickyAttributesGap.value
-        }
-        if (itemIdx >= heatmapStore.getAmountOfStickyItems) {
-          y += stickyItemsGap.value
-        }
-        ctx.fillStyle = 'red'
-        ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
+      // Adjust position if there are sticky attributes or items
+      if (attrIdx >= heatmapStore.getAmountOfStickyAttributes) {
+        x += stickyAttributesGap.value
       }
+      if (itemIdx >= heatmapStore.getAmountOfStickyItems) {
+        y += stickyItemsGap.value
+      }
+
+      // Set the fill color and draw the cell
+      // ctx.fillStyle = getHeatmapColor(adjustedValue, heatmapMinValue, heatmapMaxValue)
+      // ctx.fillRect(x, y, cellWidth.value, cellHeight.value)
+
+      // console.log('🧱 one brick at a time')
+      // pixiApplicationManager.value?.heatmap.container.addChild(
+      //   new Graphics()
+      //     .rect(x, y, cellWidth.value, cellHeight.value)
+      //     .fill(0xff0000),
+      // )
+      // console.log(pixiApplicationManager.value)
     }
-  })
+  }
 }
 
 function resetHoverStyles(resetHighlightedRow = true) {
@@ -510,20 +587,34 @@ onMounted(async () => {
     return
   }
 
+  // indirecly update heatmap
   window.addEventListener('resize', () => heatmapStore.changeHeatmap())
 
-  canvas.value.addEventListener('mousemove', updateTooltip)
-  canvas.value.addEventListener('mouseout', () => {
-    resetHoverStyles()
-  })
-  canvas.value.addEventListener('contextmenu', (event) => {
-    event.preventDefault()
-    clickCanvas(event, false)
-  })
+  // canvas.value.addEventListener('mousemove', updateTooltip)
+  // canvas.value.addEventListener('mouseout', () => {
+  //   resetHoverStyles()
+  // })
+  // canvas.value.addEventListener('contextmenu', (event) => {
+  //   event.preventDefault()
+  //   clickCanvas(event, false)
+  // })
 
-  canvas.value.addEventListener('click', (event) => {
-    clickCanvas(event, true)
-  })
+  // canvas.value.addEventListener('click', (event) => {
+  //   clickCanvas(event, true)
+  // })
+
+  // TODO: at this point the size is 0...
+  console.log('heatmapWidth', heatmapWidth.value)
+  console.log('heatmapHeight', heatmapHeight.value)
+  pixiApplicationManager.value = new PixiApplicationManager(
+    canvas.value,
+    // heatmapWidth.value,
+    // heatmapHeight.value,
+    1000,
+    1000
+  )
+
+  console.log(pixiApplicationManager)
 })
 </script>
 
@@ -591,7 +682,7 @@ onMounted(async () => {
           >
             <CsvUpload />
           </div>
-          <HelpModal />
+          <!-- <HelpModal /> -->
         </div>
       </div>
 
@@ -703,9 +794,9 @@ onMounted(async () => {
                 :style="{
                   background:
                     'linear-gradient(to right, ' +
-                    'red' +
+                    getHeatmapColor(0, 0, 1) +
                     ', ' +
-                    'red' +
+                    getHeatmapColor(1, 0, 1) +
                     ')',
                 }"
                 class="color-scale"

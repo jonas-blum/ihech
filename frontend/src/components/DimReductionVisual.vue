@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { type ItemNameAndData } from '@helpers/helpers'
 
 import * as d3 from 'd3'
@@ -7,9 +7,7 @@ import { useHeatmapStore } from '@stores/heatmapStore'
 
 const datavizRef = ref(null)
 
-const props = defineProps<{
-  width: number
-}>()
+const width = ref(500)
 
 const heatmapStore = useHeatmapStore()
 
@@ -127,8 +125,8 @@ function drawScatterplot() {
   }
 
   var margin = { top: 30, right: 30, bottom: 30, left: 30 },
-    width = props.width - margin.left - margin.right,
-    height = props.width - margin.top - margin.bottom
+    width = width.value - margin.left - margin.right,
+    height = width.value - margin.top - margin.bottom
 
   var svg = d3.select(datavizRef.value).select('svg')
   if (!svg.empty()) {
@@ -237,10 +235,17 @@ function drawScatterplot() {
         `Name: ${row.itemName}\nCollections: ${heatmapStore.getCollectionNamesOfItem(row).join(', ')}`,
     )
 }
+
+// onMounted hook
+onMounted(() => {
+  // get width of the container 
+  width.value = datavizRef.value.clientWidth
+})
+
 </script>
 
 <template>
-  <div id="pca-visualization-container" :style="{ width: props.width + 'px' }">
-    <div ref="datavizRef"></div>
+  <div id="pca-visualization-container" class="w-full h-full">
+    <div ref="datavizRef" class="w-full h-full"></div>
   </div>
 </template>

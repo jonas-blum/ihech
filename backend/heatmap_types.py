@@ -25,13 +25,7 @@ StructuralFeatureType = Literal[
     "DEPTH_OF_TAG",
 ]
 
-SortOrderAttributes = Literal[
-  "HETEROGENIC",
-  "HOMOGENIC",
-  "DESC",
-  "ASC",
-  "ALPHABETICAL"
-]
+SortOrderAttributes = Literal["HETEROGENIC", "HOMOGENIC", "DESC", "ASC", "ALPHABETICAL"]
 
 
 class ExtendedVectorRepresentation:
@@ -123,16 +117,48 @@ def custom_encoder(obj):
                 else None
             ),
         }
+
+    elif isinstance(obj, HierarchicalAttribute):
+        return {
+            "attributeName": obj.attributeName,
+            "dataAttributeIndex": obj.dataAttributeIndex,
+            "isOpen": obj.isOpen,
+            "children": (
+                [custom_encoder(child) for child in obj.children]
+                if obj.children
+                else None
+            ),
+        }
+
     elif hasattr(obj, "__dict__"):
         return obj.__dict__
     raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 
+class HierarchicalAttribute:
+    attributeName: str
+    dataAttributeIndex: int
+    isOpen: bool
+    children: Union["List[HierarchicalAttribute]", None]
+
+    def __init__(
+        self,
+        attributeName: str,
+        dataAttributeIndex: int,
+        isOpen: bool,
+        children: Union["List[HierarchicalAttribute]", None],
+    ):
+        self.attributeName: str = attributeName
+        self.dataAttributeIndex: int = dataAttributeIndex
+        self.isOpen: bool = isOpen
+        self.children: Union[List[HierarchicalAttribute], None] = children
+
+
 class HeatmapJSON:
     def __init__(self):
-        self.attributeNames: List[str] = []
         self.attributeDissimilarities: List[List[float]] = []
         self.itemNamesAndData: List[ItemNameAndData] = []
+        self.hierarchicalAttributes: List[HierarchicalAttribute] = []
         self.maxHeatmapValue: float = 0
         self.minHeatmapValue: float = 0
         self.maxDimRedXValue: float = 0

@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.cluster import AgglomerativeClustering, KMeans, MiniBatchKMeans
 from sklearn.exceptions import ConvergenceWarning
 from helpers import drop_columns
-from heatmap_types import ItemNameAndData
+from heatmap_types import ItemNameAndData, HierarchicalAttribute
 import warnings
 
 
@@ -19,6 +19,86 @@ rounding_precision = 3
 
 def all_rows_same(df):
     return (df == df.iloc[0]).all().all()
+
+
+def insert_value_in_list_at_index(
+    value: float, index: int, list_to_insert: List[float]
+) -> List[float]:
+    return list_to_insert[:index] + [value] + list_to_insert[index:]
+
+
+def insert_value_in_item_name_and_data_at_index(
+    value: float, index: int, item_name_and_data: ItemNameAndData
+) -> None:
+    item_name_and_data.data = insert_value_in_list_at_index(
+        value, index, item_name_and_data.data
+    )
+    for child in item_name_and_data.children:
+        insert_value_in_item_name_and_data_at_index(value, index, child)
+
+
+def append_average_item_by_attribute_indexes(
+    indexes: List[int], item_name_and_data: ItemNameAndData
+) -> None:
+    if item_name_and_data is None:
+        return
+    data = item_name_and_data.data
+    avg_data = np.mean([data[i] for i in indexes])
+    item_name_and_data.data.append(avg_data)
+    if item_name_and_data.children is None:
+        return
+    for child in item_name_and_data.children:
+        if child is not None:
+            append_average_item_by_attribute_indexes(indexes, child)
+
+
+def append_all_average_items_by_attribute_indexes(
+    indexes: List[int], item_names_and_data: List[ItemNameAndData]
+):
+    for item_name_and_data in item_names_and_data:
+        append_average_item_by_attribute_indexes(indexes, item_name_and_data)
+
+
+def cluster_attributes_recursively(
+    original_df_rotated: pd.DataFrame,
+    original_df_rotated_dropped: pd.DataFrame,
+    cluster_size: int,
+    cluster_by_collections: bool,
+    collection_column_names: List[str],
+    level: int,
+    item_names_and_data: List[ItemNameAndData],
+) -> Union[List[HierarchicalAttribute], None]:
+    if level == 0:
+        indexes = list(range(original_df_rotated_dropped.shape[0]))
+        append_all_average_items_by_attribute_indexes(indexes, item_names_and_data)
+        new_attribute_name = "All_Attributes"
+        children = cluster_attributes_recursively(
+            original_df_rotated,
+            original_df_rotated_dropped,
+            cluster_size,
+            cluster_by_collections,
+            collection_column_names,
+            level + 1,
+            item_names_and_data,
+        )
+        hierarchical_attribute = HierarchicalAttribute(
+            attributeName=new_attribute_name,
+            dataAttributeIndex=len(indexes),
+            children=children,
+            isOpen=True,
+        )
+        return [hierarchical_attribute]
+    elif original_df_rotated.shape[0] <= cluster_size:
+        remaining_hierarchical_attributes = []
+        for i in range(original_df_rotated.shape[0]):
+            hierarchical_attribute = HierarchicalAttribute(
+                attributeName=original_df_rotated["OriginalColumnNames"].iloc[i],
+                dataAttributeIndex=i,
+                children=None,
+                isOpen=False,
+            )
+            remaining_hierarchical_attributes.append(hierarchical_attribute)
+        return remaining_hierarchical_attributes
 
 
 def cluster_items_recursively(
@@ -97,7 +177,9 @@ def cluster_items_recursively(
                 and len(remaining_collection_column_names) == 0
             ):
                 solo_child_name = str(original_group_df.iloc[0][item_names_column_name])
-                solo_child_data = np.round(original_temp_df_dropped.iloc[0],rounding_precision).tolist()
+                solo_child_data = np.round(
+                    original_temp_df_dropped.iloc[0], rounding_precision
+                ).tolist()
                 new_children = [
                     ItemNameAndData(
                         index=original_group_df.index[0],

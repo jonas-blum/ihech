@@ -337,7 +337,7 @@ def create_heatmap(
     heatmap_json.itemNamesAndData = item_names_and_data
 
     logger.info(
-        f"Clustering done: {round(time.perf_counter() - start_clustering_items, 2)}"
+        f"Clustering items done: {round(time.perf_counter() - start_clustering_items, 2)}"
     )
     logger.info("Starting clustering attributes...")
     start_clustering_attributes = time.perf_counter()

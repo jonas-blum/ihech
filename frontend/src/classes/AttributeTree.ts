@@ -1,5 +1,6 @@
 import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
 import type { ColumnSorter } from '@/classes/ColumnSorter'
+import type { HierarchicalAttribute } from '@/helpers/helpers'
 
 export class AttributeTree {
   root: AggregatedColumn
@@ -10,34 +11,43 @@ export class AttributeTree {
 
   // TODO: for now I just roll with the current data structure. this will likely change later.
   constructor(
-    attributeNames: string[],
+    hierarchicalAttribute: HierarchicalAttribute,
     minAttributeValues: number[],
     maxAttributeValues: number[],
     attributeDissimilarities: number[],
     columnSorter: ColumnSorter,
   ) {
+    this.root = this.buildAttributeTree(hierarchicalAttribute) as AggregatedColumn
     this.columnSorter = columnSorter
-    this.root = new AggregatedColumn('age_groups', 0, 0)
-    this.root.isOpen = true
-
-    // TODO: this is just a hacky placeholder until the attributes are hierarchical
-    // TODO: this.root = this.buildAttributeTree(...)
-    for (let i = 0; i < attributeNames.length; i++) {
-      const attributeColumn: AttributeColumn = new AttributeColumn(
-        attributeNames[i],
-        i,
-        attributeDissimilarities[i],
-        this.root,
-      )
-      this.root.children.push(attributeColumn)
-
-      // add to mapping
-      this.originalIndexToColumn.set(i, attributeColumn)
-    }
+    this.sort()
   }
 
-  buildAttributeTree() {
-    // TODO: will be needed once the attributes are hierarchical as well
+  buildAttributeTree(
+    hierarchicalAttribute: HierarchicalAttribute,
+    parent: Column | null = null,
+  ): Column {
+    let column: Column
+
+    if (hierarchicalAttribute.children) {
+      column = new AggregatedColumn(
+        hierarchicalAttribute.attributeName,
+        hierarchicalAttribute.dataAttributeIndex,
+        1,
+        parent,
+        hierarchicalAttribute.isOpen,
+        hierarchicalAttribute.children.map((child: HierarchicalAttribute) =>
+          this.buildAttributeTree(child, column),
+        ),
+      )
+    } else {
+      column = new AttributeColumn(
+        hierarchicalAttribute.attributeName,
+        hierarchicalAttribute.dataAttributeIndex,
+        1,
+        parent,
+      )
+    }
+    return column
   }
 
   toggleColumnExpansion(column: AggregatedColumn) {

@@ -342,6 +342,9 @@ def create_heatmap(
     logger.info("Starting clustering attributes...")
     start_clustering_attributes = time.perf_counter()
 
+   
+
+
     original_columns = original_filtered_df_dropped.columns
     rotated_original_filtered_df = original_filtered_df_dropped.T.reset_index(
         drop=True
@@ -350,6 +353,8 @@ def create_heatmap(
     rotated_original_filtered_df_dropped = original_filtered_df_dropped.T.reset_index(
         drop=True
     ).copy()
+    
+    attributes_hierarchies_df = attribute_hierarchies.dropna(how='all') if attribute_hierarchies is not None else None
 
     hierarchical_attributes = cluster_attributes_recursively(
         rotated_original_filtered_df,
@@ -359,6 +364,7 @@ def create_heatmap(
         [],
         0,
         item_names_and_data,
+        attributes_hierarchies_df
     )
     heatmap_json.hierarchicalAttributes = hierarchical_attributes
 

@@ -84,11 +84,7 @@ export class AttributeTree {
     while (pointer !== null) {
       pointer.setPosition(position)
       pointer.setDepth(depth)
-      // TODO: decision: aggregated columns are not represented by a column. this feature would require a data structure change in the backend as well.
-      // therefore we only increase the position if the current column is an AttributeColumn
-      if (pointer instanceof AttributeColumn) {
-        position++
-      }
+      position++
 
       // Start traversal of the children if the current column is an aggregated column and is open
       if (pointer instanceof AggregatedColumn && pointer.isOpen && pointer.hasChildren()) {

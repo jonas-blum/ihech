@@ -711,6 +711,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
     },
 
+    updateCellPositionsOfItemTree() {
+      this.itemTree?.updateCellPositions()
+    },
+
     handleRowClick(row: Row) {
       console.log('handleRowClick', row)
       if (row instanceof AggregatedRow) {

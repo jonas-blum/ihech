@@ -1,6 +1,7 @@
 import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
 import type { ColumnSorter } from '@/classes/ColumnSorter'
 import type { HierarchicalAttribute } from '@/helpers/helpers'
+import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export class AttributeTree {
   root: AggregatedColumn
@@ -59,6 +60,7 @@ export class AttributeTree {
     } else {
       this.expandColumn(column)
     }
+    useHeatmapStore().updateCellPositionsOfItemTree()
   }
 
   expandColumn(column: AggregatedColumn) {

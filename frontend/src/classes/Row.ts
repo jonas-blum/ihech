@@ -51,7 +51,7 @@ export abstract class Row {
       useHeatmapStore()?.getActiveDataTable?.coloringHeatmap ===
       ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
     ) {
-      let adjustedData = []
+      const adjustedData = []
       for (let i = 0; i < data.length; i++) {
         const minAttributeValue = useHeatmapStore()?.getMinAttributeValues[i]
         const maxAttributeValue = useHeatmapStore()?.getMaxAttributeValues[i]

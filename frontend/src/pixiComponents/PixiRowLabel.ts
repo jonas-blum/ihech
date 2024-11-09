@@ -15,7 +15,7 @@ export class PixiRowLabel extends Container {
     this.isSticky = isSticky
 
     // background box
-    let backgroundWidth =
+    const backgroundWidth =
       useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
     this.background
       .rect(0, 1, backgroundWidth, useHeatmapLayoutStore().rowHeight - 2)

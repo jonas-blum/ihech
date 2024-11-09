@@ -31,20 +31,20 @@ export class LinearColorMap {
     }
 
     // Calculate the ratio
-    let ratio = (value - this.min) / (this.max - this.min)
+    const ratio = (value - this.min) / (this.max - this.min)
 
     // Interpolate each RGB component
-    let minR = (this.minColor >> 16) & 0xff
-    let minG = (this.minColor >> 8) & 0xff
-    let minB = this.minColor & 0xff
+    const minR = (this.minColor >> 16) & 0xff
+    const minG = (this.minColor >> 8) & 0xff
+    const minB = this.minColor & 0xff
 
-    let maxR = (this.maxColor >> 16) & 0xff
-    let maxG = (this.maxColor >> 8) & 0xff
-    let maxB = this.maxColor & 0xff
+    const maxR = (this.maxColor >> 16) & 0xff
+    const maxG = (this.maxColor >> 8) & 0xff
+    const maxB = this.maxColor & 0xff
 
-    let r = Math.round(minR + ratio * (maxR - minR))
-    let g = Math.round(minG + ratio * (maxG - minG))
-    let b = Math.round(minB + ratio * (maxB - minB))
+    const r = Math.round(minR + ratio * (maxR - minR))
+    const g = Math.round(minG + ratio * (maxG - minG))
+    const b = Math.round(minB + ratio * (maxB - minB))
 
     // Combine the RGB components back into a single number
     return (r << 16) | (g << 8) | b

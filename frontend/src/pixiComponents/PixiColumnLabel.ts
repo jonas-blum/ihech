@@ -15,7 +15,7 @@ export class PixiColumnLabel extends Container {
     this.column = column
 
     // background box
-    let backgroundHeight =
+    const backgroundHeight =
       useHeatmapLayoutStore().columnLabelHeight - useHeatmapLayoutStore().columnLabelPaddingBottom
     this.background
       .rect(1, 0, useHeatmapLayoutStore().columnWidth - 2, backgroundHeight)
@@ -65,7 +65,7 @@ export class PixiColumnLabel extends Container {
 
   updatePosition(animate: boolean = true) {
     // if the oldPosition is -1, we want to animate from the parent column position (if available)
-    let startPosition =
+    const startPosition =
       this.column.oldPosition === -1 ? this.column.parent?.position ?? 0 : this.column.oldPosition
     gsap.fromTo(
       this,
@@ -76,7 +76,7 @@ export class PixiColumnLabel extends Container {
       },
     )
 
-    let maxDepth = 1 + 1 // TODO: fetch dynamically
+    const maxDepth = 1 + 1 // TODO: fetch dynamically
     // BIG TODO: I need to figure out how I want to align the hierarchical column labels
     // this.y = this.column.depth * useHeatmapLayoutStore().columnLabelDepthIndent
     // this.y = this.children[0].width + this.column.depth * useHeatmapLayoutStore().columnLabelDepthIndent

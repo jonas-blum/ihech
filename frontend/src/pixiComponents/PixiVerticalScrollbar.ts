@@ -19,8 +19,8 @@ export class PixiVerticalScrollbar extends Container {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     // set the width and height of the container
-    let width = heatmapLayoutStore.verticalScrollbarWidth
-    let height = heatmapLayoutStore.canvasHeight - heatmapLayoutStore.columnLabelHeight
+    const width = heatmapLayoutStore.verticalScrollbarWidth
+    const height = heatmapLayoutStore.canvasHeight - heatmapLayoutStore.columnLabelHeight
 
     this.track
       .rect(0, 0, width, height)

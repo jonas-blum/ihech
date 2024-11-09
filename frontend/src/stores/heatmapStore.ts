@@ -117,8 +117,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return this.hoveredPixiColumnLabel.column as Column
       }
       if (this.hoveredPixiHeatmapCell) {
-        let originalColumnIndex: number = this.hoveredPixiHeatmapCell.originalColumnIndex
-        let mappedColumn = this.attributeTree?.originalIndexToColumn?.get(originalColumnIndex) as
+        const originalColumnIndex: number = this.hoveredPixiHeatmapCell.originalColumnIndex
+        const mappedColumn = this.attributeTree?.originalIndexToColumn?.get(originalColumnIndex) as
           | Column
           | undefined
         return mappedColumn || null
@@ -346,18 +346,18 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         // initialize rowSorter
         // TODO: I should probably store the rowSorter in the store, otherwise the settings are reset when the heatmap is refetched..
-        let criterion1 = new RowSorterCriterionByName()
-        let criterion2 = new RowSorterCriterionByHasChildren()
-        let criterion3 = new RowSorterCriterionByAmountOfChildren()
-        let rowSorter = new RowSorter([criterion1, criterion2, criterion3])
+        const criterion1 = new RowSorterCriterionByName()
+        const criterion2 = new RowSorterCriterionByHasChildren()
+        const criterion3 = new RowSorterCriterionByAmountOfChildren()
+        const rowSorter = new RowSorter([criterion1, criterion2, criterion3])
 
         // initialize columnSorter
-        let criterionA = new ColumnSorterCriterionByName()
-        let criterionB = new ColumnSorterCriterionByStandardDeviation()
-        let columnSorter = new ColumnSorter([criterionA, criterionB])
+        const criterionA = new ColumnSorterCriterionByName()
+        const criterionB = new ColumnSorterCriterionByStandardDeviation()
+        const columnSorter = new ColumnSorter([criterionA, criterionB])
 
         // initialize itemTree with the data received from the backend, starting at the root
-        let itemTreeRoot = this.heatmap.itemNamesAndData[0]
+        const itemTreeRoot = this.heatmap.itemNamesAndData[0]
         this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
 
         // TODO: ideally the backend would provide the dimred coordinates already normalized
@@ -790,14 +790,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
     cellClickEvent(cell: PixiHeatmapCell) {
       console.log('cellClickEvent', cell)
-      let row = (cell.parent.parent as PixiRow).row
+      const row = (cell.parent.parent as PixiRow).row
       // let column = cell.column // not used at the moment
 
       this.handleRowClick(row)
     },
 
     rowLabelClickEvent(pixiRowLabel: PixiRowLabel) {
-      let row = (pixiRowLabel.parent as PixiRow).row
+      const row = (pixiRowLabel.parent as PixiRow).row
       this.handleRowClick(row)
     },
 
@@ -811,7 +811,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
     bubbleClickEvent(bubble: PixiBubble) {
       console.log('bubbleClickEvent', bubble)
-      let row = bubble.row
+      const row = bubble.row
       // NOTE: the term Row is a bit irritating here, but because the the data structure is conceptualized as Rows and Columns, I will keep it like this for now
       this.handleRowClick(row)
     },

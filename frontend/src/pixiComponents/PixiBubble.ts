@@ -59,10 +59,10 @@ export class PixiBubble extends Container {
 
     // if the position is -1, we hide the bubble
     if (this.row.position === -1) {
-      let startX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
-      let startY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
-      let endX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
-      let endY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
+      const startX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
+      const startY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
+      const endX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
+      const endY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
       gsap.fromTo(
         this,
         {
@@ -89,10 +89,10 @@ export class PixiBubble extends Container {
 
     // if the oldPosition is -1, we want to animate from the parent row position (if available)
     if (this.row.oldPosition === -1) {
-      let startX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
-      let startY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
-      let endX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
-      let endY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
+      const startX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
+      const startY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
+      const endX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
+      const endY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
 
       this.visible = true
       gsap.fromTo(
@@ -136,18 +136,18 @@ export class PixiBubble extends Container {
     //   (1 + (maxDepth - this.row.depth)) * useDimredLayoutStore().bubbleSizeDepthIncrement
     // // console.log(`maxDepth: ${maxDepth}`)
 
-    let itemsTotal = (useHeatmapStore()?.itemTree?.root?.totalChildrenCount ?? 0) + 1
-    let itemsAmount = 1 + this.row.totalChildrenCount
+    const itemsTotal = (useHeatmapStore()?.itemTree?.root?.totalChildrenCount ?? 0) + 1
+    const itemsAmount = 1 + this.row.totalChildrenCount
 
-    let maxScaleFactor =
+    const maxScaleFactor =
       useDimredLayoutStore().bubbleSizeMaximal / useDimredLayoutStore().bubbleSize
 
     // Use logarithmic scaling for itemsAmount and itemsTotal to spread out values
-    let logItemsAmount = Math.log(itemsAmount + 1) // +1 to avoid log(0) if itemsAmount is 1
-    let logItemsTotal = Math.log(itemsTotal + 1)
+    const logItemsAmount = Math.log(itemsAmount + 1) // +1 to avoid log(0) if itemsAmount is 1
+    const logItemsTotal = Math.log(itemsTotal + 1)
 
     // Calculate the scale factor with log-transformed values
-    let scaleFactor = 1 + (maxScaleFactor - 1) * (logItemsAmount / logItemsTotal)
+    const scaleFactor = 1 + (maxScaleFactor - 1) * (logItemsAmount / logItemsTotal)
 
     // console.log(`updateSize for bubble ${this.row.name} (${this.row.depth}): ${scaleFactor}`)
     this.bubbleGraphic.scale.set(scaleFactor)

@@ -238,7 +238,6 @@ function update() {
 
     // traverse the attribute tree with all columns and create the pixiColumnLabels
     let columns = heatmapStore.attributeTree?.getAllColumns()
-    console.log('columns', columns)
     if (!columns) {
       console.warn('columns is not set')
       return

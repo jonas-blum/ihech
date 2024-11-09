@@ -35,7 +35,6 @@ export class PixiRow extends Container {
     // this.updatePosition()
     this.updateVisibility()
     this.updateCellPositions(false)
-    console.log('Updating cell positions')
   }
 
   updatePosition(animate: boolean = true) {

@@ -66,7 +66,7 @@ export class PixiColumnLabel extends Container {
   updatePosition(animate: boolean = true) {
     // if the oldPosition is -1, we want to animate from the parent column position (if available)
     let startPosition =
-      this.column.oldPosition === -1 ? (this.column.parent?.position ?? 0) : this.column.oldPosition
+      this.column.oldPosition === -1 ? this.column.parent?.position ?? 0 : this.column.oldPosition
     gsap.fromTo(
       this,
       { x: startPosition * useHeatmapLayoutStore().columnWidth },

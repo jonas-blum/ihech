@@ -15,8 +15,11 @@ export class PixiRowLabel extends Container {
     this.isSticky = isSticky
 
     // background box
-    let backgroundWidth = useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
-    this.background.rect(0, 1, backgroundWidth, useHeatmapLayoutStore().rowHeight - 2).fill(useHeatmapLayoutStore().labelBackgroundColor)
+    let backgroundWidth =
+      useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
+    this.background
+      .rect(0, 1, backgroundWidth, useHeatmapLayoutStore().rowHeight - 2)
+      .fill(useHeatmapLayoutStore().labelBackgroundColor)
     this.addChild(this.background)
 
     // create the text for the row label
@@ -56,7 +59,8 @@ export class PixiRowLabel extends Container {
     // differntiate between sticky and non-sticky rows
     if (this.isSticky) {
       this.x = 0
-      this.background.width = useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
+      this.background.width =
+        useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
     } else {
       this.x = this.row.depth * useHeatmapLayoutStore().rowLabelDepthIndent
       this.background.width =

@@ -611,7 +611,7 @@ onMounted(async () => {
     // heatmapWidth.value,
     // heatmapHeight.value,
     1000,
-    1000
+    1000,
   )
 
   console.log(pixiApplicationManager)

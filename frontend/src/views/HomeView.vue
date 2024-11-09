@@ -25,7 +25,9 @@ import { useHeatmapStore } from '@stores/heatmapStore'
           <RowSorterSettings />
           <ColumnSorterSettings />
           <ColorMap :colorMap="useHeatmapStore().colorMap" />
-          <button @click="useHeatmapStore()?.itemTree?.expandAllRows()" class="btn btn-small">Expand All</button>
+          <button @click="useHeatmapStore()?.itemTree?.expandAllRows()" class="btn btn-small">
+            Expand All
+          </button>
         </div>
       </div>
     </div>

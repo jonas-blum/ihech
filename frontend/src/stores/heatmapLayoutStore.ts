@@ -28,7 +28,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     heatmapCanvasBackgroundColor: 0xeeeeee, // background color of the heatmap
     labelBackgroundColor: 0xf0ece1, // background color of the row labels
     scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
-    scrollbarThumbColor: 0xE8D8AC, // color of the scrollbar thumb
+    scrollbarThumbColor: 0xe8d8ac, // color of the scrollbar thumb
   }),
   getters: {
     // how much vertical space is required for the whole heatmap
@@ -61,7 +61,6 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       const visibleRatio = this.verticalScrollbarTrackHeight / this.requiredHeight
       return visibleRatio * this.verticalScrollbarTrackHeight
     },
-
   },
   actions: {
     setVerticalScrollPosition(position: number) {

@@ -3,7 +3,6 @@ import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
-
 export class PixiHeatmapCell extends Container {
   cellGraphic: Graphics = new Graphics()
   // eventMode: string
@@ -23,11 +22,14 @@ export class PixiHeatmapCell extends Container {
     const heatmapStore = useHeatmapStore()
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
-    this.value = value 
+    this.value = value
     this.adjustedValue = adjustedValue
-    this.originalColumnIndex = originalColumnIndex 
+    this.originalColumnIndex = originalColumnIndex
     this.addChild(this.cellGraphic)
-    this.drawCellGraphic(heatmapLayoutStore.columnWidth - heatmapLayoutStore.cellPadding, heatmapLayoutStore.rowHeight - heatmapLayoutStore.cellPadding)
+    this.drawCellGraphic(
+      heatmapLayoutStore.columnWidth - heatmapLayoutStore.cellPadding,
+      heatmapLayoutStore.rowHeight - heatmapLayoutStore.cellPadding,
+    )
     this.updateTint(heatmapStore?.colorMap.getColor(adjustedValue))
     this.position.x = this.originalColumnIndex * heatmapLayoutStore.columnWidth
 
@@ -52,7 +54,7 @@ export class PixiHeatmapCell extends Container {
   }
 
   drawCellGraphic(width: number, height: number) {
-    this.cellGraphic.rect(0, 0, width, height).fill(0xffffff)//.stroke({width: 1, color: 0x000000})
+    this.cellGraphic.rect(0, 0, width, height).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
   }
 
   updateTint(color: number) {

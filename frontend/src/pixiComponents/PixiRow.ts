@@ -40,7 +40,7 @@ export class PixiRow extends Container {
   updatePosition(animate: boolean = true) {
     // if the oldPosition is -1, we want to animate from the parent row position (if available)
     let startPosition =
-      this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
+      this.row.oldPosition === -1 ? this.row.parent?.position ?? 0 : this.row.oldPosition
     gsap.fromTo(
       this,
       { y: startPosition * useHeatmapLayoutStore().rowHeight },

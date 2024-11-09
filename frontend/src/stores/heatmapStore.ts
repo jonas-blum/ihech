@@ -107,7 +107,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       if (this.hoveredPixiRow) {
         return this.hoveredPixiRow?.row ?? null
       } else if (this.hoveredPixiBubble) {
-        return this.hoveredPixiBubble?.row as Row ?? null
+        return (this.hoveredPixiBubble?.row as Row) ?? null
       }
       return null
     },
@@ -118,7 +118,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       if (this.hoveredPixiHeatmapCell) {
         let originalColumnIndex: number = this.hoveredPixiHeatmapCell.originalColumnIndex
-        let mappedColumn = this.attributeTree?.originalIndexToColumn?.get(originalColumnIndex) as Column | undefined;
+        let mappedColumn = this.attributeTree?.originalIndexToColumn?.get(originalColumnIndex) as
+          | Column
+          | undefined
         return mappedColumn || null
       }
       return null
@@ -380,11 +382,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.attributeTree.updatePositionsAndDepth()
         console.log('AttributeTree:', this.attributeTree)
 
-
         // update the colorMap
         this.colorMap.setMin(this.heatmap.minHeatmapValue)
         this.colorMap.setMax(this.heatmap.maxHeatmapValue)
-
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)

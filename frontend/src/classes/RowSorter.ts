@@ -2,56 +2,55 @@ import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export class RowSorter {
-    private criteria: RowSorterCriterion[];
-  
-    constructor(criteria: RowSorterCriterion[] = []) {
-      this.criteria = criteria;
-    }
-  
-    // Sort method that applies the criteria in order
-    public sort(rows: Row[]): Row[] {
-      return rows.sort((row1, row2) => {
-        for (const criterion of this.criteria) {
-          const comparison = criterion.compare(row1, row2);
-          if (comparison !== 0) {
-            return comparison;
-          }
-        }
-        return 0;
-      });
-    }
-  
-    // Add a criterion to the list
-    public addCriterion(criterion: RowSorterCriterion) {
-      this.criteria.push(criterion);
-    }
-  
-    // Remove a criterion by technicalName
-    public removeCriterion(technicalName: string) {
-      this.criteria = this.criteria.filter(criterion => criterion.technicalName !== technicalName);
-    }
-  
-    // Move a criterion to a different position in the list
-    public moveCriterion(technicalName: string, newIndex: number) {
-      const index = this.criteria.findIndex(criterion => criterion.technicalName === technicalName);
-      if (index === -1) return; // Criterion not found
+  private criteria: RowSorterCriterion[]
 
-      // Ensure newIndex is within bounds
-      if (newIndex < 0 || newIndex >= this.criteria.length) return;
-
-      const [criterion] = this.criteria.splice(index, 1); // Remove criterion
-      this.criteria.splice(newIndex, 0, criterion);       // Insert at the new index
-
-      // trigger re-sorting of the rows
-      useHeatmapStore().sortRows()
-    }
-  
-    // Retrieve all criteria (useful for displaying current order)
-    public getCriteria(): RowSorterCriterion[] {
-      return this.criteria;
-    }
+  constructor(criteria: RowSorterCriterion[] = []) {
+    this.criteria = criteria
   }
-  
+
+  // Sort method that applies the criteria in order
+  public sort(rows: Row[]): Row[] {
+    return rows.sort((row1, row2) => {
+      for (const criterion of this.criteria) {
+        const comparison = criterion.compare(row1, row2)
+        if (comparison !== 0) {
+          return comparison
+        }
+      }
+      return 0
+    })
+  }
+
+  // Add a criterion to the list
+  public addCriterion(criterion: RowSorterCriterion) {
+    this.criteria.push(criterion)
+  }
+
+  // Remove a criterion by technicalName
+  public removeCriterion(technicalName: string) {
+    this.criteria = this.criteria.filter((criterion) => criterion.technicalName !== technicalName)
+  }
+
+  // Move a criterion to a different position in the list
+  public moveCriterion(technicalName: string, newIndex: number) {
+    const index = this.criteria.findIndex((criterion) => criterion.technicalName === technicalName)
+    if (index === -1) return // Criterion not found
+
+    // Ensure newIndex is within bounds
+    if (newIndex < 0 || newIndex >= this.criteria.length) return
+
+    const [criterion] = this.criteria.splice(index, 1) // Remove criterion
+    this.criteria.splice(newIndex, 0, criterion) // Insert at the new index
+
+    // trigger re-sorting of the rows
+    useHeatmapStore().sortRows()
+  }
+
+  // Retrieve all criteria (useful for displaying current order)
+  public getCriteria(): RowSorterCriterion[] {
+    return this.criteria
+  }
+}
 
 export abstract class RowSorterCriterion {
   humanReadableName: string

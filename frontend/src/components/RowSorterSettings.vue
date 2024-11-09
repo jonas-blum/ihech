@@ -25,8 +25,18 @@ const rowSorter = computed(() => heatmapStore.itemTree?.rowSorter)
       >
         <!-- Correct property name to `humanReadableName` -->
         <span class="w-64">{{ index + 1 }}. {{ criterion.humanReadableName }}</span>
-        <button class="btn btn-xs" @click="rowSorter.moveCriterion(criterion.technicalName, index - 1)">Up</button>
-        <button class="btn btn-xs" @click="rowSorter.moveCriterion(criterion.technicalName, index + 1)">Down</button>
+        <button
+          class="btn btn-xs"
+          @click="rowSorter.moveCriterion(criterion.technicalName, index - 1)"
+        >
+          Up
+        </button>
+        <button
+          class="btn btn-xs"
+          @click="rowSorter.moveCriterion(criterion.technicalName, index + 1)"
+        >
+          Down
+        </button>
         <button class="btn btn-xs" @click="criterion.toggleReverse()">Reverse</button>
       </div>
     </div>

@@ -266,7 +266,7 @@ export class ItemTree {
     })
   }
 
-  expandAllRows(){
+  expandAllRows() {
     this.getAllRows().forEach((row) => {
       if (row instanceof AggregatedRow && !row.isOpen) {
         this.expandRow(row)

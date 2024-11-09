@@ -27,7 +27,9 @@ export class PixiVerticalScrollbar extends Container {
       .fill({ color: heatmapLayoutStore.scrollbarBackgroundColor, alpha: 0.2 })
     this.addChild(this.track)
 
-    this.thumb.rect(0, 0, width, 10).fill({ color: heatmapLayoutStore.scrollbarThumbColor, alpha: 1 })
+    this.thumb
+      .rect(0, 0, width, 10)
+      .fill({ color: heatmapLayoutStore.scrollbarThumbColor, alpha: 1 })
     this.addChild(this.thumb)
 
     // TODO: the scrolling is a bit finicky atm because the thumb needs to stay within the track bounds
@@ -72,7 +74,8 @@ export class PixiVerticalScrollbar extends Container {
       this.thumb.y = newY
 
       // Update scroll position in the layout store based on thumb position
-      const scrollRatio = newY / (heatmapLayoutStore.verticalScrollbarTrackHeight - this.thumb.height)
+      const scrollRatio =
+        newY / (heatmapLayoutStore.verticalScrollbarTrackHeight - this.thumb.height)
       heatmapLayoutStore.verticalScrollPosition =
         scrollRatio * (heatmapLayoutStore.requiredHeight - heatmapLayoutStore.canvasHeight)
     }
@@ -100,7 +103,8 @@ export class PixiVerticalScrollbar extends Container {
     // Position the thumb based on the current scroll position
     const maxThumbY = heatmapLayoutStore.verticalScrollbarTrackHeight - this.thumb.height
     const scrollRatio =
-      heatmapLayoutStore.verticalScrollPosition / (heatmapLayoutStore.requiredHeight - heatmapLayoutStore.canvasHeight)
+      heatmapLayoutStore.verticalScrollPosition /
+      (heatmapLayoutStore.requiredHeight - heatmapLayoutStore.canvasHeight)
     this.thumb.y = scrollRatio * maxThumbY
   }
 }

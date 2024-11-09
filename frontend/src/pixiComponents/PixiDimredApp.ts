@@ -28,7 +28,10 @@ export class PixiDimredApp extends Application {
     // center the dimred, ensure it is quadratic
     this.bubbleContainer.width = dimredLayoutStore.dimredSize
     this.bubbleContainer.height = dimredLayoutStore.dimredSize
-    this.bubbleContainer.position.set(dimredLayoutStore.dimredXPadding, dimredLayoutStore.dimredYPadding)
+    this.bubbleContainer.position.set(
+      dimredLayoutStore.dimredXPadding,
+      dimredLayoutStore.dimredYPadding,
+    )
   }
 
   addBubble(bubble: PixiBubble) {

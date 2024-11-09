@@ -55,7 +55,6 @@ watch(
   },
 )
 
-
 function update() {
   console.log('🔄 Dimred.vue update')
 

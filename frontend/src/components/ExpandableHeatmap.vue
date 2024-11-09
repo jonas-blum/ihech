@@ -701,12 +701,7 @@ onMounted(async () => {
               </div>
               <div
                 :style="{
-                  background:
-                    'linear-gradient(to right, ' +
-                    'red' +
-                    ', ' +
-                    'red' +
-                    ')',
+                  background: 'linear-gradient(to right, ' + 'red' + ', ' + 'red' + ')',
                 }"
                 class="color-scale"
               >

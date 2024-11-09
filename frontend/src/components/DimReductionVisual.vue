@@ -238,10 +238,9 @@ function drawScatterplot() {
 
 // onMounted hook
 onMounted(() => {
-  // get width of the container 
+  // get width of the container
   width.value = datavizRef.value.clientWidth
 })
-
 </script>
 
 <template>

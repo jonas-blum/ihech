@@ -26,7 +26,10 @@ export class PixiHeatmapApp extends Application {
     })
 
     // position the stage (which is the root container)
-    this.stage.position.set(useHeatmapLayoutStore().heatmapLeftMargin, heatmapLayoutStore.heatmapTopMargin)
+    this.stage.position.set(
+      useHeatmapLayoutStore().heatmapLeftMargin,
+      heatmapLayoutStore.heatmapTopMargin,
+    )
 
     // add the children to the main container
     this.stage.addChild(this.rowContainer)

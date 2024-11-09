@@ -67,7 +67,6 @@ def cluster_attributes_recursively(
     df_rotated_dropped: pd.DataFrame,
     cluster_size: int,
     cluster_by_collections: bool,
-    collection_column_names: List[str],
     level: int,
     item_names_and_data: List[ItemNameAndData],
     attributes_hierarchies_df: Union[pd.DataFrame, None],
@@ -81,7 +80,6 @@ def cluster_attributes_recursively(
             df_rotated_dropped,
             cluster_size,
             cluster_by_collections,
-            collection_column_names,
             level + 1,
             item_names_and_data,
             attributes_hierarchies_df
@@ -93,7 +91,7 @@ def cluster_attributes_recursively(
             isOpen=True,
         )
         return [hierarchical_attribute]
-    elif attributes_hierarchies_df is not None and attributes_hierarchies_df.shape[0] > 0:
+    elif cluster_by_collections == True and attributes_hierarchies_df is not None and attributes_hierarchies_df.shape[0] > 0:
         first_attributes_row = attributes_hierarchies_df.iloc[0]
         grouped_attributes = set(first_attributes_row.dropna().values)
         new_hierarchical_attributes = []
@@ -123,7 +121,6 @@ def cluster_attributes_recursively(
                 df_rotated_dropped.loc[indices],
                 cluster_size,
                 cluster_by_collections,
-                collection_column_names,
                 level + 1,
                 item_names_and_data,
                 attributes_hierarchies_df_first_row_removed,
@@ -218,7 +215,6 @@ def cluster_attributes_recursively(
                 original_cluster_df_dropped,
                 cluster_size,
                 cluster_by_collections,
-                collection_column_names,
                 level + 1,
                 item_names_and_data,
                 attributes_hierarchies_df

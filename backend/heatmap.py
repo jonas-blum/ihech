@@ -360,8 +360,7 @@ def create_heatmap(
         rotated_original_filtered_df,
         rotated_original_filtered_df_dropped,
         settings.clusterSize,
-        False,
-        [],
+        settings.clusterByCollections,
         0,
         item_names_and_data,
         attributes_hierarchies_df

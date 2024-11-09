@@ -134,6 +134,13 @@ export enum ColoringHeatmapEnum {
   ATTRIBUTE_RELATIVE = 'ATTRIBUTE_RELATIVE',
 }
 
+export interface HierarchicalAttribute {
+  attributeName: string
+  dataAttributeIndex: number
+  isOpen: boolean
+  children: HierarchicalAttribute[] | null
+}
+
 export interface ItemNameAndData {
   index: number | null
   itemName: string
@@ -148,9 +155,9 @@ export interface ItemNameAndData {
 }
 
 export interface HeatmapJSON {
-  attributeNames: string[]
   attributeDissimilarities: number[]
   itemNamesAndData: ItemNameAndData[]
+  hierarchicalAttributes: HierarchicalAttribute[]
   maxHeatmapValue: number
   minHeatmapValue: number
   maxDimRedXValue: number

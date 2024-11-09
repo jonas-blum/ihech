@@ -11,6 +11,7 @@ import {
   ColoringHeatmapEnum,
   getDistinctColor,
   interpolateColor,
+  type HierarchicalAttribute,
 } from '@/helpers/helpers'
 import { ItemTree } from '@/classes/ItemTree'
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
@@ -55,9 +56,9 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     colorMap: new LinearColorMap(),
 
     heatmap: {
-      attributeNames: [] as string[],
       attributeDissimilarities: [] as number[],
       itemNamesAndData: [] as ItemNameAndData[],
+      hierarchicalAttributes: [] as HierarchicalAttribute[],
       maxHeatmapValue: 100 as number,
       minHeatmapValue: 0 as number,
       maxDimRedXValue: 100 as number,
@@ -232,18 +233,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return this.attributeMap.get(newAttrIdx) ?? newAttrIdx
     },
 
-    getAttrFromNewIdx(newAttrIdx: number): string {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return ''
-      }
-      const initialIdx = this.attributeMap.get(newAttrIdx)
-      if (initialIdx === undefined) {
-        return ''
-      }
-      return this.heatmap.attributeNames[initialIdx]
-    },
-
     getAttrDissFromNewIdx(newAttrIdx: number): number {
       if (!this.activeDataTable) {
         console.error('No active data table')
@@ -254,22 +243,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         return 0
       }
       return this.heatmap.attributeDissimilarities[initialIdx]
-    },
-
-    recomputeAttributeMap(): void {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-      const correctAttributesOrder = this.getAttributesInCorrectOrder()
-      for (
-        let originalIndex = 0;
-        originalIndex < this.heatmap.attributeNames.length;
-        originalIndex++
-      ) {
-        const attributeName = this.heatmap.attributeNames[originalIndex]
-        this.attributeMap.set(correctAttributesOrder.indexOf(attributeName), originalIndex)
-      }
     },
 
     async fetchHeatmap() {
@@ -311,7 +284,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         const stream = new ReadableStream({
           async start(controller) {
-            while (true) {
+            const t = true
+            while (t) {
               const { done, value } = await reader.read()
               if (done) {
                 controller.close()
@@ -362,6 +336,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         // TODO: ideally the backend would provide the dimred coordinates already normalized
         // normalize the dimRed values
+
         this.itemTree.normalizeDimredCoordinates(
           this.heatmap.minDimRedXValue,
           this.heatmap.maxDimRedXValue,
@@ -370,9 +345,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         )
         console.log('ItemTree:', this.itemTree)
 
+        const attributeTreeRoot = this.heatmap.hierarchicalAttributes[0]
         // initialize attributeTree with the data received from the backend
         this.attributeTree = new AttributeTree(
-          this.heatmap.attributeNames,
+          attributeTreeRoot,
           this.heatmap.minAttributeValues,
           this.heatmap.maxAttributeValues,
           this.heatmap.attributeDissimilarities,
@@ -402,17 +378,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         }
       }
     },
-    getAttributesInCorrectOrder() {
-      if (this.activeDataTable === null) {
-        return []
-      }
-      const nonStickyAttributes = this.heatmap.attributeNames.filter(
-        (a) => !this.activeDataTable?.stickyAttributes.includes(a),
-      )
-      const newAttributeOrder = [...this.activeDataTable.stickyAttributes, ...nonStickyAttributes]
 
-      return newAttributeOrder
-    },
     setTimer(timer: number) {
       this.timer = timer
     },
@@ -727,24 +693,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
       this.changeHeatmap()
     },
-    toggleStickyAttribute(attribute: string) {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-
-      if (this.activeDataTable.stickyAttributes.includes(attribute)) {
-        this.activeDataTable.stickyAttributes = this.activeDataTable.stickyAttributes.filter(
-          (attr) => attr !== attribute,
-        )
-      } else {
-        this.activeDataTable.stickyAttributes.unshift(attribute)
-      }
-
-      this.recomputeAttributeMap()
-
-      this.changeHeatmap()
-    },
 
     // used as a trigger from the RowSorter to re-sort the rows
     sortRows() {
@@ -761,6 +709,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.attributeTree.updatePositionsAndDepth()
         this.itemTree?.updateCellPositions()
       }
+    },
+
+    updateCellPositionsOfItemTree() {
+      this.itemTree?.updateCellPositions()
     },
 
     handleRowClick(row: Row) {

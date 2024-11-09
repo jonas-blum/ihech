@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import DimReductionVisual from '@/components/DimReductionVisual.vue'
-// import ExpandableHeatmap from '@/components/ExpandableHeatmap.vue'
 import Heatmap from '@/components/Heatmap.vue'
 import Dimred from '@/components/Dimred.vue'
 import HeatmapSettings from '@/components/HeatmapSettings.vue'

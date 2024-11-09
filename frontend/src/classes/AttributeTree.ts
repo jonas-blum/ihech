@@ -1,5 +1,7 @@
 import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
 import type { ColumnSorter } from '@/classes/ColumnSorter'
+import type { HierarchicalAttribute } from '@/helpers/helpers'
+import { useHeatmapStore } from '@/stores/heatmapStore'
 
 export class AttributeTree {
   root: AggregatedColumn
@@ -10,34 +12,46 @@ export class AttributeTree {
 
   // TODO: for now I just roll with the current data structure. this will likely change later.
   constructor(
-    attributeNames: string[],
+    hierarchicalAttribute: HierarchicalAttribute,
     minAttributeValues: number[],
     maxAttributeValues: number[],
     attributeDissimilarities: number[],
     columnSorter: ColumnSorter,
   ) {
+    this.root = this.buildAttributeTree(hierarchicalAttribute) as AggregatedColumn
     this.columnSorter = columnSorter
-    this.root = new AggregatedColumn('age_groups', 0, 0)
-    this.root.isOpen = true
-
-    // TODO: this is just a hacky placeholder until the attributes are hierarchical
-    // TODO: this.root = this.buildAttributeTree(...)
-    for (let i = 0; i < attributeNames.length; i++) {
-      const attributeColumn: AttributeColumn = new AttributeColumn(
-        attributeNames[i],
-        i,
-        attributeDissimilarities[i],
-        this.root,
-      )
-      this.root.children.push(attributeColumn)
-
-      // add to mapping
-      this.originalIndexToColumn.set(i, attributeColumn)
-    }
+    this.sort()
   }
 
-  buildAttributeTree() {
-    // TODO: will be needed once the attributes are hierarchical as well
+  buildAttributeTree(
+    hierarchicalAttribute: HierarchicalAttribute,
+    parent: Column | null = null,
+  ): Column {
+    let column: Column
+
+    if (hierarchicalAttribute.children) {
+      column = new AggregatedColumn(
+        hierarchicalAttribute.attributeName,
+        hierarchicalAttribute.dataAttributeIndex,
+        1,
+        parent,
+        hierarchicalAttribute.isOpen,
+      )
+      const children = hierarchicalAttribute.children.map((child: HierarchicalAttribute) =>
+        this.buildAttributeTree(child, column),
+      )
+      // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
+      column.children = children
+    } else {
+      column = new AttributeColumn(
+        hierarchicalAttribute.attributeName,
+        hierarchicalAttribute.dataAttributeIndex,
+        1,
+        parent,
+      )
+    }
+    this.originalIndexToColumn.set(hierarchicalAttribute.dataAttributeIndex, column)
+    return column
   }
 
   toggleColumnExpansion(column: AggregatedColumn) {
@@ -46,6 +60,7 @@ export class AttributeTree {
     } else {
       this.expandColumn(column)
     }
+    useHeatmapStore().updateCellPositionsOfItemTree()
   }
 
   expandColumn(column: AggregatedColumn) {
@@ -71,11 +86,7 @@ export class AttributeTree {
     while (pointer !== null) {
       pointer.setPosition(position)
       pointer.setDepth(depth)
-      // TODO: decision: aggregated columns are not represented by a column. this feature would require a data structure change in the backend as well.
-      // therefore we only increase the position if the current column is an AttributeColumn
-      if (pointer instanceof AttributeColumn) {
-        position++
-      }
+      position++
 
       // Start traversal of the children if the current column is an aggregated column and is open
       if (pointer instanceof AggregatedColumn && pointer.isOpen && pointer.hasChildren()) {

@@ -19,7 +19,10 @@ from sklearn.manifold import TSNE
 from umap import UMAP
 from helpers import drop_columns, extract_columns
 from heatmap_types import HeatmapJSON, HeatmapSettings
-from clustering_functions import cluster_items_recursively
+from clustering_functions import (
+    cluster_items_recursively,
+    cluster_attributes_recursively,
+)
 
 
 logger = logging.getLogger("IHECH Logger")
@@ -100,7 +103,10 @@ def filter_attributes_and_items(
     original_df: pd.DataFrame, settings: HeatmapSettings
 ) -> pd.DataFrame:
 
-    original_df = original_df.loc[settings.selectedItemIndexes]
+    valid_indexes = list(
+        set(settings.selectedItemIndexes).intersection(original_df.index)
+    )
+    original_df = original_df.loc[valid_indexes]
 
     extracted_columns = extract_columns(
         original_df,
@@ -156,6 +162,9 @@ def create_heatmap(
 ) -> HeatmapJSON:
     logger.info("Starting Filtering...")
     start_filtering = start_heatmap
+
+    attribute_hierarchies = original_df.head(5)
+    original_df = original_df.iloc[5:]
 
     settings.stickyAttributes = [
         attr for attr in settings.stickyAttributes if attr in original_df.columns
@@ -273,9 +282,6 @@ def create_heatmap(
 
     heatmap_json = HeatmapJSON()
     heatmap_json.attributeDissimilarities = normalized_dissimilarities.tolist()
-    heatmap_json.attributeNames = [
-        attr.replace("\n", " ") for attr in original_filtered_df_dropped.columns
-    ]
 
     heatmap_json.maxHeatmapValue = original_filtered_df_dropped.max().max()
     heatmap_json.minHeatmapValue = original_filtered_df_dropped.min().min()
@@ -299,8 +305,8 @@ def create_heatmap(
         filtered_collection_column_names = []
 
     logger.info(f"Dim reduction done: {round(time.perf_counter() - start_dim_red, 2)}")
-    logger.info("Starting clustering...")
-    start_clustering = time.perf_counter()
+    logger.info("Starting clustering items...")
+    start_clustering_items = time.perf_counter()
 
     cluster_column = pd.DataFrame(
         {"cluster": [-1] * len(original_filtered_df)}, index=original_filtered_df.index
@@ -330,6 +336,39 @@ def create_heatmap(
 
     heatmap_json.itemNamesAndData = item_names_and_data
 
-    logger.info(f"Clustering done: {round(time.perf_counter() - start_clustering, 2)}")
+    logger.info(
+        f"Clustering items done: {round(time.perf_counter() - start_clustering_items, 2)}"
+    )
+    logger.info("Starting clustering attributes...")
+    start_clustering_attributes = time.perf_counter()
+
+   
+
+
+    original_columns = original_filtered_df_dropped.columns
+    rotated_original_filtered_df = original_filtered_df_dropped.T.reset_index(
+        drop=True
+    ).copy()
+    rotated_original_filtered_df["OriginalColumnNames"] = original_columns
+    rotated_original_filtered_df_dropped = original_filtered_df_dropped.T.reset_index(
+        drop=True
+    ).copy()
+    
+    attributes_hierarchies_df = attribute_hierarchies.dropna(how='all') if attribute_hierarchies is not None else None
+
+    hierarchical_attributes = cluster_attributes_recursively(
+        rotated_original_filtered_df,
+        rotated_original_filtered_df_dropped,
+        settings.clusterSize,
+        settings.clusterByCollections,
+        0,
+        item_names_and_data,
+        attributes_hierarchies_df
+    )
+    heatmap_json.hierarchicalAttributes = hierarchical_attributes
+
+    logger.info(
+        f"Clustering attributes done: {round(time.perf_counter() - start_clustering_attributes, 2)}"
+    )
 
     return heatmap_json

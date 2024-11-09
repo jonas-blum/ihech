@@ -155,7 +155,6 @@ export interface ItemNameAndData {
 }
 
 export interface HeatmapJSON {
-  attributeNames: string[]
   attributeDissimilarities: number[]
   itemNamesAndData: ItemNameAndData[]
   hierarchicalAttributes: HierarchicalAttribute[]

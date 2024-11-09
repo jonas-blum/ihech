@@ -35,10 +35,12 @@ export class AttributeTree {
         1,
         parent,
         hierarchicalAttribute.isOpen,
-        hierarchicalAttribute.children.map((child: HierarchicalAttribute) =>
-          this.buildAttributeTree(child, column),
-        ),
       )
+      const children = hierarchicalAttribute.children.map((child: HierarchicalAttribute) =>
+        this.buildAttributeTree(child, column),
+      )
+      // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
+      column.children = children
     } else {
       column = new AttributeColumn(
         hierarchicalAttribute.attributeName,

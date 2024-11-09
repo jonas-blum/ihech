@@ -60,7 +60,7 @@ export class AttributeColumn extends Column {
 
 export class AggregatedColumn extends Column {
   isOpen: boolean
-  children: Column[]
+  children: Column[] = []
 
   constructor(
     name: string,
@@ -68,11 +68,9 @@ export class AggregatedColumn extends Column {
     standardDeviation: number,
     parent?: Column | null,
     isOpen: boolean = false,
-    children: Column[] = [],
   ) {
     super(name, originalIndex, standardDeviation, parent)
     this.isOpen = isOpen
-    this.children = children
   }
 
   hasChildren(): boolean {

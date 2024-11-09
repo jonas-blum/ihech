@@ -64,8 +64,8 @@ def get_current_data_length(item_names_and_data: List[ItemNameAndData]):
 
 
 def cluster_attributes_recursively(
-    original_df_rotated: pd.DataFrame,
-    original_df_rotated_dropped: pd.DataFrame,
+    df_rotated: pd.DataFrame,
+    df_rotated_dropped: pd.DataFrame,
     cluster_size: int,
     cluster_by_collections: bool,
     collection_column_names: List[str],
@@ -73,12 +73,12 @@ def cluster_attributes_recursively(
     item_names_and_data: List[ItemNameAndData],
 ) -> Union[List[HierarchicalAttribute], None]:
     if level == 0:
-        indexes = list(range(original_df_rotated_dropped.shape[0]))
+        indexes = list(range(df_rotated_dropped.shape[0]))
         append_all_average_items_by_attribute_indexes(indexes, item_names_and_data)
         new_attribute_name = "All_Attributes"
         children = cluster_attributes_recursively(
-            original_df_rotated,
-            original_df_rotated_dropped,
+            df_rotated,
+            df_rotated_dropped,
             cluster_size,
             cluster_by_collections,
             collection_column_names,
@@ -86,18 +86,18 @@ def cluster_attributes_recursively(
             item_names_and_data,
         )
         hierarchical_attribute = HierarchicalAttribute(
-            attributeName=f'{str(level)}--{new_attribute_name}',
+            attributeName=new_attribute_name,
             dataAttributeIndex=len(indexes),
             children=children,
             isOpen=True,
         )
         return [hierarchical_attribute]
-    elif original_df_rotated.shape[0] <= cluster_size:
+    elif df_rotated.shape[0] <= cluster_size:
         remaining_hierarchical_attributes = []
-        for i in range(original_df_rotated.shape[0]):
+        for i in range(df_rotated.shape[0]):
             hierarchical_attribute = HierarchicalAttribute(
-                attributeName=f'{str(level)}--{original_df_rotated["OriginalColumnNames"].iloc[i]}',
-                dataAttributeIndex=i,
+                attributeName=df_rotated["OriginalColumnNames"].iloc[i],
+                dataAttributeIndex=df_rotated.index[i],
                 children=None,
                 isOpen=False,
             )
@@ -105,40 +105,41 @@ def cluster_attributes_recursively(
         return remaining_hierarchical_attributes
 
     else:
-        if original_df_rotated.shape[0] > 5000:
+        if df_rotated.shape[0] > 5000:
             kmeans = MiniBatchKMeans(n_clusters=cluster_size, n_init=1, random_state=42)
-            labels = kmeans.fit_predict(original_df_rotated_dropped)
+            labels = kmeans.fit_predict(df_rotated_dropped)
         else:
             hierarchical = AgglomerativeClustering(
                 n_clusters=cluster_size, linkage="ward"
             )
-            labels = hierarchical.fit_predict(original_df_rotated_dropped)
+            labels = hierarchical.fit_predict(df_rotated_dropped)
 
         new_clustered_hierarchical_attribute_list: List[HierarchicalAttribute] = []
 
         cluster_indices = {
-            cluster_id: original_df_rotated.index[labels == cluster_id]
+            cluster_id: df_rotated.index[labels == cluster_id]
             for cluster_id in np.unique(labels)
         }
 
         for _, indices in cluster_indices.items():
 
-            original_cluster_df = original_df_rotated.loc[indices]
-            original_cluster_df_dropped = original_df_rotated_dropped.loc[indices]
+            original_cluster_df = df_rotated.loc[indices]
+            original_cluster_df_dropped = df_rotated_dropped.loc[indices]
 
             if original_cluster_df.shape[0] <= 0:
                 continue
 
-            if original_cluster_df.shape[0] == original_df_rotated.shape[0]:
+            if original_cluster_df.shape[0] == df_rotated.shape[0]:
                 new__cluster_attribute_names = (
                     original_cluster_df["OriginalColumnNames"].astype(str).tolist()
                 )
 
                 for i in range(original_cluster_df.shape[0]):
                     new_hierarchical_attribute = HierarchicalAttribute(
-                        f'{str(level)}--{new__cluster_attribute_names[i]}',
-                        original_cluster_df.index[i],
-                        False,
+                        attributeName=new__cluster_attribute_names[i],
+                        dataAttributeIndex=original_cluster_df.index[i],
+                        isOpen=False,
+                        children=None,
                     )
 
                     new_clustered_hierarchical_attribute_list.append(
@@ -150,7 +151,7 @@ def cluster_attributes_recursively(
                 new_attribute_name = str(original_cluster_df["OriginalColumnNames"].astype(str).iat[0])
 
                 new_hierarchical_attribute = HierarchicalAttribute(
-                    f'{str(level)}--{new_attribute_name}', original_cluster_df.index[0], False, None
+                    attributeName=new_attribute_name, dataAttributeIndex=original_cluster_df.index[0], isOpen=False, children=None
                 )
 
                 new_clustered_hierarchical_attribute_list.append(
@@ -172,11 +173,11 @@ def cluster_attributes_recursively(
                 cluster_by_collections,
                 collection_column_names,
                 level + 1,
-                item_names_and_data,
+                item_names_and_data
             )
 
             new_aggregated_hierarchical_attribute = HierarchicalAttribute(
-                f'{str(level)}--{new_attribute_name}', new_index, False, children
+                attributeName=new_attribute_name, dataAttributeIndex=new_index,isOpen=False, children=children
             )
 
             new_clustered_hierarchical_attribute_list.append(

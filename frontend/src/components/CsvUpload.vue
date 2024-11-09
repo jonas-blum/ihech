@@ -111,7 +111,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
 
     clusterByCollections: true,
 
-    clusterSize: 5,
+    clusterSize: 7,
     dimReductionAlgo: DimReductionAlgoEnum.PCA,
     clusterAfterDimRed: false,
 

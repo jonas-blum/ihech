@@ -49,6 +49,7 @@ export class AttributeTree {
         parent,
       )
     }
+    this.originalIndexToColumn.set(hierarchicalAttribute.dataAttributeIndex, column)
     return column
   }
 

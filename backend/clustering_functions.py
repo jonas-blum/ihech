@@ -86,7 +86,7 @@ def cluster_attributes_recursively(
             item_names_and_data,
         )
         hierarchical_attribute = HierarchicalAttribute(
-            attributeName=new_attribute_name,
+            attributeName=f'{str(level)}--{new_attribute_name}',
             dataAttributeIndex=len(indexes),
             children=children,
             isOpen=True,
@@ -96,7 +96,7 @@ def cluster_attributes_recursively(
         remaining_hierarchical_attributes = []
         for i in range(original_df_rotated.shape[0]):
             hierarchical_attribute = HierarchicalAttribute(
-                attributeName=original_df_rotated["OriginalColumnNames"].iloc[i],
+                attributeName=f'{str(level)}--{original_df_rotated["OriginalColumnNames"].iloc[i]}',
                 dataAttributeIndex=i,
                 children=None,
                 isOpen=False,
@@ -136,7 +136,7 @@ def cluster_attributes_recursively(
 
                 for i in range(original_cluster_df.shape[0]):
                     new_hierarchical_attribute = HierarchicalAttribute(
-                        new__cluster_attribute_names[i],
+                        f'{str(level)}--{new__cluster_attribute_names[i]}',
                         original_cluster_df.index[i],
                         False,
                     )
@@ -147,12 +147,10 @@ def cluster_attributes_recursively(
                 continue
 
             if original_cluster_df.shape[0] == 1:
-                new_attribute_name = (
-                    original_cluster_df["OriginalColumnNames"].astype(str).iat[0]
-                )
+                new_attribute_name = str(original_cluster_df["OriginalColumnNames"].astype(str).iat[0])
 
                 new_hierarchical_attribute = HierarchicalAttribute(
-                    new_attribute_name, original_cluster_df.index[0], False, None
+                    f'{str(level)}--{new_attribute_name}', original_cluster_df.index[0], False, None
                 )
 
                 new_clustered_hierarchical_attribute_list.append(
@@ -178,7 +176,7 @@ def cluster_attributes_recursively(
             )
 
             new_aggregated_hierarchical_attribute = HierarchicalAttribute(
-                new_attribute_name, new_index, False, children
+                f'{str(level)}--{new_attribute_name}', new_index, False, children
             )
 
             new_clustered_hierarchical_attribute_list.append(

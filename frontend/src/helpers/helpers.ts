@@ -137,6 +137,7 @@ export enum ColoringHeatmapEnum {
 export interface HierarchicalAttribute {
   attributeName: string
   dataAttributeIndex: number
+  std: number
   isOpen: boolean
   children: HierarchicalAttribute[] | null
 }

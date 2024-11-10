@@ -33,7 +33,7 @@ export class AttributeTree {
       column = new AggregatedColumn(
         hierarchicalAttribute.attributeName,
         hierarchicalAttribute.dataAttributeIndex,
-        1,
+        hierarchicalAttribute.std,
         parent,
         hierarchicalAttribute.isOpen,
       )
@@ -46,7 +46,7 @@ export class AttributeTree {
       column = new AttributeColumn(
         hierarchicalAttribute.attributeName,
         hierarchicalAttribute.dataAttributeIndex,
-        1,
+        hierarchicalAttribute.std,
         parent,
       )
     }

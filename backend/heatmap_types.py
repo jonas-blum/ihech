@@ -122,6 +122,7 @@ def custom_encoder(obj):
         return {
             "attributeName": obj.attributeName,
             "dataAttributeIndex": obj.dataAttributeIndex,
+            "std": obj.std,
             "isOpen": obj.isOpen,
             "children": (
                 [custom_encoder(child) for child in obj.children]
@@ -138,6 +139,7 @@ def custom_encoder(obj):
 class HierarchicalAttribute:
     attributeName: str
     dataAttributeIndex: int
+    std: float
     isOpen: bool
     children: Union["List[HierarchicalAttribute]", None]
 
@@ -145,11 +147,13 @@ class HierarchicalAttribute:
         self,
         attributeName: str,
         dataAttributeIndex: int,
+        std: float,
         isOpen: bool,
         children: Union["List[HierarchicalAttribute]", None],
     ):
         self.attributeName: str = attributeName
         self.dataAttributeIndex: int = dataAttributeIndex
+        self.std: float = std
         self.isOpen: bool = isOpen
         self.children: Union[List[HierarchicalAttribute], None] = children
 

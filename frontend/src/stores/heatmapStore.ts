@@ -28,6 +28,7 @@ import {
   ColumnSorter,
   ColumnSorterCriterion,
   ColumnSorterCriterionByName,
+  ColumnSorterCriterionByOriginalAttributeOrder,
   ColumnSorterCriterionByStandardDeviation,
 } from '@/classes/ColumnSorter'
 import { Container } from 'pixi.js'
@@ -328,7 +329,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         // initialize columnSorter
         const criterionA = new ColumnSorterCriterionByName()
         const criterionB = new ColumnSorterCriterionByStandardDeviation()
-        const columnSorter = new ColumnSorter([criterionA, criterionB])
+        const criterionC = new ColumnSorterCriterionByOriginalAttributeOrder()
+        const columnSorter = new ColumnSorter([criterionA, criterionB, criterionC])
 
         // initialize itemTree with the data received from the backend, starting at the root
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]

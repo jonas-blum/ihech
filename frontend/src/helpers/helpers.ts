@@ -138,6 +138,7 @@ export interface HierarchicalAttribute {
   attributeName: string
   dataAttributeIndex: number
   std: number
+  originalAttributeOrder: number
   isOpen: boolean
   children: HierarchicalAttribute[] | null
 }

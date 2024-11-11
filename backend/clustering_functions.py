@@ -90,7 +90,7 @@ def cluster_attributes_recursively(
             attributeName=new_attribute_name,
             dataAttributeIndex=len(indexes),
             std=-1000,
-            originalIndex=0,
+            originalAttributeOrder=0,
             children=children,
             isOpen=True,
         )
@@ -156,7 +156,7 @@ def cluster_attributes_recursively(
                 attributeName=new_attribute_name,
                 dataAttributeIndex=new_index,
                 std=-1000,
-                originalIndex=average_attribute_index,
+                originalAttributeOrder=average_attribute_index,
                 children=children,
                 isOpen=False,
             )
@@ -173,7 +173,7 @@ def cluster_attributes_recursively(
                 attributeName=attribute_name,
                 dataAttributeIndex=df_rotated.index[i],
                 std=-1000,
-                originalIndex=original_attribute_index,
+                originalAttributeOrder=original_attribute_index,
                 children=None,
                 isOpen=False,
             )
@@ -217,7 +217,7 @@ def cluster_attributes_recursively(
                         attributeName=attribute_name,
                         dataAttributeIndex=original_cluster_df.index[i],
                         std=-1000,
-                        originalIndex=attribute_idx,
+                        originalAttributeOrder=attribute_idx,
                         isOpen=False,
                         children=None,
                     )
@@ -237,7 +237,7 @@ def cluster_attributes_recursively(
                     attributeName=new_attribute_name,
                     dataAttributeIndex=original_cluster_df.index[0],
                     std=-1000,
-                    originalIndex=original_index,
+                    originalAttributeOrder=original_index,
                     isOpen=False,
                     children=None,
                 )
@@ -281,7 +281,7 @@ def cluster_attributes_recursively(
                 attributeName=new_attribute_name,
                 dataAttributeIndex=new_index,
                 std=-1000,
-                originalIndex=index_average,
+                originalAttributeOrder=index_average,
                 isOpen=False,
                 children=children,
             )

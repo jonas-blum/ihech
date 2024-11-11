@@ -247,6 +247,12 @@ def create_heatmap(
         raise ValueError("Invalid dim reduction algorithm")
 
     dim_red_df = pd.DataFrame(dim_red_df, index=original_filtered_df.index)
+    x_centered = dim_red_df[0] - dim_red_df[0].mean()
+    y_centered = dim_red_df[1] - dim_red_df[1].mean()
+    max_range = max(np.abs(x_centered).max(), np.abs(y_centered).max())
+    x_scaled = x_centered / (2 * max_range) + 0.5
+    y_scaled = y_centered / (2 * max_range) + 0.5
+    dim_red_df = pd.DataFrame({0: x_scaled, 1: y_scaled}, index=dim_red_df.index)
 
     original_filtered_df_dropped = drop_columns(
         original_filtered_df,

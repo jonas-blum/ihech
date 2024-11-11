@@ -336,15 +336,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]
         this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
 
-        // TODO: ideally the backend would provide the dimred coordinates already normalized
-        // normalize the dimRed values
-
-        this.itemTree.normalizeDimredCoordinates(
-          this.heatmap.minDimRedXValue,
-          this.heatmap.maxDimRedXValue,
-          this.heatmap.minDimRedYValue,
-          this.heatmap.maxDimRedYValue,
-        )
         console.log('ItemTree:', this.itemTree)
 
         const attributeTreeRoot = this.heatmap.hierarchicalAttributes[0]

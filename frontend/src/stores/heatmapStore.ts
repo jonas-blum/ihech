@@ -319,9 +319,10 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         const rowSorter = new RowSorter([criterion1, criterion2, criterion3])
 
         // initialize columnSorter
-        const criterionA = new ColumnSorterCriterionByName()
-        const criterionB = new ColumnSorterCriterionByStandardDeviation()
-        const criterionC = new ColumnSorterCriterionByOriginalAttributeOrder()
+        const criterionA = new ColumnSorterCriterionByOriginalAttributeOrder()
+        const criterionB = new ColumnSorterCriterionByName()
+        const criterionC = new ColumnSorterCriterionByStandardDeviation()
+
         const columnSorter = new ColumnSorter([criterionA, criterionB, criterionC])
 
         // initialize itemTree with the data received from the backend, starting at the root

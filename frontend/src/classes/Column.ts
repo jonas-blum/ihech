@@ -4,6 +4,7 @@ export abstract class Column {
   name: string
   originalIndex: number // corresponds to the 'index' in the backend data; useful for finding the correct PixiHeatmapCell in the PixiRow.pixiHeatmapCellsContainer
   standardDeviation: number // corresponds to the 'heterogeneity' in the backend data
+  originalAttributeOrder: number
   parent: Column | null
   position: number = -1
   oldPosition: number = -1
@@ -15,11 +16,13 @@ export abstract class Column {
   protected constructor(
     name: string,
     originalIndex: number,
+    originalAttributeOrder: number,
     standardDeviation: number,
     parent: Column | null = null,
   ) {
     this.name = name
     this.originalIndex = originalIndex
+    this.originalAttributeOrder = originalAttributeOrder
     this.standardDeviation = standardDeviation
     this.parent = parent
   }
@@ -47,10 +50,11 @@ export class AttributeColumn extends Column {
   constructor(
     name: string,
     originalIndex: number,
+    originalAttributeOrder: number,
     standardDeviation: number,
     parent?: Column | null,
   ) {
-    super(name, originalIndex, standardDeviation, parent)
+    super(name, originalIndex, standardDeviation, originalAttributeOrder, parent)
   }
 
   hasChildren(): boolean {
@@ -65,11 +69,12 @@ export class AggregatedColumn extends Column {
   constructor(
     name: string,
     originalIndex: number,
+    originalAttributeOrder: number,
     standardDeviation: number,
     parent?: Column | null,
     isOpen: boolean = false,
   ) {
-    super(name, originalIndex, standardDeviation, parent)
+    super(name, originalIndex, standardDeviation, originalAttributeOrder, parent)
     this.isOpen = isOpen
   }
 

@@ -34,6 +34,7 @@ export class AttributeTree {
         hierarchicalAttribute.attributeName,
         hierarchicalAttribute.dataAttributeIndex,
         hierarchicalAttribute.std,
+        hierarchicalAttribute.originalAttributeOrder,
         parent,
         hierarchicalAttribute.isOpen,
       )
@@ -47,6 +48,7 @@ export class AttributeTree {
         hierarchicalAttribute.attributeName,
         hierarchicalAttribute.dataAttributeIndex,
         hierarchicalAttribute.std,
+        hierarchicalAttribute.originalAttributeOrder,
         parent,
       )
     }

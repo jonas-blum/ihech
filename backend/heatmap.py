@@ -182,6 +182,8 @@ def create_heatmap(
         settings.collectionColumnNames,
     )
 
+    original_columns_list = list(original_filtered_dropped.columns)
+
     all_data_df = original_df[original_filtered_dropped.columns]
     all_data_df_medians = all_data_df.median()
     all_data_df = all_data_df.fillna(all_data_df_medians)
@@ -366,6 +368,7 @@ def create_heatmap(
         0,
         item_names_and_data,
         attributes_hierarchies_df,
+        original_columns_list,
     )
     heatmap_json.hierarchicalAttributes = hierarchical_attributes
     calculate_attribute_std(item_names_and_data, hierarchical_attributes)

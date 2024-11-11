@@ -98,3 +98,14 @@ export class ColumnSorterCriterionByStandardDeviation extends ColumnSorterCriter
     return this.applyReverse(result)
   }
 }
+
+export class ColumnSorterCriterionByOriginalAttributeOrder extends ColumnSorterCriterion {
+  constructor(reverse: boolean = false) {
+    super('Original Attribute Order', 'originalAttributeOrder', reverse)
+  }
+
+  compare(column1: Column, column2: Column): number {
+    const result = column1.originalAttributeOrder - column2.originalAttributeOrder
+    return this.applyReverse(result)
+  }
+}

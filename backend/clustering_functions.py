@@ -70,6 +70,7 @@ def cluster_attributes_recursively(
     level: int,
     item_names_and_data: List[ItemNameAndData],
     attributes_hierarchies_df: Union[pd.DataFrame, None],
+    original_columns: List[str],
 ) -> Union[List[HierarchicalAttribute], None]:
     if level == 0:
         indexes = list(range(df_rotated_dropped.shape[0]))
@@ -83,11 +84,13 @@ def cluster_attributes_recursively(
             level + 1,
             item_names_and_data,
             attributes_hierarchies_df,
+            original_columns,
         )
         hierarchical_attribute = HierarchicalAttribute(
             attributeName=new_attribute_name,
             dataAttributeIndex=len(indexes),
             std=-1000,
+            originalAttributeOrder=0,
             children=children,
             isOpen=True,
         )
@@ -106,7 +109,20 @@ def cluster_attributes_recursively(
                 continue
 
             new_attribute_name = str(hierarchy)
-
+            attribute_names = list(
+                first_attributes_row[first_attributes_row == hierarchy].index
+            )
+            attribute_idx_sum = 0
+            attribute_idx_count = 0
+            for attribute in attribute_names:
+                if attribute not in original_columns:
+                    continue
+                attribute_idx = original_columns.index(attribute)
+                attribute_idx_sum += attribute_idx
+                attribute_idx_count += 1
+            if attribute_idx_count == 0:
+                attribute_idx_sum = 1
+            average_attribute_index = attribute_idx_sum / attribute_idx_count
             indices = df_rotated[
                 df_rotated["OriginalColumnNames"].isin(
                     first_attributes_row[first_attributes_row == hierarchy].index
@@ -133,12 +149,14 @@ def cluster_attributes_recursively(
                 level + 1,
                 item_names_and_data,
                 attributes_hierarchies_df_first_row_removed,
+                original_columns,
             )
 
             hierarchical_attribute = HierarchicalAttribute(
                 attributeName=new_attribute_name,
                 dataAttributeIndex=new_index,
                 std=-1000,
+                originalAttributeOrder=average_attribute_index,
                 children=children,
                 isOpen=False,
             )
@@ -149,10 +167,13 @@ def cluster_attributes_recursively(
     elif df_rotated.shape[0] <= cluster_size:
         remaining_hierarchical_attributes = []
         for i in range(df_rotated.shape[0]):
+            attribute_name = str(df_rotated["OriginalColumnNames"].iloc[i])
+            original_attribute_index = original_columns.index(attribute_name)
             hierarchical_attribute = HierarchicalAttribute(
-                attributeName=df_rotated["OriginalColumnNames"].iloc[i],
+                attributeName=attribute_name,
                 dataAttributeIndex=df_rotated.index[i],
                 std=-1000,
+                originalAttributeOrder=original_attribute_index,
                 children=None,
                 isOpen=False,
             )
@@ -190,10 +211,13 @@ def cluster_attributes_recursively(
                 )
 
                 for i in range(original_cluster_df.shape[0]):
+                    attribute_name = new__cluster_attribute_names[i]
+                    attribute_idx = original_columns.index(attribute_name)
                     new_hierarchical_attribute = HierarchicalAttribute(
-                        attributeName=new__cluster_attribute_names[i],
+                        attributeName=attribute_name,
                         dataAttributeIndex=original_cluster_df.index[i],
                         std=-1000,
+                        originalAttributeOrder=attribute_idx,
                         isOpen=False,
                         children=None,
                     )
@@ -207,11 +231,13 @@ def cluster_attributes_recursively(
                 new_attribute_name = str(
                     original_cluster_df["OriginalColumnNames"].astype(str).iat[0]
                 )
+                original_index = original_columns.index(new_attribute_name)
 
                 new_hierarchical_attribute = HierarchicalAttribute(
                     attributeName=new_attribute_name,
                     dataAttributeIndex=original_cluster_df.index[0],
                     std=-1000,
+                    originalAttributeOrder=original_index,
                     isOpen=False,
                     children=None,
                 )
@@ -226,6 +252,18 @@ def cluster_attributes_recursively(
                 indices_list, item_names_and_data
             )
 
+            index_sum = 0
+            index_count = 0
+            for i in range(original_cluster_df.shape[0]):
+                attribute_name = str(original_cluster_df["OriginalColumnNames"].iloc[i])
+                original_attribute_index = original_columns.index(attribute_name)
+                index_sum += original_attribute_index
+                index_count += 1
+
+            if index_count == 0:
+                index_count = 1
+            index_average = index_sum / index_count
+
             new_attribute_name = str(original_cluster_df.shape[0])
 
             children = cluster_attributes_recursively(
@@ -236,12 +274,14 @@ def cluster_attributes_recursively(
                 level + 1,
                 item_names_and_data,
                 attributes_hierarchies_df,
+                original_columns,
             )
 
             new_aggregated_hierarchical_attribute = HierarchicalAttribute(
                 attributeName=new_attribute_name,
                 dataAttributeIndex=new_index,
                 std=-1000,
+                originalAttributeOrder=index_average,
                 isOpen=False,
                 children=children,
             )

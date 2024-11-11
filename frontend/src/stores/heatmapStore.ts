@@ -62,10 +62,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       hierarchicalAttributes: [] as HierarchicalAttribute[],
       maxHeatmapValue: 100 as number,
       minHeatmapValue: 0 as number,
-      maxDimRedXValue: 100 as number,
-      maxDimRedYValue: 0 as number,
-      minDimRedXValue: 0 as number,
-      minDimRedYValue: 100 as number,
       maxAttributeValues: [] as number[],
       minAttributeValues: [] as number[],
     },
@@ -135,10 +131,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     getHeatmap: (state) => state.heatmap,
     getHeatmapMaxValue: (state) => state.heatmap.maxHeatmapValue,
     getHeatmapMinValue: (state) => state.heatmap.minHeatmapValue,
-    getDimRedMaxXValue: (state) => state.heatmap.maxDimRedXValue,
-    getDimRedMinXValue: (state) => state.heatmap.minDimRedXValue,
-    getDimRedMaxYValue: (state) => state.heatmap.maxDimRedYValue,
-    getDimRedMinYValue: (state) => state.heatmap.minDimRedYValue,
     getMaxAttributeValues: (state) => state.heatmap.maxAttributeValues,
     getMinAttributeValues: (state) => state.heatmap.minAttributeValues,
 
@@ -336,15 +328,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]
         this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
 
-        // TODO: ideally the backend would provide the dimred coordinates already normalized
-        // normalize the dimRed values
-
-        this.itemTree.normalizeDimredCoordinates(
-          this.heatmap.minDimRedXValue,
-          this.heatmap.maxDimRedXValue,
-          this.heatmap.minDimRedYValue,
-          this.heatmap.maxDimRedYValue,
-        )
         console.log('ItemTree:', this.itemTree)
 
         const attributeTreeRoot = this.heatmap.hierarchicalAttributes[0]

@@ -162,10 +162,6 @@ export interface HeatmapJSON {
   hierarchicalAttributes: HierarchicalAttribute[]
   maxHeatmapValue: number
   minHeatmapValue: number
-  maxDimRedXValue: number
-  minDimRedXValue: number
-  maxDimRedYValue: number
-  minDimRedYValue: number
   maxAttributeValues: number[]
   minAttributeValues: number[]
 }

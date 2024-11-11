@@ -169,10 +169,6 @@ class HeatmapJSON:
         self.hierarchicalAttributes: List[HierarchicalAttribute] = []
         self.maxHeatmapValue: float = 0
         self.minHeatmapValue: float = 0
-        self.maxDimRedXValue: float = 0
-        self.minDimRedXValue: float = 0
-        self.maxDimRedYValue: float = 0
-        self.minDimRedYValue: float = 0
         self.minAttributeValues: List[float] = []
         self.maxAttributeValues: List[float] = []
 

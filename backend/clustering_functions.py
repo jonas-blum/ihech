@@ -211,11 +211,13 @@ def cluster_attributes_recursively(
                 )
 
                 for i in range(original_cluster_df.shape[0]):
+                    attribute_name = new__cluster_attribute_names[i]
+                    attribute_idx = original_columns.index(attribute_name)
                     new_hierarchical_attribute = HierarchicalAttribute(
-                        attributeName=new__cluster_attribute_names[i],
+                        attributeName=attribute_name,
                         dataAttributeIndex=original_cluster_df.index[i],
                         std=-1000,
-                        originalIndex=0,
+                        originalIndex=attribute_idx,
                         isOpen=False,
                         children=None,
                     )
@@ -250,6 +252,18 @@ def cluster_attributes_recursively(
                 indices_list, item_names_and_data
             )
 
+            index_sum = 0
+            index_count = 0
+            for i in range(original_cluster_df.shape[0]):
+                attribute_name = str(original_cluster_df["OriginalColumnNames"].iloc[i])
+                original_attribute_index = original_columns.index(attribute_name)
+                index_sum += original_attribute_index
+                index_count += 1
+
+            if index_count == 0:
+                index_count = 1
+            index_average = index_sum / index_count
+
             new_attribute_name = str(original_cluster_df.shape[0])
 
             children = cluster_attributes_recursively(
@@ -267,7 +281,7 @@ def cluster_attributes_recursively(
                 attributeName=new_attribute_name,
                 dataAttributeIndex=new_index,
                 std=-1000,
-                originalIndex=0,
+                originalIndex=index_average,
                 isOpen=False,
                 children=children,
             )

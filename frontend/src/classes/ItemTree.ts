@@ -259,13 +259,6 @@ export class ItemTree {
     return this.getAllRows().length
   }
 
-  normalizeDimredCoordinates(minX: number, maxX: number, minY: number, maxY: number) {
-    this.getAllRows().forEach((row) => {
-      row.dimredPosition.x = (row.dimredPosition.x - minX) / (maxX - minX)
-      row.dimredPosition.y = (row.dimredPosition.y - minY) / (maxY - minY)
-    })
-  }
-
   expandAllRows() {
     this.getAllRows().forEach((row) => {
       if (row instanceof AggregatedRow && !row.isOpen) {

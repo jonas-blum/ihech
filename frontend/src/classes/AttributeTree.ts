@@ -9,6 +9,7 @@ export class AttributeTree {
   // this mapping will allow the rows to do a O(1) lookup of the updated cell position
   // TODO: this mapping is updated every time the columns are reordered (??? necessary ???)
   originalIndexToColumn: Map<number, Column> = new Map()
+  maxDepth: number = 0 // keeps track of the maximum depth of the tree; used for several display purposes
 
   // TODO: for now I just roll with the current data structure. this will likely change later.
   constructor(
@@ -68,11 +69,31 @@ export class AttributeTree {
   expandColumn(column: AggregatedColumn) {
     column.open()
     this.updatePositionsAndDepth()
+
+    // Update the maxDepth if necessary
+    if (column.depth >= this.maxDepth) {
+      this.maxDepth = column.depth + 1
+    }
   }
 
   closeColumn(column: AggregatedColumn) {
     column.close()
     this.updatePositionsAndDepth()
+
+    // update the maxDepth if necessary
+    // NOTE: I am not happy how inefficient this is, as we have to traverse the whole tree to find the new maxDepth
+    //      but I don't see a better way right now
+    this.calculateMaxDepth()
+  }
+
+  calculateMaxDepth() {
+    let maxDepth = 0
+    this.getVisibleColumns().forEach((column) => {
+      if (column.depth > maxDepth) {
+        maxDepth = column.depth
+      }
+    })
+    this.maxDepth = maxDepth
   }
 
   updatePositionsAndDepth(startColumn: Column = this.root) {

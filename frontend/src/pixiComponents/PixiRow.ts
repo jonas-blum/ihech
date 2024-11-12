@@ -75,11 +75,6 @@ export class PixiRow extends Container {
           duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
         },
       )
-
-      // gsap.to(cell, {
-      //   x: columnIndex * useHeatmapLayoutStore().columnWidth,
-      //   duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
-      // })
     }
   }
 

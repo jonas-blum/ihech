@@ -204,6 +204,21 @@ watch(
   },
 )
 
+// watch for attributesMaxDepth changes
+watch(
+  () => heatmapStore.attributesMaxDepth,
+  (newAttributeMaxDepth, oldAttributeMaxDepth) => {
+    // console.log('attributeMaxDepth changed from', oldAttributeMaxDepth, 'to', newAttributeMaxDepth)
+
+    // update the position of all column labels
+    for (let column of heatmapStore.attributeTree?.getVisibleColumns() ?? []) {
+      if (column.pixiColumnLabel) {
+        column.pixiColumnLabel.updatePosition()
+      }
+    }
+  },
+)
+
 function update() {
   console.log('🔄 Heatmap.vue update')
   // update the heatmapLayoutStore with the current canvas dimensions

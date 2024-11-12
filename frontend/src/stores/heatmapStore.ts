@@ -87,6 +87,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return this.itemTree?.maxDepth ?? 0
     },
 
+    // various rendering functions need to know the max depth of the attributeTree
+    attributesMaxDepth(): number {
+      return this.attributeTree?.maxDepth ?? 0
+    },
+
     // this getter is needed because the PixiRow consists of the PixiRowLabel and the PixiHeatmapCells
     hoveredPixiRow(): PixiRow | null {
       if (this.hoveredPixiRowLabel) {
@@ -342,6 +347,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         )
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
+        this.attributeTree.calculateMaxDepth()
         console.log('AttributeTree:', this.attributeTree)
 
         // update the colorMap

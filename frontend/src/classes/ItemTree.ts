@@ -69,7 +69,7 @@ export class ItemTree {
   expandRow(row: AggregatedRow) {
     row.open()
     this.updatePositionsAndDepth(row)
-    this.updateCellPositions(row)
+    this.updateCellPositions(row, false)
 
     // update the maxDepth if necessary
     if (row.depth >= this.maxDepth) {
@@ -130,11 +130,11 @@ export class ItemTree {
   }
 
   // traverses through the tree and calls the updateCellPositions method for each row (which is open for efficiency reasons)
-  updateCellPositions(startRow: Row = this.root) {
+  updateCellPositions(startRow: Row = this.root, animate: boolean = true) {
     let pointer: Row | null = startRow
 
     while (pointer !== null) {
-      pointer.pixiRow?.updateCellPositions()
+      pointer.pixiRow?.updateCellPositions(animate)
 
       // Start traversal of the children if the current row is an aggregated row and is open
       if (pointer instanceof AggregatedRow && pointer.isOpen && pointer.hasChildren()) {
@@ -150,7 +150,7 @@ export class ItemTree {
     }
 
     // also update the sticky rows
-    this.stickyRows.forEach((stickyRow) => stickyRow.stickyPixiRow?.updateCellPositions())
+    this.stickyRows.forEach((stickyRow) => stickyRow.stickyPixiRow?.updateCellPositions(animate))
   }
 
   getAllRows(): Row[] {

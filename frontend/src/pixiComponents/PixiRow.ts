@@ -1,6 +1,7 @@
 import { Container, Text } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
+import { Column } from '@/classes/Column'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { useHeatmapStore } from '@/stores/heatmapStore'
@@ -56,14 +57,29 @@ export class PixiRow extends Container {
     for (let i = 0; i < this.pixiHeatmapCellsContainer.children.length; i++) {
       const cell = this.pixiHeatmapCellsContainer.children[i] as Container
 
-      // lookup the position of the cell
-      const columnIndex =
-        useHeatmapStore()?.attributeTree?.originalIndexToColumn.get(i)?.position ?? -1
+      // lookup the position of the column
+      const column = useHeatmapStore()?.attributeTree?.originalIndexToColumn.get(i)
+      
+      // update visibility of the cell
+      cell.visible = column?.position !== -1
 
-      gsap.to(cell, {
-        x: columnIndex * useHeatmapLayoutStore().columnWidth,
-        duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
-      })
+      // if the oldPosition is -1, we want to animate from the parent column position (if available)
+      const startPosition = column?.oldPosition === -1 ? column?.parent?.position ?? 0 : column?.oldPosition ?? 0
+      const endPosition = column?.position ?? column?.parent?.position ?? 0
+
+      gsap.fromTo(
+        cell,
+        { x: startPosition * useHeatmapLayoutStore().columnWidth },
+        {
+          x: endPosition * useHeatmapLayoutStore().columnWidth,
+          duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+        },
+      )
+
+      // gsap.to(cell, {
+      //   x: columnIndex * useHeatmapLayoutStore().columnWidth,
+      //   duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+      // })
     }
   }
 

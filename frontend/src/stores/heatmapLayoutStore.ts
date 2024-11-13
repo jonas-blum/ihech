@@ -25,7 +25,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
 
     animationDuration: 0.3, // duration of animations in seconds
 
-    heatmapCanvasBackgroundColor: 0xeeeeee, // background color of the heatmap
+    heatmapCanvasBackgroundColor: 0x777777, // background color of the heatmap
     labelBackgroundColor: 0xf0ece1, // background color of the row labels
     scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
     scrollbarThumbColor: 0xe8d8ac, // color of the scrollbar thumb

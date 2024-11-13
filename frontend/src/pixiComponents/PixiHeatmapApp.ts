@@ -6,6 +6,7 @@ import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiHeatmapApp extends Application {
   public rowContainer: Container = new Container() // PixiRow[] as children
+  public rowContainerMask: Graphics = new Graphics() // mask for the row container
   public stickyRowContainer: Container = new Container() // PixiRow[] as children
   public columnLabelsContainer: Container = new Container() // PixiColumnLabel[] as children
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
@@ -37,6 +38,7 @@ export class PixiHeatmapApp extends Application {
 
     // add the children to the main container
     this.stage.addChild(this.rowContainer)
+    this.stage.addChild(this.rowContainerMask)
     this.stage.addChild(this.stickyRowContainer)
     this.stage.addChild(this.columnLabelsContainer)
     this.stage.addChild(this.verticalScrollbar)
@@ -46,6 +48,10 @@ export class PixiHeatmapApp extends Application {
     this.stickyRowContainer.position.set(0, heatmapLayoutStore.columnLabelHeight)
     this.columnLabelsContainer.position.set(heatmapLayoutStore.rowLabelWidth, 0)
     this.verticalScrollbar.update()
+
+    // set the mask for the row container
+    this.updateRowContainerMask()
+    this.rowContainer.mask = this.rowContainerMask
   }
 
   addRow(row: PixiRow) {
@@ -79,5 +85,22 @@ export class PixiHeatmapApp extends Application {
       )
       .fill(0xffffff)
     this.heatmapCellTexture = this.renderer.generateTexture(heatmapCellGraphic)
+  }
+
+  updateRowContainerPosition() {
+    this.rowContainer.position.y = useHeatmapLayoutStore().rowsVerticalStartPosition
+  }
+
+  updateRowContainerMask() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.rowContainerMask.clear()
+    this.rowContainerMask
+      .rect(
+        0,
+        heatmapLayoutStore.rowsVerticalStartPosition,
+        heatmapLayoutStore.canvasWidth,
+        heatmapLayoutStore.canvasHeight - heatmapLayoutStore.rowsVerticalStartPosition,
+      )
+      .fill(0xffffff)
   }
 }

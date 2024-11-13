@@ -6,8 +6,7 @@ export class PixiContainer extends Container {
   constructor(backgroundColor: number = 0xffffff) {
     super()
 
-    // size of background should always be the same as the container
-    this.background.tint = backgroundColor
+    this.setBackgroundColor(backgroundColor)
     this.addChild(this.background)
   }
 

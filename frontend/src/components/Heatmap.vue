@@ -150,8 +150,9 @@ watch(
       }
     })
 
-    // Update the vertical position of the row container to account for sticky rows
-    pixiHeatmapApp.rowContainer.position.y = heatmapLayoutStore.rowsVerticalStartPosition
+    // Update the vertical position of the row container (and the mask) to account for sticky rows
+    pixiHeatmapApp.updateRowContainerPosition()
+    pixiHeatmapApp.updateRowContainerMask()
   },
 )
 
@@ -294,13 +295,13 @@ function updateCanvasDimensions() {
 
 function debug() {
   console.log('🐞', pixiHeatmapApp)
-  console.log('renderer', pixiHeatmapApp?.renderer)
 
+  
   if (pixiHeatmapApp) {
-    const sprite1 = new Sprite(pixiHeatmapApp.heatmapCellTexture)
-    sprite1.position.x = 100
-    sprite1.tint = 0x00ff00
-    pixiHeatmapApp.stage.addChild(sprite1)
+    const mask = new Graphics()
+    mask.rect(0, 0, 500, 500).fill(0xff0000)
+    pixiHeatmapApp.stage.addChild(mask)
+    pixiHeatmapApp.rowContainer.mask = mask
   }
 }
 

@@ -138,7 +138,7 @@ watch(
 
     // add new sticky rows
     stickyRowsToAdd?.forEach((row, index) => {
-      const pixiRow = new PixiRow(row, true) // create PixiRow with reference to the Row
+      const pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiHeatmapApp?.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
     })

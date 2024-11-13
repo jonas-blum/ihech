@@ -55,22 +55,44 @@ watch(
   },
 )
 
-function update() {
-  console.log('🔄 Dimred.vue update')
+function init() {
+  console.log('🚀 Dimred.vue init')
 
   if (!dimredCanvas.value) {
     console.warn('dimredCanvas is not set')
     return
   }
 
-  dimredLayoutStore.canvasWidth = dimredCanvas.value.clientWidth
-  dimredLayoutStore.canvasHeight = dimredCanvas.value.clientHeight
-  // console.log('📏 Dimred canvas size', dimredCanvas.value.width, dimredCanvas.value.height)
+  updateCanvasDimensions()
+
+  pixiDimredApp = new PixiDimredApp(dimredCanvas.value)
+
+  // this is necessary to ensure that the renderer is ready
+  function ensureRendererReady(callback: () => void) {
+    if (pixiDimredApp?.renderer) {
+      callback()
+    } else {
+      requestAnimationFrame(() => ensureRendererReady(callback))
+    }
+  }
+
+  ensureRendererReady(() => {
+    pixiDimredApp?.generateBubbleTexture()
+  })
+}
+
+function update() {
+  console.log('🔄 Dimred.vue update')
+  updateCanvasDimensions()
+
+  if (!pixiDimredApp) {
+    console.warn('pixiDimredApp is not set')
+    return
+  }
 
   // init the pixi containers and graphics (only once)
   if (!pixiDimredInitialized.value) {
-    pixiDimredApp = new PixiDimredApp(dimredCanvas.value)
-
+    console.time('initPixiDimredComponents')
     // traverse the item tree with all rows and create the pixiBubbles
     let rows = heatmapStore.itemTree?.getAllRows()
     if (!rows) {
@@ -79,13 +101,21 @@ function update() {
     }
 
     for (let row of rows) {
-      let pixiBubble = new PixiBubble(row) // create PixiBubble with reference to the Row
+      let pixiBubble = new PixiBubble(row, pixiDimredApp.bubbleTexture) // create PixiBubble with reference to the Row
       row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
       pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp
     }
+    console.timeEnd('initPixiDimredComponents')
 
     pixiDimredInitialized.value = true
     console.log('💨 Dimred components are initialized', pixiDimredApp)
+  }
+}
+
+function updateCanvasDimensions() {
+  if (dimredCanvas.value) {
+    dimredLayoutStore.canvasWidth = dimredCanvas.value.clientWidth
+    dimredLayoutStore.canvasHeight = dimredCanvas.value.clientHeight
   }
 }
 
@@ -99,7 +129,7 @@ watch(
 onMounted(async () => {
   window.addEventListener('resize', () => heatmapStore.changeHeatmap())
 
-  update()
+  init()
 })
 </script>
 

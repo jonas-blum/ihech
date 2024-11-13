@@ -1,10 +1,11 @@
-import { Application, Container } from 'pixi.js'
+import { Application, Container, Texture, Graphics } from 'pixi.js'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
 
 export class PixiDimredApp extends Application {
   public bubbleContainer: Container = new Container() // PixiBubble[] as children
+  public bubbleTexture: Texture = new Texture() // used to efficiently render bubbles as sprites
 
   constructor(canvasElement: HTMLCanvasElement) {
     super()
@@ -36,5 +37,15 @@ export class PixiDimredApp extends Application {
 
   addBubble(bubble: PixiBubble) {
     this.bubbleContainer.addChild(bubble)
+  }
+
+  generateBubbleTexture() {
+    const bubbleGraphic = new Graphics()
+    bubbleGraphic.circle(0, 0, useDimredLayoutStore().bubbleSize).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
+    bubbleGraphic.fill(0xffffff)
+    this.bubbleTexture = this.renderer.generateTexture({
+      target: bubbleGraphic,
+      resolution: 8,
+    })
   }
 }

@@ -244,11 +244,15 @@ function init() {
 
 function update() {
   console.log('🔄 Heatmap.vue update')
-  // update the heatmapLayoutStore with the current canvas dimensions
   updateCanvasDimensions()
 
+  if (!pixiHeatmapApp) {
+    console.warn('pixiHeatmapApp is not set')
+    return
+  }
+
   // only once I need to init the pixi containers and graphics
-  if (!pixiHeatmapApp || !pixiHeatmapInitialized.value) {
+  if (!pixiHeatmapInitialized.value) {
     // traverse the item tree with all rows and create the pixiRows
     let rows = heatmapStore.itemTree?.getAllRows()
     if (!rows) {

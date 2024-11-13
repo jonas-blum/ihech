@@ -1,4 +1,4 @@
-import { Container, Text, Graphics } from 'pixi.js'
+import { Container, Texture, Graphics, Sprite } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
@@ -10,17 +10,20 @@ import { gsap } from 'gsap'
 
 export class PixiBubble extends Container {
   public row: Row // reference to data structure Row
-  public bubbleGraphic: Graphics = new Graphics()
+  public bubbleGraphic: Sprite
 
-  constructor(row: Row) {
+  constructor(row: Row, texture: Texture) {
     super()
     this.row = row
 
     const heatmapStore = useHeatmapStore()
 
-    this.addChild(this.bubbleGraphic)
-    this.drawBubbleGraphic()
+    this.bubbleGraphic = new Sprite(texture)
+    this.bubbleGraphic.pivot.set(this.bubbleGraphic.width / 2, this.bubbleGraphic.height / 2)
     this.updateTint()
+    this.updateOpacity(0.5)
+    this.addChild(this.bubbleGraphic)
+
     // this.position.x = this.originalColumnIndex * useHeatmapLayoutStore().columnWidth
 
     this.eventMode = 'static'
@@ -44,14 +47,6 @@ export class PixiBubble extends Container {
 
     this.updatePositionAndVisibility(false)
     this.updateSize()
-  }
-
-  drawBubbleGraphic() {
-    this.bubbleGraphic.circle(0, 0, useDimredLayoutStore().bubbleSize).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
-    this.updateOpacity(0.5)
-
-    // Set the pivot to the center of the bubble
-    this.bubbleGraphic.pivot.set(this.bubbleGraphic.width / 2, this.bubbleGraphic.height / 2)
   }
 
   updatePositionAndVisibility(animate: boolean = true) {

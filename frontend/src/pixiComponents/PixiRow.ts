@@ -1,4 +1,4 @@
-import { Container, Text } from 'pixi.js'
+import { Container, Texture } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { Column } from '@/classes/Column'
@@ -14,7 +14,7 @@ export class PixiRow extends Container {
   public pixiRowLabel: PixiRowLabel | null // reference to the corresponding PixiRowLabel for rendering
   public row: Row // reference to data structure Row
 
-  constructor(row: Row, isSticky: boolean = false) {
+  constructor(row: Row, cellTexture: Texture, isSticky: boolean = false) {
     super()
     this.row = row
     this.isSticky = isSticky
@@ -29,7 +29,7 @@ export class PixiRow extends Container {
     for (let i = 0; i < row.data.length; i++) {
       const value = row.data[i]
       const adjustedValue = row.dataAdjusted[i]
-      const cell = new PixiHeatmapCell(value, adjustedValue, i)
+      const cell = new PixiHeatmapCell(cellTexture, value, adjustedValue, i)
       this.pixiHeatmapCellsContainer.addChild(cell)
     }
 

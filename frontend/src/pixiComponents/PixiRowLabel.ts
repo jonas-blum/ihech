@@ -1,13 +1,13 @@
 import { Container, Text, Rectangle, Graphics } from 'pixi.js'
+import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { Row } from '@/classes/Row'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
-export class PixiRowLabel extends Container {
+export class PixiRowLabel extends PixiContainer {
   public row: Row // reference to data structure Row
   public isSticky: boolean // true for sticky rows
   public text: Text
-  public background: Graphics = new Graphics()
 
   constructor(row: Row, isSticky: boolean = false) {
     super()
@@ -17,10 +17,7 @@ export class PixiRowLabel extends Container {
     // background box
     const backgroundWidth =
       useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
-    this.background
-      .rect(0, 1, backgroundWidth, useHeatmapLayoutStore().rowHeight - 2)
-      .fill(useHeatmapLayoutStore().labelBackgroundColor)
-    this.addChild(this.background)
+    this.setBackgroundRect(0, 1, backgroundWidth, useHeatmapLayoutStore().rowHeight - 2)
 
     // create the text for the row label
     this.text = new Text({
@@ -59,14 +56,17 @@ export class PixiRowLabel extends Container {
     // differntiate between sticky and non-sticky rows
     if (this.isSticky) {
       this.x = 0
-      this.background.width =
-        useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
+      this.setBackgroundWidth(
+        useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight,
+      )
+      useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
     } else {
       this.x = this.row.depth * useHeatmapLayoutStore().rowLabelDepthIndent
-      this.background.width =
+      this.setBackgroundWidth(
         useHeatmapLayoutStore().rowLabelWidth -
-        this.row.depth * useHeatmapLayoutStore().rowLabelDepthIndent -
-        useHeatmapLayoutStore().rowLabelPaddingRight
+          this.row.depth * useHeatmapLayoutStore().rowLabelDepthIndent -
+          useHeatmapLayoutStore().rowLabelPaddingRight,
+      )
     }
   }
 }

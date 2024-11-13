@@ -1,14 +1,14 @@
 import { Container, Text, Graphics } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
+import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { Column } from '@/classes/Column'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
-export class PixiColumnLabel extends Container {
+export class PixiColumnLabel extends PixiContainer {
   public column: Column // reference to data structure Column
   public text: Text
-  public background: Graphics = new Graphics()
 
   constructor(column: Column) {
     super()
@@ -19,10 +19,7 @@ export class PixiColumnLabel extends Container {
     // background box
     const backgroundHeight =
       heatmapLayoutStore.columnLabelHeight - heatmapLayoutStore.columnLabelPaddingBottom
-    this.background
-      .rect(1, 0, heatmapLayoutStore.columnWidth - 2, backgroundHeight)
-      .fill(heatmapLayoutStore.labelBackgroundColor)
-    this.addChild(this.background)
+    this.setBackgroundRect(1, 0, heatmapLayoutStore.columnWidth - 2, backgroundHeight)
 
     // create the text for the column label
     this.text = new Text({

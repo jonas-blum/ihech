@@ -11,13 +11,7 @@ import { useHeatmapStore } from '@stores/heatmapStore'
 
 <template>
   <div class="w-full h-full flex">
-    <div class="w-1/2 h-full border-red-500 border-0">
-      <Heatmap />
-    </div>
     <div class="w-1/2 h-full flex flex-col border-blue-500 border-4">
-      <div class="w-full h-2/3 border-cyan-500 border-4">
-        <Dimred />
-      </div>
       <div class="w-full h-1/3 flex border-violet-500 border-4">
         <div class="flex gap-2 relative h-min">
           <RowSorterSettings />
@@ -28,6 +22,12 @@ import { useHeatmapStore } from '@stores/heatmapStore'
           </button>
         </div>
       </div>
+      <div class="w-full h-2/3 border-cyan-500 border-4">
+        <Dimred />
+      </div>
+    </div>
+    <div class="w-1/2 h-full border-red-500 border-0">
+      <Heatmap />
     </div>
   </div>
 

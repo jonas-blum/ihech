@@ -1,4 +1,4 @@
-import { Application, Container } from 'pixi.js'
+import { Application, Container, Graphics, Texture } from 'pixi.js'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import type { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { PixiVerticalScrollbar } from '@/pixiComponents/PixiVerticalScrollbar'
@@ -9,8 +9,12 @@ export class PixiHeatmapApp extends Application {
   public stickyRowContainer: Container = new Container() // PixiRow[] as children
   public columnLabelsContainer: Container = new Container() // PixiColumnLabel[] as children
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
+  public heatmapCellTexture: Texture = new Texture() // used to efficiently render heatmap cells as sprites
 
   constructor(canvasElement: HTMLCanvasElement) {
+    console.log('PixiHeatmapApp constructor', canvasElement)
+    console.log('width', useHeatmapLayoutStore().canvasWidth)
+    console.log('height', useHeatmapLayoutStore().canvasHeight)
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     super()
@@ -59,5 +63,21 @@ export class PixiHeatmapApp extends Application {
 
   addColumnLabel(columnLabel: PixiColumnLabel) {
     this.columnLabelsContainer.addChild(columnLabel)
+  }
+
+  generateHeatmapCellTexture() {
+    console.log('generateHeatmapCellTexture')
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+
+    const heatmapCellGraphic = new Graphics()
+    heatmapCellGraphic
+      .rect(
+        0,
+        0,
+        heatmapLayoutStore.columnWidth - heatmapLayoutStore.cellPadding,
+        heatmapLayoutStore.rowHeight - heatmapLayoutStore.cellPadding,
+      )
+      .fill(0xffffff)
+    this.heatmapCellTexture = this.renderer.generateTexture(heatmapCellGraphic)
   }
 }

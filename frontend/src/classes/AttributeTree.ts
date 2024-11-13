@@ -204,4 +204,12 @@ export class AttributeTree {
     // TODO: this might break if we introduce gaps (e.g. for aggregated columns)
     return this.originalIndexToColumn.size
   }
+
+  expandAllColumns() {
+    this.getAllColumns().forEach((column) => {
+      if (column instanceof AggregatedColumn && !column.isOpen) {
+        this.expandColumn(column)
+      }
+    })
+  }
 }

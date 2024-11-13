@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from 'vue'
 import { useMouse } from '@vueuse/core'
+import { Graphics, Sprite, RenderTexture, Texture, createLevelBuffersFromKTX } from 'pixi.js'
 
 import { useHeatmapStore } from '@stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
@@ -31,9 +32,6 @@ const heatmapLayoutStore = useHeatmapLayoutStore()
 let pixiHeatmapApp: PixiHeatmapApp | null = null
 
 const heatmapCanvas = ref<HTMLCanvasElement | null>(null)
-
-const heatmapWidth = ref<number>(0)
-const heatmapHeight = ref<number>(0)
 
 const pixiHeatmapInitialized = ref(false)
 
@@ -140,7 +138,7 @@ watch(
 
     // add new sticky rows
     stickyRowsToAdd?.forEach((row, index) => {
-      const pixiRow = new PixiRow(row, true) // create PixiRow with reference to the Row
+      const pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiHeatmapApp?.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
     })
@@ -219,24 +217,42 @@ watch(
   },
 )
 
+function init() {
+  console.log('🚀 Heatmap.vue init')
+  if (!heatmapCanvas.value) {
+    console.warn('canvas is not set')
+    return
+  }
+
+  updateCanvasDimensions()
+
+  pixiHeatmapApp = new PixiHeatmapApp(heatmapCanvas.value)
+
+  // this is necessary to ensure that the renderer is ready
+  function ensureRendererReady(callback: () => void) {
+    if (pixiHeatmapApp?.renderer) {
+      callback()
+    } else {
+      requestAnimationFrame(() => ensureRendererReady(callback))
+    }
+  }
+
+  ensureRendererReady(() => {
+    pixiHeatmapApp?.generateHeatmapCellTexture()
+  })
+}
+
 function update() {
   console.log('🔄 Heatmap.vue update')
-  // update the heatmapLayoutStore with the current canvas dimensions
-  if (heatmapCanvas.value) {
-    heatmapLayoutStore.canvasWidth = heatmapCanvas.value.clientWidth
-    heatmapLayoutStore.canvasHeight = heatmapCanvas.value.clientHeight
-    // console.log('📏 Heatmap canvas size', heatmapCanvas.value.clientWidth, heatmapCanvas.value.clientHeight)
+  updateCanvasDimensions()
+
+  if (!pixiHeatmapApp) {
+    console.warn('pixiHeatmapApp is not set')
+    return
   }
 
   // only once I need to init the pixi containers and graphics
   if (!pixiHeatmapInitialized.value) {
-    if (!heatmapCanvas.value) {
-      console.warn('canvas is not set')
-      return
-    }
-
-    pixiHeatmapApp = new PixiHeatmapApp(heatmapCanvas.value)
-
     // traverse the item tree with all rows and create the pixiRows
     let rows = heatmapStore.itemTree?.getAllRows()
     if (!rows) {
@@ -245,7 +261,7 @@ function update() {
     }
 
     for (let row of rows) {
-      let pixiRow = new PixiRow(row) // create PixiRow with reference to the Row
+      let pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture) // create PixiRow with reference to the Row
       row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
       pixiRow.updatePosition()
       pixiHeatmapApp.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp
@@ -264,14 +280,28 @@ function update() {
       pixiHeatmapApp.addColumnLabel(pixiColumnLabel) // adds the PixiColumnLabel to the PixiHeatmapApp
     }
 
+    console.log('💨 Pixi Heatmap components are created', pixiHeatmapApp)
     pixiHeatmapInitialized.value = true
-    console.log('💨 Heatmap components are initialized', pixiHeatmapApp)
+  }
+}
+
+function updateCanvasDimensions() {
+  if (heatmapCanvas.value) {
+    heatmapLayoutStore.canvasWidth = heatmapCanvas.value.clientWidth
+    heatmapLayoutStore.canvasHeight = heatmapCanvas.value.clientHeight
   }
 }
 
 function debug() {
   console.log('🐞', pixiHeatmapApp)
-  pixiHeatmapApp?.rowContainer.position.set(0, 0)
+  console.log('renderer', pixiHeatmapApp?.renderer)
+
+  if (pixiHeatmapApp) {
+    const sprite1 = new Sprite(pixiHeatmapApp.heatmapCellTexture)
+    sprite1.position.x = 100
+    sprite1.tint = 0x00ff00
+    pixiHeatmapApp.stage.addChild(sprite1)
+  }
 }
 
 watch(
@@ -284,14 +314,14 @@ watch(
 onMounted(async () => {
   window.addEventListener('resize', () => heatmapStore.changeHeatmap())
 
-  heatmapStore.changeHeatmap()
+  init()
 })
 </script>
 
 <template>
   <div class="w-full h-full">
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
-    <button class="btn btn-primary btn-small" @click="debug()">Debug</button>
+    <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button>
     <span>{{ heatmapLayoutStore.requiredHeight }}</span>
 
     <div

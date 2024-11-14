@@ -138,7 +138,7 @@ watch(
 
     // add new sticky rows
     stickyRowsToAdd?.forEach((row, index) => {
-      const pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture, true) // create PixiRow with reference to the Row
+      const pixiRow = new PixiRow(row, pixiHeatmapApp!.heatmapCellTexture, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiHeatmapApp?.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
     })
@@ -199,6 +199,13 @@ watch(
     if (pixiHeatmapApp) {
       pixiHeatmapApp.rowContainer.position.y =
         heatmapLayoutStore.rowsVerticalStartPosition - newVerticalScrollPosition
+
+      // update visibility of all rows (because they might be outside the viewport)
+      for (let row of heatmapStore.itemTree?.getAllRows() ?? []) {
+        if (row.pixiRow) {
+          row.pixiRow.updateVisibility()
+        }
+      }
     }
   },
 )

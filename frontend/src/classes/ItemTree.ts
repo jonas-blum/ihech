@@ -266,11 +266,20 @@ export class ItemTree {
   }
 
   expandAllRows() {
+    // this.getAllRows().forEach((row) => {
+    //   if (row instanceof AggregatedRow && !row.isOpen) {
+    //     this.expandRow(row)
+    //   }
+    // })
+  
     this.getAllRows().forEach((row) => {
-      if (row instanceof AggregatedRow && !row.isOpen) {
-        this.expandRow(row)
+      if (row instanceof AggregatedRow) {
+        row.open()
       }
     })
+
+    this.updatePositionsAndDepth()
+    this.calculateMaxDepth()
   }
 
   assignColorToTopLevelRows() {

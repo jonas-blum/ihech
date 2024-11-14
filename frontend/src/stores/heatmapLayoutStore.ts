@@ -51,6 +51,14 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       return this.columnLabelHeight + stickyRowAmount * this.rowHeight + stickyRowPadding
     },
 
+    firstVisibleRowIndex(): number {
+      return Math.floor(this.verticalScrollPosition / this.rowHeight)
+    },
+
+    lastVisibleRowIndex(): number {
+      return Math.ceil((this.verticalScrollPosition + this.canvasHeight) / this.rowHeight)
+    },
+
     verticalScrollbarVisible(): boolean {
       return this.requiredHeight > this.canvasHeight
     },

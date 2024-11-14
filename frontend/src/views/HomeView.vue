@@ -7,6 +7,7 @@ import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
 import ColorMap from '@/components/ColorMap.vue'
 import { useHeatmapStore } from '@stores/heatmapStore'
+import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 </script>
 
 <template>
@@ -20,6 +21,11 @@ import { useHeatmapStore } from '@stores/heatmapStore'
           <button @click="useHeatmapStore()?.itemTree?.expandAllRows()" class="btn btn-small">
             Expand All
           </button>
+
+          requiredHeight: {{ useHeatmapLayoutStore().requiredHeight}}<br>
+          rowsVerticalStartPosition: {{ useHeatmapLayoutStore().rowsVerticalStartPosition }} <br>
+          firstVisibleRowIndex: {{ useHeatmapLayoutStore().firstVisibleRowIndex }} <br>
+          lastVisibleRowIndex: {{ useHeatmapLayoutStore().lastVisibleRowIndex }} <br>
         </div>
       </div>
       <div class="w-full h-2/3 border-cyan-500 border-0">

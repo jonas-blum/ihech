@@ -41,7 +41,7 @@ export class PixiRow extends Container {
   updatePosition(animate: boolean = true) {
     // if the oldPosition is -1, we want to animate from the parent row position (if available)
     const startPosition =
-      this.row.oldPosition === -1 ? this.row.parent?.position ?? 0 : this.row.oldPosition
+      this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
     gsap.fromTo(
       this,
       { y: startPosition * useHeatmapLayoutStore().rowHeight },
@@ -59,12 +59,13 @@ export class PixiRow extends Container {
 
       // lookup the position of the column
       const column = useHeatmapStore()?.attributeTree?.originalIndexToColumn.get(i)
-      
+
       // update visibility of the cell
       cell.visible = column?.position !== -1
 
       // if the oldPosition is -1, we want to animate from the parent column position (if available)
-      const startPosition = column?.oldPosition === -1 ? column?.parent?.position ?? 0 : column?.oldPosition ?? 0
+      const startPosition =
+        column?.oldPosition === -1 ? (column?.parent?.position ?? 0) : (column?.oldPosition ?? 0)
       const endPosition = column?.position ?? column?.parent?.position ?? 0
 
       gsap.fromTo(
@@ -87,7 +88,18 @@ export class PixiRow extends Container {
   }
 
   updateVisibility() {
-    this.visible = this.row.position !== -1
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+
+    if (this.isSticky) {
+      this.visible = true
+      return
+    }
+
+    // this is our custom culling mechanism -> prevent rendering if not in visible viewport
+    this.visible =
+      this.row.position !== -1 &&
+      this.row.position >= heatmapLayoutStore.firstVisibleRowIndex &&
+      this.row.position <= heatmapLayoutStore.lastVisibleRowIndex
   }
 
   updateHighlightedDisplay(highlighted: boolean) {

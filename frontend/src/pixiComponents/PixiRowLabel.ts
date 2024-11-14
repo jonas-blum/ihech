@@ -23,7 +23,7 @@ export class PixiRowLabel extends PixiContainer {
     this.text = new Text({
       text: row.name,
       style: {
-        fill: 0x000000,
+        fill: this.row.getColor(),
         fontSize: 12,
         fontFamily: 'Arial',
       },

@@ -18,6 +18,7 @@ export abstract class Row {
   position: number = -1 // position in the list of rows; -1 if not visible
   oldPosition: number = -1 // used for animations
   depth: number = -1 // indentation level in the tree
+  color: number | null = null // color of the row; used for rendering
   prevSibling: Row | null = null
   nextSibling: Row | null = null
   pixiRow: PixiRow | null = null // reference to the corresponding PixiRow for rendering
@@ -89,6 +90,10 @@ export abstract class Row {
 
     // update the pixiBubble rendering
     this.pixiBubble?.updateSize()
+  }
+
+  getColor(): number {
+    return this.color ?? this.parent?.getColor() ?? 0x000000
   }
 }
 

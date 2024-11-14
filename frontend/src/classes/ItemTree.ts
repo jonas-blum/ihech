@@ -1,5 +1,6 @@
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
 import { RowSorter } from '@/classes/RowSorter'
+import { scaleSequential, interpolateRainbow } from 'd3'
 
 export class ItemTree {
   root: AggregatedRow
@@ -7,14 +8,19 @@ export class ItemTree {
   // NOTE: to allow change detection in the sticky rows via shallow watchers, always replace the array instead of modifying it
   stickyRows: ItemRow[] = [] // for now we only allow sticky rows to be ItemRows; might change in the future
   maxDepth: number = 0 // keeps track of the maximum depth of the tree; used for several display purposes
+  colorScheme: any
 
   constructor(itemNameAndData: any, rowSorter: RowSorter) {
     this.root = this.buildItemTree(itemNameAndData) as AggregatedRow
     this.rowSorter = rowSorter
+    this.colorScheme = scaleSequential(interpolateRainbow)
 
     this.sort()
     this.updatePositionsAndDepth()
     this.calculateMaxDepth()
+    this.assignColorToTopLevelRows()
+
+    console.log('🎨', this.colorScheme)
   }
 
   buildItemTree(itemNameAndData: any, parent: Row | null = null): Row {
@@ -264,6 +270,12 @@ export class ItemTree {
       if (row instanceof AggregatedRow && !row.isOpen) {
         this.expandRow(row)
       }
+    })
+  }
+
+  assignColorToTopLevelRows() {
+    this.root.children.forEach((row, index) => {
+      row.color = this.colorScheme(index / (this.root.children.length - 1))
     })
   }
 }

@@ -20,7 +20,7 @@ export class PixiBubble extends Container {
 
     this.bubbleGraphic = new Sprite(texture)
     this.bubbleGraphic.pivot.set(this.bubbleGraphic.width / 2, this.bubbleGraphic.height / 2)
-    this.updateTint()
+    this.updateTint(this.row.getColor())
     this.updateOpacity(0.5)
     this.addChild(this.bubbleGraphic)
 

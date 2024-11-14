@@ -20,10 +20,12 @@ export class PixiRow extends Container {
     this.isSticky = isSticky
     this.pixiRowLabel = new PixiRowLabel(row, isSticky)
 
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+
     this.addChild(this.pixiHeatmapCellsContainer)
     this.addChild(this.pixiRowLabel)
 
-    this.pixiHeatmapCellsContainer.position.set(useHeatmapLayoutStore().rowLabelWidth, 0)
+    this.pixiHeatmapCellsContainer.position.set(heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin, 0)
 
     // create all the cells for the row
     for (let i = 0; i < row.data.length; i++) {

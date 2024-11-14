@@ -143,8 +143,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full h-full">
-    <canvas class="w-full h-full" ref="dimredCanvas"></canvas>
+  <div class="w-full h-full p-3">
+    <canvas class="w-full h-full shadow-[0_0_3px_0px_rgba(0,0,0,1)]" ref="dimredCanvas"></canvas>
     <div
       class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
       :style="tooltipStyle"

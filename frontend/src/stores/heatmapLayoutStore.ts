@@ -18,7 +18,9 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     rowLabelDepthIndent: 10, // indent for each depth level in the row labels
     columnLabelDepthIndent: 10, // indent for each depth level in the row labels
     heatmapLeftMargin: 5, // prevent the heatmap from touching the left border
+    heatmapRightMargin: 5, // prevent the heatmap from touching the right border
     heatmapTopMargin: 5, // prevent the heatmap from touching the top border
+    heatmapBottomMargin: 10, // prevent the heatmap from touching the bottom border
 
     verticalScrollbarWidth: 30, // width of the vertical scrollbar
     verticalScrollPosition: 0, // current vertical scroll position
@@ -38,7 +40,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
         (heatmapStore?.itemTree?.getVisibleRowsCount() ?? 0) * this.rowHeight
       const heightOfStickyRows = (heatmapStore?.itemTree?.stickyRows.length ?? 0) * this.rowHeight
       const stickyRowPadding = heightOfStickyRows > 0 ? this.gapAfterStickyRows : 0
-      return this.columnLabelHeight + heightOfVisibleRows + heightOfStickyRows + stickyRowPadding
+      return this.columnLabelHeight + heightOfVisibleRows + heightOfStickyRows + stickyRowPadding + this.heatmapBottomMargin
     },
 
     // vertical start position of rows (excluding sticky rows)

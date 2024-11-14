@@ -32,7 +32,7 @@ export class PixiHeatmapApp extends Application {
 
     // position the stage (which is the root container)
     this.stage.position.set(
-      useHeatmapLayoutStore().heatmapLeftMargin,
+      heatmapLayoutStore.heatmapLeftMargin,
       heatmapLayoutStore.heatmapTopMargin,
     )
 
@@ -52,6 +52,12 @@ export class PixiHeatmapApp extends Application {
     // set the mask for the row container
     this.updateRowContainerMask()
     this.rowContainer.mask = this.rowContainerMask
+  }
+
+  clear() {
+    this.rowContainer.removeChildren()
+    this.stickyRowContainer.removeChildren()
+    this.columnLabelsContainer.removeChildren()
   }
 
   addRow(row: PixiRow) {

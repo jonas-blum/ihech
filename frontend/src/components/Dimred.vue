@@ -55,6 +55,14 @@ watch(
   },
 )
 
+function clear() {
+  console.log('🧹 Dimred.vue clear')
+  if (pixiDimredApp) {
+    pixiDimredApp.clear()
+    pixiDimredInitialized.value = false
+  }
+}
+
 function init() {
   console.log('🚀 Dimred.vue init')
 
@@ -122,6 +130,7 @@ function updateCanvasDimensions() {
 watch(
   () => heatmapStore.getDataChanging,
   () => {
+    clear()
     update()
   },
 )

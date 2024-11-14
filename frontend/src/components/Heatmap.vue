@@ -218,6 +218,15 @@ watch(
   },
 )
 
+function clear() {
+  console.log('🧹 Heatmap.vue clear')
+  if (pixiHeatmapApp) {
+    // TODO: necessary to free memory (Pixi graphics, textures, etc.)? or is pixi automatically cleaning up?
+    pixiHeatmapApp.clear()
+    pixiHeatmapInitialized.value = false
+  }
+}
+
 function init() {
   console.log('🚀 Heatmap.vue init')
   if (!heatmapCanvas.value) {
@@ -308,6 +317,7 @@ function debug() {
 watch(
   () => heatmapStore.getDataChanging,
   () => {
+    clear()
     update()
   },
 )

@@ -180,7 +180,7 @@ export class PixiHeatmapApp extends Application {
         0,
         heatmapLayoutStore.rowsVerticalStartPosition,
         heatmapLayoutStore.canvasWidth,
-        heatmapLayoutStore.canvasHeight - heatmapLayoutStore.rowsVerticalStartPosition,
+        heatmapLayoutStore.canvasInnerHeight - heatmapLayoutStore.rowsVerticalStartPosition,
       )
       .fill(0xffffff)
   }

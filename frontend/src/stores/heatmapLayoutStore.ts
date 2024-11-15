@@ -49,9 +49,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       const heatmapStore = useHeatmapStore()
       const heightOfVisibleRows =
         (heatmapStore?.itemTree?.getVisibleRowsCount() ?? 0) * this.rowHeight
-      const heightOfStickyRows = (heatmapStore?.itemTree?.stickyRows.length ?? 0) * this.rowHeight
-      const stickyRowPadding = heightOfStickyRows > 0 ? this.gapAfterStickyRows : 0
-      return this.rowsVerticalStartPosition + heightOfVisibleRows + this.heatmapBottomMargin
+      return this.rowsVerticalStartPosition + heightOfVisibleRows + this.tileMargin
     },
 
     // vertical start position of rows (excluding sticky rows)

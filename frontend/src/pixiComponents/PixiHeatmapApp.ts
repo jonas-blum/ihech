@@ -35,10 +35,7 @@ export class PixiHeatmapApp extends Application {
     })
 
     // position the stage (which is the root container)
-    this.stage.position.set(
-      heatmapLayoutStore.heatmapLeftMargin,
-      heatmapLayoutStore.heatmapTopMargin,
-    )
+    this.stage.position.set(heatmapLayoutStore.tileMargin, heatmapLayoutStore.tileMargin)
 
     // add the children to the main container
     this.stage.addChild(this.rowLabelTile)
@@ -49,44 +46,87 @@ export class PixiHeatmapApp extends Application {
     this.stage.addChild(this.stickyRowContainer)
     this.stage.addChild(this.columnLabelsContainer)
     this.stage.addChild(this.verticalScrollbar)
-    
+
     // set the position of the containers
-    this.rowContainer.position.set(heatmapLayoutStore.tilePadding, heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding)
-    this.stickyRowContainer.position.set(heatmapLayoutStore.tilePadding, heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding)
-    this.columnLabelsContainer.position.set(heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding, heatmapLayoutStore.tilePadding)
+    this.rowContainer.position.set(
+      heatmapLayoutStore.tilePadding,
+      heatmapLayoutStore.columnLabelHeight +
+        heatmapLayoutStore.tileMargin +
+        heatmapLayoutStore.tilePadding,
+    )
+    this.stickyRowContainer.position.set(
+      heatmapLayoutStore.tilePadding,
+      heatmapLayoutStore.columnLabelHeight +
+        heatmapLayoutStore.tileMargin +
+        heatmapLayoutStore.tilePadding,
+    )
+    this.columnLabelsContainer.position.set(
+      heatmapLayoutStore.rowLabelWidth +
+        heatmapLayoutStore.tileMargin +
+        heatmapLayoutStore.tilePadding,
+      heatmapLayoutStore.tilePadding,
+    )
     this.verticalScrollbar.update()
 
     // set the mask for the row container
     this.updateRowContainerMask()
     this.rowContainer.mask = this.rowContainerMask
 
-    // set row label tile
-    this.rowLabelTile.rect(0, 0, heatmapLayoutStore.rowLabelWidth, 2000).fill(0xffffff)
-    this.rowLabelTile.position.set(0, heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin)
-    this.rowLabelTile.filters = [new DropShadowFilter({
-      offset: {x:0, y:0},
-      blur: 1,
-      alpha: 1
-    })]
+    // row label tile
+    const rowLabelTileY = heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin
+    this.rowLabelTile
+      .rect(
+        0,
+        rowLabelTileY,
+        heatmapLayoutStore.rowLabelWidth,
+        heatmapLayoutStore.canvasInnerHeight - rowLabelTileY,
+      )
+      .fill(0xffffff)
+    this.rowLabelTile.filters = [
+      new DropShadowFilter({
+        offset: { x: 0, y: 0 },
+        blur: 1,
+        alpha: 1,
+      }),
+    ]
 
-    // set column label tile
-    this.columnLabelTile.rect(0, 0, 2000, heatmapLayoutStore.columnLabelHeight).fill(0xffffff)
-    this.columnLabelTile.position.set(heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin, 0)
-    this.columnLabelTile.filters = [new DropShadowFilter({
-      offset: {x:0, y:0},
-      blur: 1,
-      alpha: 1
-    })]
+    // column label tile
+    this.columnLabelTile
+      .rect(
+        heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin,
+        0,
+        heatmapLayoutStore.canvasInnerWidth -
+          heatmapLayoutStore.rowLabelWidth -
+          heatmapLayoutStore.tileMargin,
+        heatmapLayoutStore.columnLabelHeight,
+      )
+      .fill(0xffffff)
+    this.columnLabelTile.filters = [
+      new DropShadowFilter({
+        offset: { x: 0, y: 0 },
+        blur: 1,
+        alpha: 1,
+      }),
+    ]
 
-    // set heatmap tile
-    this.heatmapTile.rect(0, 0, 2000, 2000).fill(0xffffff)
-    this.heatmapTile.position.set(heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin, heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin)
-    this.heatmapTile.filters = [new DropShadowFilter({
-      offset: {x:0, y:0},
-      blur: 1,
-      alpha: 1
-    })]
-
+    // heatmap tile
+    this.heatmapTile
+      .rect(
+        heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin,
+        heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin,
+        heatmapLayoutStore.canvasInnerWidth -
+          heatmapLayoutStore.rowLabelWidth -
+          heatmapLayoutStore.tileMargin,
+        heatmapLayoutStore.canvasInnerHeight - rowLabelTileY,
+      )
+      .fill(0xffffff)
+    this.heatmapTile.filters = [
+      new DropShadowFilter({
+        offset: { x: 0, y: 0 },
+        blur: 1,
+        alpha: 1,
+      }),
+    ]
   }
 
   clear() {

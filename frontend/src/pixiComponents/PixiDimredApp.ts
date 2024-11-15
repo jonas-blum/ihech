@@ -1,11 +1,14 @@
 import { Application, Container, Texture, Graphics } from 'pixi.js'
+import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiDimredApp extends Application {
   public bubbleContainer: Container = new Container() // PixiBubble[] as children
   public bubbleTexture: Texture = new Texture() // used to efficiently render bubbles as sprites
+  public dimredTile: Graphics = new Graphics() // purely visual; disconnected from actual Pixi objects
 
   constructor(canvasElement: HTMLCanvasElement) {
     super()
@@ -23,7 +26,25 @@ export class PixiDimredApp extends Application {
       // autoDensity: true, // not sure what this does
     })
 
-    this.stage.position.set(0, 0) // TODO: margin
+    this.stage.position.set(dimredLayoutStore.tileMargin, dimredLayoutStore.tileMargin)
+
+    // tile for border effect
+    this.dimredTile
+      .rect(
+        0,
+        0,
+        dimredLayoutStore.canvasInnerWidth + dimredLayoutStore.tileMargin - 1,
+        dimredLayoutStore.canvasInnerHeight,
+      )
+      .fill(0xffffff)
+    this.dimredTile.filters = [
+      new DropShadowFilter({
+        offset: { x: 0, y: 0 },
+        blur: 1,
+        alpha: 1,
+      }),
+    ]
+    this.stage.addChild(this.dimredTile)
 
     this.stage.addChild(this.bubbleContainer)
     // center the dimred, ensure it is quadratic

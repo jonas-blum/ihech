@@ -20,7 +20,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     heatmapLeftMargin: 5, // prevent the heatmap from touching the left border
     heatmapRightMargin: 5, // prevent the heatmap from touching the right border
     heatmapTopMargin: 5, // prevent the heatmap from touching the top border
-    heatmapBottomMargin: 10, // prevent the heatmap from touching the bottom border
+    heatmapBottomMargin: 5, // prevent the heatmap from touching the bottom border
     tilePadding: 5, // padding of items inside the "layout tiles"; do not confuse with cellPadding
     tileMargin: 20, // margin between "layout tiles"
 
@@ -35,6 +35,15 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     scrollbarThumbColor: 0xe8d8ac, // color of the scrollbar thumb
   }),
   getters: {
+    // heatmap canvas width without the left and right margins
+    canvasInnerWidth(): number {
+      return this.canvasWidth - 2 * this.tileMargin
+    },
+    // heatmap canvas height without the top and bottom margins
+    canvasInnerHeight(): number {
+      return this.canvasHeight - 2 * this.tileMargin
+    },
+
     // how much vertical space is required for the whole heatmap
     requiredHeight(): number {
       const heatmapStore = useHeatmapStore()

@@ -27,15 +27,15 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     },
     // because the dimred points need to be quadratic, we take the minimum of the width and height
     dimredSize(): number {
-      return Math.min(this.canvasWidth, this.canvasHeight)
+      return Math.min(this.canvasInnerWidth, this.canvasInnerHeight)
     },
     // if the canvasWidth > canvasHeight, we need to center the dimred horizontally
     dimredXPadding(): number {
-      return (this.canvasWidth - this.dimredSize) / 2
+      return (this.canvasInnerWidth - this.dimredSize) / 2
     },
     // if the canvasHeight > canvasWidth, we need to center the dimred vertically
     dimredYPadding(): number {
-      return (this.canvasHeight - this.dimredSize) / 2
+      return (this.canvasInnerHeight - this.dimredSize) / 2
     },
   },
   actions: {

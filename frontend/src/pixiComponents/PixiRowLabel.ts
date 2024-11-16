@@ -14,10 +14,12 @@ export class PixiRowLabel extends PixiContainer {
     this.row = row
     this.isSticky = isSticky
 
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+
     // background box
-    const backgroundWidth =
-      useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
-    this.setBackgroundRect(0, 1, backgroundWidth, useHeatmapLayoutStore().rowHeight - 2)
+    const backgroundWidth = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
+    this.setBackgroundRect(0, heatmapLayoutStore.cellPadding, backgroundWidth, heatmapLayoutStore.rowHeight - 2*heatmapLayoutStore.cellPadding)
+    this.setBackgroundColor(heatmapLayoutStore.labelBackgroundColor)
 
     // create the text for the row label
     this.text = new Text({
@@ -28,8 +30,8 @@ export class PixiRowLabel extends PixiContainer {
         fontFamily: 'Arial',
       },
     })
-    this.text.y = (useHeatmapLayoutStore().rowHeight - this.text.height) / 2
-    this.text.x = useHeatmapLayoutStore().rowLabelTextPaddingLeft
+    this.text.y = (heatmapLayoutStore.rowHeight - this.text.height) / 2
+    this.text.x = heatmapLayoutStore.rowLabelTextPaddingLeft
     this.addChild(this.text)
     // TODO: icons and other stuff can be added here
 
@@ -53,19 +55,17 @@ export class PixiRowLabel extends PixiContainer {
   }
 
   updatePosition() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
     // differntiate between sticky and non-sticky rows
     if (this.isSticky) {
       this.x = 0
-      this.setBackgroundWidth(
-        useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight,
-      )
-      useHeatmapLayoutStore().rowLabelWidth - useHeatmapLayoutStore().rowLabelPaddingRight
+      this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding)
     } else {
-      this.x = this.row.depth * useHeatmapLayoutStore().rowLabelDepthIndent
+      this.x = this.row.depth * heatmapLayoutStore.rowLabelDepthIndent
       this.setBackgroundWidth(
-        useHeatmapLayoutStore().rowLabelWidth -
-          this.row.depth * useHeatmapLayoutStore().rowLabelDepthIndent -
-          useHeatmapLayoutStore().rowLabelPaddingRight,
+        heatmapLayoutStore.rowLabelWidth -
+          this.row.depth * heatmapLayoutStore.rowLabelDepthIndent -
+          2 * heatmapLayoutStore.tilePadding,
       )
     }
   }

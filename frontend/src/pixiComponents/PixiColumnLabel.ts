@@ -18,8 +18,14 @@ export class PixiColumnLabel extends PixiContainer {
 
     // background box
     const backgroundHeight =
-      heatmapLayoutStore.columnLabelHeight - heatmapLayoutStore.columnLabelPaddingBottom
-    this.setBackgroundRect(1, 0, heatmapLayoutStore.columnWidth - 2, backgroundHeight)
+      heatmapLayoutStore.columnLabelHeight - 2 * heatmapLayoutStore.tilePadding
+    this.setBackgroundRect(
+      heatmapLayoutStore.cellPadding,
+      0,
+      heatmapLayoutStore.columnWidth - 2 * heatmapLayoutStore.cellPadding,
+      backgroundHeight,
+    )
+    this.setBackgroundColor(heatmapLayoutStore.labelBackgroundColor)
 
     // create the text for the column label
     this.text = new Text({
@@ -36,7 +42,7 @@ export class PixiColumnLabel extends PixiContainer {
     this.text.rotation = -Math.PI / 2
     this.text.y =
       heatmapLayoutStore.columnLabelHeight -
-      heatmapLayoutStore.columnLabelPaddingBottom -
+      heatmapLayoutStore.tilePadding -
       heatmapLayoutStore.columnLabelTextPaddingBottom
 
     this.addChild(this.text)
@@ -82,7 +88,7 @@ export class PixiColumnLabel extends PixiContainer {
     // this.y = this.column.depth * heatmapLayoutStore.columnLabelDepthIndent - maxDepth * heatmapLayoutStore.columnLabelDepthIndent
     this.text.y =
       heatmapLayoutStore.columnLabelHeight -
-      heatmapLayoutStore.columnLabelPaddingBottom -
+      heatmapLayoutStore.tilePadding -
       heatmapLayoutStore.columnLabelTextPaddingBottom -
       (maxDepth - this.column.depth) * heatmapLayoutStore.columnLabelDepthIndent
   }

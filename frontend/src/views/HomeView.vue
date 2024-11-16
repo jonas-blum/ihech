@@ -11,9 +11,9 @@ import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 </script>
 
 <template>
-  <div class="w-full h-full flex">
-    <div class="w-1/2 h-full flex flex-col border-blue-500 border-0">
-      <div class="w-full h-1/3 flex border-violet-500 border-0">
+  <div class="w-full h-full flex white">
+    <div class="w-1/3 h-full flex flex-col border-blue-500 border-0">
+      <div class="w-full flex border-violet-500 border-0" :style="{height: `${useHeatmapLayoutStore().columnLabelHeight + useHeatmapLayoutStore().tileMargin}px`}">
         <div class="flex gap-2 relative h-min">
           <RowSorterSettings />
           <ColumnSorterSettings />
@@ -28,11 +28,11 @@ import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
           lastVisibleRowIndex: {{ useHeatmapLayoutStore().lastVisibleRowIndex }} <br>
         </div>
       </div>
-      <div class="w-full h-2/3 border-cyan-500 border-0">
+      <div class="w-full" :style="{height: `calc(100% - ${useHeatmapLayoutStore().columnLabelHeight + useHeatmapLayoutStore().tileMargin}px)`}">
         <Dimred />
       </div>
     </div>
-    <div class="w-1/2 h-full border-red-500 border-0">
+    <div class="w-2/3 border-red-500 border-0">
       <Heatmap />
     </div>
   </div>

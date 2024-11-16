@@ -337,9 +337,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="w-full h-full p-0">
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
-    <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button>
+    <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
     <span>{{ heatmapLayoutStore.requiredHeight }}</span>
 
     <div

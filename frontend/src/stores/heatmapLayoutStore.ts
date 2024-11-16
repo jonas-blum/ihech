@@ -7,7 +7,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     canvasHeight: 0, // height of the canvas
     rowHeight: 20, // height of a row in the heatmap
     columnWidth: 20, // width of a column in the heatmap
-    columnLabelHeight: 120, // top margin until the rows start
+    columnLabelHeight: 200, // top margin until the rows start
     columnLabelPaddingBottom: 5, // prevent column labels from touching the cells
     columnLabelTextPaddingBottom: 5, // bottom padding of the column label text compared to the column label background
     rowLabelWidth: 200, // left margin until the columns start
@@ -20,27 +20,36 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     heatmapLeftMargin: 5, // prevent the heatmap from touching the left border
     heatmapRightMargin: 5, // prevent the heatmap from touching the right border
     heatmapTopMargin: 5, // prevent the heatmap from touching the top border
-    heatmapBottomMargin: 10, // prevent the heatmap from touching the bottom border
+    heatmapBottomMargin: 5, // prevent the heatmap from touching the bottom border
+    tilePadding: 5, // padding of items inside the "layout tiles"; do not confuse with cellPadding
+    tileMargin: 20, // margin between "layout tiles"
 
     verticalScrollbarWidth: 30, // width of the vertical scrollbar
     verticalScrollPosition: 0, // current vertical scroll position
 
     animationDuration: 0.3, // duration of animations in seconds
 
-    heatmapCanvasBackgroundColor: 0x777777, // background color of the heatmap
-    labelBackgroundColor: 0xf0ece1, // background color of the row labels
+    heatmapCanvasBackgroundColor: 0xffffff, // background color of the heatmap
+    labelBackgroundColor: 0xeeeeee, // background color of the row labels
     scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
     scrollbarThumbColor: 0xe8d8ac, // color of the scrollbar thumb
   }),
   getters: {
+    // heatmap canvas width without the left and right margins
+    canvasInnerWidth(): number {
+      return this.canvasWidth - 2 * this.tileMargin
+    },
+    // heatmap canvas height without the top and bottom margins
+    canvasInnerHeight(): number {
+      return this.canvasHeight - 2 * this.tileMargin
+    },
+
     // how much vertical space is required for the whole heatmap
     requiredHeight(): number {
       const heatmapStore = useHeatmapStore()
       const heightOfVisibleRows =
         (heatmapStore?.itemTree?.getVisibleRowsCount() ?? 0) * this.rowHeight
-      const heightOfStickyRows = (heatmapStore?.itemTree?.stickyRows.length ?? 0) * this.rowHeight
-      const stickyRowPadding = heightOfStickyRows > 0 ? this.gapAfterStickyRows : 0
-      return this.columnLabelHeight + heightOfVisibleRows + heightOfStickyRows + stickyRowPadding + this.heatmapBottomMargin
+      return this.rowsVerticalStartPosition + heightOfVisibleRows + this.tileMargin
     },
 
     // vertical start position of rows (excluding sticky rows)
@@ -48,7 +57,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       const heatmapStore = useHeatmapStore()
       const stickyRowAmount = heatmapStore?.itemTree?.stickyRows.length ?? 0
       const stickyRowPadding = stickyRowAmount > 0 ? this.gapAfterStickyRows : 0
-      return this.columnLabelHeight + stickyRowAmount * this.rowHeight + stickyRowPadding
+      return this.columnLabelHeight + this.tileMargin + this.tilePadding + stickyRowAmount * this.rowHeight + stickyRowPadding
     },
 
     firstVisibleRowIndex(): number {

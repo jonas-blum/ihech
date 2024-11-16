@@ -144,7 +144,8 @@ onMounted(async () => {
 
 <template>
   <div class="w-full h-full">
-    <canvas class="w-full h-full" ref="dimredCanvas"></canvas>
+    <!-- might use later: this is the equivalent border shadow of the Pixi.DropShadowFilter -->
+    <canvas class="w-full h-full " ref="dimredCanvas"></canvas>
     <div
       class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
       :style="tooltipStyle"

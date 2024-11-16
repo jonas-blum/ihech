@@ -4,6 +4,7 @@ import Dimred from '@/components/Dimred.vue'
 import HeatmapSettings from '@/components/HeatmapSettings.vue'
 import CsvUpload from '@/components/CsvUpload.vue'
 import InteractiveSettings from '@/components/InteractiveSettings.vue'
+import InteractiveSettings from '@/components/InteractiveSettings.vue'
 import { useHeatmapStore } from '@stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
@@ -21,10 +22,10 @@ function reloadHeatmap() {
     <div class="w-1/3 h-full flex flex-col">
       <!-- TODO: calculate width dynamically -->
       <div
-        class="p-5 z-10 flex flex-col gap-2"
+        class="p-5 z-10"
         :style="{
           width: `${700}px`,
-          height: `${heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin}px`,
+          height: `${useHeatmapLayoutStore().columnLabelHeight + useHeatmapLayoutStore().tileMargin}px`,
         }"
       >
         <InteractiveSettings />
@@ -32,26 +33,12 @@ function reloadHeatmap() {
           <button @click="heatmapStore?.itemTree?.expandAllRows()" class="btn btn-sm">
             Expand All
           </button>
-          <button
-            @click="reloadHeatmap()"
-            :class="{
-              btn: true,
-              'btn-sm': true,
-              'btn-neutral': !heatmapStore.isOutOfSync,
-              'btn-warning': heatmapStore.isOutOfSync,
-              'text-sm': true,
-            }"
-          >
-            Update
-            <span v-if="heatmapStore.isOutOfSync">(unsaved changes!)</span>
-            <span v-if="heatmapStore.isLoading" class="loading loading-spinner"></span>
-          </button>
         </div>
       </div>
       <div
         class="w-full"
         :style="{
-          height: `calc(100% - ${heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin}px)`,
+          height: `calc(100% - ${useHeatmapLayoutStore().columnLabelHeight + useHeatmapLayoutStore().tileMargin}px)`,
         }"
       >
         <Dimred />

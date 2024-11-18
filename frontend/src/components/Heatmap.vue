@@ -14,7 +14,7 @@ import { Row } from '@/classes/Row'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
-
+import ColorMap from '@/components/ColorMap.vue'
 
 const { x: mouseX, y: mouseY } = useMouse()
 
@@ -359,11 +359,26 @@ onMounted(async () => {
     </div>
     <RowSorterSettings
       class="absolute"
-      :style="{ top: `${heatmapLayoutStore.rowsVerticalStartPosition + heatmapLayoutStore.rowHeight - 3}px`, left: `${heatmapLayoutStore.rowLabelWidth - 0}px` }"
+      :style="{
+        top: `${heatmapLayoutStore.rowsVerticalStartPosition + heatmapLayoutStore.rowHeight - 3}px`,
+        left: `${heatmapLayoutStore.rowLabelWidth - 0}px`,
+      }"
     />
     <ColumnSorterSettings
       class="absolute"
-      :style="{ top: `${heatmapLayoutStore.tileMargin}px`, left: `${heatmapLayoutStore.rowLabelWidth + 2*heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding + 3}px` }"
+      :style="{
+        top: `${heatmapLayoutStore.tileMargin}px`,
+        left: `${heatmapLayoutStore.rowLabelWidth + 2 * heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding + 3}px`,
+      }"
+    />
+    <ColorMap
+      :colorMap="heatmapStore.colorMap"
+      class="absolute z-10"
+      :style="{
+        top: `${heatmapLayoutStore.rowsVerticalStartPosition - 50}px`,
+        left: `${heatmapLayoutStore.tileMargin}px`,
+        width: `${heatmapLayoutStore.rowLabelWidth}px`
+      }"
     />
   </div>
 </template>

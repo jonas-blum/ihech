@@ -13,6 +13,7 @@ import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { Row } from '@/classes/Row'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import RowSorterSettings from '@/components/RowSorterSettings.vue'
+import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
 
 
 const { x: mouseX, y: mouseY } = useMouse()
@@ -359,6 +360,10 @@ onMounted(async () => {
     <RowSorterSettings
       class="absolute"
       :style="{ top: `${heatmapLayoutStore.rowsVerticalStartPosition + heatmapLayoutStore.rowHeight - 3}px`, left: `${heatmapLayoutStore.rowLabelWidth - 0}px` }"
+    />
+    <ColumnSorterSettings
+      class="absolute"
+      :style="{ top: `${heatmapLayoutStore.tileMargin}px`, left: `${heatmapLayoutStore.rowLabelWidth + 2*heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding + 3}px` }"
     />
   </div>
 </template>

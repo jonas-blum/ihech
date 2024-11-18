@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { Icon } from '@iconify/vue'
+
 
 const heatmapStore = useHeatmapStore()
+const heatmapLayoutStore = useHeatmapLayoutStore()
 
 // Use computed to reactively access the column sorter from the store
 const columnSorter = computed(() => heatmapStore.attributeTree?.columnSorter)
@@ -10,7 +14,14 @@ const columnSorter = computed(() => heatmapStore.attributeTree?.columnSorter)
 
 <template>
   <div class="dropdown dropdown-hover">
-    <div tabindex="1" role="button" class="btn btn-md">Column Sorter</div>
+    <div
+      tabindex="0"
+      role="button"
+      class="btn btn-xs min-h-[0px] p-0 rounded-sm"
+      :style="{ height: `${heatmapLayoutStore.rowHeight -3}px`, transform: 'translateY(-0px)' }"
+    >
+      <Icon icon="iconoir:sort-down" class="p-0 text-opacity-50 cursor-pointer -rotate-90" />
+    </div>
     <div
       v-if="columnSorter"
       tabindex="1"

@@ -9,6 +9,8 @@ import { PixiDimredApp } from '@/pixiComponents/PixiDimredApp'
 import { Row } from '@/classes/Row'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
 
+import DimredAlgoSelection from '@components/DimredAlgoSelection.vue'
+
 const heatmapStore = useHeatmapStore()
 const dimredLayoutStore = useDimredLayoutStore()
 const dimredCanvas = ref<HTMLCanvasElement | null>(null)
@@ -143,7 +145,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="w-full h-full relative">
     <!-- might use later: this is the equivalent border shadow of the Pixi.DropShadowFilter -->
     <canvas class="w-full h-full " ref="dimredCanvas"></canvas>
     <div
@@ -159,6 +161,7 @@ onMounted(async () => {
         {{ heatmapStore.hoveredPixiBubble?.row.name }}
       </span>
     </div>
+    <DimredAlgoSelection class="absolute" :style="{top: `${dimredLayoutStore.tileMargin}px`, left: `${dimredLayoutStore.tileMargin}px`}" />
   </div>
 </template>
 

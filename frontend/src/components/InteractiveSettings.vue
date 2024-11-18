@@ -4,6 +4,7 @@ import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 import { Icon } from '@iconify/vue'
 
 const itemGroupingOptions = [
+  { label: 'No Grouping', value: 'none' },
   { label: 'Kanton', value: 'kanton' },
   { label: 'District', value: 'district' },
   { label: 'Language Region', value: 'language' },
@@ -32,20 +33,25 @@ const kOptions = [
     <p>You are exploring the age distribution of residents across municipalities in Switzerland.</p>
     <p>
       Municipalities are grouped by
-      <select class="select select-bordered select-xs w-min">
+      <select class="select select-bordered select-xs w-min mx-1">
         <option v-for="option in itemGroupingOptions" :value="option.value">
           {{ option.label }}
         </option>
       </select>
       and recursively clustered using the k-means algorithm with
-      <select class="select select-bordered select-xs w-min">
+      <select class="select select-bordered select-xs w-min mx-1">
         <option v-for="option in kOptions" :value="option.value">{{ option.label }}</option>
       </select>
-      .
+      on the 
+      <select class="select select-bordered select-xs w-min mx-1">
+        <option value="hd">high-dimensional</option>
+        <option value="ld">dimensionality reduced</option>
+      </select>
+      data.
     </p>
     <p>
       Age groups are grouped by
-      <select class="select select-bordered select-xs w-min">
+      <select class="select select-bordered select-xs w-min mx-1">
         <option v-for="option in attributeGroupingOptions" :value="option.value">
           {{ option.label }}
         </option>

@@ -28,22 +28,22 @@ const kOptions = [
   { label: 'k=10', value: 10 },
 ]
 
-async function updateClusterSize(event: Event) {
+async function updateItemsClusterSize(event: Event) {
   if (!(event.target instanceof HTMLSelectElement)) {
     console.error('Event target is not an HTMLSelectElement:', event.target)
     return
   }
   const size = event.target.value
-  heatmapStore.setClusterSize(parseInt(size, 10))
+  heatmapStore.setItemsClusterSize(parseInt(size, 10))
   heatmapStore.setIsOutOfSync(true)
 }
 
-async function updateClusterByCollections(event: Event) {
+async function updateClusterItemsByCollections(event: Event) {
   if (!(event.target instanceof HTMLInputElement)) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterByCollections(event.target.checked)
+  heatmapStore.setClusterItemsByCollections(event.target.checked)
   heatmapStore.setIsOutOfSync(true)
 }
 
@@ -58,15 +58,15 @@ async function updateClusterAfterDimRed() {
     <p>You are exploring the age distribution of residents across municipalities in Switzerland.</p>
     <p>
       Municipalities are
-      <span v-if="!heatmapStore.getActiveDataTable?.clusterByCollections">not</span> grouped (
+      <span v-if="!heatmapStore.getActiveDataTable?.clusterItemsByCollections">not</span> grouped (
       <input
-        @click="updateClusterByCollections"
+        @click="updateClusterItemsByCollections"
         type="checkbox"
         class="toggle toggle-xs translate-y-[4px]"
-        :checked="heatmapStore.getActiveDataTable?.clusterByCollections"
+        :checked="heatmapStore.getActiveDataTable?.clusterItemsByCollections"
       />
       )
-      <span v-if="heatmapStore.getActiveDataTable?.clusterByCollections">
+      <span v-if="heatmapStore.getActiveDataTable?.clusterItemsByCollections">
         by
         <select class="select select-bordered select-xs w-min mx-1">
           <option v-for="option in itemGroupingOptions" :value="option.value">
@@ -76,13 +76,13 @@ async function updateClusterAfterDimRed() {
       </span>
       and recursively clustered using the k-means algorithm with
       <select
-        @change="updateClusterSize($event)"
+        @change="updateItemsClusterSize($event)"
         class="select select-bordered select-xs w-min mx-1"
       >
         <option
           v-for="option in kOptions"
           :value="option.value"
-          :selected="heatmapStore.getActiveDataTable?.clusterSize === option.value"
+          :selected="heatmapStore.getActiveDataTable?.itemsClusterSize === option.value"
         >
           {{ option.label }}
         </option>

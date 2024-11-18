@@ -12,6 +12,8 @@ import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { Row } from '@/classes/Row'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
+import RowSorterSettings from '@/components/RowSorterSettings.vue'
+
 
 const { x: mouseX, y: mouseY } = useMouse()
 
@@ -312,7 +314,6 @@ function updateCanvasDimensions() {
 function debug() {
   console.log('🐞', pixiHeatmapApp)
 
-  
   if (pixiHeatmapApp) {
     const mask = new Graphics()
     mask.rect(0, 0, 500, 500).fill(0xff0000)
@@ -337,7 +338,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full h-full p-0">
+  <div class="w-full h-full relative p-0">
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
     <span>{{ heatmapLayoutStore.requiredHeight }}</span>
@@ -355,6 +356,10 @@ onMounted(async () => {
         {{ heatmapStore.hoveredPixiHeatmapCell?.value }}
       </span>
     </div>
+    <RowSorterSettings
+      class="absolute"
+      :style="{ top: `${heatmapLayoutStore.rowsVerticalStartPosition + heatmapLayoutStore.rowHeight - 3}px`, left: `${heatmapLayoutStore.rowLabelWidth - 0}px` }"
+    />
   </div>
 </template>
 

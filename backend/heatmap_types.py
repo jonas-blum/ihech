@@ -194,7 +194,8 @@ class HeatmapSettings:
 
     clusterByCollections: bool
 
-    clusterSize: int
+    itemsClusterSize: int
+    attributesClusterSize: int
     dimReductionAlgo: DimReductionAlgoType
     clusterAfterDimRed: bool
 
@@ -220,7 +221,8 @@ class HeatmapSettings:
 
         self.clusterByCollections = dict["clusterByCollections"]
 
-        self.clusterSize = dict["clusterSize"]
+        self.itemsClusterSize = dict["itemsClusterSize"]
+        self.attributesClusterSize = dict["attributesClusterSize"]
         self.dimReductionAlgo = dict["dimReductionAlgo"]
         self.clusterAfterDimRed = dict["clusterAfterDimRed"]
 

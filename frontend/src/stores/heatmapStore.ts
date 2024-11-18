@@ -418,12 +418,19 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       this.activeDataTable.clusterItemsBasedOnStickyAttributes = clusterItemsBasedOnStickyAttributes
     },
-    setClusterSize(clusterSize: number) {
+    setItemsClusterSize(clusterSize: number) {
       if (!this.activeDataTable) {
         console.error('No active data table')
         return
       }
-      this.activeDataTable.clusterSize = clusterSize
+      this.activeDataTable.itemsClusterSize = clusterSize
+    },
+    setAttributesClusterSize(clusterSize: number) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.attributesClusterSize = clusterSize
     },
     setDimReductionAlgo(dimReductionAlgo: DimReductionAlgoEnum) {
       if (!this.activeDataTable) {
@@ -464,7 +471,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
         clusterByCollections: this.activeDataTable.clusterByCollections,
 
-        clusterSize: this.activeDataTable.clusterSize,
+        itemsClusterSize: this.activeDataTable.itemsClusterSize,
+        attributesClusterSize: this.activeDataTable.attributesClusterSize,
         dimReductionAlgo: this.activeDataTable.dimReductionAlgo,
         clusterAfterDimRed: this.activeDataTable.clusterAfterDimRed,
 

@@ -184,7 +184,8 @@ export interface HeatmapSettings {
 
   clusterByCollections: boolean
 
-  clusterSize: number
+  itemsClusterSize: number
+  attributesClusterSize: number
   dimReductionAlgo: DimReductionAlgoEnum
   clusterAfterDimRed: boolean
 
@@ -225,7 +226,8 @@ export interface CsvDataTableProfile {
 
   clusterByCollections: boolean
 
-  clusterSize: number
+  itemsClusterSize: number
+  attributesClusterSize: number
   dimReductionAlgo: DimReductionAlgoEnum
   clusterAfterDimRed: boolean
 

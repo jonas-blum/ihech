@@ -69,13 +69,23 @@ async function updateClusterAfterDimRed(event: Event) {
   heatmapStore.setIsOutOfSync(true)
 }
 
-async function updateClusterSize(event: Event) {
+async function updateItemsClusterSize(event: Event) {
   if (!(event.target instanceof HTMLSelectElement)) {
     console.error('Event target is not an HTMLSelectElement:', event.target)
     return
   }
   const size = event.target.value
-  heatmapStore.setClusterSize(parseInt(size, 10))
+  heatmapStore.setItemsClusterSize(parseInt(size, 10))
+  heatmapStore.setIsOutOfSync(true)
+}
+
+async function updateAttributesClusterSize(event: Event) {
+  if (!(event.target instanceof HTMLSelectElement)) {
+    console.error('Event target is not an HTMLSelectElement:', event.target)
+    return
+  }
+  const size = event.target.value
+  heatmapStore.setAttributesClusterSize(parseInt(size, 10))
   heatmapStore.setIsOutOfSync(true)
 }
 
@@ -230,11 +240,14 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
             </span>
             <a class="toggle-container">
               <div>Size:</div>
-              <select @change="updateClusterSize($event)" class="select select-primary max-w-xs">
+              <select
+                @change="updateItemsClusterSize($event)"
+                class="select select-primary max-w-xs"
+              >
                 <option
                   :key="i"
-                  :selected="heatmapStore.getActiveDataTable?.clusterSize === i"
-                  v-for="i in Array.from({ length: 29 }, (_, i) => i + 2)"
+                  :selected="heatmapStore.getActiveDataTable?.itemsClusterSize === i"
+                  v-for="i in Array.from({ length: 30 }, (_, i) => i + 1)"
                 >
                   {{ i }}
                 </option>
@@ -350,11 +363,38 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
         </span>
         <div tabindex="0" role="button" class="btn m-1">
           <SettingsIcon style="height: 20px; width: 20px" />
-          <p>Attributes Ordering</p>
+          <p>Attributes</p>
         </div>
       </div>
 
       <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-72">
+        <li>
+          <div class="self-tooltip">
+            <span class="tooltiptext-right">
+              <div>Determines how many sub-groups are directly inside a group</div>
+              <div>Use a small value like 2 to get an aggregated view of the data</div>
+              <div>
+                Use a large value like 30 to get a broader view of the data to detect outliers more
+                easily
+              </div>
+            </span>
+            <a class="toggle-container">
+              <div>Size:</div>
+              <select
+                @change="updateAttributesClusterSize($event)"
+                class="select select-primary max-w-xs"
+              >
+                <option
+                  :key="i"
+                  :selected="heatmapStore.getActiveDataTable?.attributesClusterSize === i"
+                  v-for="i in Array.from({ length: 30 }, (_, i) => i + 1)"
+                >
+                  {{ i }}
+                </option>
+              </select>
+            </a>
+          </div>
+        </li>
         <li>
           <div class="self-tooltip">
             <span class="tooltiptext-right">

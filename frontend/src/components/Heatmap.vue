@@ -373,9 +373,9 @@ onMounted(async () => {
     />
     <ColorMap
       :colorMap="heatmapStore.colorMap"
-      class="absolute z-10"
+      class="absolute z-10 -translate-y-[100%]"
       :style="{
-        top: `${heatmapLayoutStore.rowsVerticalStartPosition - 50}px`,
+        top: `${heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin}px`,
         left: `${heatmapLayoutStore.tileMargin}px`,
         width: `${heatmapLayoutStore.rowLabelWidth}px`
       }"

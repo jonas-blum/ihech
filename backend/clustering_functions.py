@@ -72,6 +72,7 @@ def cluster_attributes_recursively(
     attributes_hierarchies_df: Union[pd.DataFrame, None],
     original_columns: List[str],
 ) -> Union[List[HierarchicalAttribute], None]:
+    # Case: root level
     if level == 0:
         indexes = list(range(df_rotated_dropped.shape[0]))
         append_all_average_items_by_attribute_indexes(indexes, item_names_and_data)
@@ -95,6 +96,7 @@ def cluster_attributes_recursively(
             isOpen=True,
         )
         return [hierarchical_attribute]
+    # Case: Predetermined clusters
     elif (
         cluster_by_collections == True
         and attributes_hierarchies_df is not None
@@ -164,7 +166,12 @@ def cluster_attributes_recursively(
 
         return new_hierarchical_attributes
 
-    elif df_rotated.shape[0] <= cluster_size:
+    # Case: Only few attributes left or all attributes or the same or cluster size set to <= 1
+    elif (
+        df_rotated.shape[0] <= cluster_size
+        or all_rows_same(df_rotated_dropped)
+        or cluster_size <= 1
+    ):
         remaining_hierarchical_attributes = []
         for i in range(df_rotated.shape[0]):
             attribute_name = str(df_rotated["OriginalColumnNames"].iloc[i])
@@ -180,6 +187,7 @@ def cluster_attributes_recursively(
             remaining_hierarchical_attributes.append(hierarchical_attribute)
         return remaining_hierarchical_attributes
 
+    # Case: Dynamic clustering based on attribute similarity
     else:
         if df_rotated.shape[0] > 5000:
             kmeans = MiniBatchKMeans(n_clusters=cluster_size, n_init=1, random_state=42)
@@ -304,6 +312,7 @@ def cluster_items_recursively(
     collection_column_names: List[str],
     level: int,
 ) -> Union[List[ItemNameAndData], None]:
+    # Case: root level
     if level == 0:
         tag_data_0_aggregated_mean = original_df_dropped.mean()
         tag_data_0_aggregated = np.round(
@@ -342,6 +351,7 @@ def cluster_items_recursively(
 
     is_open = False
 
+    # Case: Cluster by collections
     if cluster_by_collections and len(collection_column_names) > 0:
         new_collection_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
         collection_column_name = collection_column_names[0]
@@ -427,7 +437,12 @@ def cluster_items_recursively(
         ]
         return new_collection_item_names_and_data_to_return
 
-    if original_df.shape[0] <= cluster_size or all_rows_same(scaled_df):
+    # Case: Only few items left or all items are the same or cluster size set to <= 1
+    if (
+        original_df.shape[0] <= cluster_size
+        or all_rows_same(scaled_df)
+        or cluster_size <= 1
+    ):
         if original_df.shape[0] == 0:
             raise Exception("No items in cluster")
         if original_df.shape[0] == 1:
@@ -461,6 +476,7 @@ def cluster_items_recursively(
         new_item_names_and_data_to_return = [x[0] for x in new_item_names_and_data]
         return new_item_names_and_data_to_return
 
+    # Case: Dynamic clustering based on item similarity
     else:
         if scaled_df.shape[0] > 5000:
             kmeans = MiniBatchKMeans(n_clusters=cluster_size, n_init=1, random_state=42)

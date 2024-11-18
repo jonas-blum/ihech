@@ -390,12 +390,19 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       this.activeDataTable.coloringHeatmap = coloringHeatmap
       this.changeHeatmap()
     },
-    setClusterByCollections(clusterByCollections: boolean) {
+    setClusterItemsByCollections(clusterByCollections: boolean) {
       if (!this.activeDataTable) {
         console.error('No active data table')
         return
       }
-      this.activeDataTable.clusterByCollections = clusterByCollections
+      this.activeDataTable.clusterItemsByCollections = clusterByCollections
+    },
+    setClusterAttributesByCollections(clusterByCollections: boolean) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.clusterAttributesByCollections = clusterByCollections
     },
     setSortOrderAttributes(sortOrderAttributes: SortOrderAttributes) {
       if (!this.activeDataTable) {
@@ -418,12 +425,19 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       }
       this.activeDataTable.clusterItemsBasedOnStickyAttributes = clusterItemsBasedOnStickyAttributes
     },
-    setClusterSize(clusterSize: number) {
+    setItemsClusterSize(clusterSize: number) {
       if (!this.activeDataTable) {
         console.error('No active data table')
         return
       }
-      this.activeDataTable.clusterSize = clusterSize
+      this.activeDataTable.itemsClusterSize = clusterSize
+    },
+    setAttributesClusterSize(clusterSize: number) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.attributesClusterSize = clusterSize
     },
     setDimReductionAlgo(dimReductionAlgo: DimReductionAlgoEnum) {
       if (!this.activeDataTable) {
@@ -462,9 +476,11 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         clusterItemsBasedOnStickyAttributes:
           this.activeDataTable.clusterItemsBasedOnStickyAttributes,
 
-        clusterByCollections: this.activeDataTable.clusterByCollections,
+        clusterItemsByCollections: this.activeDataTable.clusterItemsByCollections,
+        clusterAttributesByCollections: this.activeDataTable.clusterAttributesByCollections,
 
-        clusterSize: this.activeDataTable.clusterSize,
+        itemsClusterSize: this.activeDataTable.itemsClusterSize,
+        attributesClusterSize: this.activeDataTable.attributesClusterSize,
         dimReductionAlgo: this.activeDataTable.dimReductionAlgo,
         clusterAfterDimRed: this.activeDataTable.clusterAfterDimRed,
 

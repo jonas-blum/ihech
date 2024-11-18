@@ -302,7 +302,7 @@ def create_heatmap(
         for col in settings.collectionColumnNames
         if col in original_filtered_df.columns
     ]
-    if not settings.clusterByCollections:
+    if not settings.clusterItemsByCollections:
 
         original_filtered_df = original_filtered_df.drop(
             filtered_collection_column_names, axis=1
@@ -329,9 +329,9 @@ def create_heatmap(
         original_filtered_df_dropped,
         scaled_filtered_df,
         dim_red_df,
-        settings.clusterSize,
+        settings.itemsClusterSize,
         settings.itemNamesColumnName,
-        settings.clusterByCollections,
+        settings.clusterItemsByCollections,
         filtered_collection_column_names,
         level=0,
     )
@@ -365,8 +365,8 @@ def create_heatmap(
     hierarchical_attributes = cluster_attributes_recursively(
         rotated_original_filtered_df,
         rotated_original_filtered_df_dropped,
-        settings.clusterSize,
-        settings.clusterByCollections,
+        settings.attributesClusterSize,
+        settings.clusterAttributesByCollections,
         0,
         item_names_and_data,
         attributes_hierarchies_df,

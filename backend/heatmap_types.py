@@ -192,9 +192,11 @@ class HeatmapSettings:
     stickyItemIndexes: List[str]
     clusterItemsBasedOnStickyAttributes: bool
 
-    clusterByCollections: bool
+    clusterItemsByCollections: bool
+    clusterAttributesByCollections: bool
 
-    clusterSize: int
+    itemsClusterSize: int
+    attributesClusterSize: int
     dimReductionAlgo: DimReductionAlgoType
     clusterAfterDimRed: bool
 
@@ -218,9 +220,11 @@ class HeatmapSettings:
             "clusterItemsBasedOnStickyAttributes"
         ]
 
-        self.clusterByCollections = dict["clusterByCollections"]
+        self.clusterItemsByCollections = dict["clusterItemsByCollections"]
+        self.clusterAttributesByCollections = dict["clusterAttributesByCollections"]
 
-        self.clusterSize = dict["clusterSize"]
+        self.itemsClusterSize = dict["itemsClusterSize"]
+        self.attributesClusterSize = dict["attributesClusterSize"]
         self.dimReductionAlgo = dict["dimReductionAlgo"]
         self.clusterAfterDimRed = dict["clusterAfterDimRed"]
 

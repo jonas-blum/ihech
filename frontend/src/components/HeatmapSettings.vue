@@ -28,12 +28,21 @@ function updateColoringHeatmap(coloringHeatmap: ColoringHeatmapEnum) {
   heatmapStore.setColoringHeatmap(coloringHeatmap)
 }
 
-async function updateClusterByCollections(event: Event) {
+async function updateClusterItemsByCollections(event: Event) {
   if (!(event.target instanceof HTMLInputElement)) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterByCollections(event.target.checked)
+  heatmapStore.setClusterItemsByCollections(event.target.checked)
+  heatmapStore.setIsOutOfSync(true)
+}
+
+async function updateClusterAttributesByCollections(event: Event) {
+  if (!(event.target instanceof HTMLInputElement)) {
+    console.error('Event target is not an HTMLInputElement:', event.target)
+    return
+  }
+  heatmapStore.setClusterAttributesByCollections(event.target.checked)
   heatmapStore.setIsOutOfSync(true)
 }
 
@@ -275,10 +284,10 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
               <div class="toggle-container">
                 <p>By Collections?</p>
                 <input
-                  @click="updateClusterByCollections"
+                  @click="updateClusterItemsByCollections"
                   type="checkbox"
                   class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.clusterByCollections"
+                  :checked="heatmapStore.getActiveDataTable?.clusterItemsByCollections"
                 />
               </div>
             </a>
@@ -392,6 +401,34 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   {{ i }}
                 </option>
               </select>
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="self-tooltip">
+            <span class="tooltiptext-right">
+              <div>
+                Determines if the grouping should initially be based on the selected collection
+                layers.
+              </div>
+              <div>
+                Enable this if you want to compare single items against the aggregation of an entire
+                collection, compare collections against other collections and if you want to see
+                outliers inside a collection easily
+              </div>
+              <div>Disable this if you want to find global outliers</div>
+            </span>
+
+            <a>
+              <div class="toggle-container">
+                <p>By Collections?</p>
+                <input
+                  @click="updateClusterAttributesByCollections"
+                  type="checkbox"
+                  class="toggle"
+                  :checked="heatmapStore.getActiveDataTable?.clusterAttributesByCollections"
+                />
+              </div>
             </a>
           </div>
         </li>

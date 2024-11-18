@@ -182,7 +182,8 @@ export interface HeatmapSettings {
   stickyItemIndexes: number[]
   clusterItemsBasedOnStickyAttributes: boolean
 
-  clusterByCollections: boolean
+  clusterItemsByCollections: boolean
+  clusterAttributesByCollections: boolean
 
   itemsClusterSize: number
   attributesClusterSize: number
@@ -224,7 +225,8 @@ export interface CsvDataTableProfile {
   stickyItemIndexes: number[]
   clusterItemsBasedOnStickyAttributes: boolean
 
-  clusterByCollections: boolean
+  clusterItemsByCollections: boolean
+  clusterAttributesByCollections: boolean
 
   itemsClusterSize: number
   attributesClusterSize: number

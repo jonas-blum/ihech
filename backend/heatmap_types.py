@@ -192,7 +192,8 @@ class HeatmapSettings:
     stickyItemIndexes: List[str]
     clusterItemsBasedOnStickyAttributes: bool
 
-    clusterByCollections: bool
+    clusterItemsByCollections: bool
+    clusterAttributesByCollections: bool
 
     itemsClusterSize: int
     attributesClusterSize: int
@@ -219,7 +220,8 @@ class HeatmapSettings:
             "clusterItemsBasedOnStickyAttributes"
         ]
 
-        self.clusterByCollections = dict["clusterByCollections"]
+        self.clusterItemsByCollections = dict["clusterItemsByCollections"]
+        self.clusterAttributesByCollections = dict["clusterAttributesByCollections"]
 
         self.itemsClusterSize = dict["itemsClusterSize"]
         self.attributesClusterSize = dict["attributesClusterSize"]

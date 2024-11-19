@@ -348,7 +348,6 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
         this.attributeTree.calculateMaxDepth()
-        this.attributeTree.expandAllColumns()
         console.log('AttributeTree:', this.attributeTree)
 
         // update the colorMap

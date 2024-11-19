@@ -66,7 +66,7 @@ async function updateAttributesClusterByCollections(event: Event) {
   <div class="text-md">
     <h2 class="text-xl font-bold underline mb-2">C&G Version - 🚧 Work In Progress 🚧</h2>
     <p>You are exploring the age distribution of residents across municipalities in Switzerland.</p>
-    
+
     <!-- Item Settings -->
     <p>
       Municipalities are

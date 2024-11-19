@@ -110,7 +110,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
     clusterItemsBasedOnStickyAttributes: false,
 
     clusterItemsByCollections: true,
-    clusterAttributesByCollections: false,
+    clusterAttributesByCollections: true,
 
     itemsClusterSize: 7,
     attributesClusterSize: -1,
@@ -320,8 +320,31 @@ onMounted(async () => {
     // updateHierarchyLayer('1', 'Kanton')
     // await fetchCsvFileByFileName('2019_altersklassen_absolute.csv', false)
     // updateHierarchyLayer('1', 'Kanton')
-    await fetchCsvFileByFileName('2019_altersklassen_relative.csv', false)
-    updateHierarchyLayer('1', 'Kanton')
+    // await fetchCsvFileByFileName('2019_altersklassen_relative.csv', false)
+    await fetchCsvFileByFileName('voting_Institution.csv', false)
+    updateHierarchyLayer('1', 'Sprachregion')
+    updateHierarchyLayer('2', 'Kanton')
+    await fetchCsvFileByFileName('voting_Vote trigger.csv', false)
+    updateHierarchyLayer('1', 'Sprachregion')
+    updateHierarchyLayer('2', 'Kanton')
+    await fetchCsvFileByFileName('voting_Vote trigger actor.csv', false)
+    updateHierarchyLayer('1', 'Sprachregion')
+    updateHierarchyLayer('2', 'Kanton')
+    await fetchCsvFileByFileName('voting_Theme 1.csv', false)
+    updateHierarchyLayer('1', 'Sprachregion')
+    updateHierarchyLayer('2', 'Kanton')
+    await fetchCsvFileByFileName('voting_Theme 2.csv', false)
+    updateHierarchyLayer('1', 'Sprachregion')
+    updateHierarchyLayer('2', 'Kanton')
+    await fetchCsvFileByFileName('voting_Theme 3.csv', false)
+    updateHierarchyLayer('1', 'Sprachregion')
+    updateHierarchyLayer('2', 'Kanton')
+    await fetchCsvFileByFileName('2019_age_groups_2-layers.csv', false)
+    updateHierarchyLayer('1', 'Sprachregion')
+    updateHierarchyLayer('2', 'Kanton')
+    await fetchCsvFileByFileName('2019_age_groups_1-layer.csv', false)
+    updateHierarchyLayer('1', 'Sprachregion')
+    updateHierarchyLayer('2', 'Kanton')
 
     focusActiveDataTable('smooth')
 

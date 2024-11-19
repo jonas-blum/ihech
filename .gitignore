@@ -18,6 +18,8 @@ backend/projectenv
 .pyc
 
 **/*.log
+**/.DS_Store
+**/original_data_by_municipality.csv
 
 
 

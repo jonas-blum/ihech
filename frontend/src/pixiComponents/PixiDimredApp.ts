@@ -1,4 +1,4 @@
-import { Application, Container, Texture, Graphics } from 'pixi.js'
+import { Application, Container, Texture, Graphics, Rectangle } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 import { useHeatmapStore } from '@/stores/heatmapStore'
@@ -66,8 +66,10 @@ export class PixiDimredApp extends Application {
   }
 
   generateBubbleTexture() {
+    const size = useDimredLayoutStore().bubbleSize
+
     const bubbleGraphic = new Graphics()
-    bubbleGraphic.circle(0, 0, useDimredLayoutStore().bubbleSize).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
+    bubbleGraphic.circle(0, 0, size).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
     this.bubbleTexture = this.renderer.generateTexture({
       target: bubbleGraphic,
       resolution: 8,
@@ -75,13 +77,15 @@ export class PixiDimredApp extends Application {
   }
 
   generateStickyBubbleTexture() {
-    const graphic = new Graphics()
+    const dimredLayoutStore = useDimredLayoutStore()
+    const starScaleFactor = 2
+    const size = dimredLayoutStore.bubbleSize * starScaleFactor
 
-    // draw a star shape
-    graphic.star(0, 0, 5, useDimredLayoutStore().bubbleSize).fill(0xffffff)
+    const graphic = new Graphics().star(0, 0, 5, size).fill(0xffffff)
+
     this.stickyBubbleTexture = this.renderer.generateTexture({
       target: graphic,
-      resolution: 8,
+      resolution: 8, // Optional: Keep this if you want higher resolution
     })
   }
 }

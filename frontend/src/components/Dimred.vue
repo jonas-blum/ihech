@@ -79,6 +79,39 @@ watch(
   },
 )
 
+// Watch for changes in the stickyRows array
+// NOTE: shallow watch is enough, because the stickyRows array is always a new array (because deep watch would be too expensive)
+// NOTE: Having watcher in the Heatmap and Dimred components is not the most efficient way, but for seperation of concerns it is justifiable
+watch(
+  () => heatmapStore.itemTree?.stickyRows,
+  (newStickyRows, oldStickyRows) => {
+    // console.log('stickyRows changed from', oldStickyRows, 'to', newStickyRows)
+
+    if (!pixiDimredApp) {
+      console.warn('pixiDimredApp is not set')
+      return
+    }
+
+    // find difference between old and new sticky rows
+    let stickyRowsToRemove = oldStickyRows?.filter(
+      (oldStickyRow) => !newStickyRows?.includes(oldStickyRow),
+    )
+    // find new sticky rows
+    let stickyRowsToAdd = newStickyRows?.filter(
+      (newStickyRow) => !oldStickyRows?.includes(newStickyRow),
+    )
+
+    stickyRowsToRemove?.forEach((row, index) => {
+      row.pixiBubble?.changeTexture(pixiDimredApp!.bubbleTexture)
+    })
+
+    stickyRowsToAdd?.forEach((row, index) => {
+      row.pixiBubble?.changeTexture(pixiDimredApp!.stickyBubbleTexture)
+    })
+  },
+)
+
+
 function clear() {
   console.log('🧹 Dimred.vue clear')
   if (pixiDimredApp) {
@@ -110,6 +143,7 @@ function init() {
 
   ensureRendererReady(() => {
     pixiDimredApp?.generateBubbleTexture()
+    pixiDimredApp?.generateStickyBubbleTexture()
   })
 }
 
@@ -133,7 +167,7 @@ function update() {
     }
 
     for (let row of rows) {
-      let pixiBubble = new PixiBubble(row, pixiDimredApp.bubbleTexture) // create PixiBubble with reference to the Row
+      let pixiBubble = new PixiBubble(row, pixiDimredApp.bubbleTexture, pixiDimredApp.stickyBubbleTexture) // create PixiBubble with reference to the Row
       row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
       pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp
     }

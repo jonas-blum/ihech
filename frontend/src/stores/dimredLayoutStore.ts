@@ -12,6 +12,7 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     tileMargin: 20, // margin between "layout tiles"
 
     animationDuration: 0.3, // duration of animations in seconds
+    showParentBubbles: true, // whether to show the parent bubbles in the dimred
 
     dimredCanvasBackgroundColor: 0xffffff, // background color of the heatmap
     basicBubbleColor: 0x654321, // basic color of the bubbles

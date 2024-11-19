@@ -1,4 +1,4 @@
-import { Container, Texture, Graphics, Sprite } from 'pixi.js'
+import { Container, Texture, Graphics, Sprite, Point } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
@@ -10,22 +10,21 @@ import { gsap } from 'gsap'
 
 export class PixiBubble extends Container {
   public row: Row // reference to data structure Row
-  public bubbleGraphic: Sprite
+  public bubbleGraphic: Sprite = new Sprite()
 
-  constructor(row: Row, texture: Texture) {
+  constructor(row: Row, texture: Texture, stickyBubbleTexture: Texture) {
     super()
     this.row = row
 
     const heatmapStore = useHeatmapStore()
 
-    this.bubbleGraphic = new Sprite(texture)
-    this.bubbleGraphic.pivot.set(this.bubbleGraphic.width / 2, this.bubbleGraphic.height / 2)
+    this.addChild(this.bubbleGraphic)
+    this.changeTexture(texture)
     this.updateTint(this.row.getColor())
     this.updateOpacity(0.5)
-    this.addChild(this.bubbleGraphic)
-
-    // this.position.x = this.originalColumnIndex * useHeatmapLayoutStore().columnWidth
-
+    this.updatePositionAndVisibility(false)
+    this.updateSize()
+    
     this.eventMode = 'static'
     this.cursor = 'pointer'
 
@@ -44,9 +43,12 @@ export class PixiBubble extends Container {
     this.on('mouseout', () => {
       heatmapStore?.setHoveredPixiBubble(null)
     })
+    
+  }
 
-    this.updatePositionAndVisibility(false)
-    this.updateSize()
+  changeTexture(texture: Texture) {
+    this.bubbleGraphic.texture = texture
+    this.bubbleGraphic.pivot = new Point(texture.width / 2, texture.height / 2)
   }
 
   updatePositionAndVisibility(animate: boolean = true) {
@@ -74,7 +76,7 @@ export class PixiBubble extends Container {
       // set visibility to false after the animation
       setTimeout(
         () => {
-          this.visible = false
+          this.updateVisibility()
         },
         animate ? dimredLayoutStore.animationDuration * 1000 : 0,
       )
@@ -89,7 +91,6 @@ export class PixiBubble extends Container {
       const endX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
       const endY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
 
-      this.visible = true
       gsap.fromTo(
         this,
         {
@@ -104,7 +105,24 @@ export class PixiBubble extends Container {
       )
     }
 
-    // if neiter the position nor the oldPosition is -1, we do not need to change anything
+    // if neiter the position nor the oldPosition is -1, we do not need to change the position
+
+    this.updateVisibility()
+
+  }
+
+  updateVisibility(delay: number = 0) {
+    if (this.row.position === -1) {
+      this.visible = false
+      return
+    }
+
+    if (!useDimredLayoutStore().showParentBubbles && this.row.hasChildren() && 'isOpen' in this.row && this.row.isOpen) {
+      this.visible = false
+      return
+    }
+
+    this.visible = true
   }
 
   updateTint(color?: number) {
@@ -144,8 +162,7 @@ export class PixiBubble extends Container {
     // Calculate the scale factor with log-transformed values
     const scaleFactor = 1 + (maxScaleFactor - 1) * (logItemsAmount / logItemsTotal)
 
-    // console.log(`updateSize for bubble ${this.row.name} (${this.row.depth}): ${scaleFactor}`)
-    this.bubbleGraphic.scale.set(scaleFactor)
+    this.bubbleGraphic.scale = scaleFactor
   }
 
   updateHighlightedDisplay(highlighted: boolean) {

@@ -57,6 +57,28 @@ watch(
   },
 )
 
+// watch for showParentBubbles
+watch(
+  () => dimredLayoutStore.showParentBubbles,
+  (newValue, oldValue) => {
+    if (!pixiDimredApp) {
+      console.warn('pixiDimredApp is not set')
+      return
+    }
+
+    // update position and visibility for all bubbles
+    let rows = heatmapStore.itemTree?.getAllRows()
+    if (!rows) {
+      console.warn('rows is not set')
+      return
+    }
+
+    for (let row of rows) {
+      row.pixiBubble?.updateVisibility()
+    }
+  },
+)
+
 function clear() {
   console.log('🧹 Dimred.vue clear')
   if (pixiDimredApp) {
@@ -162,6 +184,14 @@ onMounted(async () => {
       </span>
     </div>
     <DimredAlgoSelection class="absolute" :style="{top: `${dimredLayoutStore.tileMargin}px`, left: `${dimredLayoutStore.tileMargin}px`}" />
+    <div class="absolute" :style="{top: `${dimredLayoutStore.tileMargin}px`, right: `${dimredLayoutStore.tileMargin}px`}">
+      <span class="text-xs mr-1">Show Parent Bubbles?</span>
+      <input
+        v-model="dimredLayoutStore.showParentBubbles"
+        type="checkbox"
+        class="toggle toggle-xs translate-y-[4px]"
+      />
+    </div>
   </div>
 </template>
 

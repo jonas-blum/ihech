@@ -7,7 +7,8 @@ import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiDimredApp extends Application {
   public bubbleContainer: Container = new Container() // PixiBubble[] as children
-  public bubbleTexture: Texture = new Texture() // used to efficiently render bubbles as sprites
+  public bubbleTexture: Texture = new Texture() // texture used to efficiently render bubbles as sprites
+  public stickyBubbleTexture: Texture = new Texture() // texture used to encode sticky rows in the dimred
   public dimredTile: Graphics = new Graphics() // purely visual; disconnected from actual Pixi objects
 
   constructor(canvasElement: HTMLCanvasElement) {
@@ -67,9 +68,19 @@ export class PixiDimredApp extends Application {
   generateBubbleTexture() {
     const bubbleGraphic = new Graphics()
     bubbleGraphic.circle(0, 0, useDimredLayoutStore().bubbleSize).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
-    bubbleGraphic.fill(0xffffff)
     this.bubbleTexture = this.renderer.generateTexture({
       target: bubbleGraphic,
+      resolution: 8,
+    })
+  }
+
+  generateStickyBubbleTexture() {
+    const graphic = new Graphics()
+
+    // draw a star shape
+    graphic.star(0, 0, 5, useDimredLayoutStore().bubbleSize).fill(0xffffff)
+    this.stickyBubbleTexture = this.renderer.generateTexture({
+      target: graphic,
       resolution: 8,
     })
   }

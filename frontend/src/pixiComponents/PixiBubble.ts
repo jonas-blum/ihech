@@ -74,7 +74,7 @@ export class PixiBubble extends Container {
       // set visibility to false after the animation
       setTimeout(
         () => {
-          this.visible = false
+          this.updateVisibility()
         },
         animate ? dimredLayoutStore.animationDuration * 1000 : 0,
       )
@@ -89,7 +89,6 @@ export class PixiBubble extends Container {
       const endX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
       const endY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
 
-      this.visible = true
       gsap.fromTo(
         this,
         {
@@ -104,7 +103,24 @@ export class PixiBubble extends Container {
       )
     }
 
-    // if neiter the position nor the oldPosition is -1, we do not need to change anything
+    // if neiter the position nor the oldPosition is -1, we do not need to change the position
+    
+    this.updateVisibility()
+
+  }
+
+  updateVisibility(delay: number = 0) {
+    if (this.row.position === -1) {
+      this.visible = false
+      return
+    }
+
+    if (!useDimredLayoutStore().showParentBubbles && this.row.hasChildren() && 'isOpen' in this.row && this.row.isOpen) {
+      this.visible = false
+      return
+    }
+
+    this.visible = true
   }
 
   updateTint(color?: number) {

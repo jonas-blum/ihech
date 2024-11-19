@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useHeatmapStore } from '@stores/heatmapStore'
+import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
+import { Icon } from '@iconify/vue'
 
 const heatmapStore = useHeatmapStore()
 

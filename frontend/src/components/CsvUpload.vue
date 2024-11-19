@@ -333,7 +333,9 @@ onMounted(async () => {
     updateHierarchyLayer('1', 'Kanton')
     await fetchCsvFileByFileName('voting_Theme 3.csv', false)
     updateHierarchyLayer('1', 'Kanton')
-    await fetchCsvFileByFileName('2019_altersklassen_relative.csv', false)
+    await fetchCsvFileByFileName('2019_age_groups_2-layers.csv', false)
+    updateHierarchyLayer('1', 'Kanton')
+    await fetchCsvFileByFileName('2019_age_groups_1-layer.csv', false)
     updateHierarchyLayer('1', 'Kanton')
 
     focusActiveDataTable('smooth')

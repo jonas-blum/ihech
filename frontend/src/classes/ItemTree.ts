@@ -1,6 +1,6 @@
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
 import { RowSorter } from '@/classes/RowSorter'
-import { scaleSequential, interpolateRainbow } from 'd3'
+import { scaleSequential, scaleOrdinal, interpolateRainbow, schemePaired, schemeCategory10 } from 'd3'
 
 export class ItemTree {
   root: AggregatedRow
@@ -13,7 +13,8 @@ export class ItemTree {
   constructor(itemNameAndData: any, rowSorter: RowSorter) {
     this.root = this.buildItemTree(itemNameAndData) as AggregatedRow
     this.rowSorter = rowSorter
-    this.colorScheme = scaleSequential(interpolateRainbow)
+    // this.colorScheme = scaleSequential(interpolateRainbow)
+    this.colorScheme = scaleOrdinal(schemeCategory10)
 
     this.sort()
     this.updatePositionsAndDepth()

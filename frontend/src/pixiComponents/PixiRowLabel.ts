@@ -32,6 +32,8 @@ export class PixiRowLabel extends PixiContainer {
     })
     this.text.y = (heatmapLayoutStore.rowHeight - this.text.height) / 2
     this.text.x = heatmapLayoutStore.rowLabelTextPaddingLeft
+    this.text.width = Math.min(this.text.width, backgroundWidth - 2 * heatmapLayoutStore.rowLabelTextPaddingLeft)
+    
     this.addChild(this.text)
     // TODO: icons and other stuff can be added here
 

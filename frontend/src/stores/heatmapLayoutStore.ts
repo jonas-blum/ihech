@@ -24,7 +24,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     tilePadding: 5, // padding of items inside the "layout tiles"; do not confuse with cellPadding
     tileMargin: 20, // margin between "layout tiles"
 
-    verticalScrollbarWidth: 30, // width of the vertical scrollbar
+    verticalScrollbarWidth: 10, // width of the vertical scrollbar
     verticalScrollPosition: 0, // current vertical scroll position
 
     animationDuration: 0.3, // duration of animations in seconds
@@ -32,7 +32,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     heatmapCanvasBackgroundColor: 0xffffff, // background color of the heatmap
     labelBackgroundColor: 0xeeeeee, // background color of the row labels
     scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
-    scrollbarThumbColor: 0xe8d8ac, // color of the scrollbar thumb
+    scrollbarThumbColor: 0x000000, // color of the scrollbar thumb
   }),
   getters: {
     // heatmap canvas width without the left and right margins
@@ -45,11 +45,15 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     },
 
     // how much vertical space is required for the whole heatmap
-    requiredHeight(): number {
+    requiredHeightOfRows(): number {
       const heatmapStore = useHeatmapStore()
       const heightOfVisibleRows =
         (heatmapStore?.itemTree?.getVisibleRowsCount() ?? 0) * this.rowHeight
-      return this.rowsVerticalStartPosition + heightOfVisibleRows + this.tileMargin
+      return heightOfVisibleRows
+    },
+
+    availableHeightForRows(): number {
+      return this.canvasInnerHeight - this.rowsVerticalStartPosition - 2* this.tilePadding
     },
 
     // vertical start position of rows (excluding sticky rows)
@@ -69,21 +73,19 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     },
 
     verticalScrollbarVisible(): boolean {
-      return this.requiredHeight > this.canvasHeight
-    },
-
-    verticalScrollbarTrackHeight(): number {
-      return this.canvasHeight - this.rowsVerticalStartPosition
+      return this.requiredHeightOfRows > this.availableHeightForRows
     },
 
     verticalScrollbarThumbHeight(): number {
-      const visibleRatio = this.verticalScrollbarTrackHeight / this.requiredHeight
-      return visibleRatio * this.verticalScrollbarTrackHeight
+      return this.availableHeightForRows / this.requiredHeightOfRows * this.availableHeightForRows
     },
   },
   actions: {
     setVerticalScrollPosition(position: number) {
-      this.verticalScrollPosition = position
+      // clamp the position to the available height
+      // make sure the position is updated based on the ratio of the required height
+      const maxPosition = this.requiredHeightOfRows - this.availableHeightForRows
+      this.verticalScrollPosition = Math.max(0, Math.min(maxPosition, position))
     },
   },
 })

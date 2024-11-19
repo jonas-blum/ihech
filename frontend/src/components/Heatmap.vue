@@ -12,6 +12,9 @@ import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { Row } from '@/classes/Row'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
+import RowSorterSettings from '@/components/RowSorterSettings.vue'
+import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
+import ColorMap from '@/components/ColorMap.vue'
 
 const { x: mouseX, y: mouseY } = useMouse()
 
@@ -180,9 +183,27 @@ watch(
 
 // watch for requiredHeight changes
 watch(
-  () => heatmapLayoutStore.requiredHeight,
-  (newRequiredHeight, oldRequiredHeight) => {
-    // console.log('requiredHeight changed from', oldRequiredHeight, 'to', newRequiredHeight)
+  () => heatmapLayoutStore.availableHeightForRows,
+  (newAvailableHeightForRows, oldAvailableHeightForRows) => {
+    console.log(
+      'availableHeightForRows changed from',
+      oldAvailableHeightForRows,
+      'to',
+      newAvailableHeightForRows,
+    )
+
+    // update the vertical scrollbar
+    if (pixiHeatmapApp) {
+      pixiHeatmapApp.verticalScrollbar.update()
+    }
+  },
+)
+
+// watch for availableHeightForRows changes
+watch(
+  () => heatmapLayoutStore.requiredHeightOfRows,
+  (newRequiredHeightOfRows, oldRequiredHeightOfRows) => {
+    // console.log('requiredHeightOfRows changed from', oldRequiredHeightOfRows, 'to', newRequiredHeightOfRows)
 
     // update the vertical scrollbar
     if (pixiHeatmapApp) {
@@ -197,10 +218,13 @@ watch(
   (newVerticalScrollPosition, oldVerticalScrollPosition) => {
     // update the vertical position of the row container
     if (pixiHeatmapApp) {
+      pixiHeatmapApp.verticalScrollbar.update()
+
       pixiHeatmapApp.rowContainer.position.y =
         heatmapLayoutStore.rowsVerticalStartPosition - newVerticalScrollPosition
 
       // update visibility of all rows (because they might be outside the viewport)
+      // TODO: this causes laggy scrolling. a less strict culling mechanism would be better
       for (let row of heatmapStore.itemTree?.getAllRows() ?? []) {
         if (row.pixiRow) {
           row.pixiRow.updateVisibility()
@@ -312,7 +336,6 @@ function updateCanvasDimensions() {
 function debug() {
   console.log('🐞', pixiHeatmapApp)
 
-  
   if (pixiHeatmapApp) {
     const mask = new Graphics()
     mask.rect(0, 0, 500, 500).fill(0xff0000)
@@ -337,11 +360,16 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full h-full p-0">
+  <div class="w-full h-full relative p-0">
+    <!-- <span class="absolute"
+      >{{ heatmapLayoutStore.requiredHeightOfRows }} /
+      {{ heatmapLayoutStore.availableHeightForRows }} /
+      {{ heatmapLayoutStore.verticalScrollbarVisible }} /
+      {{ heatmapLayoutStore.verticalScrollPosition }}</span
+    > -->
+
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
-    <span>{{ heatmapLayoutStore.requiredHeight }}</span>
-
     <div
       class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
       :style="tooltipStyle"
@@ -355,6 +383,29 @@ onMounted(async () => {
         {{ heatmapStore.hoveredPixiHeatmapCell?.value }}
       </span>
     </div>
+    <RowSorterSettings
+      class="absolute"
+      :style="{
+        top: `${heatmapLayoutStore.rowsVerticalStartPosition + heatmapLayoutStore.rowHeight - 3}px`,
+        left: `${heatmapLayoutStore.rowLabelWidth - 0}px`,
+      }"
+    />
+    <ColumnSorterSettings
+      class="absolute"
+      :style="{
+        top: `${heatmapLayoutStore.tileMargin}px`,
+        left: `${heatmapLayoutStore.rowLabelWidth + 2 * heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding + 3}px`,
+      }"
+    />
+    <ColorMap
+      :colorMap="heatmapStore.colorMap"
+      class="absolute z-10 -translate-y-[100%]"
+      :style="{
+        top: `${heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin}px`,
+        left: `${heatmapLayoutStore.tileMargin}px`,
+        width: `${heatmapLayoutStore.rowLabelWidth}px`,
+      }"
+    />
   </div>
 </template>
 

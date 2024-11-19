@@ -4,7 +4,6 @@ import Dimred from '@/components/Dimred.vue'
 import HeatmapSettings from '@/components/HeatmapSettings.vue'
 import CsvUpload from '@/components/CsvUpload.vue'
 import InteractiveSettings from '@/components/InteractiveSettings.vue'
-import InteractiveSettings from '@/components/InteractiveSettings.vue'
 import { useHeatmapStore } from '@stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 

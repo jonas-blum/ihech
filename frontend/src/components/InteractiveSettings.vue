@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { useHeatmapStore } from '@stores/heatmapStore'
-import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
-import { Icon } from '@iconify/vue'
 
 const heatmapStore = useHeatmapStore()
 
@@ -137,22 +135,5 @@ async function updateAttributesClusterByCollections(event: Event) {
       .
       <!-- TODO: here I could add the k-means attribute clustering parameter. for now I "disabled" it by settings the parameter to -1 -->
     </p>
-  </div>
-</template>
-<script setup lang="ts">
-import { useHeatmapStore } from '@stores/heatmapStore'
-import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
-</script>
-
-<template>
-  <div class="text-lg">
-    <p>
-      This dataset provides the age distribution of residents across municipalities in Switzerland.
-    </p>
-    <p>
-      Municipalities are grouped by Kanton and recursively clustered (k=7) based on their
-      similarity.
-    </p>
-    <p>Age groups are grouped by Jung/Alt.</p>
   </div>
 </template>

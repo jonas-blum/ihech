@@ -51,11 +51,22 @@ async function updateClusterAfterDimRed() {
   heatmapStore.setClusterAfterDimRed(!heatmapStore.getActiveDataTable?.clusterAfterDimRed)
   heatmapStore.setIsOutOfSync(true)
 }
+
+async function updateAttributesClusterByCollections(event: Event) {
+  if (!(event.target instanceof HTMLInputElement)) {
+    console.error('Event target is not an HTMLInputElement:', event.target)
+    return
+  }
+  heatmapStore.setClusterAttributesByCollections(event.target.checked)
+  heatmapStore.setIsOutOfSync(true)
+}
 </script>
 
 <template>
   <div class="text-md">
     <p>You are exploring the age distribution of residents across municipalities in Switzerland.</p>
+    
+    <!-- Item Settings -->
     <p>
       Municipalities are
       <span v-if="!heatmapStore.getActiveDataTable?.clusterItemsByCollections">not</span> grouped (
@@ -88,21 +99,42 @@ async function updateClusterAfterDimRed() {
         </option>
       </select>
       on the
-      <select @change="updateClusterAfterDimRed" class="select select-bordered select-xs w-min mx-1">
-        <option :selected="!heatmapStore.getActiveDataTable?.clusterAfterDimRed">high-dimensional</option>
-        <option :selected="heatmapStore.getActiveDataTable?.clusterAfterDimRed">dimensionality reduced</option>
+      <select
+        @change="updateClusterAfterDimRed"
+        class="select select-bordered select-xs w-min mx-1"
+      >
+        <option :selected="!heatmapStore.getActiveDataTable?.clusterAfterDimRed">
+          high-dimensional
+        </option>
+        <option :selected="heatmapStore.getActiveDataTable?.clusterAfterDimRed">
+          dimensionality reduced
+        </option>
       </select>
       data.
     </p>
+
+    <!-- Attribute Settings -->
     <p>
-      <!-- TODO: toggle to disable grouping of attributes (analogously to clusterByCollections) -->
-      Age groups are grouped by
-      <select class="select select-bordered select-xs w-min mx-1">
-        <option v-for="option in attributeGroupingOptions" :value="option.value" @change="">
-          {{ option.label }}
-        </option>
-      </select>
+      Age groups are
+      <span v-if="!heatmapStore.getActiveDataTable?.clusterAttributesByCollections">not</span>
+      grouped (
+      <input
+        @click="updateAttributesClusterByCollections"
+        type="checkbox"
+        class="toggle toggle-xs translate-y-[4px]"
+        :checked="heatmapStore.getActiveDataTable?.clusterAttributesByCollections"
+      />
+      )
+      <span v-if="heatmapStore.getActiveDataTable?.clusterAttributesByCollections">
+        by
+        <select class="select select-bordered select-xs w-min mx-1">
+          <option v-for="option in attributeGroupingOptions" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </span>
       .
+      <!-- TODO: here I could add the k-means attribute clustering parameter. for now I "disabled" it by settings the parameter to -1 -->
     </p>
   </div>
 </template>

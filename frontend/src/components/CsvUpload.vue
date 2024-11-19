@@ -110,7 +110,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
     clusterItemsBasedOnStickyAttributes: false,
 
     clusterItemsByCollections: true,
-    clusterAttributesByCollections: false,
+    clusterAttributesByCollections: true,
 
     itemsClusterSize: 7,
     attributesClusterSize: -1,
@@ -320,7 +320,7 @@ onMounted(async () => {
     // updateHierarchyLayer('1', 'Kanton')
     // await fetchCsvFileByFileName('2019_altersklassen_absolute.csv', false)
     // updateHierarchyLayer('1', 'Kanton')
-    await fetchCsvFileByFileName('2019_altersklassen_relative.csv', false)
+    await fetchCsvFileByFileName('yes_percent.csv', false)
     updateHierarchyLayer('1', 'Kanton')
 
     focusActiveDataTable('smooth')

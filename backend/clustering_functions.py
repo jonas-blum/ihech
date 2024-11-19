@@ -123,7 +123,7 @@ def cluster_attributes_recursively(
                 attribute_idx_sum += attribute_idx
                 attribute_idx_count += 1
             if attribute_idx_count == 0:
-                attribute_idx_sum = 1
+                attribute_idx_count = 1
             average_attribute_index = attribute_idx_sum / attribute_idx_count
             indices = df_rotated[
                 df_rotated["OriginalColumnNames"].isin(

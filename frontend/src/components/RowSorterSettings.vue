@@ -24,10 +24,9 @@ const rowSorter = computed(() => heatmapStore.itemTree?.rowSorter)
     <div
       v-if="rowSorter"
       tabindex="0"
-      class="dropdown-content bg-base-100 z-[1] w-64 p-2 rounded-sm shadow text-xs"
+      class="dropdown-content bg-base-100 z-[1] w-48 p-2 rounded-sm shadow text-xs"
     >
       <p class="font-bold">Sort Rows by:</p>
-      <!-- Use `in` instead of `of` for `v-for` and add a unique key -->
       <div
         v-for="(criterion, index) in rowSorter.getCriteria()"
         :key="criterion.technicalName"

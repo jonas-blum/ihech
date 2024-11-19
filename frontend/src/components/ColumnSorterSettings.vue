@@ -4,7 +4,6 @@ import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { Icon } from '@iconify/vue'
 
-
 const heatmapStore = useHeatmapStore()
 const heatmapLayoutStore = useHeatmapLayoutStore()
 
@@ -13,42 +12,44 @@ const columnSorter = computed(() => heatmapStore.attributeTree?.columnSorter)
 </script>
 
 <template>
-  <div class="dropdown dropdown-hover">
+  <div class="dropdown dropdown-hover items-start align-start">
     <div
       tabindex="0"
       role="button"
       class="btn btn-xs min-h-[0px] p-0 rounded-sm"
-      :style="{ height: `${heatmapLayoutStore.rowHeight -3}px`, transform: 'translateY(-0px)' }"
+      :style="{ height: `${heatmapLayoutStore.rowHeight - 3}px`, transform: 'translateY(-0px)' }"
     >
       <Icon icon="iconoir:sort-down" class="p-0 text-opacity-50 cursor-pointer -rotate-90" />
     </div>
     <div
       v-if="columnSorter"
-      tabindex="1"
-      class="dropdown-content bg-base-100 z-[1] w-64 p-2 rounded-sm shadow text-xs"
+      tabindex="0"
+      class="dropdown-content bg-base-100 z-[1] w-60 p-2 rounded-sm shadow text-xs"
     >
-      <p class="font-bold">Sort Columns by:</p>
-      <!-- Use `in` instead of `of` for `v-for` and add a unique key -->
+      <p class="font-bold">Sort Rows by:</p>
       <div
         v-for="(criterion, index) in columnSorter.getCriteria()"
         :key="criterion.technicalName"
         class="flex gap-[4px] items-center"
       >
-        <!-- Correct property name to `humanReadableName` -->
-        <span class="w-64">{{ index + 1 }}. {{ criterion.humanReadableName }}</span>
         <button
-          class="btn btn-xs"
+          class="btn btn-xs p-0"
+          :disabled="index === 0"
           @click="columnSorter.moveCriterion(criterion.technicalName, index - 1)"
         >
-          Up
+          <Icon icon="stash:arrow-up" class="w-4 h-4 p-0 text-opacity-50 cursor-pointer" />
         </button>
         <button
-          class="btn btn-xs"
+          class="btn btn-xs p-0"
+          :disabled="index === columnSorter.getCriteria().length - 1"
           @click="columnSorter.moveCriterion(criterion.technicalName, index + 1)"
         >
-          Down
+          <Icon icon="stash:arrow-down" class="w-4 h-4 p-0 text-opacity-50 cursor-pointer" />
         </button>
-        <button class="btn btn-xs" @click="criterion.toggleReverse()">Reverse</button>
+        <span class="w-64">{{ index + 1 }}. {{ criterion.humanReadableName }}</span>
+        <button class="btn btn-xs p-0" @click="criterion.toggleReverse()">
+          <Icon icon="system-uicons:reverse" class="w-4 h-4 p-0 text-opacity-50 cursor-pointer" />
+        </button>
       </div>
     </div>
   </div>

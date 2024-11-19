@@ -39,8 +39,8 @@ const handleColorZeroChange = (event: Event) => {
     <div tabindex="0" class="w-full cursor-pointer" role="button">
       <div class="w-full h-4" :style="{ background: gradientStyle }"></div>
       <div class="w-full flex justify-between text-xs mt-1">
-        <span>{{ props.colorMap.min }}</span>
-        <span>{{ props.colorMap.max }}</span>
+        <span>{{ props.colorMap.min.toFixed(3) }}</span>
+        <span>{{ props.colorMap.max.toFixed(3) }}</span>
       </div>
     </div>
 

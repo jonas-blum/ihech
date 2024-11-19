@@ -110,7 +110,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
     clusterItemsBasedOnStickyAttributes: false,
 
     clusterItemsByCollections: true,
-    clusterAttributesByCollections: true,
+    clusterAttributesByCollections: false,
 
     itemsClusterSize: 7,
     attributesClusterSize: -1,

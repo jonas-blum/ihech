@@ -76,7 +76,7 @@ def cluster_attributes_recursively(
     if level == 0:
         indexes = list(range(df_rotated_dropped.shape[0]))
         append_all_average_items_by_attribute_indexes(indexes, item_names_and_data)
-        new_attribute_name = "All_Attributes"
+        new_attribute_name = f"All_Attributes {str(len(indexes))}"
         children = cluster_attributes_recursively(
             df_rotated,
             df_rotated_dropped,
@@ -109,8 +109,6 @@ def cluster_attributes_recursively(
         for hierarchy in grouped_attributes:
             if hierarchy == "nan":
                 continue
-
-            new_attribute_name = str(hierarchy)
             attribute_names = list(
                 first_attributes_row[first_attributes_row == hierarchy].index
             )
@@ -143,6 +141,7 @@ def cluster_attributes_recursively(
             attributes_hierarchies_df_first_row_removed = (
                 attributes_hierarchies_df.iloc[1:]
             )
+            new_attribute_name = f"{str(hierarchy)} {str(len(indices_list))}"
             children = cluster_attributes_recursively(
                 df_rotated.loc[indices],
                 df_rotated_dropped.loc[indices],

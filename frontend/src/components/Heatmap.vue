@@ -199,6 +199,19 @@ watch(
   },
 )
 
+// watch for requiredWidth changes
+watch(
+  () => heatmapLayoutStore.availableWidthForColumns,
+  (newAvailableWidthForColumns, oldAvailableWidthForColumns) => {
+    // console.log('availableWidthForColumns changed from', oldAvailableWidthForColumns, 'to', newAvailableWidthForColumns)
+
+    // update the horizontal scrollbar
+    if (pixiHeatmapApp) {
+      pixiHeatmapApp.horizontalScrollbar.update()
+    }
+  },
+)
+
 // watch for availableHeightForRows changes
 watch(
   () => heatmapLayoutStore.requiredHeightOfRows,
@@ -208,6 +221,19 @@ watch(
     // update the vertical scrollbar
     if (pixiHeatmapApp) {
       pixiHeatmapApp.verticalScrollbar.update()
+    }
+  },
+)
+
+// watch for availableWidthForColumns changes
+watch(
+  () => heatmapLayoutStore.requiredWidthOfColumns,
+  (newRequiredWidthOfColumns, oldRequiredWidthOfColumns) => {
+    // console.log('requiredWidthOfColumns changed from', oldRequiredWidthOfColumns, 'to', newRequiredWidthOfColumns)
+
+    // update the horizontal scrollbar
+    if (pixiHeatmapApp) {
+      pixiHeatmapApp.horizontalScrollbar.update()
     }
   },
 )
@@ -230,6 +256,19 @@ watch(
           row.pixiRow.updateVisibility()
         }
       }
+    }
+  },
+)
+
+// watch for horizontalScrollPosition changes
+watch(
+  () => heatmapLayoutStore.horizontalScrollPosition,
+  (newHorizontalScrollPosition, oldHorizontalScrollPosition) => {
+    // update the horizontal position of the column container
+    if (pixiHeatmapApp) {
+      pixiHeatmapApp.horizontalScrollbar.update()
+
+      // TODO: this might get complicated because it is not easy to shift horizontally..
     }
   },
 )
@@ -367,6 +406,13 @@ onMounted(async () => {
       {{ heatmapLayoutStore.verticalScrollbarVisible }} /
       {{ heatmapLayoutStore.verticalScrollPosition }}</span
     > -->
+
+    <span class="absolute"
+      >{{ heatmapLayoutStore.requiredWidthOfColumns }} /
+      {{ heatmapLayoutStore.availableWidthForColumns }} /
+      {{ heatmapLayoutStore.horizontalScrollbarVisible }} /
+      {{ heatmapLayoutStore.horizontalScrollPosition }}</span
+    >
 
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->

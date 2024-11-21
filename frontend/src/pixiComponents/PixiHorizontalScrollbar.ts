@@ -7,11 +7,11 @@ import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
-export class PixiVerticalScrollbar extends Container {
+export class PixiHorizontalScrollbar extends Container {
   track: Graphics = new Graphics() // the 'track' is the background of the scrollbar
   thumb: Graphics = new Graphics() // the 'thumb' is the draggable part of the scrollbar
   isDragging: boolean = false // flag to track dragging state
-  startDragY: number = 0 // stores the initial Y position on drag start
+  startDragX: number = 0 // stores the initial X position on drag start
   startDragScrollPosition: number = 0 // stores the initial scroll position on drag start
 
   constructor() {
@@ -20,8 +20,8 @@ export class PixiVerticalScrollbar extends Container {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     // set the width and height of the container
-    const width = heatmapLayoutStore.verticalScrollbarWidth
-    const height = heatmapLayoutStore.canvasHeight - heatmapLayoutStore.columnLabelHeight
+    const width = heatmapLayoutStore.canvasWidth - heatmapLayoutStore.rowLabelWidth
+    const height = heatmapLayoutStore.horizontalScrollbarHeight
 
     this.track
       .rect(0, 0, width, height)
@@ -29,7 +29,7 @@ export class PixiVerticalScrollbar extends Container {
     this.addChild(this.track)
 
     this.thumb
-      .rect(0, 0, width, 10)
+      .rect(0, 0, width, height)
       .fill({ color: heatmapLayoutStore.scrollbarThumbColor, alpha: 0.5 })
     this.addChild(this.thumb)
 
@@ -51,8 +51,8 @@ export class PixiVerticalScrollbar extends Container {
   // Drag start event
   onDragStart(event: any): void {
     this.isDragging = true
-    this.startDragY = event.data.global.y
-    this.startDragScrollPosition = useHeatmapLayoutStore().verticalScrollPosition
+    this.startDragX = event.data.global.x
+    this.startDragScrollPosition = useHeatmapLayoutStore().horizontalScrollPosition
   }
 
   // Drag end event
@@ -66,35 +66,42 @@ export class PixiVerticalScrollbar extends Container {
       const heatmapLayoutStore = useHeatmapLayoutStore()
 
       // the amount of pixels the thumb was dragged
-      const dragDelta = event.data.global.y - this.startDragY
+      const dragDelta = event.data.global.x - this.startDragX
 
       // set vertical scroll position based on the drag distance (based on ratio)
-      const scrollDelta = (dragDelta / heatmapLayoutStore.availableHeightForRows) * heatmapLayoutStore.requiredHeightOfRows
+      const scrollDelta = (dragDelta / heatmapLayoutStore.availableWidthForColumns) * heatmapLayoutStore.requiredWidthOfColumns
 
-      heatmapLayoutStore.setVerticalScrollPosition(this.startDragScrollPosition + scrollDelta)
+      heatmapLayoutStore.setHorizontalScrollPosition(this.startDragScrollPosition + scrollDelta)
     }
   }
 
   update() {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
-    this.visible = heatmapLayoutStore.verticalScrollbarVisible
+    this.visible = heatmapLayoutStore.horizontalScrollbarVisible
 
-    this.position.x =
-      heatmapLayoutStore.rowLabelWidth +
+    this.position.y =
+      heatmapLayoutStore.columnLabelHeight +
       heatmapLayoutStore.tileMargin / 2 -
-      heatmapLayoutStore.verticalScrollbarWidth / 2
+      heatmapLayoutStore.horizontalScrollbarHeight / 2
 
     // align the scrollbar with the rows (excluding the sticky rows)
-    this.position.y = heatmapLayoutStore.rowsVerticalStartPosition
+    this.position.x = heatmapLayoutStore.columnsHorizontalStartPosition
 
-    // adjust the height of the scrollbar track to go until the bottom of the canvas
-    this.track.height = heatmapLayoutStore.availableHeightForRows
+    // adjust the width of the scrollbar track to go until the right end of the canvas
+    this.track.width = heatmapLayoutStore.availableWidthForColumns
 
-    // set the height of the thumb
-    this.thumb.height = heatmapLayoutStore.verticalScrollbarThumbHeight
+    // set the width of the thumb
+    this.thumb.width = heatmapLayoutStore.horizontalScrollbarThumbHeight
 
-    // Position the thumb based on the current scroll position (ratio of scroll position to required height)
-    this.thumb.y = (heatmapLayoutStore.verticalScrollPosition / heatmapLayoutStore.requiredHeightOfRows) * this.track.height
+    // Position the thumb based on the current scroll position (ratio of scroll position to required width)
+    this.thumb.x = (heatmapLayoutStore.horizontalScrollPosition / heatmapLayoutStore.requiredWidthOfColumns) * this.track.width
+
+    console.log('update horizontal scrollbar', this)
+    console.log('this.visible', this.visible)
+    console.log('this.position', this.position)
+    console.log('this.track.width', this.track.width)
+    console.log('this.thumb.width', this.thumb.width)
+    console.log('this.thumb.x', this.thumb.x)
   }
 }

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useHeatmapStore } from '@/stores/heatmapStore'
+import { set } from '@vueuse/core'
 
 export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
   state: () => ({
@@ -26,6 +27,8 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
 
     verticalScrollbarWidth: 10, // width of the vertical scrollbar
     verticalScrollPosition: 0, // current vertical scroll position
+    horizontalScrollbarHeight: 10, // height of the horizontal scrollbar
+    horizontalScrollPosition: 0, // current horizontal scroll position
 
     animationDuration: 0.3, // duration of animations in seconds
     allowAnimations: false, // if false, no animations will be performed
@@ -53,8 +56,19 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       return heightOfVisibleRows
     },
 
+    requiredWidthOfColumns(): number {
+      const heatmapStore = useHeatmapStore()
+      const widthOfVisibleColumns =
+        (heatmapStore?.attributeTree?.getVisibleColumnsCount() ?? 0) * this.columnWidth
+      return widthOfVisibleColumns
+    },
+
     availableHeightForRows(): number {
-      return this.canvasInnerHeight - this.rowsVerticalStartPosition - 2* this.tilePadding
+      return this.canvasInnerHeight - this.rowsVerticalStartPosition - 2 * this.tilePadding
+    },
+
+    availableWidthForColumns(): number {
+      return this.canvasInnerWidth - this.rowLabelWidth - 2 * this.tilePadding
     },
 
     // vertical start position of rows (excluding sticky rows)
@@ -65,6 +79,11 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       return this.columnLabelHeight + this.tileMargin + this.tilePadding + stickyRowAmount * this.rowHeight + stickyRowPadding
     },
 
+    // horizontal start position of columns
+    columnsHorizontalStartPosition(): number {
+      return this.rowLabelWidth + this.tileMargin + this.tilePadding
+    },
+
     firstVisibleRowIndex(): number {
       return Math.floor(this.verticalScrollPosition / this.rowHeight)
     },
@@ -73,12 +92,36 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       return Math.ceil((this.verticalScrollPosition + this.canvasHeight) / this.rowHeight)
     },
 
+    firstVisibleColumnIndex(): number {
+      return Math.floor(this.horizontalScrollPosition / this.columnWidth)
+    },
+
+    lastVisibleColumnIndex(): number {
+      return Math.ceil((this.horizontalScrollPosition + this.canvasWidth) / this.columnWidth)
+    },
+
     verticalScrollbarVisible(): boolean {
       return this.requiredHeightOfRows > this.availableHeightForRows
     },
 
+    horizontalScrollbarVisible(): boolean {
+      return this.requiredWidthOfColumns > this.availableWidthForColumns
+    },
+
     verticalScrollbarThumbHeight(): number {
       return this.availableHeightForRows / this.requiredHeightOfRows * this.availableHeightForRows
+    },
+
+    verticalScrollbarThumbPosition(): number {
+      return this.verticalScrollPosition / this.requiredHeightOfRows * this.availableHeightForRows
+    },
+
+    horizontalScrollbarThumbHeight(): number {
+      return this.availableWidthForColumns / this.requiredWidthOfColumns * this.availableWidthForColumns
+    },
+
+    horizontalScrollbarThumbPosition(): number {
+      return this.horizontalScrollPosition / this.requiredWidthOfColumns * this.availableWidthForColumns
     },
   },
   actions: {
@@ -88,5 +131,11 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       const maxPosition = this.requiredHeightOfRows - this.availableHeightForRows
       this.verticalScrollPosition = Math.max(0, Math.min(maxPosition, position))
     },
+    setHorizontalScrollPosition(position: number) {
+      // clamp the position to the available width
+      // make sure the position is updated based on the ratio of the required width
+      const maxPosition = this.requiredWidthOfColumns - this.availableWidthForColumns
+      this.horizontalScrollPosition = Math.max(0, Math.min(maxPosition, position))
+    }
   },
 })

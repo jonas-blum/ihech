@@ -175,6 +175,10 @@ export class AttributeTree {
     return columns
   }
 
+  getVisibleColumnsCount(): number {
+    return this.getVisibleColumns().length
+  }
+
   // NOTE: should only be called when the columnSorter changed! for other operations, the updatePositionsAndDepth method should be used
   // apply the columnSorter to all columns on the same depth level
   sort(parent: AggregatedColumn = this.root) {

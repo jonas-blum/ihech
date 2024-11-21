@@ -3,6 +3,7 @@ import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import type { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { PixiVerticalScrollbar } from '@/pixiComponents/PixiVerticalScrollbar'
+import { PixiHorizontalScrollbar } from '@/pixiComponents/PixiHorizontalScrollbar'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiHeatmapApp extends Application {
@@ -11,6 +12,7 @@ export class PixiHeatmapApp extends Application {
   public stickyRowContainer: Container = new Container() // PixiRow[] as children
   public columnLabelsContainer: Container = new Container() // PixiColumnLabel[] as children
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
+  public horizontalScrollbar: PixiHorizontalScrollbar = new PixiHorizontalScrollbar()
   public heatmapCellTexture: Texture = new Texture() // used to efficiently render heatmap cells as sprites
   public rowLabelTile: Graphics = new Graphics() // purely visual; disconnected from actual Pixi objects
   public columnLabelTile: Graphics = new Graphics() // purely visual; disconnected from actual Pixi objects
@@ -46,6 +48,7 @@ export class PixiHeatmapApp extends Application {
     this.stage.addChild(this.stickyRowContainer)
     this.stage.addChild(this.columnLabelsContainer)
     this.stage.addChild(this.verticalScrollbar)
+    this.stage.addChild(this.horizontalScrollbar)
 
     // set the position of the containers
     this.rowContainer.position.set(
@@ -67,6 +70,7 @@ export class PixiHeatmapApp extends Application {
       heatmapLayoutStore.tilePadding,
     )
     this.verticalScrollbar.update()
+    this.horizontalScrollbar.update()
 
     // set the mask for the row container
     this.updateRowContainerMask()

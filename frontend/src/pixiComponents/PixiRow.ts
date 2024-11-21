@@ -41,21 +41,24 @@ export class PixiRow extends Container {
   }
 
   updatePosition(animate: boolean = true) {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
     // if the oldPosition is -1, we want to animate from the parent row position (if available)
     const startPosition =
       this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
     gsap.fromTo(
       this,
-      { y: startPosition * useHeatmapLayoutStore().rowHeight },
+      { y: startPosition * heatmapLayoutStore.rowHeight },
       {
-        y: this.row.position * useHeatmapLayoutStore().rowHeight,
-        duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+        y: this.row.position * heatmapLayoutStore.rowHeight,
+        duration: (animate && heatmapLayoutStore.allowAnimations) ? heatmapLayoutStore.animationDuration : 0,
       },
     )
     this.pixiRowLabel?.updatePosition()
   }
 
   updateCellPositions(animate: boolean = true) {
+const heatmapLayoutStore = useHeatmapLayoutStore()
+
     for (let i = 0; i < this.pixiHeatmapCellsContainer.children.length; i++) {
       const cell = this.pixiHeatmapCellsContainer.children[i] as Container
 
@@ -72,10 +75,10 @@ export class PixiRow extends Container {
 
       gsap.fromTo(
         cell,
-        { x: startPosition * useHeatmapLayoutStore().columnWidth },
+        { x: startPosition * heatmapLayoutStore.columnWidth },
         {
-          x: endPosition * useHeatmapLayoutStore().columnWidth,
-          duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+          x: endPosition * heatmapLayoutStore.columnWidth,
+          duration: (animate && heatmapLayoutStore.allowAnimations) ? heatmapLayoutStore.animationDuration : 0,
         },
       )
     }

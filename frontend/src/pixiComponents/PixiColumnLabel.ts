@@ -79,7 +79,7 @@ export class PixiColumnLabel extends PixiContainer {
       { x: startPosition * heatmapLayoutStore.columnWidth },
       {
         x: this.column.position * heatmapLayoutStore.columnWidth,
-        duration: animate ? heatmapLayoutStore.animationDuration : 0,
+        duration: (animate && heatmapLayoutStore.allowAnimations) ? heatmapLayoutStore.animationDuration : 0,
       },
     )
 

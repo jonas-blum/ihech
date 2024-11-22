@@ -76,7 +76,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       const heatmapStore = useHeatmapStore()
       const stickyRowAmount = heatmapStore?.itemTree?.stickyRows.length ?? 0
       const stickyRowPadding = stickyRowAmount > 0 ? this.gapAfterStickyRows : 0
-      return this.columnLabelHeight + this.tileMargin + this.tilePadding + stickyRowAmount * this.rowHeight + stickyRowPadding
+      return stickyRowAmount * this.rowHeight + stickyRowPadding
     },
 
     // horizontal start position of columns

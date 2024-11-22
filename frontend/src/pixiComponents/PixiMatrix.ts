@@ -1,4 +1,4 @@
-import { Container, Texture } from 'pixi.js'
+import { Container, Texture, Graphics } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { Column } from '@/classes/Column'
@@ -7,10 +7,10 @@ import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
-export class PixiRow extends Container {
-  public pixiHeatmapCellsContainer: Container = new Container() // PixiHeatmapCell[] as children
-  public isSticky: boolean // true for sticky rows
-  public row: Row // reference to data structure Row
+export class PixiMatrix extends Container {
+    public rowContainer: Container = new Container() // PixiRow[] as children
+    public rowContainerMask: Graphics = new Graphics() // mask for the row container
+    public stickyRowContainer: Container = new Container() // PixiRow[] as children
 
   constructor(row: Row, cellTexture: Texture, isSticky: boolean = false) {
     super()

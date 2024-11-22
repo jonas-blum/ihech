@@ -2,15 +2,18 @@ import { Application, Container, Graphics, Texture } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import type { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
+import type { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiVerticalScrollbar } from '@/pixiComponents/PixiVerticalScrollbar'
 import { PixiHorizontalScrollbar } from '@/pixiComponents/PixiHorizontalScrollbar'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiHeatmapApp extends Application {
+  public matrixContainer: Container = new Container() // PixiMatrix
   public rowContainer: Container = new Container() // PixiRow[] as children
   public rowContainerMask: Graphics = new Graphics() // mask for the row container
   public stickyRowContainer: Container = new Container() // PixiRow[] as children
   public columnLabelsContainer: Container = new Container() // PixiColumnLabel[] as children
+  public rowLabelsContainer: Container = new Container() // PixiRowLabel[] as children
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
   public horizontalScrollbar: PixiHorizontalScrollbar = new PixiHorizontalScrollbar()
   public heatmapCellTexture: Texture = new Texture() // used to efficiently render heatmap cells as sprites
@@ -43,25 +46,18 @@ export class PixiHeatmapApp extends Application {
     this.stage.addChild(this.rowLabelTile)
     this.stage.addChild(this.columnLabelTile)
     this.stage.addChild(this.heatmapTile)
-    this.stage.addChild(this.rowContainer)
-    this.stage.addChild(this.rowContainerMask)
+    this.stage.addChild(this.matrixContainer)
+    this.matrixContainer.addChild(this.rowContainer)
+    this.matrixContainer.addChild(this.rowContainerMask)
     this.stage.addChild(this.stickyRowContainer)
     this.stage.addChild(this.columnLabelsContainer)
+    this.stage.addChild(this.rowLabelsContainer)
     this.stage.addChild(this.verticalScrollbar)
     this.stage.addChild(this.horizontalScrollbar)
 
-    // set the position of the containers
-    this.rowContainer.position.set(
-      heatmapLayoutStore.tilePadding,
-      heatmapLayoutStore.columnLabelHeight +
-        heatmapLayoutStore.tileMargin +
-        heatmapLayoutStore.tilePadding,
-    )
-    this.stickyRowContainer.position.set(
-      heatmapLayoutStore.tilePadding,
-      heatmapLayoutStore.columnLabelHeight +
-        heatmapLayoutStore.tileMargin +
-        heatmapLayoutStore.tilePadding,
+    this.matrixContainer.position.set(
+      heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding,
+      heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding,
     )
     this.columnLabelsContainer.position.set(
       heatmapLayoutStore.rowLabelWidth +
@@ -69,8 +65,16 @@ export class PixiHeatmapApp extends Application {
         heatmapLayoutStore.tilePadding,
       heatmapLayoutStore.tilePadding,
     )
+    this.rowLabelsContainer.position.set(
+      heatmapLayoutStore.tilePadding,
+      heatmapLayoutStore.columnLabelHeight +
+        heatmapLayoutStore.tileMargin +
+        heatmapLayoutStore.tilePadding,
+    )
     this.verticalScrollbar.update()
     this.horizontalScrollbar.update()
+
+    this.updateRowContainerPosition()
 
     // set the mask for the row container
     this.updateRowContainerMask()
@@ -134,9 +138,9 @@ export class PixiHeatmapApp extends Application {
   }
 
   clear() {
-    this.rowContainer.removeChildren()
-    this.stickyRowContainer.removeChildren()
+    this.matrixContainer.removeChildren()
     this.columnLabelsContainer.removeChildren()
+    this.rowLabelsContainer.removeChildren()
   }
 
   addRow(row: PixiRow) {
@@ -156,6 +160,10 @@ export class PixiHeatmapApp extends Application {
     this.columnLabelsContainer.addChild(columnLabel)
   }
 
+  addRowLabel(rowLabel: PixiRowLabel) {
+    this.rowLabelsContainer.addChild(rowLabel)
+  }
+
   generateHeatmapCellTexture() {
     console.log('generateHeatmapCellTexture')
     const heatmapLayoutStore = useHeatmapLayoutStore()
@@ -173,7 +181,11 @@ export class PixiHeatmapApp extends Application {
   }
 
   updateRowContainerPosition() {
+    // this.rowContainer.position.x = 0
     this.rowContainer.position.y = useHeatmapLayoutStore().rowsVerticalStartPosition
+
+    // this.stickyRowContainer.position.x = 0
+    // this.stickyRowContainer.position.y = 0
   }
 
   updateRowContainerMask() {
@@ -183,7 +195,7 @@ export class PixiHeatmapApp extends Application {
       .rect(
         0,
         heatmapLayoutStore.rowsVerticalStartPosition,
-        heatmapLayoutStore.canvasWidth,
+        heatmapLayoutStore.canvasInnerWidth,
         heatmapLayoutStore.canvasInnerHeight - heatmapLayoutStore.rowsVerticalStartPosition,
       )
       .fill(0xffffff)

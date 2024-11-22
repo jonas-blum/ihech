@@ -345,6 +345,8 @@ function update() {
       row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
       pixiRow.updatePosition()
       pixiHeatmapApp.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp
+
+      // TODO: create row labels
     }
 
     // traverse the attribute tree with all columns and create the pixiColumnLabels

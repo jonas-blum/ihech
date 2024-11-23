@@ -1,50 +1,79 @@
-import { Graphics } from 'pixi.js'
-import { DropShadowFilter } from 'pixi-filters'
-import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { Graphics } from 'pixi.js';
+import { DropShadowFilter } from 'pixi-filters';
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore';
+import { PixiContainer } from '@/pixiComponents/PixiContainer';
+import { PixiRowsContainer } from '@/pixiComponents/PixiRowsContainer';
+import { PixiColumnLabelsContainer } from '@/pixiComponents/PixiColumnLabelsContainer';
+import { PixiRowLabelsContainer } from '@/pixiComponents/PixiRowLabelsContainer';
 
-export class PixiTile extends Graphics {
+export class PixiTile extends PixiContainer {
+  content: PixiContainer = new PixiContainer();
+
   constructor() {
-    super()
+    super();
+  }
 
-    this.filters = [
-      new DropShadowFilter({
-        offset: { x: 0, y: 0 },
-        blur: 1,
-        alpha: 1,
-      }),
-    ]
+  initializeTile(frame: { x: number; y: number; width: number; height: number }) {
+    const { x, y, width, height } = frame;
+    const padding = useHeatmapLayoutStore().tilePadding;
+
+    // position tile
+    this.x = x;
+    this.y = y;
+
+    // background and drop shadow
+    this.addBackground();
+    this.setBackgroundDimensions(width, height);
+    this.addDropShadow();
+
+    // content container
+    this.addChild(this.content);
+    this.content.x = padding;
+    this.content.y = padding;
+    // this.content.addBackground(0x00ffff);
+    // this.content.setBackgroundDimensions(width - padding * 2, height - padding * 2);
+
+    // mask the content to prevent overflow
+    this.content.addMask(0, 0, width - padding * 2, height - padding * 2);
   }
 }
 
 export class RowLabelTile extends PixiTile {
+  public rowLabelsContainer: PixiRowLabelsContainer = new PixiRowLabelsContainer() // PixiRowLabel[] as children
+  // NOTE: add container here to support sticky rows
+
   constructor() {
-    super()
+    super();
+    const heatmapLayoutStore = useHeatmapLayoutStore();
+    this.initializeTile(heatmapLayoutStore.rowLabelsTileFrame);
 
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-
-    const { x, y, width, height } = heatmapLayoutStore.rowLabelsTileFrame
-    this.rect(x, y, width, height).fill(0xffffff)
+    this.content.addChild(this.rowLabelsContainer);
   }
 }
 
 export class ColumnLabelTile extends PixiTile {
+  public columnLabelsContainer: PixiColumnLabelsContainer = new PixiColumnLabelsContainer() // PixiColumnLabel[] as children
+  // NOTE: add container here to support sticky columns
+
   constructor() {
-    super()
+    super();
+    const heatmapLayoutStore = useHeatmapLayoutStore();
+    this.initializeTile(heatmapLayoutStore.columnLabelsTileFrame);
 
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-
-    const { x, y, width, height } = heatmapLayoutStore.columnLabelsTileFrame
-    this.rect(x, y, width, height).fill(0xffffff)
+    this.content.addChild(this.columnLabelsContainer);
   }
 }
 
 export class MatrixTile extends PixiTile {
+  public rowsContainer: PixiRowsContainer = new PixiRowsContainer()
+  public stickyRowsContainer: PixiRowsContainer = new PixiRowsContainer()
+
   constructor() {
-    super()
+    super();
+    const heatmapLayoutStore = useHeatmapLayoutStore();
+    this.initializeTile(heatmapLayoutStore.matrixTileFrame);
 
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-
-    const { x, y, width, height } = heatmapLayoutStore.matrixTileFrame
-    this.rect(x, y, width, height).fill(0xffffff)
+    this.content.addChild(this.rowsContainer)
+    this.content.addChild(this.stickyRowsContainer)
   }
 }

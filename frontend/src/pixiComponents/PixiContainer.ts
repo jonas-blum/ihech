@@ -1,4 +1,6 @@
 import { Container, Texture, Sprite } from 'pixi.js'
+import { DropShadowFilter } from 'pixi-filters'
+
 
 export class PixiContainer extends Container {
   background: Sprite | null = null
@@ -17,9 +19,25 @@ export class PixiContainer extends Container {
 
   addBackground(color: number = 0xffffff) {
     this.background = new Sprite(Texture.WHITE)
-    this.setBackgroundRect(0, 0, this.width, this.height)
+    // NOTE: the parent might not be available if the container has not been added as a child yet
+    if (this.parent) {
+      this.setBackgroundRect(0, 0, this.width, this.height)
+    }
     this.setBackgroundColor(color)
     this.addChild(this.background)
+  }
+
+  addDropShadow() {
+    if (!this.background) {
+      this.addBackground()
+    }
+    this.background!.filters = [
+      new DropShadowFilter({
+        offset: { x: 0, y: 0 },
+        blur: 1,
+        alpha: 1,
+      }),
+    ]
   }
 
   addMask(x: number = 0, y: number = 0, width: number = this.width, height: number = this.height) {

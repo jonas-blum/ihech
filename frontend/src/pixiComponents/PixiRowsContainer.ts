@@ -22,12 +22,4 @@ export class PixiRowsContainer extends PixiContainer {
     this.removeChild(row)
     row.destroy()
   }
-
-  updatePosition() {
-    // TODO
-  }
-
-  updateMask() {
-    // TODO
-  }
 }

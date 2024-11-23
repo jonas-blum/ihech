@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, Texture } from 'pixi.js'
+import { Application, Container, Graphics, Rectangle, Texture } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import type { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
@@ -6,15 +6,12 @@ import type { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiVerticalScrollbar } from '@/pixiComponents/PixiVerticalScrollbar'
 import { PixiHorizontalScrollbar } from '@/pixiComponents/PixiHorizontalScrollbar'
 import { ColumnLabelTile, RowLabelTile, MatrixTile } from '@/pixiComponents/PixiTile'
-import { PixiMatrixContainer } from '@/pixiComponents/PixiMatrixContainer'
 import { PixiColumnLabelsContainer } from '@/pixiComponents/PixiColumnLabelsContainer'
 import { PixiRowLabelsContainer } from '@/pixiComponents/PixiRowLabelsContainer'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { PixiContainer } from '@/pixiComponents/PixiContainer'
 
 export class PixiHeatmapApp extends Application {
-  public matrixContainer: PixiMatrixContainer = new PixiMatrixContainer() // PixiMatrixContainer
-  public columnLabelsContainer: PixiColumnLabelsContainer = new PixiColumnLabelsContainer() // PixiColumnLabel[] as children
-  public rowLabelsContainer: PixiRowLabelsContainer = new PixiRowLabelsContainer() // PixiRowLabel[] as children
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
   public horizontalScrollbar: PixiHorizontalScrollbar = new PixiHorizontalScrollbar()
   public heatmapCellTexture: Texture = new Texture() // used to efficiently render heatmap cells as sprites
@@ -44,42 +41,26 @@ export class PixiHeatmapApp extends Application {
     this.stage.addChild(this.rowLabelTile)
     this.stage.addChild(this.columnLabelTile)
     this.stage.addChild(this.matrixTile)
-    this.stage.addChild(this.matrixContainer)
-    this.stage.addChild(this.columnLabelsContainer)
-    this.stage.addChild(this.rowLabelsContainer)
     this.stage.addChild(this.verticalScrollbar)
     this.stage.addChild(this.horizontalScrollbar)
 
-
-    this.matrixContainer.position.set(
-      heatmapLayoutStore.matrixContainerFrame.x,
-      heatmapLayoutStore.matrixContainerFrame.y,
-    )
-    this.columnLabelsContainer.position.set(
-      heatmapLayoutStore.columnLabelsContainerFrame.x,
-      heatmapLayoutStore.columnLabelsContainerFrame.y,
-    )
-    this.rowLabelsContainer.position.set(
-      heatmapLayoutStore.rowLabelsContainerFrame.x,
-      heatmapLayoutStore.rowLabelsContainerFrame.y,
-    )
     this.verticalScrollbar.update()
     this.horizontalScrollbar.update()
   }
 
   clear() {
-    this.matrixContainer.rowsContainer.removeChildren()
-    this.matrixContainer.stickyRowsContainer.removeChildren()
-    this.columnLabelsContainer.removeChildren()
-    this.rowLabelsContainer.removeChildren()
+    this.matrixTile.rowsContainer.removeChildren()
+    this.matrixTile.stickyRowsContainer.removeChildren()
+    this.columnLabelTile.columnLabelsContainer.removeChildren()
+    this.rowLabelTile.rowLabelsContainer.removeChildren()
   }
 
   addColumnLabel(columnLabel: PixiColumnLabel) {
-    this.columnLabelsContainer.addChild(columnLabel)
+    this.columnLabelTile.columnLabelsContainer.addChild(columnLabel)
   }
 
   addRowLabel(rowLabel: PixiRowLabel) {
-    this.rowLabelsContainer.addChild(rowLabel)
+    this.rowLabelTile.rowLabelsContainer.addChild(rowLabel)
   }
 
   generateHeatmapCellTexture() {

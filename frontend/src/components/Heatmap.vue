@@ -132,9 +132,12 @@ watch(
     // loop over the sticky rows to remove
     stickyRowsToRemove?.forEach((row) => {
       // remove the PixiRow from the PixiHeatmap.stickyRowsContainer
-      if (row?.stickyPixiRow) {
+      if (row?.stickyPixiRow && row?.stickyPixiRowLabel) {
         if (row.stickyPixiRow instanceof PixiRow) {
-          pixiHeatmapApp?.removeStickyRow(row.stickyPixiRow)
+          pixiHeatmapApp?.matrixContainer.stickyRowsContainer.removeRow(row.stickyPixiRow)
+        }
+        if (row.stickyPixiRowLabel instanceof PixiRowLabel) {
+          pixiHeatmapApp?.removeRowLabel(row.stickyPixiRowLabel)
         }
       }
     })
@@ -143,7 +146,7 @@ watch(
     stickyRowsToAdd?.forEach((row, index) => {
       const pixiRow = new PixiRow(row, pixiHeatmapApp!.heatmapCellTexture, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
-      pixiHeatmapApp?.addStickyRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
+      pixiHeatmapApp?.matrixContainer.stickyRowsContainer.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
     })
 
     // update the position of all rows
@@ -154,8 +157,8 @@ watch(
     })
 
     // Update the vertical position of the row container (and the mask) to account for sticky rows
-    pixiHeatmapApp.updateRowContainerPosition()
-    pixiHeatmapApp.updateRowContainerMask()
+    pixiHeatmapApp.matrixContainer.rowsContainer.updatePosition()
+    pixiHeatmapApp.matrixContainer.rowsContainer.updateMask()
   },
 )
 
@@ -246,14 +249,17 @@ watch(
     if (pixiHeatmapApp) {
       pixiHeatmapApp.verticalScrollbar.update()
 
-      pixiHeatmapApp.rowContainer.position.y =
-        heatmapLayoutStore.rowsVerticalStartPosition - newVerticalScrollPosition
+      // this sliding of the containers results in the scrolling effect
+      pixiHeatmapApp.matrixContainer.rowsContainer.position.y = -newVerticalScrollPosition
+      pixiHeatmapApp.rowLabelsContainer.position.y =
+        heatmapLayoutStore.rowLabelsContainerFrame.y - newVerticalScrollPosition
 
       // update visibility of all rows (because they might be outside the viewport)
       // TODO: this causes laggy scrolling. a less strict culling mechanism would be better
       for (let row of heatmapStore.itemTree?.getAllRows() ?? []) {
-        if (row.pixiRow) {
+        if (row.pixiRow && row.pixiRowLabel) {
           row.pixiRow.updateVisibility()
+          row.pixiRowLabel.updateVisibility()
         }
       }
     }
@@ -268,7 +274,10 @@ watch(
     if (pixiHeatmapApp) {
       pixiHeatmapApp.horizontalScrollbar.update()
 
-      // TODO: this might get complicated because it is not easy to shift horizontally..
+      pixiHeatmapApp.matrixContainer.rowsContainer.position.x = -newHorizontalScrollPosition
+      // TODO: update position of the sticky rows container as well
+      pixiHeatmapApp.columnLabelsContainer.position.x =
+        heatmapLayoutStore.columnLabelsContainerFrame.x - newHorizontalScrollPosition
     }
   },
 )
@@ -344,9 +353,12 @@ function update() {
       let pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture) // create PixiRow with reference to the Row
       row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
       pixiRow.updatePosition()
-      pixiHeatmapApp.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp
+      pixiHeatmapApp.matrixContainer.rowsContainer.addRow(pixiRow)
 
       // TODO: create row labels
+      let pixiRowLabel = new PixiRowLabel(row) // create PixiRowLabel with reference to the Row
+      row.pixiRowLabel = pixiRowLabel // set the reference to the PixiRowLabel in the Row
+      pixiHeatmapApp.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmapApp
     }
 
     // traverse the attribute tree with all columns and create the pixiColumnLabels
@@ -378,10 +390,7 @@ function debug() {
   console.log('🐞', pixiHeatmapApp)
 
   if (pixiHeatmapApp) {
-    const mask = new Graphics()
-    mask.rect(0, 0, 500, 500).fill(0xff0000)
-    pixiHeatmapApp.stage.addChild(mask)
-    pixiHeatmapApp.rowContainer.mask = mask
+    pixiHeatmapApp.matrixContainer.updateMask()
   }
 }
 
@@ -409,12 +418,13 @@ onMounted(async () => {
       {{ heatmapLayoutStore.verticalScrollPosition }}</span
     > -->
 
-    <span class="absolute"
+    <span class="absolute z-[1000]"
       >{{ heatmapLayoutStore.requiredWidthOfColumns }} /
       {{ heatmapLayoutStore.availableWidthForColumns }} /
       {{ heatmapLayoutStore.horizontalScrollbarVisible }} /
-      {{ heatmapLayoutStore.horizontalScrollPosition }}</span
-    >
+      {{ heatmapLayoutStore.horizontalScrollPosition }}
+      <button @click="debug" class="btn btn-xs">Debug</button>
+    </span>
 
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->

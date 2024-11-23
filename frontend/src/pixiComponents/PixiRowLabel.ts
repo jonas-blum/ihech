@@ -3,6 +3,8 @@ import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { Row } from '@/classes/Row'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { gsap } from 'gsap'
+
 
 export class PixiRowLabel extends PixiContainer {
   public row: Row // reference to data structure Row
@@ -17,9 +19,14 @@ export class PixiRowLabel extends PixiContainer {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     // background box
+    this.addBackground(heatmapLayoutStore.labelBackgroundColor)
     const backgroundWidth = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
-    this.setBackgroundRect(0, heatmapLayoutStore.cellPadding, backgroundWidth, heatmapLayoutStore.rowHeight - 2*heatmapLayoutStore.cellPadding)
-    this.setBackgroundColor(heatmapLayoutStore.labelBackgroundColor)
+    this.setBackgroundRect(
+      0,
+      heatmapLayoutStore.cellPadding,
+      backgroundWidth,
+      heatmapLayoutStore.rowHeight - 2 * heatmapLayoutStore.cellPadding,
+    )
 
     // create the text for the row label
     this.text = new Text({
@@ -32,8 +39,11 @@ export class PixiRowLabel extends PixiContainer {
     })
     this.text.y = (heatmapLayoutStore.rowHeight - this.text.height) / 2
     this.text.x = heatmapLayoutStore.rowLabelTextPaddingLeft
-    this.text.width = Math.min(this.text.width, backgroundWidth - 2 * heatmapLayoutStore.rowLabelTextPaddingLeft)
-    
+    this.text.width = Math.min(
+      this.text.width,
+      backgroundWidth - 2 * heatmapLayoutStore.rowLabelTextPaddingLeft,
+    )
+
     this.addChild(this.text)
     // TODO: icons and other stuff can be added here
 
@@ -56,7 +66,7 @@ export class PixiRowLabel extends PixiContainer {
     })
   }
 
-  updatePosition() {
+  updatePosition(animate: boolean = true) {
     const heatmapLayoutStore = useHeatmapLayoutStore()
     // differntiate between sticky and non-sticky rows
     if (this.isSticky) {
@@ -70,5 +80,32 @@ export class PixiRowLabel extends PixiContainer {
           2 * heatmapLayoutStore.tilePadding,
       )
     }
+
+    const startPosition =
+      this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
+    gsap.fromTo(
+      this,
+      { y: startPosition * heatmapLayoutStore.rowHeight },
+      {
+        y: this.row.position * heatmapLayoutStore.rowHeight,
+        duration:
+          animate && heatmapLayoutStore.allowAnimations ? heatmapLayoutStore.animationDuration : 0,
+      },
+    )
+  }
+
+  updateVisibility() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+
+    if (this.isSticky) {
+      this.visible = true
+      return
+    }
+
+    // this is our custom culling mechanism -> prevent rendering if not in visible viewport
+    this.visible =
+      this.row.position !== -1 &&
+      this.row.position >= heatmapLayoutStore.firstVisibleRowIndex &&
+      this.row.position <= heatmapLayoutStore.lastVisibleRowIndex
   }
 }

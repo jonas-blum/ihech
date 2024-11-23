@@ -1,6 +1,7 @@
-import { PixiRow } from '@/pixiComponents/PixiRow'
-import { useHeatmapStore } from '@/stores/heatmapStore'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
+import { useHeatmapStore } from '@/stores/heatmapStore'
+import { PixiRow } from '@/pixiComponents/PixiRow'
+import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import type { PixiBubble } from '@/pixiComponents/PixiBubble'
 
 interface DimredPosition {
@@ -22,7 +23,9 @@ export abstract class Row {
   prevSibling: Row | null = null
   nextSibling: Row | null = null
   pixiRow: PixiRow | null = null // reference to the corresponding PixiRow for rendering
+  pixiRowLabel: PixiRowLabel | null = null // reference to the corresponding PixiRowLabel for rendering
   stickyPixiRow: PixiRow | null = null // reference to the corresponding (sticky!) PixiRow for rendering
+  stickyPixiRowLabel: PixiRowLabel | null = null // reference to the corresponding (sticky!) PixiRowLabel for rendering
   pixiBubble: PixiBubble | null = null // reference to the corresponding PixiBubble for rendering
 
   protected constructor(
@@ -77,6 +80,8 @@ export abstract class Row {
     // update the pixiRow rendering
     this.pixiRow?.updatePosition()
     this.pixiRow?.updateVisibility()
+    this.pixiRowLabel?.updatePosition()
+    this.pixiRowLabel?.updateVisibility()
 
     // update the pixiBubble rendering
     this.pixiBubble?.updatePositionAndVisibility()
@@ -87,6 +92,7 @@ export abstract class Row {
 
     // update the pixiRow rendering
     this.pixiRow?.updatePosition()
+    this.pixiRowLabel?.updatePosition()
 
     // update the pixiBubble rendering
     this.pixiBubble?.updateSize()

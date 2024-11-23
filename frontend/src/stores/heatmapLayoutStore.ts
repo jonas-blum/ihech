@@ -31,7 +31,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     horizontalScrollPosition: 0, // current horizontal scroll position
 
     animationDuration: 0.3, // duration of animations in seconds
-    allowAnimations: false, // if false, no animations will be performed
+    allowAnimations: true, // if false, no animations will be performed
 
     heatmapCanvasBackgroundColor: 0xffffff, // background color of the heatmap
     labelBackgroundColor: 0xeeeeee, // background color of the row labels
@@ -39,16 +39,70 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     scrollbarThumbColor: 0x000000, // color of the scrollbar thumb
   }),
   getters: {
-    // heatmap canvas width without the left and right margins
+    // canvas width without the left and right margins
     canvasInnerWidth(): number {
       return this.canvasWidth - 2 * this.tileMargin
     },
-    // heatmap canvas height without the top and bottom margins
+    // canvas height without the top and bottom margins
     canvasInnerHeight(): number {
       return this.canvasHeight - 2 * this.tileMargin
     },
+    // frame of the row labels tile (absolute positioned)
+    rowLabelsTileFrame(): { x: number; y: number; width: number; height: number } {
+      return {
+        x: this.tileMargin,
+        y: this.columnLabelHeight + 2 * this.tileMargin,
+        width: this.rowLabelWidth,
+        height: this.canvasInnerHeight - this.columnLabelHeight - this.tileMargin,
+      }
+    },
+    // frame of the column labels tile (absolute positioned)
+    columnLabelsTileFrame(): { x: number; y: number; width: number; height: number } {
+      return {
+        x: this.rowLabelWidth + 2 * this.tileMargin,
+        y: this.tileMargin,
+        width: this.canvasInnerWidth - this.rowLabelWidth - this.tileMargin,
+        height: this.columnLabelHeight,
+      }
+    },
+    // frame of the heatmap tile (absolute positioned)
+    matrixTileFrame(): { x: number; y: number; width: number; height: number } {
+      return {
+        x: this.rowLabelWidth + 2 * this.tileMargin,
+        y: this.columnLabelHeight + 2 * this.tileMargin,
+        width: this.canvasInnerWidth - this.rowLabelWidth - this.tileMargin,
+        height: this.canvasInnerHeight - this.columnLabelHeight - this.tileMargin,
+      }
+    },
+    // frame of the row labels container (absolute positioned)
+    rowLabelsContainerFrame(): { x: number; y: number; width: number; height: number } {
+      return {
+        x: this.rowLabelsTileFrame.x + this.tilePadding,
+        y: this.rowLabelsTileFrame.y + this.tilePadding,
+        width: this.rowLabelsTileFrame.width - 2 * this.tilePadding,
+        height: this.rowLabelsTileFrame.height - 2 * this.tilePadding,
+      }
+    },
+    // frame of the column labels container (absolute positioned)
+    columnLabelsContainerFrame(): { x: number; y: number; width: number; height: number } {
+      return {
+        x: this.columnLabelsTileFrame.x + this.tilePadding,
+        y: this.columnLabelsTileFrame.y + this.tilePadding,
+        width: this.columnLabelsTileFrame.width - 2 * this.tilePadding,
+        height: this.columnLabelsTileFrame.height - 2 * this.tilePadding,
+      }
+    },
+    // frame of the heatmap container (absolute positioned)
+    matrixContainerFrame(): { x: number; y: number; width: number; height: number } {
+      return {
+        x: this.matrixTileFrame.x + this.tilePadding,
+        y: this.matrixTileFrame.y + this.tilePadding,
+        width: this.matrixTileFrame.width - 2 * this.tilePadding,
+        height: this.matrixTileFrame.height - 2 * this.tilePadding,
+      }
+    },
 
-    // how much vertical space is required for the whole heatmap
+    // how much vertical space is required for the (non-sticky) rows
     requiredHeightOfRows(): number {
       const heatmapStore = useHeatmapStore()
       const heightOfVisibleRows =
@@ -63,12 +117,22 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       return widthOfVisibleColumns
     },
 
+    // height of sticky rows (includig gap after sticky rows)
+    requiredHeightOfStickyRows(): number {
+      const heatmapStore = useHeatmapStore()
+      const heightOfStickyRows = (heatmapStore?.itemTree?.stickyRows.length ?? 0) * this.rowHeight
+      const gap = heightOfStickyRows > 0 ? this.gapAfterStickyRows : 0
+      return heightOfStickyRows + gap
+    },
+
+    
     availableHeightForRows(): number {
-      return this.canvasInnerHeight - this.rowsVerticalStartPosition - 2 * this.tilePadding
+      return this.matrixContainerFrame.height - this.requiredHeightOfStickyRows
     },
 
     availableWidthForColumns(): number {
-      return this.canvasInnerWidth - this.rowLabelWidth - 2 * this.tilePadding
+      // NOTE: if we ever introduce sticky attributes, we need to subtract the width of the sticky attributes
+      return this.matrixContainerFrame.width
     },
 
     // vertical start position of rows (excluding sticky rows)
@@ -109,19 +173,25 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     },
 
     verticalScrollbarThumbHeight(): number {
-      return this.availableHeightForRows / this.requiredHeightOfRows * this.availableHeightForRows
+      return (this.availableHeightForRows / this.requiredHeightOfRows) * this.availableHeightForRows
     },
 
     verticalScrollbarThumbPosition(): number {
-      return this.verticalScrollPosition / this.requiredHeightOfRows * this.availableHeightForRows
+      return (this.verticalScrollPosition / this.requiredHeightOfRows) * this.availableHeightForRows
     },
 
-    horizontalScrollbarThumbHeight(): number {
-      return this.availableWidthForColumns / this.requiredWidthOfColumns * this.availableWidthForColumns
+    horizontalScrollbarThumbWidth(): number {
+      return (
+        (this.availableWidthForColumns / this.requiredWidthOfColumns) *
+        this.availableWidthForColumns
+      )
     },
 
     horizontalScrollbarThumbPosition(): number {
-      return this.horizontalScrollPosition / this.requiredWidthOfColumns * this.availableWidthForColumns
+      return (
+        (this.horizontalScrollPosition / this.requiredWidthOfColumns) *
+        this.availableWidthForColumns
+      )
     },
   },
   actions: {
@@ -136,6 +206,6 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       // make sure the position is updated based on the ratio of the required width
       const maxPosition = this.requiredWidthOfColumns - this.availableWidthForColumns
       this.horizontalScrollPosition = Math.max(0, Math.min(maxPosition, position))
-    }
+    },
   },
 })

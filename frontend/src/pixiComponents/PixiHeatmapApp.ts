@@ -5,21 +5,22 @@ import type { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import type { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiVerticalScrollbar } from '@/pixiComponents/PixiVerticalScrollbar'
 import { PixiHorizontalScrollbar } from '@/pixiComponents/PixiHorizontalScrollbar'
+import { ColumnLabelTile, RowLabelTile, MatrixTile } from '@/pixiComponents/PixiTile'
+import { PixiMatrixContainer } from '@/pixiComponents/PixiMatrixContainer'
+import { PixiColumnLabelsContainer } from '@/pixiComponents/PixiColumnLabelsContainer'
+import { PixiRowLabelsContainer } from '@/pixiComponents/PixiRowLabelsContainer'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiHeatmapApp extends Application {
-  public matrixContainer: Container = new Container() // PixiMatrix
-  public rowContainer: Container = new Container() // PixiRow[] as children
-  public rowContainerMask: Graphics = new Graphics() // mask for the row container
-  public stickyRowContainer: Container = new Container() // PixiRow[] as children
-  public columnLabelsContainer: Container = new Container() // PixiColumnLabel[] as children
-  public rowLabelsContainer: Container = new Container() // PixiRowLabel[] as children
+  public matrixContainer: PixiMatrixContainer = new PixiMatrixContainer() // PixiMatrixContainer
+  public columnLabelsContainer: PixiColumnLabelsContainer = new PixiColumnLabelsContainer() // PixiColumnLabel[] as children
+  public rowLabelsContainer: PixiRowLabelsContainer = new PixiRowLabelsContainer() // PixiRowLabel[] as children
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
   public horizontalScrollbar: PixiHorizontalScrollbar = new PixiHorizontalScrollbar()
   public heatmapCellTexture: Texture = new Texture() // used to efficiently render heatmap cells as sprites
-  public rowLabelTile: Graphics = new Graphics() // purely visual; disconnected from actual Pixi objects
-  public columnLabelTile: Graphics = new Graphics() // purely visual; disconnected from actual Pixi objects
-  public heatmapTile: Graphics = new Graphics() // purely visual; disconnected from actual Pixi objects
+  public rowLabelTile: RowLabelTile = new RowLabelTile() // purely visual; disconnected from actual Pixi objects
+  public columnLabelTile: ColumnLabelTile = new ColumnLabelTile() // purely visual; disconnected from actual Pixi objects
+  public matrixTile: MatrixTile = new MatrixTile() // purely visual; disconnected from actual Pixi objects
 
   constructor(canvasElement: HTMLCanvasElement) {
     console.log('PixiHeatmapApp constructor', canvasElement)
@@ -39,121 +40,38 @@ export class PixiHeatmapApp extends Application {
       // autoDensity: true, // not sure what this does
     })
 
-    // position the stage (which is the root container)
-    this.stage.position.set(heatmapLayoutStore.tileMargin, heatmapLayoutStore.tileMargin)
-
     // add the children to the main container
     this.stage.addChild(this.rowLabelTile)
     this.stage.addChild(this.columnLabelTile)
-    this.stage.addChild(this.heatmapTile)
+    this.stage.addChild(this.matrixTile)
     this.stage.addChild(this.matrixContainer)
-    this.matrixContainer.addChild(this.rowContainer)
-    this.matrixContainer.addChild(this.rowContainerMask)
-    this.stage.addChild(this.stickyRowContainer)
     this.stage.addChild(this.columnLabelsContainer)
     this.stage.addChild(this.rowLabelsContainer)
     this.stage.addChild(this.verticalScrollbar)
     this.stage.addChild(this.horizontalScrollbar)
 
+
     this.matrixContainer.position.set(
-      heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding,
-      heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin + heatmapLayoutStore.tilePadding,
+      heatmapLayoutStore.matrixContainerFrame.x,
+      heatmapLayoutStore.matrixContainerFrame.y,
     )
     this.columnLabelsContainer.position.set(
-      heatmapLayoutStore.rowLabelWidth +
-        heatmapLayoutStore.tileMargin +
-        heatmapLayoutStore.tilePadding,
-      heatmapLayoutStore.tilePadding,
+      heatmapLayoutStore.columnLabelsContainerFrame.x,
+      heatmapLayoutStore.columnLabelsContainerFrame.y,
     )
     this.rowLabelsContainer.position.set(
-      heatmapLayoutStore.tilePadding,
-      heatmapLayoutStore.columnLabelHeight +
-        heatmapLayoutStore.tileMargin +
-        heatmapLayoutStore.tilePadding,
+      heatmapLayoutStore.rowLabelsContainerFrame.x,
+      heatmapLayoutStore.rowLabelsContainerFrame.y,
     )
     this.verticalScrollbar.update()
     this.horizontalScrollbar.update()
-
-    this.updateRowContainerPosition()
-
-    // set the mask for the row container
-    this.updateRowContainerMask()
-    this.rowContainer.mask = this.rowContainerMask
-
-    // row label tile
-    const rowLabelTileY = heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin
-    this.rowLabelTile
-      .rect(
-        0,
-        rowLabelTileY,
-        heatmapLayoutStore.rowLabelWidth,
-        heatmapLayoutStore.canvasInnerHeight - rowLabelTileY,
-      )
-      .fill(0xffffff)
-    this.rowLabelTile.filters = [
-      new DropShadowFilter({
-        offset: { x: 0, y: 0 },
-        blur: 1,
-        alpha: 1,
-      }),
-    ]
-
-    // column label tile
-    this.columnLabelTile
-      .rect(
-        heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin,
-        0,
-        heatmapLayoutStore.canvasInnerWidth -
-          heatmapLayoutStore.rowLabelWidth -
-          heatmapLayoutStore.tileMargin,
-        heatmapLayoutStore.columnLabelHeight,
-      )
-      .fill(0xffffff)
-    this.columnLabelTile.filters = [
-      new DropShadowFilter({
-        offset: { x: 0, y: 0 },
-        blur: 1,
-        alpha: 1,
-      }),
-    ]
-
-    // heatmap tile
-    this.heatmapTile
-      .rect(
-        heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin,
-        heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin,
-        heatmapLayoutStore.canvasInnerWidth -
-          heatmapLayoutStore.rowLabelWidth -
-          heatmapLayoutStore.tileMargin,
-        heatmapLayoutStore.canvasInnerHeight - rowLabelTileY,
-      )
-      .fill(0xffffff)
-    this.heatmapTile.filters = [
-      new DropShadowFilter({
-        offset: { x: 0, y: 0 },
-        blur: 1,
-        alpha: 1,
-      }),
-    ]
   }
 
   clear() {
-    this.matrixContainer.removeChildren()
+    this.matrixContainer.rowsContainer.removeChildren()
+    this.matrixContainer.stickyRowsContainer.removeChildren()
     this.columnLabelsContainer.removeChildren()
     this.rowLabelsContainer.removeChildren()
-  }
-
-  addRow(row: PixiRow) {
-    this.rowContainer.addChild(row)
-  }
-
-  addStickyRow(row: PixiRow) {
-    this.stickyRowContainer.addChild(row)
-  }
-
-  removeStickyRow(row: PixiRow) {
-    this.stickyRowContainer.removeChild(row)
-    row.destroy()
   }
 
   addColumnLabel(columnLabel: PixiColumnLabel) {
@@ -178,26 +96,5 @@ export class PixiHeatmapApp extends Application {
       )
       .fill(0xffffff)
     this.heatmapCellTexture = this.renderer.generateTexture(heatmapCellGraphic)
-  }
-
-  updateRowContainerPosition() {
-    // this.rowContainer.position.x = 0
-    this.rowContainer.position.y = useHeatmapLayoutStore().rowsVerticalStartPosition
-
-    // this.stickyRowContainer.position.x = 0
-    // this.stickyRowContainer.position.y = 0
-  }
-
-  updateRowContainerMask() {
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.rowContainerMask.clear()
-    this.rowContainerMask
-      .rect(
-        0,
-        heatmapLayoutStore.rowsVerticalStartPosition,
-        heatmapLayoutStore.canvasInnerWidth,
-        heatmapLayoutStore.canvasInnerHeight - heatmapLayoutStore.rowsVerticalStartPosition,
-      )
-      .fill(0xffffff)
   }
 }

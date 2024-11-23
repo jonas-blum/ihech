@@ -750,14 +750,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
     cellClickEvent(cell: PixiHeatmapCell) {
       console.log('cellClickEvent', cell)
-      const row = (cell.parent.parent as PixiRow).row
+      const row = (cell.parent as PixiRow).row
       // let column = cell.column // not used at the moment
 
       this.handleRowClick(row)
     },
 
     rowLabelClickEvent(pixiRowLabel: PixiRowLabel) {
-      const row = (pixiRowLabel.parent as PixiRow).row
+      const row = pixiRowLabel.row
       this.handleRowClick(row)
     },
 

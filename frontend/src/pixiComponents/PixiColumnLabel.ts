@@ -17,6 +17,7 @@ export class PixiColumnLabel extends PixiContainer {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     // background box
+    this.addBackground(heatmapLayoutStore.labelBackgroundColor)
     const backgroundHeight =
       heatmapLayoutStore.columnLabelHeight - 2 * heatmapLayoutStore.tilePadding
     this.setBackgroundRect(
@@ -25,7 +26,6 @@ export class PixiColumnLabel extends PixiContainer {
       heatmapLayoutStore.columnWidth - 2 * heatmapLayoutStore.cellPadding,
       backgroundHeight,
     )
-    this.setBackgroundColor(heatmapLayoutStore.labelBackgroundColor)
 
     // create the text for the column label
     this.text = new Text({
@@ -79,7 +79,8 @@ export class PixiColumnLabel extends PixiContainer {
       { x: startPosition * heatmapLayoutStore.columnWidth },
       {
         x: this.column.position * heatmapLayoutStore.columnWidth,
-        duration: (animate && heatmapLayoutStore.allowAnimations) ? heatmapLayoutStore.animationDuration : 0,
+        duration:
+          animate && heatmapLayoutStore.allowAnimations ? heatmapLayoutStore.animationDuration : 0,
       },
     )
 
@@ -102,7 +103,7 @@ export class PixiColumnLabel extends PixiContainer {
     this.text.style.fontWeight = highlighted ? 'bold' : 'normal'
 
     // make background of column label glow
-    this.background.filters = highlighted ? [new GlowFilter()] : []
+    this.background!.filters = highlighted ? [new GlowFilter()] : []
     // make sure the higlighted column is rendered last, otherwise the glow filter is not visible
     if (highlighted && this.parent) {
       this.parent.setChildIndex(this, this.parent.children.length - 1)

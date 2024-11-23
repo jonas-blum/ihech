@@ -13,6 +13,8 @@ export class PixiHorizontalScrollbar extends Container {
   isDragging: boolean = false // flag to track dragging state
   startDragX: number = 0 // stores the initial X position on drag start
   startDragScrollPosition: number = 0 // stores the initial scroll position on drag start
+  narrowHitArea: Rectangle // is active by default
+  wideHitArea: Rectangle // is active when dragging
 
   constructor() {
     super()
@@ -45,7 +47,9 @@ export class PixiHorizontalScrollbar extends Container {
       .on('pointermove', this.onDragMove.bind(this))
 
     // quick fix to increase the hit area of the thumb
-    this.thumb.hitArea = new Rectangle(-20, -20, width + 40, height + 40)
+    this.narrowHitArea = new Rectangle(-10, -10, width + 20, height + 20)
+    this.wideHitArea = new Rectangle(-2000, -1000, width + 4000, height + 2000)
+    this.thumb.hitArea = this.narrowHitArea
   }
 
   // Drag start event
@@ -53,11 +57,13 @@ export class PixiHorizontalScrollbar extends Container {
     this.isDragging = true
     this.startDragX = event.data.global.x
     this.startDragScrollPosition = useHeatmapLayoutStore().horizontalScrollPosition
+    this.thumb.hitArea = this.wideHitArea
   }
 
   // Drag end event
   onDragEnd() {
     this.isDragging = false
+    this.thumb.hitArea = this.narrowHitArea
   }
 
   // Drag move event
@@ -80,28 +86,16 @@ export class PixiHorizontalScrollbar extends Container {
 
     this.visible = heatmapLayoutStore.horizontalScrollbarVisible
 
-    this.position.y =
-      heatmapLayoutStore.columnLabelHeight +
-      heatmapLayoutStore.tileMargin / 2 -
-      heatmapLayoutStore.horizontalScrollbarHeight / 2
-
-    // align the scrollbar with the rows (excluding the sticky rows)
-    this.position.x = heatmapLayoutStore.columnsHorizontalStartPosition
+    this.position.y = heatmapLayoutStore.matrixTileFrame.y - heatmapLayoutStore.tileMargin / 2 - heatmapLayoutStore.horizontalScrollbarHeight / 2
+    this.position.x = heatmapLayoutStore.matrixTileFrame.x
 
     // adjust the width of the scrollbar track to go until the right end of the canvas
-    this.track.width = heatmapLayoutStore.availableWidthForColumns
+    this.track.width = heatmapLayoutStore.matrixTileFrame.width
 
     // set the width of the thumb
-    this.thumb.width = heatmapLayoutStore.horizontalScrollbarThumbHeight
+    this.thumb.width = heatmapLayoutStore.horizontalScrollbarThumbWidth
 
     // Position the thumb based on the current scroll position (ratio of scroll position to required width)
     this.thumb.x = (heatmapLayoutStore.horizontalScrollPosition / heatmapLayoutStore.requiredWidthOfColumns) * this.track.width
-
-    console.log('update horizontal scrollbar', this)
-    console.log('this.visible', this.visible)
-    console.log('this.position', this.position)
-    console.log('this.track.width', this.track.width)
-    console.log('this.thumb.width', this.thumb.width)
-    console.log('this.thumb.x', this.thumb.x)
   }
 }

@@ -13,6 +13,8 @@ export class PixiVerticalScrollbar extends Container {
   isDragging: boolean = false // flag to track dragging state
   startDragY: number = 0 // stores the initial Y position on drag start
   startDragScrollPosition: number = 0 // stores the initial scroll position on drag start
+  narrowHitArea: Rectangle // is active by default
+  wideHitArea: Rectangle // is active when dragging
 
   constructor() {
     super()
@@ -45,7 +47,9 @@ export class PixiVerticalScrollbar extends Container {
       .on('pointermove', this.onDragMove.bind(this))
 
     // quick fix to increase the hit area of the thumb
-    this.thumb.hitArea = new Rectangle(-20, -20, width + 40, height + 40)
+    this.narrowHitArea = new Rectangle(-10, -10, width + 20, height + 20)
+    this.wideHitArea = new Rectangle(-1000, -2000, width + 2000, height + 4000)
+    this.thumb.hitArea = this.narrowHitArea
   }
 
   // Drag start event
@@ -53,11 +57,13 @@ export class PixiVerticalScrollbar extends Container {
     this.isDragging = true
     this.startDragY = event.data.global.y
     this.startDragScrollPosition = useHeatmapLayoutStore().verticalScrollPosition
+    this.thumb.hitArea = this.wideHitArea
   }
 
   // Drag end event
   onDragEnd() {
     this.isDragging = false
+    this.thumb.hitArea = this.narrowHitArea
   }
 
   // Drag move event
@@ -69,7 +75,9 @@ export class PixiVerticalScrollbar extends Container {
       const dragDelta = event.data.global.y - this.startDragY
 
       // set vertical scroll position based on the drag distance (based on ratio)
-      const scrollDelta = (dragDelta / heatmapLayoutStore.availableHeightForRows) * heatmapLayoutStore.requiredHeightOfRows
+      const scrollDelta =
+        (dragDelta / heatmapLayoutStore.availableHeightForRows) *
+        heatmapLayoutStore.requiredHeightOfRows
 
       heatmapLayoutStore.setVerticalScrollPosition(this.startDragScrollPosition + scrollDelta)
     }
@@ -81,20 +89,22 @@ export class PixiVerticalScrollbar extends Container {
     this.visible = heatmapLayoutStore.verticalScrollbarVisible
 
     this.position.x =
-      heatmapLayoutStore.rowLabelWidth +
+      heatmapLayoutStore.matrixTileFrame.x -
       heatmapLayoutStore.tileMargin / 2 -
       heatmapLayoutStore.verticalScrollbarWidth / 2
 
     // align the scrollbar with the rows (excluding the sticky rows)
-    this.position.y = heatmapLayoutStore.rowsVerticalStartPosition
+    this.position.y = heatmapLayoutStore.matrixTileFrame.y + heatmapLayoutStore.requiredHeightOfStickyRows
 
     // adjust the height of the scrollbar track to go until the bottom of the canvas
-    this.track.height = heatmapLayoutStore.availableHeightForRows
+    this.track.height = heatmapLayoutStore.matrixTileFrame.height - heatmapLayoutStore.requiredHeightOfStickyRows
 
     // set the height of the thumb
     this.thumb.height = heatmapLayoutStore.verticalScrollbarThumbHeight
 
     // Position the thumb based on the current scroll position (ratio of scroll position to required height)
-    this.thumb.y = (heatmapLayoutStore.verticalScrollPosition / heatmapLayoutStore.requiredHeightOfRows) * this.track.height
+    this.thumb.y =
+      (heatmapLayoutStore.verticalScrollPosition / heatmapLayoutStore.requiredHeightOfRows) *
+      this.track.height
   }
 }

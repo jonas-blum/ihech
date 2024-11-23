@@ -1,14 +1,14 @@
-import { Container, Texture } from 'pixi.js'
+import { Container, Graphics, Texture } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { Column } from '@/classes/Column'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
+import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
-export class PixiRow extends Container {
-  public pixiHeatmapCellsContainer: Container = new Container() // PixiHeatmapCell[] as children
+export class PixiRow extends PixiContainer {
   public isSticky: boolean // true for sticky rows
   public row: Row // reference to data structure Row
 
@@ -19,21 +19,19 @@ export class PixiRow extends Container {
 
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
-    this.addChild(this.pixiHeatmapCellsContainer)
-
-    this.pixiHeatmapCellsContainer.position.set(heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin, 0)
-
     // create all the cells for the row
     for (let i = 0; i < row.data.length; i++) {
       const value = row.data[i]
       const adjustedValue = row.dataAdjusted[i]
       const cell = new PixiHeatmapCell(cellTexture, value, adjustedValue, i)
-      this.pixiHeatmapCellsContainer.addChild(cell)
+      this.addChild(cell)
     }
 
     // this.updatePosition()
     this.updateVisibility()
     this.updateCellPositions(false)
+
+    console.log('🍄 PixiRow created', `${this.position.x}|${this.position.y}`)
   }
 
   updatePosition(animate: boolean = true) {
@@ -46,16 +44,18 @@ export class PixiRow extends Container {
       { y: startPosition * heatmapLayoutStore.rowHeight },
       {
         y: this.row.position * heatmapLayoutStore.rowHeight,
-        duration: (animate && heatmapLayoutStore.allowAnimations) ? heatmapLayoutStore.animationDuration : 0,
+        duration:
+          animate && heatmapLayoutStore.allowAnimations ? heatmapLayoutStore.animationDuration : 0,
       },
     )
+
   }
 
   updateCellPositions(animate: boolean = true) {
-const heatmapLayoutStore = useHeatmapLayoutStore()
+    const heatmapLayoutStore = useHeatmapLayoutStore()
 
-    for (let i = 0; i < this.pixiHeatmapCellsContainer.children.length; i++) {
-      const cell = this.pixiHeatmapCellsContainer.children[i] as Container
+    for (let i = 0; i < this.children.length; i++) {
+      const cell = this.children[i] as Container
 
       // lookup the position of the column
       const column = useHeatmapStore()?.attributeTree?.originalIndexToColumn.get(i)
@@ -73,15 +73,18 @@ const heatmapLayoutStore = useHeatmapLayoutStore()
         { x: startPosition * heatmapLayoutStore.columnWidth },
         {
           x: endPosition * heatmapLayoutStore.columnWidth,
-          duration: (animate && heatmapLayoutStore.allowAnimations) ? heatmapLayoutStore.animationDuration : 0,
+          duration:
+            animate && heatmapLayoutStore.allowAnimations
+              ? heatmapLayoutStore.animationDuration
+              : 0,
         },
       )
     }
   }
 
   updateCellColoring() {
-    for (let i = 0; i < this.pixiHeatmapCellsContainer.children.length; i++) {
-      const cell = this.pixiHeatmapCellsContainer.children[i] as PixiHeatmapCell
+    for (let i = 0; i < this.children.length; i++) {
+      const cell = this.children[i] as PixiHeatmapCell
       const color = useHeatmapStore()?.colorMap?.getColor(cell.adjustedValue)
       cell.updateTint(color)
     }
@@ -116,8 +119,8 @@ const heatmapLayoutStore = useHeatmapLayoutStore()
       this.parent.setChildIndex(this, this.parent.children.length - 1)
     }
 
-    // this.pixiHeatmapCellsContainer.filters = highlighted ? [new OutlineFilter()] : []
-    // this.pixiHeatmapCellsContainer.filters = highlighted ? [new DropShadowFilter()] : []
-    this.pixiHeatmapCellsContainer.filters = highlighted ? [new GlowFilter()] : []
+    // this.filters = highlighted ? [new OutlineFilter()] : []
+    // this.filters = highlighted ? [new DropShadowFilter()] : []
+    this.filters = highlighted ? [new GlowFilter()] : []
   }
 }

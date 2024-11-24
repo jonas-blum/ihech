@@ -4,15 +4,15 @@ import Dimred from '@/components/Dimred.vue'
 import HeatmapSettings from '@/components/HeatmapSettings.vue'
 import CsvUpload from '@/components/CsvUpload.vue'
 import InteractiveSettings from '@/components/InteractiveSettings.vue'
-import { useHeatmapStore } from '@stores/heatmapStore'
+import { useMainStore } from '@stores/mainStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 const heatmapLayoutStore = useHeatmapLayoutStore()
 
 function reloadHeatmap() {
-  heatmapStore.setCsvUploadOpen(false)
-  heatmapStore.fetchHeatmap()
+  mainStore.setCsvUploadOpen(false)
+  mainStore.fetchHeatmap()
 }
 </script>
 
@@ -29,7 +29,7 @@ function reloadHeatmap() {
       >
         <InteractiveSettings />
         <div class="flex gap-2 relative h-min">
-          <button @click="heatmapStore?.itemTree?.expandAllRows()" class="btn btn-sm">
+          <button @click="mainStore?.itemTree?.expandAllRows()" class="btn btn-sm">
             Expand All
           </button>
           <button
@@ -37,14 +37,14 @@ function reloadHeatmap() {
             :class="{
               btn: true,
               'btn-sm': true,
-              'btn-neutral': !heatmapStore.isOutOfSync,
-              'btn-warning': heatmapStore.isOutOfSync,
+              'btn-neutral': !mainStore.isOutOfSync,
+              'btn-warning': mainStore.isOutOfSync,
               'text-sm': true,
             }"
           >
             Update
-            <span v-if="heatmapStore.isOutOfSync">(unsaved changes!)</span>
-            <span v-if="heatmapStore.isLoading" class="loading loading-spinner"></span>
+            <span v-if="mainStore.isOutOfSync">(unsaved changes!)</span>
+            <span v-if="mainStore.isLoading" class="loading loading-spinner"></span>
           </button>
         </div>
       </div>

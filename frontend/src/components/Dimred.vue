@@ -2,7 +2,7 @@
 import { onMounted, watch, ref } from 'vue'
 import { useMouse } from '@vueuse/core'
 
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 
 import { PixiDimredApp } from '@/pixiComponents/PixiDimredApp'
@@ -11,7 +11,7 @@ import { PixiBubble } from '@/pixiComponents/PixiBubble'
 
 import DimredAlgoSelection from '@components/DimredAlgoSelection.vue'
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 const dimredLayoutStore = useDimredLayoutStore()
 const dimredCanvas = ref<HTMLCanvasElement | null>(null)
 
@@ -34,7 +34,7 @@ const pixiDimredInitialized = ref(false)
 // watch for changes is highlightedRow
 // NOTE: I guess having watcher in the Heatmap and Dimred components is not the most efficient way, but for seperation of concerns it is justifiable
 watch(
-  () => heatmapStore.highlightedRow,
+  () => mainStore.highlightedRow,
   (newRow, oldRow) => {
     // console.log('highlightedRow changed from', oldRow, 'to', newRow)
 
@@ -67,7 +67,7 @@ watch(
     }
 
     // update position and visibility for all bubbles
-    let rows = heatmapStore.itemTree?.getAllRows()
+    let rows = mainStore.itemTree?.getAllRows()
     if (!rows) {
       console.warn('rows is not set')
       return
@@ -83,7 +83,7 @@ watch(
 // NOTE: shallow watch is enough, because the stickyRows array is always a new array (because deep watch would be too expensive)
 // NOTE: Having watcher in the Heatmap and Dimred components is not the most efficient way, but for seperation of concerns it is justifiable
 watch(
-  () => heatmapStore.itemTree?.stickyRows,
+  () => mainStore.itemTree?.stickyRows,
   (newStickyRows, oldStickyRows) => {
     // console.log('stickyRows changed from', oldStickyRows, 'to', newStickyRows)
 
@@ -160,7 +160,7 @@ function update() {
   if (!pixiDimredInitialized.value) {
     console.time('initPixiDimredComponents')
     // traverse the item tree with all rows and create the pixiBubbles
-    let rows = heatmapStore.itemTree?.getAllRows()
+    let rows = mainStore.itemTree?.getAllRows()
     if (!rows) {
       console.warn('rows is not set')
       return
@@ -186,7 +186,7 @@ function updateCanvasDimensions() {
 }
 
 watch(
-  () => heatmapStore.getDataChanging,
+  () => mainStore.getDataChanging,
   () => {
     clear()
     update()
@@ -194,7 +194,7 @@ watch(
 )
 
 onMounted(async () => {
-  window.addEventListener('resize', () => heatmapStore.changeHeatmap())
+  window.addEventListener('resize', () => mainStore.changeHeatmap())
 
   init()
 })
@@ -207,14 +207,14 @@ onMounted(async () => {
     <div
       class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
       :style="tooltipStyle"
-      v-show="heatmapStore.hoveredPixiBubble"
+      v-show="mainStore.hoveredPixiBubble"
     >
-      <!-- <span>{{ heatmapStore.highlightedRow?.name }}</span
+      <!-- <span>{{ mainStore.highlightedRow?.name }}</span
       ><br />
-      <span>{{ heatmapStore.highlightedColumn?.name }}</span
+      <span>{{ mainStore.highlightedColumn?.name }}</span
       ><br /> -->
       <span>
-        {{ heatmapStore.hoveredPixiBubble?.row.name }}
+        {{ mainStore.hoveredPixiBubble?.row.name }}
       </span>
     </div>
     <DimredAlgoSelection class="absolute" :style="{top: `${dimredLayoutStore.tileMargin}px`, left: `${dimredLayoutStore.tileMargin}px`}" />

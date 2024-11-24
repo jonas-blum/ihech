@@ -4,7 +4,7 @@ import { Row } from '@/classes/Row'
 import { Column } from '@/classes/Column'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
@@ -56,7 +56,7 @@ export class PixiRow extends PixiContainer {
       const cell = this.children[i] as Container
 
       // lookup the position of the column
-      const column = useHeatmapStore()?.attributeTree?.originalIndexToColumn.get(i)
+      const column = useMainStore()?.attributeTree?.originalIndexToColumn.get(i)
 
       // update visibility of the cell
       cell.visible = column?.position !== -1
@@ -83,7 +83,7 @@ export class PixiRow extends PixiContainer {
   updateCellColoring() {
     for (let i = 0; i < this.children.length; i++) {
       const cell = this.children[i] as PixiHeatmapCell
-      const color = useHeatmapStore()?.colorMap?.getColor(cell.adjustedValue)
+      const color = useMainStore()?.colorMap?.getColor(cell.adjustedValue)
       cell.updateTint(color)
     }
   }

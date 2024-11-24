@@ -1,5 +1,5 @@
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import type { PixiBubble } from '@/pixiComponents/PixiBubble'
@@ -47,27 +47,27 @@ export abstract class Row {
 
   static computeAdjustedData(data: number[]): number[] {
     if (
-      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
+      useMainStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
     ) {
       const maxValue = Math.max(...data)
       return data.map((value) => value / maxValue)
     } else if (
-      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap ===
+      useMainStore()?.getActiveDataTable?.coloringHeatmap ===
       ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
     ) {
       const adjustedData = []
       for (let i = 0; i < data.length; i++) {
-        const minAttributeValue = useHeatmapStore()?.getMinAttributeValues[i]
-        const maxAttributeValue = useHeatmapStore()?.getMaxAttributeValues[i]
+        const minAttributeValue = useMainStore()?.getMinAttributeValues[i]
+        const maxAttributeValue = useMainStore()?.getMaxAttributeValues[i]
         const difference =
           maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
         adjustedData.push((data[i] - minAttributeValue) / difference)
       }
       return adjustedData
     } else if (
-      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
+      useMainStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
     ) {
-      return data.map((value) => Math.log(value + useHeatmapStore()?.getLogShiftValue))
+      return data.map((value) => Math.log(value + useMainStore()?.getLogShiftValue))
     } else {
       return data
     }

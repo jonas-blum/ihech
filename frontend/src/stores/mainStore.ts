@@ -41,7 +41,7 @@ import { LinearColorMap } from '@/classes/LinearColorMap'
 import { nextTick, setDevtoolsHook } from 'vue'
 
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
-export const useHeatmapStore = defineStore('heatmapStore', {
+export const useMainStore = defineStore('mainStore', {
   state: () => ({
     dataTables: [] as CsvDataTableProfile[],
     activeDataTable: null as CsvDataTableProfile | null,

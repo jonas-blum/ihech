@@ -6,7 +6,7 @@ import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { PixiRow } from '@/pixiComponents/PixiRow'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 

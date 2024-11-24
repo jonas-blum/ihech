@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import InformationIcon from '@assets/information-icon.svg'
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 
 function handleCollectionColorChange(event: Event, collection: string) {
   const target = event.target as HTMLInputElement
-  heatmapStore.setColorOfCollection(collection, target.value)
+  mainStore.setColorOfCollection(collection, target.value)
 }
 </script>
 
 <template>
   <div
-    v-if="heatmapStore.getActiveDataTable?.firstLayerCollectionNames?.length || 0 > 0"
+    v-if="mainStore.getActiveDataTable?.firstLayerCollectionNames?.length || 0 > 0"
     :style="{ alignSelf: 'flex-start', display: 'flex', flexDirection: 'column', gap: '5px' }"
   >
     <div :style="{ display: 'flex', gap: '5px', alignItems: 'center' }">
       <input
         :style="{ width: '20px', height: '20px' }"
         type="checkbox"
-        :checked="heatmapStore.areAllCollectionsEnabled()"
-        @change="heatmapStore.toggleAllCollectionsEnabled()"
+        :checked="mainStore.areAllCollectionsEnabled()"
+        @change="mainStore.toggleAllCollectionsEnabled()"
       />
       <h2 class="text-lg font-bold">Collections:</h2>
       <div class="self-tooltip">
@@ -46,23 +46,23 @@ function handleCollectionColorChange(event: Event, collection: string) {
       }"
     >
       <li
-        v-for="collection in heatmapStore.getActiveDataTable?.firstLayerCollectionNames"
+        v-for="collection in mainStore.getActiveDataTable?.firstLayerCollectionNames"
         :key="collection"
         :style="{ display: 'flex', gap: '5px', alignItems: 'center' }"
       >
         <input
           :style="{ width: '20px', height: '20px' }"
           type="checkbox"
-          :checked="heatmapStore.isCollectionEnabled(collection)"
-          @change="heatmapStore.toggleCollectionEnabled(collection)"
+          :checked="mainStore.isCollectionEnabled(collection)"
+          @change="mainStore.toggleCollectionEnabled(collection)"
         />
         <input
           :style="{ width: '20px', height: '20px' }"
           @change="handleCollectionColorChange($event, collection)"
           type="color"
-          :value="heatmapStore.getColorOfCollection(collection)"
+          :value="mainStore.getColorOfCollection(collection)"
         />
-        <p :style="{ color: heatmapStore.getColorOfCollection(collection) }">{{ collection }}</p>
+        <p :style="{ color: mainStore.getColorOfCollection(collection) }">{{ collection }}</p>
       </li>
     </ul>
   </div>

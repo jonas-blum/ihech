@@ -3,7 +3,7 @@ import { onMounted, watch, ref } from 'vue'
 import { useMouse } from '@vueuse/core'
 import { Graphics, Sprite, RenderTexture, Texture, createLevelBuffersFromKTX } from 'pixi.js'
 
-import { useHeatmapStore } from '@stores/heatmapStore'
+import { useMainStore } from '@stores/mainStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
 import { PixiHeatmapApp } from '@/pixiComponents/PixiHeatmapApp'
@@ -29,7 +29,7 @@ watch([mouseX, mouseY], ([x, y]) => {
   tooltipStyle.value.top = `${y + 10}px`
 })
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 const heatmapLayoutStore = useHeatmapLayoutStore()
 
 let pixiHeatmapApp: PixiHeatmapApp | null = null
@@ -40,7 +40,7 @@ const pixiHeatmapInitialized = ref(false)
 
 // watch for changes is highlightedRow
 watch(
-  () => heatmapStore.highlightedRow,
+  () => mainStore.highlightedRow,
   (newRow, oldRow) => {
     // console.log('highlightedRow changed from', oldRow, 'to', newRow)
 
@@ -71,7 +71,7 @@ watch(
 
 // watch for changes is highlightedColumn
 watch(
-  () => heatmapStore.highlightedColumn,
+  () => mainStore.highlightedColumn,
   (newColumn, oldColumn) => {
     // console.log('highlightedColumn changed from', oldColumn, 'to', newColumn)
 
@@ -103,7 +103,7 @@ watch(
 
 // watch for changes is highlightedCell
 watch(
-  () => heatmapStore.hoveredPixiHeatmapCell,
+  () => mainStore.hoveredPixiHeatmapCell,
   (newCell, oldCell) => {
     // console.log('hoveredPixiHeatmapCell changed from', oldCell, 'to', newCell)
   },
@@ -112,7 +112,7 @@ watch(
 // Watch for changes in the stickyRows array
 // NOTE: shallow watch is enough, because the stickyRows array is always a new array (because deep watch would be too expensive)
 watch(
-  () => heatmapStore.itemTree?.stickyRows,
+  () => mainStore.itemTree?.stickyRows,
   (newStickyRows, oldStickyRows) => {
     // console.log('stickyRows changed from', oldStickyRows, 'to', newStickyRows)
 
@@ -173,7 +173,7 @@ watch(
 
 // watch for deep changes in ColorMap
 watch(
-  () => heatmapStore.colorMap,
+  () => mainStore.colorMap,
   (newColorMap, oldColorMap) => {
     if (!pixiHeatmapApp) {
       console.warn('pixiHeatmapApp is not set')
@@ -181,7 +181,7 @@ watch(
     }
 
     // update color for each heatmap cell
-    for (let row of heatmapStore.itemTree?.getAllRows() ?? []) {
+    for (let row of mainStore.itemTree?.getAllRows() ?? []) {
       if (row.pixiRow) {
         row.pixiRow.updateCellColoring()
       }
@@ -264,7 +264,7 @@ watch(
 
       // update visibility of all rows (because they might be outside the viewport)
       // TODO: this causes laggy scrolling. a less strict culling mechanism would be better
-      for (let row of heatmapStore.itemTree?.getAllRows() ?? []) {
+      for (let row of mainStore.itemTree?.getAllRows() ?? []) {
         if (row.pixiRow && row.pixiRowLabel) {
           row.pixiRow.updateVisibility()
           row.pixiRowLabel.updateVisibility()
@@ -290,12 +290,12 @@ watch(
 
 // watch for attributesMaxDepth changes
 watch(
-  () => heatmapStore.attributesMaxDepth,
+  () => mainStore.attributesMaxDepth,
   (newAttributeMaxDepth, oldAttributeMaxDepth) => {
     // console.log('attributeMaxDepth changed from', oldAttributeMaxDepth, 'to', newAttributeMaxDepth)
 
     // update the position of all column labels
-    for (let column of heatmapStore.attributeTree?.getVisibleColumns() ?? []) {
+    for (let column of mainStore.attributeTree?.getVisibleColumns() ?? []) {
       if (column.pixiColumnLabel) {
         column.pixiColumnLabel.updatePosition()
       }
@@ -349,7 +349,7 @@ function update() {
   // only once I need to init the pixi containers and graphics
   if (!pixiHeatmapInitialized.value) {
     // traverse the item tree with all rows and create the pixiRows
-    let rows = heatmapStore.itemTree?.getAllRows()
+    let rows = mainStore.itemTree?.getAllRows()
     if (!rows) {
       console.warn('rows is not set')
       return
@@ -368,7 +368,7 @@ function update() {
     }
 
     // traverse the attribute tree with all columns and create the pixiColumnLabels
-    let columns = heatmapStore.attributeTree?.getAllColumns()
+    let columns = mainStore.attributeTree?.getAllColumns()
     if (!columns) {
       console.warn('columns is not set')
       return
@@ -409,7 +409,7 @@ function debug() {
 }
 
 watch(
-  () => heatmapStore.getDataChanging,
+  () => mainStore.getDataChanging,
   () => {
     clear()
     update()
@@ -417,7 +417,7 @@ watch(
 )
 
 onMounted(async () => {
-  window.addEventListener('resize', () => heatmapStore.changeHeatmap())
+  window.addEventListener('resize', () => mainStore.changeHeatmap())
 
   init()
 })
@@ -445,14 +445,14 @@ onMounted(async () => {
     <div
       class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
       :style="tooltipStyle"
-      v-show="heatmapStore.hoveredPixiHeatmapCell"
+      v-show="mainStore.hoveredPixiHeatmapCell"
     >
-      <span>{{ heatmapStore.highlightedRow?.name }}</span
+      <span>{{ mainStore.highlightedRow?.name }}</span
       ><br />
-      <span>{{ heatmapStore.highlightedColumn?.name }}</span
+      <span>{{ mainStore.highlightedColumn?.name }}</span
       ><br />
       <span>
-        {{ heatmapStore.hoveredPixiHeatmapCell?.value }}
+        {{ mainStore.hoveredPixiHeatmapCell?.value }}
       </span>
     </div>
     <RowSorterSettings
@@ -470,7 +470,7 @@ onMounted(async () => {
       }"
     />
     <ColorMap
-      :colorMap="heatmapStore.colorMap"
+      :colorMap="mainStore.colorMap"
       class="absolute z-10 -translate-y-[100%]"
       :style="{
         top: `${heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin}px`,

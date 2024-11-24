@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { set } from '@vueuse/core'
 
 export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
@@ -104,23 +104,23 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
 
     // how much vertical space is required for the (non-sticky) rows
     requiredHeightOfRows(): number {
-      const heatmapStore = useHeatmapStore()
+      const mainStore = useMainStore()
       const heightOfVisibleRows =
-        (heatmapStore?.itemTree?.getVisibleRowsCount() ?? 0) * this.rowHeight
+        (mainStore?.itemTree?.getVisibleRowsCount() ?? 0) * this.rowHeight
       return heightOfVisibleRows
     },
 
     requiredWidthOfColumns(): number {
-      const heatmapStore = useHeatmapStore()
+      const mainStore = useMainStore()
       const widthOfVisibleColumns =
-        (heatmapStore?.attributeTree?.getVisibleColumnsCount() ?? 0) * this.columnWidth
+        (mainStore?.attributeTree?.getVisibleColumnsCount() ?? 0) * this.columnWidth
       return widthOfVisibleColumns
     },
 
     // height of sticky rows (includig gap after sticky rows)
     requiredHeightOfStickyRows(): number {
-      const heatmapStore = useHeatmapStore()
-      const heightOfStickyRows = (heatmapStore?.itemTree?.stickyRows.length ?? 0) * this.rowHeight
+      const mainStore = useMainStore()
+      const heightOfStickyRows = (mainStore?.itemTree?.stickyRows.length ?? 0) * this.rowHeight
       const gap = heightOfStickyRows > 0 ? this.gapAfterStickyRows : 0
       return heightOfStickyRows + gap
     },
@@ -137,8 +137,8 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
 
     // vertical start position of rows (excluding sticky rows)
     rowsVerticalStartPosition(): number {
-      const heatmapStore = useHeatmapStore()
-      const stickyRowAmount = heatmapStore?.itemTree?.stickyRows.length ?? 0
+      const mainStore = useMainStore()
+      const stickyRowAmount = mainStore?.itemTree?.stickyRows.length ?? 0
       const stickyRowPadding = stickyRowAmount > 0 ? this.gapAfterStickyRows : 0
       return stickyRowAmount * this.rowHeight + stickyRowPadding
     },

@@ -2,7 +2,7 @@ import { Container, Text, Graphics } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { Column } from '@/classes/Column'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
@@ -56,15 +56,15 @@ export class PixiColumnLabel extends PixiContainer {
     this.cursor = 'pointer'
     // @ts-ignore: Property 'on' does not exist
     this.on('click', () => {
-      useHeatmapStore()?.columnLabelClickEvent(this.column)
+      useMainStore()?.columnLabelClickEvent(this.column)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseover', () => {
-      useHeatmapStore()?.setHoveredPixiColumnLabel(this)
+      useMainStore()?.setHoveredPixiColumnLabel(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseout', () => {
-      useHeatmapStore()?.setHoveredPixiColumnLabel(null)
+      useMainStore()?.setHoveredPixiColumnLabel(null)
     })
   }
 
@@ -84,7 +84,7 @@ export class PixiColumnLabel extends PixiContainer {
       },
     )
 
-    const maxDepth = useHeatmapStore()?.attributesMaxDepth ?? 0
+    const maxDepth = useMainStore()?.attributesMaxDepth ?? 0
     // BIG TODO: I need to figure out how I want to align the hierarchical column labels
     // this.y = this.column.depth * heatmapLayoutStore.columnLabelDepthIndent - maxDepth * heatmapLayoutStore.columnLabelDepthIndent
     this.text.y =

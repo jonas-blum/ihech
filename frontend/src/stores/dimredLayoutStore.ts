@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 
 export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
   state: () => ({

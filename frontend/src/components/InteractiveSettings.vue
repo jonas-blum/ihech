@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useHeatmapStore } from '@stores/heatmapStore'
+import { useMainStore } from '@stores/mainStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 import { Icon } from '@iconify/vue'
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 
 const itemGroupingOptions = [
   { label: 'Kanton', value: 'kanton' },
@@ -34,8 +34,8 @@ async function updateItemsClusterSize(event: Event) {
     return
   }
   const size = event.target.value
-  heatmapStore.setItemsClusterSize(parseInt(size, 10))
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setItemsClusterSize(parseInt(size, 10))
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateClusterItemsByCollections(event: Event) {
@@ -43,13 +43,13 @@ async function updateClusterItemsByCollections(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterItemsByCollections(event.target.checked)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setClusterItemsByCollections(event.target.checked)
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateClusterAfterDimRed() {
-  heatmapStore.setClusterAfterDimRed(!heatmapStore.getActiveDataTable?.clusterAfterDimRed)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setClusterAfterDimRed(!mainStore.getActiveDataTable?.clusterAfterDimRed)
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateAttributesClusterByCollections(event: Event) {
@@ -57,8 +57,8 @@ async function updateAttributesClusterByCollections(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterAttributesByCollections(event.target.checked)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setClusterAttributesByCollections(event.target.checked)
+  mainStore.setIsOutOfSync(true)
 }
 </script>
 
@@ -70,15 +70,15 @@ async function updateAttributesClusterByCollections(event: Event) {
     <!-- Item Settings -->
     <p>
       Municipalities are
-      <span v-if="!heatmapStore.getActiveDataTable?.clusterItemsByCollections">not</span> grouped (
+      <span v-if="!mainStore.getActiveDataTable?.clusterItemsByCollections">not</span> grouped (
       <input
         @click="updateClusterItemsByCollections"
         type="checkbox"
         class="toggle toggle-xs translate-y-[4px]"
-        :checked="heatmapStore.getActiveDataTable?.clusterItemsByCollections"
+        :checked="mainStore.getActiveDataTable?.clusterItemsByCollections"
       />
       )
-      <span v-if="heatmapStore.getActiveDataTable?.clusterItemsByCollections">
+      <span v-if="mainStore.getActiveDataTable?.clusterItemsByCollections">
         by
         <select class="select select-bordered select-xs w-min mx-1">
           <option v-for="option in itemGroupingOptions" :value="option.value">
@@ -94,7 +94,7 @@ async function updateAttributesClusterByCollections(event: Event) {
         <option
           v-for="option in kOptions"
           :value="option.value"
-          :selected="heatmapStore.getActiveDataTable?.itemsClusterSize === option.value"
+          :selected="mainStore.getActiveDataTable?.itemsClusterSize === option.value"
         >
           {{ option.label }}
         </option>
@@ -104,10 +104,10 @@ async function updateAttributesClusterByCollections(event: Event) {
         @change="updateClusterAfterDimRed"
         class="select select-bordered select-xs w-min mx-1"
       >
-        <option :selected="!heatmapStore.getActiveDataTable?.clusterAfterDimRed">
+        <option :selected="!mainStore.getActiveDataTable?.clusterAfterDimRed">
           high-dimensional
         </option>
-        <option :selected="heatmapStore.getActiveDataTable?.clusterAfterDimRed">
+        <option :selected="mainStore.getActiveDataTable?.clusterAfterDimRed">
           dimensionality reduced
         </option>
       </select>
@@ -117,16 +117,16 @@ async function updateAttributesClusterByCollections(event: Event) {
     <!-- Attribute Settings -->
     <p>
       Age groups are
-      <span v-if="!heatmapStore.getActiveDataTable?.clusterAttributesByCollections">not</span>
+      <span v-if="!mainStore.getActiveDataTable?.clusterAttributesByCollections">not</span>
       grouped (
       <input
         @click="updateAttributesClusterByCollections"
         type="checkbox"
         class="toggle toggle-xs translate-y-[4px]"
-        :checked="heatmapStore.getActiveDataTable?.clusterAttributesByCollections"
+        :checked="mainStore.getActiveDataTable?.clusterAttributesByCollections"
       />
       )
-      <span v-if="heatmapStore.getActiveDataTable?.clusterAttributesByCollections">
+      <span v-if="mainStore.getActiveDataTable?.clusterAttributesByCollections">
         by
         <select class="select select-bordered select-xs w-min mx-1">
           <option v-for="option in attributeGroupingOptions" :value="option.value">

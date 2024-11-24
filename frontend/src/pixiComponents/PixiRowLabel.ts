@@ -2,7 +2,7 @@ import { Container, Text, Rectangle, Graphics } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { Row } from '@/classes/Row'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
@@ -54,15 +54,15 @@ export class PixiRowLabel extends PixiContainer {
     this.cursor = 'pointer'
     // @ts-ignore: Property 'on' does not exist on type 'CollectionGraphics'
     this.on('click', () => {
-      useHeatmapStore()?.rowLabelClickEvent(this)
+      useMainStore()?.rowLabelClickEvent(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseover', () => {
-      useHeatmapStore()?.setHoveredPixiRowLabel(this)
+      useMainStore()?.setHoveredPixiRowLabel(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseout', () => {
-      useHeatmapStore()?.setHoveredPixiRowLabel(null)
+      useMainStore()?.setHoveredPixiRowLabel(null)
     })
   }
 

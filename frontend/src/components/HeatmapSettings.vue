@@ -10,22 +10,22 @@ import {
   mapScalingEnum,
   type ItemNameAndData,
 } from '@/helpers/helpers'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import SettingsIcon from '@assets/settings.svg'
 import { ref } from 'vue'
 import SingleSelect from './SingleSelect.vue'
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 
 const selectedItem = ref<ItemNameAndData | null>(null)
 
 async function updateScaling(scaling: ScalingEnum) {
-  heatmapStore.setScaling(scaling)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setScaling(scaling)
+  mainStore.setIsOutOfSync(true)
 }
 
 function updateColoringHeatmap(coloringHeatmap: ColoringHeatmapEnum) {
-  heatmapStore.setColoringHeatmap(coloringHeatmap)
+  mainStore.setColoringHeatmap(coloringHeatmap)
 }
 
 async function updateClusterItemsByCollections(event: Event) {
@@ -33,8 +33,8 @@ async function updateClusterItemsByCollections(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterItemsByCollections(event.target.checked)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setClusterItemsByCollections(event.target.checked)
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateClusterAttributesByCollections(event: Event) {
@@ -42,13 +42,13 @@ async function updateClusterAttributesByCollections(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterAttributesByCollections(event.target.checked)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setClusterAttributesByCollections(event.target.checked)
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateSortOrderAttributes(sortOrder: SortOrderAttributes) {
-  heatmapStore.setSortOrderAttributes(sortOrder)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setSortOrderAttributes(sortOrder)
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateSortAttributesBasedOnStickyItems(event: Event) {
@@ -56,8 +56,8 @@ async function updateSortAttributesBasedOnStickyItems(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setSortAttributesBasedOnStickyItems(event.target.checked)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setSortAttributesBasedOnStickyItems(event.target.checked)
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateClusterBasedOnStickyAttributes(event: Event) {
@@ -65,8 +65,8 @@ async function updateClusterBasedOnStickyAttributes(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterItemsBasedOnStickyAttributes(event.target.checked)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setClusterItemsBasedOnStickyAttributes(event.target.checked)
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateClusterAfterDimRed(event: Event) {
@@ -74,8 +74,8 @@ async function updateClusterAfterDimRed(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.setClusterAfterDimRed(event.target.checked)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setClusterAfterDimRed(event.target.checked)
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateItemsClusterSize(event: Event) {
@@ -84,8 +84,8 @@ async function updateItemsClusterSize(event: Event) {
     return
   }
   const size = event.target.value
-  heatmapStore.setItemsClusterSize(parseInt(size, 10))
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setItemsClusterSize(parseInt(size, 10))
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateAttributesClusterSize(event: Event) {
@@ -94,13 +94,13 @@ async function updateAttributesClusterSize(event: Event) {
     return
   }
   const size = event.target.value
-  heatmapStore.setAttributesClusterSize(parseInt(size, 10))
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setAttributesClusterSize(parseInt(size, 10))
+  mainStore.setIsOutOfSync(true)
 }
 
 async function updateDimReductionAlgo(dimReductionAlgo: DimReductionAlgoEnum) {
-  heatmapStore.setDimReductionAlgo(dimReductionAlgo)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setDimReductionAlgo(dimReductionAlgo)
+  mainStore.setIsOutOfSync(true)
 }
 
 function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
@@ -108,21 +108,21 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
     console.error('Event target is not an HTMLInputElement:', event.target)
     return
   }
-  heatmapStore.toggleShowOnlyStickyItemsInDimReduction(event.target.checked)
-  heatmapStore.changeHeatmap()
+  mainStore.toggleShowOnlyStickyItemsInDimReduction(event.target.checked)
+  mainStore.changeHeatmap()
 }
 
 function reloadHeatmap() {
-  heatmapStore.setCsvUploadOpen(false)
-  heatmapStore.fetchHeatmap()
+  mainStore.setCsvUploadOpen(false)
+  mainStore.fetchHeatmap()
 }
 
 function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
   if (!item) return
-  if (!heatmapStore.getStickyItems.includes(item)) {
-    heatmapStore.toggleStickyItem(item)
+  if (!mainStore.getStickyItems.includes(item)) {
+    mainStore.toggleStickyItem(item)
   }
-  heatmapStore.expandItemAndAllParents(item)
+  mainStore.expandItemAndAllParents(item)
 }
 </script>
 
@@ -156,7 +156,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   @click="updateOnlyDimReductionBasedOnStickyItems($event)"
                   type="checkbox"
                   class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
+                  :checked="mainStore.getActiveDataTable?.showOnlyStickyItemsInDimReduction"
                 />
               </div>
             </a>
@@ -184,7 +184,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                     @click="updateDimReductionAlgo(dimReductionAlgo)"
                     :class="{
                       'bg-green-700 text-white':
-                        heatmapStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo,
+                        mainStore.getActiveDataTable?.dimReductionAlgo === dimReductionAlgo,
                     }"
                     >{{ mapDimReductionAlgoEnum(dimReductionAlgo) }}</a
                   >
@@ -230,7 +230,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   @click="updateClusterBasedOnStickyAttributes($event)"
                   type="checkbox"
                   class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
+                  :checked="mainStore.getActiveDataTable?.clusterItemsBasedOnStickyAttributes"
                 />
               </div>
             </a>
@@ -255,7 +255,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
               >
                 <option
                   :key="i"
-                  :selected="heatmapStore.getActiveDataTable?.itemsClusterSize === i"
+                  :selected="mainStore.getActiveDataTable?.itemsClusterSize === i"
                   v-for="i in Array.from({ length: 30 }, (_, i) => i + 1)"
                 >
                   {{ i }}
@@ -287,7 +287,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   @click="updateClusterItemsByCollections"
                   type="checkbox"
                   class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.clusterItemsByCollections"
+                  :checked="mainStore.getActiveDataTable?.clusterItemsByCollections"
                 />
               </div>
             </a>
@@ -317,7 +317,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   @click="updateClusterAfterDimRed($event)"
                   type="checkbox"
                   class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.clusterAfterDimRed"
+                  :checked="mainStore.getActiveDataTable?.clusterAfterDimRed"
                 />
               </div>
             </a>
@@ -351,7 +351,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                     @click="updateScaling(scaling)"
                     :class="{
                       'bg-green-700 text-white':
-                        heatmapStore.getActiveDataTable?.scaling === scaling,
+                        mainStore.getActiveDataTable?.scaling === scaling,
                     }"
                     >{{ mapScalingEnum(scaling) }}</a
                   >
@@ -395,7 +395,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
               >
                 <option
                   :key="i"
-                  :selected="heatmapStore.getActiveDataTable?.attributesClusterSize === i"
+                  :selected="mainStore.getActiveDataTable?.attributesClusterSize === i"
                   v-for="i in Array.from({ length: 30 }, (_, i) => i + 1)"
                 >
                   {{ i }}
@@ -426,7 +426,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   @click="updateClusterAttributesByCollections"
                   type="checkbox"
                   class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.clusterAttributesByCollections"
+                  :checked="mainStore.getActiveDataTable?.clusterAttributesByCollections"
                 />
               </div>
             </a>
@@ -451,7 +451,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   @click="updateSortAttributesBasedOnStickyItems"
                   type="checkbox"
                   class="toggle"
-                  :checked="heatmapStore.getActiveDataTable?.sortAttributesBasedOnStickyItems"
+                  :checked="mainStore.getActiveDataTable?.sortAttributesBasedOnStickyItems"
                 />
               </div>
             </a>
@@ -485,7 +485,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                     @click="updateSortOrderAttributes(sortOrder)"
                     :class="{
                       'bg-green-700 text-white':
-                        heatmapStore.getActiveDataTable?.sortOrderAttributes === sortOrder,
+                        mainStore.getActiveDataTable?.sortOrderAttributes === sortOrder,
                     }"
                     >{{ mapSortOderAttributesEnum(sortOrder) }}</a
                   >
@@ -540,7 +540,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                     @click="updateColoringHeatmap(coloringHeatmap)"
                     :class="{
                       'bg-green-700 text-white':
-                        heatmapStore.getActiveDataTable?.coloringHeatmap === coloringHeatmap,
+                        mainStore.getActiveDataTable?.coloringHeatmap === coloringHeatmap,
                     }"
                     >{{ mapColoringHeatmapEnum(coloringHeatmap) }}</a
                   >
@@ -559,7 +559,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
             </span>
             <a>
               <SingleSelect
-                :options="heatmapStore.getAllItems"
+                :options="mainStore.getAllItems"
                 :selected="selectedItem"
                 @select="makeItemStickyAndExpandItem"
               />
@@ -573,14 +573,14 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
       @click="reloadHeatmap()"
       :class="{
         btn: true,
-        'btn-success': !heatmapStore.isOutOfSync,
-        'btn-warning': heatmapStore.isOutOfSync,
+        'btn-success': !mainStore.isOutOfSync,
+        'btn-warning': mainStore.isOutOfSync,
         'text-lg': true,
       }"
     >
       Reload Heatmap
-      <span v-if="heatmapStore.isOutOfSync">(unsaved changes!)</span>
-      <span v-if="heatmapStore.isLoading" class="loading loading-spinner"></span>
+      <span v-if="mainStore.isOutOfSync">(unsaved changes!)</span>
+      <span v-if="mainStore.isLoading" class="loading loading-spinner"></span>
     </button>
   </div>
 </template>

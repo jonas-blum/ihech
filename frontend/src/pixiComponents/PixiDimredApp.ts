@@ -1,7 +1,7 @@
 import { Application, Container, Texture, Graphics, Rectangle } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 

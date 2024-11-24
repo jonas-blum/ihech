@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { Icon } from '@iconify/vue'
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 const heatmapLayoutStore = useHeatmapLayoutStore()
 
 // Use computed to reactively access the column sorter from the store
-const columnSorter = computed(() => heatmapStore.attributeTree?.columnSorter)
+const columnSorter = computed(() => mainStore.attributeTree?.columnSorter)
 </script>
 
 <template>

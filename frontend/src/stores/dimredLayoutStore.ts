@@ -20,7 +20,7 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
   getters: {
     // canvas width without the left and right margins
     canvasInnerWidth(): number {
-      return this.canvasWidth - 2 * this.tileMargin
+      return this.canvasWidth - 1 * this.tileMargin - 2 // NOTE: dirty fix to make the gap between the dimred and heatmap canvas (almost) equal
     },
     // canvas height without the top and bottom margins
     canvasInnerHeight(): number {
@@ -38,6 +38,14 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     dimredYPadding(): number {
       return (this.canvasInnerHeight - this.dimredSize) / 2
     },
+    dimredTileFrame(): { x: number; y: number; width: number; height: number } {
+      return {
+        x: this.tileMargin,
+        y: this.tileMargin,
+        width: this.canvasInnerWidth,
+        height: this.canvasInnerHeight,
+      }
+    }
   },
   actions: {
     dummyAction(param: number) {

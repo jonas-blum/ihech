@@ -15,9 +15,9 @@ export class PixiHeatmapApp extends Application {
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
   public horizontalScrollbar: PixiHorizontalScrollbar = new PixiHorizontalScrollbar()
   public heatmapCellTexture: Texture = new Texture() // used to efficiently render heatmap cells as sprites
-  public rowLabelTile: RowLabelTile = new RowLabelTile() // purely visual; disconnected from actual Pixi objects
-  public columnLabelTile: ColumnLabelTile = new ColumnLabelTile() // purely visual; disconnected from actual Pixi objects
-  public matrixTile: MatrixTile = new MatrixTile() // purely visual; disconnected from actual Pixi objects
+  public rowLabelTile: RowLabelTile = new RowLabelTile() 
+  public columnLabelTile: ColumnLabelTile = new ColumnLabelTile() 
+  public matrixTile: MatrixTile = new MatrixTile() 
 
   constructor(canvasElement: HTMLCanvasElement) {
     console.log('PixiHeatmapApp constructor', canvasElement)

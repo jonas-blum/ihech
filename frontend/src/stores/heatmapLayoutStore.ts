@@ -153,7 +153,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     },
 
     lastVisibleRowIndex(): number {
-      return Math.ceil((this.verticalScrollPosition + this.canvasHeight) / this.rowHeight)
+      return Math.ceil((this.verticalScrollPosition + this.availableHeightForRows) / this.rowHeight)
     },
 
     firstVisibleColumnIndex(): number {

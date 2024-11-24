@@ -5,6 +5,7 @@ import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { PixiRowsContainer } from '@/pixiComponents/PixiRowsContainer'
 import { PixiColumnLabelsContainer } from '@/pixiComponents/PixiColumnLabelsContainer'
 import { PixiRowLabelsContainer } from '@/pixiComponents/PixiRowLabelsContainer'
+import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 
 export class PixiTile extends PixiContainer {
   content: PixiContainer = new PixiContainer()
@@ -120,5 +121,14 @@ export class MatrixTile extends PixiTile {
       40000,
       heatmapLayoutStore.matrixTileFrame.height,
     )
+  }
+}
+
+export class DimredTile extends PixiTile {
+  constructor() {
+    super()
+
+    const dimredLayoutStore = useDimredLayoutStore()
+    this.initializeTile(dimredLayoutStore.dimredTileFrame)
   }
 }

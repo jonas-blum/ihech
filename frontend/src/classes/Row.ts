@@ -102,7 +102,6 @@ export abstract class Row {
   // TODO: Work in progress; for more efficient culling
   setHeatmapVisibility(visibility: boolean) {
     if (this.heatmapVisibility !== visibility) {
-      console.log('setHeatmapVisibility', this.name, visibility)
       this.heatmapVisibility = visibility
       this.pixiRow?.updateVisibility()
       this.pixiRow?.updateCellPositions(false)

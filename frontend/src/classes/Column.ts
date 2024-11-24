@@ -49,7 +49,6 @@ export abstract class Column {
   // TODO: Work in progress; for more efficient culling
   setHeatmapVisibility(visibility: boolean) {
     if (this.heatmapVisibility !== visibility) {
-      console.log('setHeatmapVisibility', this.name, visibility)
       this.heatmapVisibility = visibility
       this.pixiColumnLabel?.updateVisibility()
     }

@@ -113,10 +113,12 @@ watch(
 
 function clear() {
   console.log('🧹 Dimred.vue clear')
+  const clearStart = performance.now()
   if (pixiDimredApp) {
     pixiDimredApp.clear()
     pixiDimredInitialized.value = false
   }
+  console.log(`🧹 Dimred.vue clear took ${performance.now() - clearStart}ms`)
 }
 
 function init() {
@@ -189,12 +191,30 @@ function updateCanvasDimensions() {
 }
 
 watch(
-  () => mainStore.getDataChanging,
-  () => {
-    clear()
-    update()
+  () => mainStore.loading,
+  (loading) => {
+    if (loading === true) {
+      // we are about to fetch new data, so this is a good time to clear the canvas
+      // stop first, because we don't want to update the canvas while it is being cleared
+      pixiDimredApp?.stop() 
+      // now clear all kinds of PIXI stuff
+      clear()
+
+    } else {
+      // we have new data, so we need to update the canvas
+      update()
+      pixiDimredApp?.start() // start again
+    }
   },
 )
+
+// watch(
+//   () => mainStore.getDataChanging,
+//   () => {
+//     clear()
+//     update()
+//   },
+// )
 
 onMounted(async () => {
   window.addEventListener('resize', () => mainStore.changeHeatmap())

@@ -48,7 +48,7 @@ export class PixiDimredApp extends Application {
   }
 
   clear() {
-    this.bubbleContainer.removeChildren()
+    this.dimredTile.clear()
   }
 
   addBubble(bubble: PixiBubble) {

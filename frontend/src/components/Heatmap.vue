@@ -307,11 +307,12 @@ watch(
 
 function clear() {
   console.log('🧹 Heatmap.vue clear')
+  const clearStart = performance.now()
   if (pixiHeatmapApp) {
-    // TODO: necessary to free memory (Pixi graphics, textures, etc.)? or is pixi automatically cleaning up?
     pixiHeatmapApp.clear()
     pixiHeatmapInitialized.value = false
   }
+  console.log(`🧹 Heatmap.vue clear took ${performance.now() - clearStart}ms`)
 }
 
 function init() {
@@ -341,57 +342,73 @@ function init() {
 
 function update() {
   console.log('🔄 Heatmap.vue update')
+  const startTime = performance.now()
+
+  const canvasStart = performance.now()
   updateCanvasDimensions()
+  console.log(`⏱️ updateCanvasDimensions took ${performance.now() - canvasStart}ms`)
 
   if (!pixiHeatmapApp) {
     console.warn('pixiHeatmapApp is not set')
     return
   }
 
-  // only once I need to init the pixi containers and graphics
   if (!pixiHeatmapInitialized.value) {
-    // traverse the item tree with all rows and create the pixiRows
+    const initStart = performance.now()
+    console.log('🔧 Initializing Pixi containers and graphics')
+
+    const rowsStart = performance.now()
     let rows = mainStore.itemTree?.rowsAsArray
     if (!rows) {
       console.warn('rows is not set')
       return
     }
+    console.log(`✅ Fetched rows in ${performance.now() - rowsStart}ms`)
 
+    const rowsLoopStart = performance.now()
     for (let row of rows) {
-      let pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture) // create PixiRow with reference to the Row
-      row.pixiRow = pixiRow // set the reference to the PixiRow in the Row
+      let pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture)
+      row.pixiRow = pixiRow
       pixiRow.updatePosition()
       pixiHeatmapApp.matrixTile.rowsContainer.addRow(pixiRow)
 
-      // TODO: create row labels
-      let pixiRowLabel = new PixiRowLabel(row) // create PixiRowLabel with reference to the Row
-      row.pixiRowLabel = pixiRowLabel // set the reference to the PixiRowLabel in the Row
-      pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmapApp
+      let pixiRowLabel = new PixiRowLabel(row)
+      row.pixiRowLabel = pixiRowLabel
+      pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel)
     }
+    console.log(`⏱️ Processed all rows in ${performance.now() - rowsLoopStart}ms`)
 
-    // traverse the attribute tree with all columns and create the pixiColumnLabels
+    const columnsStart = performance.now()
     let columns = mainStore.attributeTree?.columnsAsArray
     if (!columns) {
       console.warn('columns is not set')
       return
     }
+    console.log(`✅ Fetched columns in ${performance.now() - columnsStart}ms`)
 
+    const columnsLoopStart = performance.now()
     for (let column of columns) {
-      let pixiColumnLabel = new PixiColumnLabel(column) // create PixiColumnLabel with reference to the Column
-      column.pixiColumnLabel = pixiColumnLabel // set the reference to the PixiColumnLabel in the Column
-      pixiHeatmapApp.columnLabelTile.columnLabelsContainer.addColumnLabel(pixiColumnLabel) // adds the PixiColumnLabel to the PixiHeatmapApp
+      let pixiColumnLabel = new PixiColumnLabel(column)
+      column.pixiColumnLabel = pixiColumnLabel
+      pixiHeatmapApp.columnLabelTile.columnLabelsContainer.addColumnLabel(pixiColumnLabel)
     }
+    console.log(`⏱️ Processed all columns in ${performance.now() - columnsLoopStart}ms`)
 
+    const updatesStart = performance.now()
     pixiHeatmapApp.matrixTile.updateHorizontalPosition()
     pixiHeatmapApp.matrixTile.updateVerticalPosition()
     pixiHeatmapApp.rowLabelTile.updateVerticalPosition()
     mainStore.itemTree?.updateHeatmapVisibilityOfRows()
     mainStore.attributeTree?.updateHeatmapVisibilityOfColumns()
     mainStore.updateCellPositionsOfCurrentlyDisplayedRows()
+    console.log(`⏱️ Updates took ${performance.now() - updatesStart}ms`)
 
     console.log('💨 Pixi Heatmap components are created', pixiHeatmapApp)
     pixiHeatmapInitialized.value = true
+    console.log(`⏱️ Initialization took ${performance.now() - initStart}ms`)
   }
+
+  console.log(`⚡ Total update time: ${performance.now() - startTime}ms`)
 }
 
 function updateCanvasDimensions() {
@@ -405,21 +422,40 @@ function debug() {
   console.log('🐞', pixiHeatmapApp)
 
   if (pixiHeatmapApp) {
+    const debugTImer = performance.now()
     // test if the updateMask functionalitiy of the PixiContainer is even working
-    mainStore.updateCellPositionsOfCurrentlyDisplayedRows()
+    clear()
   }
 }
 
 watch(
-  () => mainStore.getDataChanging,
-  () => {
-    clear()
-    update()
+  () => mainStore.loading,
+  (loading) => {
+    if (loading === true) {
+      // we are about to fetch new data, so this is a good time to clear the canvas
+      // stop first, because we don't want to update the canvas while it is being cleared
+      pixiHeatmapApp?.stop() 
+      // now clear all kinds of PIXI stuff
+      clear()
+
+    } else {
+      // we have new data, so we need to update the canvas
+      update()
+      pixiHeatmapApp?.start() // start again
+    }
   },
 )
 
+// watch(
+//   () => mainStore.getDataChanging,
+//   () => {
+//     clear()
+//     update()
+//   },
+// )
+
 onMounted(async () => {
-  window.addEventListener('resize', () => mainStore.changeHeatmap())
+  // window.addEventListener('resize', () => mainStore.changeHeatmap())
 
   init()
 })

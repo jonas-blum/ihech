@@ -37,45 +37,23 @@ export class PixiTile extends PixiContainer {
     // mask the content to prevent overflow
     this.content.addMask(0, 0, width - padding * 2, height - padding * 2)
   }
-}
 
-export class RowLabelTile extends PixiTile {
-  public rowLabelsContainer: PixiRowLabelsContainer = new PixiRowLabelsContainer() // PixiRowLabel[] as children
-  public stickyRowLabelsContainer: PixiRowLabelsContainer = new PixiRowLabelsContainer() // PixiRowLabel[] as children
-
-  constructor() {
-    super()
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.initializeTile(heatmapLayoutStore.rowLabelsTileFrame)
-
-    this.content.addChild(this.rowLabelsContainer)
-    this.content.addChild(this.stickyRowLabelsContainer)
-  }
-
-  updateVerticalPosition() {
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.rowLabelsContainer.position.y =
-      heatmapLayoutStore.requiredHeightOfStickyRows - heatmapLayoutStore.verticalScrollPosition
-
-    this.rowLabelsContainer.updateMask(0, heatmapLayoutStore.verticalScrollPosition, 20000, 20000)
+  // destroys all children inside containers of the content container (but not the containers themselves)
+  clear() {
+    this.content.children.forEach((child) => {
+      while (child.children[0]) {
+        child.children[0].destroy({ children: true, texture: false, textureSource: false })
+      }
+    })
   }
 }
 
-export class ColumnLabelTile extends PixiTile {
-  public columnLabelsContainer: PixiColumnLabelsContainer = new PixiColumnLabelsContainer() // PixiColumnLabel[] as children
-  // NOTE: add container here to support sticky columns
-
+export class DimredTile extends PixiTile {
   constructor() {
     super()
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.initializeTile(heatmapLayoutStore.columnLabelsTileFrame)
 
-    this.content.addChild(this.columnLabelsContainer)
-  }
-
-  updateHorizontalPosition() {
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.columnLabelsContainer.position.x = -heatmapLayoutStore.horizontalScrollPosition
+    const dimredLayoutStore = useDimredLayoutStore()
+    this.initializeTile(dimredLayoutStore.dimredTileFrame)
   }
 }
 
@@ -124,11 +102,42 @@ export class MatrixTile extends PixiTile {
   }
 }
 
-export class DimredTile extends PixiTile {
+export class RowLabelTile extends PixiTile {
+  public rowLabelsContainer: PixiRowLabelsContainer = new PixiRowLabelsContainer() // PixiRowLabel[] as children
+  public stickyRowLabelsContainer: PixiRowLabelsContainer = new PixiRowLabelsContainer() // PixiRowLabel[] as children
+
   constructor() {
     super()
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.initializeTile(heatmapLayoutStore.rowLabelsTileFrame)
 
-    const dimredLayoutStore = useDimredLayoutStore()
-    this.initializeTile(dimredLayoutStore.dimredTileFrame)
+    this.content.addChild(this.rowLabelsContainer)
+    this.content.addChild(this.stickyRowLabelsContainer)
+  }
+
+  updateVerticalPosition() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.rowLabelsContainer.position.y =
+      heatmapLayoutStore.requiredHeightOfStickyRows - heatmapLayoutStore.verticalScrollPosition
+
+    this.rowLabelsContainer.updateMask(0, heatmapLayoutStore.verticalScrollPosition, 20000, 20000)
+  }
+}
+
+export class ColumnLabelTile extends PixiTile {
+  public columnLabelsContainer: PixiColumnLabelsContainer = new PixiColumnLabelsContainer() // PixiColumnLabel[] as children
+  // NOTE: add container here to support sticky columns
+
+  constructor() {
+    super()
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.initializeTile(heatmapLayoutStore.columnLabelsTileFrame)
+
+    this.content.addChild(this.columnLabelsContainer)
+  }
+
+  updateHorizontalPosition() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.columnLabelsContainer.position.x = -heatmapLayoutStore.horizontalScrollPosition
   }
 }

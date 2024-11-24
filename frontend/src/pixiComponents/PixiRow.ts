@@ -50,9 +50,7 @@ export class PixiRow extends PixiContainer {
   }
 
   updateCellPositions(animate: boolean = true) {
-    console.log('🍄🍄🍄 updateCellPositions for pixiRow')
     if (!this.row.heatmapVisibility) {
-      console.log('row not visible')
       return
     }
 

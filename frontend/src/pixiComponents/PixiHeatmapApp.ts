@@ -49,10 +49,10 @@ export class PixiHeatmapApp extends Application {
   }
 
   clear() {
-    this.matrixTile.rowsContainer.removeChildren()
-    this.matrixTile.stickyRowsContainer.removeChildren()
-    this.columnLabelTile.columnLabelsContainer.removeChildren()
-    this.rowLabelTile.rowLabelsContainer.removeChildren()
+    // DOCS: https://pixijs.download/release/docs/app.Application.html#destroy
+    this.rowLabelTile.clear()
+    this.columnLabelTile.clear()
+    this.matrixTile.clear()
   }
 
   generateHeatmapCellTexture() {

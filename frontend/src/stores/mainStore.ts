@@ -183,7 +183,7 @@ export const useMainStore = defineStore('mainStore', {
     },
   },
   actions: {
-    saveDataTable(dataTable: CsvDataTableProfile, fetchHeatmap = true) {
+    saveDataTable(dataTable: CsvDataTableProfile, fetchData = true) {
       if (
         dataTable.tableName === null ||
         dataTable.df === null ||
@@ -198,8 +198,8 @@ export const useMainStore = defineStore('mainStore', {
         this.dataTables.push(dataTable)
       }
       this.setActiveDataTable(dataTable)
-      if (fetchHeatmap) {
-        this.fetchHeatmap()
+      if (fetchData) {
+        this.fetchData()
       }
     },
     setActiveDataTable(dataTable: CsvDataTableProfile) {
@@ -231,13 +231,13 @@ export const useMainStore = defineStore('mainStore', {
       return this.heatmap.attributeDissimilarities[initialIdx]
     },
 
-    async fetchHeatmap() {
+    async fetchData() {
       if (this.reloadingScheduled) {
-        console.log('Reloading scheduled, skipping fetchHeatmap')
+        console.log('Reloading scheduled, skipping fetchData')
         return
       }
       if (this.isLoading) {
-        console.log('Already loading, skipping fetchHeatmap, queuing reload')
+        console.log('Already loading, skipping fetchData, queuing reload')
         this.reloadingScheduled = true
         return
       }
@@ -354,7 +354,7 @@ export const useMainStore = defineStore('mainStore', {
         this.loading = false
         if (this.reloadingScheduled) {
           this.reloadingScheduled = false
-          this.fetchHeatmap()
+          this.fetchData()
         }
       }
     },

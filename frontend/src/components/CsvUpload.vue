@@ -37,7 +37,7 @@ function toggleAccordion() {
 
 function selectDataTable(dataTable: CsvDataTableProfile) {
   mainStore.setActiveDataTable(dataTable)
-  mainStore.fetchHeatmap()
+  mainStore.fetchData()
 }
 function triggerFileInput() {
   fileInput.value?.click()
@@ -48,7 +48,7 @@ function isNumeric(value: any): boolean {
   return !isNaN(parseFloat(value)) && isFinite(value)
 }
 
-function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap = true) {
+function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = true) {
   let df: dataForge.IDataFrame = dataForge
     .fromCSV(contents, { skipEmptyLines: true })
     .resetIndex()
@@ -122,7 +122,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
     coloringHeatmap: ColoringHeatmapEnum.ABSOLUTE,
   }
 
-  mainStore.saveDataTable(newDataTable, fetchHeatmap)
+  mainStore.saveDataTable(newDataTable, fetchData)
 }
 
 function uploadCsvFile(event: Event) {
@@ -270,13 +270,13 @@ function toggleAttribute(attribute: string) {
   mainStore.setIsOutOfSync(true)
 }
 
-async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
+async function fetchCsvFileByFileName(fileName: string, fetchData: boolean) {
   const response = await fetch(fileName)
   if (!response.ok) {
     throw new Error('Failed to fetch the CSV file.')
   }
   const csvText = await response.text()
-  uploadCsvFileFromFile(csvText, fileName, fetchHeatmap)
+  uploadCsvFileFromFile(csvText, fileName, fetchData)
 }
 
 function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
@@ -354,7 +354,7 @@ onMounted(async () => {
 
     focusActiveDataTable('smooth')
 
-    await mainStore.fetchHeatmap()
+    await mainStore.fetchData()
   } else {
     focusActiveDataTable()
   }

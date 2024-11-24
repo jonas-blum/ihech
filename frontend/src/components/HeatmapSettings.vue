@@ -114,7 +114,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
 
 function reloadHeatmap() {
   mainStore.setCsvUploadOpen(false)
-  mainStore.fetchHeatmap()
+  mainStore.fetchData()
 }
 
 function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {

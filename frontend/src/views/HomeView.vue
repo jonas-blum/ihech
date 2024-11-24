@@ -12,7 +12,7 @@ const heatmapLayoutStore = useHeatmapLayoutStore()
 
 function reloadHeatmap() {
   mainStore.setCsvUploadOpen(false)
-  mainStore.fetchHeatmap()
+  mainStore.fetchData()
 }
 </script>
 

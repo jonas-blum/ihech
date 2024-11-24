@@ -16,6 +16,7 @@ export class PixiRow extends PixiContainer {
     super()
     this.row = row
     this.isSticky = isSticky
+    // this.cullable = true
 
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
@@ -46,25 +47,37 @@ export class PixiRow extends PixiContainer {
           animate && heatmapLayoutStore.allowAnimations ? heatmapLayoutStore.animationDuration : 0,
       },
     )
-
   }
 
   updateCellPositions(animate: boolean = true) {
+    console.log('🍄🍄🍄 updateCellPositions for pixiRow')
+    if (!this.row.heatmapVisibility) {
+      console.log('row not visible')
+      return
+    }
+
     const heatmapLayoutStore = useHeatmapLayoutStore()
+    const mainStore = useMainStore()
 
     for (let i = 0; i < this.children.length; i++) {
       const cell = this.children[i] as Container
+      // console.log('cell', cell)
 
       // lookup the position of the column
-      const column = useMainStore()?.attributeTree?.originalIndexToColumn.get(i)
-
-      // update visibility of the cell
-      cell.visible = column?.position !== -1
+      const column = mainStore?.attributeTree?.originalIndexToColumn.get(i)
+      if (column?.heatmapVisibility == false) {
+        cell.visible = false
+        continue
+      }
 
       // if the oldPosition is -1, we want to animate from the parent column position (if available)
       const startPosition =
         column?.oldPosition === -1 ? (column?.parent?.position ?? 0) : (column?.oldPosition ?? 0)
       const endPosition = column?.position ?? column?.parent?.position ?? 0
+      // console.log('startPosition', startPosition, 'endPosition', endPosition)
+
+      // cell.x = endPosition * heatmapLayoutStore.columnWidth
+      cell.visible = true
 
       gsap.fromTo(
         cell,
@@ -96,8 +109,9 @@ export class PixiRow extends PixiContainer {
       return
     }
 
+    this.visible = this.row.heatmapVisibility
+
     // this is our custom culling mechanism -> prevent rendering if not in visible viewport
-    // TODO: disabled for debugging
     // this.visible =
     //   this.row.position !== -1 &&
     //   this.row.position >= heatmapLayoutStore.firstVisibleRowIndex &&

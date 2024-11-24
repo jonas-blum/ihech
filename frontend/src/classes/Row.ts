@@ -27,6 +27,7 @@ export abstract class Row {
   stickyPixiRow: PixiRow | null = null // reference to the corresponding (sticky!) PixiRow for rendering
   stickyPixiRowLabel: PixiRowLabel | null = null // reference to the corresponding (sticky!) PixiRowLabel for rendering
   pixiBubble: PixiBubble | null = null // reference to the corresponding PixiBubble for rendering
+  heatmapVisibility: boolean = false // wheter the row is visible in the heatmap; used for culling
 
   protected constructor(
     name: string,
@@ -78,10 +79,10 @@ export abstract class Row {
     this.position = position
 
     // update the pixiRow rendering
-    this.pixiRow?.updatePosition()
     this.pixiRow?.updateVisibility()
-    this.pixiRowLabel?.updatePosition()
+    // this.pixiRow?.updatePosition()
     this.pixiRowLabel?.updateVisibility()
+    this.pixiRowLabel?.updatePosition()
 
     // update the pixiBubble rendering
     this.pixiBubble?.updatePositionAndVisibility()
@@ -96,6 +97,17 @@ export abstract class Row {
 
     // update the pixiBubble rendering
     this.pixiBubble?.updateSize()
+  }
+
+  // TODO: Work in progress; for more efficient culling
+  setHeatmapVisibility(visibility: boolean) {
+    if (this.heatmapVisibility !== visibility) {
+      console.log('setHeatmapVisibility', this.name, visibility)
+      this.heatmapVisibility = visibility
+      this.pixiRow?.updateVisibility()
+      this.pixiRow?.updateCellPositions(false)
+      this.pixiRowLabel?.updateVisibility()
+    }
   }
 
   getColor(): number {

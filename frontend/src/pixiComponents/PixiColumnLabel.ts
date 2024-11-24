@@ -48,8 +48,8 @@ export class PixiColumnLabel extends PixiContainer {
     this.addChild(this.text)
     // TODO: icons and other stuff can be added here
 
-    this.updatePosition()
     this.updateVisibility()
+    this.updatePosition()
 
     // event listeners
     this.eventMode = 'static'
@@ -95,7 +95,7 @@ export class PixiColumnLabel extends PixiContainer {
   }
 
   updateVisibility() {
-    this.visible = this.column.position !== -1
+    this.visible = this.column.heatmapVisibility
   }
 
   updateHighlightedDisplay(highlighted: boolean) {

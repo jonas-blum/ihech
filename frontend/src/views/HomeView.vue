@@ -30,7 +30,10 @@ function reloadHeatmap() {
         <InteractiveSettings />
         <div class="flex gap-2 relative h-min">
           <button @click="mainStore?.itemTree?.expandAllRows()" class="btn btn-sm">
-            Expand All
+            Expand All Rows
+          </button>
+          <button @click="mainStore?.attributeTree?.expandAllColumns()" class="btn btn-sm">
+            Expand All Cols
           </button>
           <button
             @click="reloadHeatmap()"

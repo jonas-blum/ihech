@@ -59,8 +59,6 @@ export class PixiContainer extends Container {
   }
 
   updateMask(x: number, y: number, width: number, height: number) {
-    console.log('🥽 super.updateMask')
-
     // TODO: clearing and re-addding the mask is probably not the most efficient way to update the mask
     this.removeMask()
     this.addMask(x, y, width, height)

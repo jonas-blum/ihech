@@ -67,7 +67,7 @@ watch(
     }
 
     // update position and visibility for all bubbles
-    let rows = mainStore.itemTree?.getAllRows()
+    let rows = mainStore.itemTree?.rowsAsArray
     if (!rows) {
       console.warn('rows is not set')
       return
@@ -160,7 +160,7 @@ function update() {
   if (!pixiDimredInitialized.value) {
     console.time('initPixiDimredComponents')
     // traverse the item tree with all rows and create the pixiBubbles
-    let rows = mainStore.itemTree?.getAllRows()
+    let rows = mainStore.itemTree?.rowsAsArray
     if (!rows) {
       console.warn('rows is not set')
       return

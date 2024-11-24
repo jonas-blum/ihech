@@ -53,9 +53,10 @@ export class RowLabelTile extends PixiTile {
 
   updateVerticalPosition() {
     const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.rowLabelsContainer.position.y = heatmapLayoutStore.requiredHeightOfStickyRows - heatmapLayoutStore.verticalScrollPosition
+    this.rowLabelsContainer.position.y =
+      heatmapLayoutStore.requiredHeightOfStickyRows - heatmapLayoutStore.verticalScrollPosition
 
-    this.rowLabelsContainer.updateMask(0, heatmapLayoutStore.verticalScrollPosition, 2000, 2000)
+    this.rowLabelsContainer.updateMask(0, heatmapLayoutStore.verticalScrollPosition, 20000, 20000)
   }
 }
 
@@ -69,6 +70,11 @@ export class ColumnLabelTile extends PixiTile {
     this.initializeTile(heatmapLayoutStore.columnLabelsTileFrame)
 
     this.content.addChild(this.columnLabelsContainer)
+  }
+
+  updateHorizontalPosition() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.columnLabelsContainer.position.x = -heatmapLayoutStore.horizontalScrollPosition
   }
 }
 
@@ -86,16 +92,33 @@ export class MatrixTile extends PixiTile {
   }
 
   updateHorizontalPosition() {
-    const horizontalScrollPosition = useHeatmapLayoutStore().horizontalScrollPosition
-    this.rowsContainer.position.x = -horizontalScrollPosition
-    this.stickyRowsContainer.position.x = -horizontalScrollPosition
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+
+    // this.content.position.x = -heatmapLayoutStore.horizontalScrollPosition
+    this.rowsContainer.position.x = -heatmapLayoutStore.horizontalScrollPosition
+    this.stickyRowsContainer.position.x = -heatmapLayoutStore.horizontalScrollPosition
+
+    // TODO: not sure about the performance side effects of this ...
+    // this.rowsContainer.updateMask(
+    //   0,
+    //   heatmapLayoutStore.verticalScrollPosition,
+    //   heatmapLayoutStore.matrixTileFrame.width,
+    //   heatmapLayoutStore.matrixTileFrame.height,
+    // )
   }
 
   updateVerticalPosition() {
     const heatmapLayoutStore = useHeatmapLayoutStore()
+
     this.rowsContainer.position.y =
       heatmapLayoutStore.requiredHeightOfStickyRows - heatmapLayoutStore.verticalScrollPosition
 
-    this.rowsContainer.updateMask(0, heatmapLayoutStore.verticalScrollPosition, 2000, 2000)
+    // TODO: not sure about the performance side effects of this ...
+    this.rowsContainer.updateMask(
+      0,
+      heatmapLayoutStore.verticalScrollPosition,
+      40000,
+      heatmapLayoutStore.matrixTileFrame.height,
+    )
   }
 }

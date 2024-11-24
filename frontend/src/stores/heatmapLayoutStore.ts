@@ -31,7 +31,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     horizontalScrollPosition: 0, // current horizontal scroll position
 
     animationDuration: 0.3, // duration of animations in seconds
-    allowAnimations: true, // if false, no animations will be performed
+    allowAnimations: false, // if false, no animations will be performed
 
     heatmapCanvasBackgroundColor: 0xffffff, // background color of the heatmap
     labelBackgroundColor: 0xeeeeee, // background color of the row labels
@@ -161,7 +161,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     },
 
     lastVisibleColumnIndex(): number {
-      return Math.ceil((this.horizontalScrollPosition + this.canvasWidth) / this.columnWidth)
+      return Math.ceil((this.horizontalScrollPosition + this.availableWidthForColumns) / this.columnWidth)
     },
 
     verticalScrollbarVisible(): boolean {

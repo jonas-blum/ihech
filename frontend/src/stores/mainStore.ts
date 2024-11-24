@@ -703,12 +703,18 @@ export const useMainStore = defineStore('mainStore', {
       if (this.attributeTree) {
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
-        this.itemTree?.updateCellPositions()
+        this.updateCellPositionsOfCurrentlyDisplayedRows()
       }
     },
 
-    updateCellPositionsOfItemTree() {
-      this.itemTree?.updateCellPositions()
+    updateCellPositionsOfCurrentlyDisplayedRows() {
+      console.log('updateCellPositionsOfCurrentlyDisplayedRows')
+      const rowsVisibleInHeatmap = this.itemTree?.getRowsVisibleInHeatmap()
+      console.log('rowsVisibleInHeatmap', rowsVisibleInHeatmap)
+      rowsVisibleInHeatmap!.forEach((row) => {
+        row.pixiRow?.updateCellPositions()
+        row.stickyPixiRow?.updateCellPositions()
+      })
     },
 
     handleRowClick(row: Row) {

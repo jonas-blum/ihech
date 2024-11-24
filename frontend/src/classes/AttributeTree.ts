@@ -2,6 +2,7 @@ import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
 import type { ColumnSorter } from '@/classes/ColumnSorter'
 import type { HierarchicalAttribute } from '@/helpers/helpers'
 import { useMainStore } from '@/stores/mainStore'
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class AttributeTree {
   root: AggregatedColumn
@@ -10,6 +11,7 @@ export class AttributeTree {
   // TODO: this mapping is updated every time the columns are reordered (??? necessary ???)
   originalIndexToColumn: Map<number, Column> = new Map()
   maxDepth: number = 0 // keeps track of the maximum depth of the tree; used for several display purposes
+  columnsAsArray: Column[] = [] 
 
   // TODO: for now I just roll with the current data structure. this will likely change later.
   constructor(
@@ -22,6 +24,7 @@ export class AttributeTree {
     this.root = this.buildAttributeTree(hierarchicalAttribute) as AggregatedColumn
     this.columnSorter = columnSorter
     this.sort()
+    this.columnsAsArray = this.getAllColumns()
   }
 
   buildAttributeTree(
@@ -63,7 +66,7 @@ export class AttributeTree {
     } else {
       this.expandColumn(column)
     }
-    useMainStore().updateCellPositionsOfItemTree()
+    useMainStore().updateCellPositionsOfCurrentlyDisplayedRows()
   }
 
   expandColumn(column: AggregatedColumn) {
@@ -74,6 +77,8 @@ export class AttributeTree {
     if (column.depth >= this.maxDepth) {
       this.maxDepth = column.depth + 1
     }
+
+    this.updateHeatmapVisibilityOfColumns()
   }
 
   closeColumn(column: AggregatedColumn) {
@@ -84,6 +89,8 @@ export class AttributeTree {
     // NOTE: I am not happy how inefficient this is, as we have to traverse the whole tree to find the new maxDepth
     //      but I don't see a better way right now
     this.calculateMaxDepth()
+
+    this.updateHeatmapVisibilityOfColumns()
   }
 
   calculateMaxDepth() {
@@ -125,6 +132,20 @@ export class AttributeTree {
         pointer = pointer.nextSibling
       }
     }
+  }
+
+  // this function might be moved to the heatmapLayoutStore
+  updateHeatmapVisibilityOfColumns() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    const firstVisibleColumnIndex = heatmapLayoutStore.firstVisibleColumnIndex
+    const lastVisibleColumnIndex = heatmapLayoutStore.lastVisibleColumnIndex
+    this.columnsAsArray.forEach((column) => {
+      column.setHeatmapVisibility(
+        column.position !== -1 &&
+          column.position >= firstVisibleColumnIndex &&
+          column.position <= lastVisibleColumnIndex,
+      )
+    })
   }
 
   getAllColumns(): Column[] {
@@ -210,10 +231,12 @@ export class AttributeTree {
   }
 
   expandAllColumns() {
-    this.getAllColumns().forEach((column) => {
+    this.columnsAsArray.forEach((column) => {
       if (column instanceof AggregatedColumn && !column.isOpen) {
         this.expandColumn(column)
       }
     })
+    this.updateHeatmapVisibilityOfColumns()
+    useMainStore().updateCellPositionsOfCurrentlyDisplayedRows()
   }
 }

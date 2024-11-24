@@ -1,4 +1,5 @@
 import { Container, Text, Rectangle, Graphics } from 'pixi.js'
+import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { Row } from '@/classes/Row'
 import { useHeatmapStore } from '@/stores/heatmapStore'
@@ -103,5 +104,13 @@ export class PixiRowLabel extends PixiContainer {
       this.row.position !== -1 &&
       this.row.position >= heatmapLayoutStore.firstVisibleRowIndex &&
       this.row.position <= heatmapLayoutStore.lastVisibleRowIndex
+  }
+
+  updateHighlightedDisplay(highlighted: boolean) {
+    // make font bold of text object
+    this.text.style.fontWeight = highlighted ? 'bold' : 'normal'
+
+    // make background of row label glow
+    this.background!.filters = highlighted ? [new GlowFilter()] : []
   }
 }

@@ -92,26 +92,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return this.attributeTree?.maxDepth ?? 0
     },
 
-    // this getter is needed because the PixiRow consists of the PixiRowLabel and the PixiHeatmapCells
-    hoveredPixiRow(): PixiRow | null {
-      if (this.hoveredPixiRowLabel) {
-        // if row label (which is child of pixiRow) is currently hovered, we can return the pixiRow
-        return this.hoveredPixiRowLabel.parent as PixiRow
-      }
-      if (this.hoveredPixiHeatmapCell) {
-        // if heatmap cell (which is child of a pixiRow) is hovered, this parent row is highlighted
-        return this.hoveredPixiHeatmapCell.parent.parent as PixiRow
-      }
-      // if none of the above is the case, no row is highlighted
-      return null
-    },
-
     highlightedRow(): Row | null {
-      if (this.hoveredPixiRow) {
-        return this.hoveredPixiRow?.row ?? null
+      if (this.hoveredPixiRowLabel) {
+        return this.hoveredPixiRowLabel.row as Row
+      } else if (this.hoveredPixiHeatmapCell) {
+        return this.hoveredPixiHeatmapCell.parent?.row as Row
       } else if (this.hoveredPixiBubble) {
         return (this.hoveredPixiBubble?.row as Row) ?? null
-      }
+      } 
       return null
     },
 

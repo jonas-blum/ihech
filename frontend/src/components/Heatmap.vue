@@ -53,14 +53,18 @@ watch(
     if (oldRow?.pixiRow) {
       // oldRow.pixiRow.removeHighlight()
       oldRow.pixiRow.updateHighlightedDisplay(false)
+      oldRow.pixiRowLabel?.updateHighlightedDisplay(false)
       oldRow.stickyPixiRow?.updateHighlightedDisplay(false)
+      oldRow.stickyPixiRowLabel?.updateHighlightedDisplay(false)
     }
 
     // add the highlight to the new row
     if (newRow?.pixiRow) {
       // newRow.pixiRow.addHighlight()
       newRow.pixiRow.updateHighlightedDisplay(true)
+      newRow.pixiRowLabel?.updateHighlightedDisplay(true)
       newRow.stickyPixiRow?.updateHighlightedDisplay(true)
+      newRow.stickyPixiRowLabel?.updateHighlightedDisplay(true)
     }
   },
 )

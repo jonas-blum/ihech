@@ -105,6 +105,7 @@ export class PixiRow extends PixiContainer {
   }
 
   updateHighlightedDisplay(highlighted: boolean) {
+    console.log('updateHighlightedDisplay for pixiRow')
     // if (this.pixiRowLabel) {
     //   // make font bold of text object
     //   this.pixiRowLabel.text.style.fontWeight = highlighted ? 'bold' : 'normal'

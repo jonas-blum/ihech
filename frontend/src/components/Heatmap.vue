@@ -268,7 +268,8 @@ watchThrottled(
       // TODO: culling implementation.. maybe throttle this?
       mainStore.itemTree?.updateHeatmapVisibilityOfRows()
     }
-  }, { throttle: 300 },
+  },
+  { throttle: 1 },
 )
 
 // watch for horizontalScrollPosition changes
@@ -285,7 +286,8 @@ watchThrottled(
 
     mainStore.attributeTree?.updateHeatmapVisibilityOfColumns()
     mainStore.updateCellPositionsOfCurrentlyDisplayedRows()
-  }, { throttle: 300 },
+  },
+  { throttle: 1 },
 )
 
 // watch for attributesMaxDepth changes
@@ -385,6 +387,7 @@ function update() {
     pixiHeatmapApp.rowLabelTile.updateVerticalPosition()
     mainStore.itemTree?.updateHeatmapVisibilityOfRows()
     mainStore.attributeTree?.updateHeatmapVisibilityOfColumns()
+    mainStore.updateCellPositionsOfCurrentlyDisplayedRows()
 
     console.log('💨 Pixi Heatmap components are created', pixiHeatmapApp)
     pixiHeatmapInitialized.value = true
@@ -424,41 +427,28 @@ onMounted(async () => {
 
 <template>
   <div class="w-full h-full relative p-0">
-    <span class="absolute z-[1000]"
+    <!-- <span class="absolute z-[1000]"
       >{{ heatmapLayoutStore.requiredWidthOfColumns }} /
       {{ heatmapLayoutStore.availableWidthForColumns }} /
       {{ heatmapLayoutStore.horizontalScrollbarVisible }} /
       {{ heatmapLayoutStore.horizontalScrollPosition }}
-      <button @click="debug" class="btn btn-xs">Debug</button>
-    </span>
-    <span class="absolute top-[1rem]"
+    </span> -->
+    <!-- <span class="absolute top-[1rem]"
       >{{ heatmapLayoutStore.requiredHeightOfRows }} /
       {{ heatmapLayoutStore.availableHeightForRows }} /
       {{ heatmapLayoutStore.verticalScrollbarVisible }} /
-      {{ heatmapLayoutStore.verticalScrollPosition }}</span
-    >
+      {{ heatmapLayoutStore.verticalScrollPosition }}</span> -->
 
-    <span class="absolute top-[2rem] z-[1000]">
-      {{ heatmapLayoutStore.firstVisibleRowIndex }} / {{ heatmapLayoutStore.lastVisibleRowIndex }} /
-      {{ heatmapLayoutStore.firstVisibleColumnIndex }} /
-      {{ heatmapLayoutStore.lastVisibleColumnIndex }}
-    </span>
+    <!-- <span class="absolute top-[2rem] z-[1000]">
+        {{ heatmapLayoutStore.firstVisibleRowIndex }} / {{ heatmapLayoutStore.lastVisibleRowIndex }} /
+        {{ heatmapLayoutStore.firstVisibleColumnIndex }} /
+        {{ heatmapLayoutStore.lastVisibleColumnIndex }}
+      </span> -->
+
+    <button @click="debug" class="absolute z-[1000] btn btn-xs">Debug</button>
 
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
-    <div
-      class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
-      :style="tooltipStyle"
-      v-show="mainStore.hoveredPixiHeatmapCell"
-    >
-      <span>{{ mainStore.highlightedRow?.name }}</span
-      ><br />
-      <span>{{ mainStore.highlightedColumn?.name }}</span
-      ><br />
-      <span>
-        {{ mainStore.hoveredPixiHeatmapCell?.value }}
-      </span>
-    </div>
     <RowSorterSettings
       class="absolute"
       :style="{
@@ -482,6 +472,20 @@ onMounted(async () => {
         width: `${heatmapLayoutStore.rowLabelWidth}px`,
       }"
     />
+  </div>
+  <!-- Tooltip -->
+  <div
+    class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
+    :style="tooltipStyle"
+    v-show="mainStore.hoveredPixiHeatmapCell"
+  >
+    <span>{{ mainStore.highlightedRow?.name }}</span
+    ><br />
+    <span>{{ mainStore.highlightedColumn?.name }}</span
+    ><br />
+    <span>
+      {{ mainStore.hoveredPixiHeatmapCell?.value }}
+    </span>
   </div>
 </template>
 

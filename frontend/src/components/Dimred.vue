@@ -111,7 +111,6 @@ watch(
   },
 )
 
-
 function clear() {
   console.log('🧹 Dimred.vue clear')
   if (pixiDimredApp) {
@@ -167,7 +166,11 @@ function update() {
     }
 
     for (let row of rows) {
-      let pixiBubble = new PixiBubble(row, pixiDimredApp.bubbleTexture, pixiDimredApp.stickyBubbleTexture) // create PixiBubble with reference to the Row
+      let pixiBubble = new PixiBubble(
+        row,
+        pixiDimredApp.bubbleTexture,
+        pixiDimredApp.stickyBubbleTexture,
+      ) // create PixiBubble with reference to the Row
       row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
       pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp
     }
@@ -203,22 +206,22 @@ onMounted(async () => {
 <template>
   <div class="w-full h-full relative">
     <!-- might use later: this is the equivalent border shadow of the Pixi.DropShadowFilter -->
-    <canvas class="w-full h-full " ref="dimredCanvas"></canvas>
+    <canvas class="w-full h-full" ref="dimredCanvas"></canvas>
+
+    <DimredAlgoSelection
+      class="absolute"
+      :style="{
+        top: `${dimredLayoutStore.tileMargin}px`,
+        left: `${dimredLayoutStore.tileMargin}px`,
+      }"
+    />
     <div
-      class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
-      :style="tooltipStyle"
-      v-show="mainStore.hoveredPixiBubble"
+      class="absolute"
+      :style="{
+        top: `${dimredLayoutStore.tileMargin}px`,
+        right: `${dimredLayoutStore.tileMargin}px`,
+      }"
     >
-      <!-- <span>{{ mainStore.highlightedRow?.name }}</span
-      ><br />
-      <span>{{ mainStore.highlightedColumn?.name }}</span
-      ><br /> -->
-      <span>
-        {{ mainStore.hoveredPixiBubble?.row.name }}
-      </span>
-    </div>
-    <DimredAlgoSelection class="absolute" :style="{top: `${dimredLayoutStore.tileMargin}px`, left: `${dimredLayoutStore.tileMargin}px`}" />
-    <div class="absolute" :style="{top: `${dimredLayoutStore.tileMargin}px`, right: `${dimredLayoutStore.tileMargin}px`}">
       <span class="text-xs mr-1">Show Parent Bubbles?</span>
       <input
         v-model="dimredLayoutStore.showParentBubbles"
@@ -226,6 +229,20 @@ onMounted(async () => {
         class="toggle toggle-xs translate-y-[4px]"
       />
     </div>
+  </div>
+  <!-- Tooltip -->
+  <div
+    class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
+    :style="tooltipStyle"
+    v-show="mainStore.hoveredPixiBubble"
+  >
+    <!-- <span>{{ mainStore.highlightedRow?.name }}</span
+      ><br />
+      <span>{{ mainStore.highlightedColumn?.name }}</span
+      ><br /> -->
+    <span>
+      {{ mainStore.hoveredPixiBubble?.row.name }}
+    </span>
   </div>
 </template>
 

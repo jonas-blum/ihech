@@ -712,6 +712,9 @@ export const useMainStore = defineStore('mainStore', {
       const rowsVisibleInHeatmap = this.itemTree?.getRowsVisibleInHeatmap()
       rowsVisibleInHeatmap!.forEach((row) => {
         row.pixiRow?.updateCellPositions()
+      })
+      const stickyRows = this.itemTree?.stickyRows
+      stickyRows!.forEach((row) => {
         row.stickyPixiRow?.updateCellPositions()
       })
     },

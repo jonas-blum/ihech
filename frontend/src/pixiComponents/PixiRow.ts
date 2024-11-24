@@ -50,7 +50,8 @@ export class PixiRow extends PixiContainer {
   }
 
   updateCellPositions(animate: boolean = true) {
-    if (!this.row.heatmapVisibility) {
+    // only proceed if the row is visible (or sticky); otherwise we can skip
+    if (!this.row.heatmapVisibility && !this.isSticky) {
       return
     }
 

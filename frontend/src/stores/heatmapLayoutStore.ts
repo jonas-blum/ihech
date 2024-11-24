@@ -31,7 +31,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     horizontalScrollPosition: 0, // current horizontal scroll position
 
     animationDuration: 0.3, // duration of animations in seconds
-    allowAnimations: false, // if false, no animations will be performed
+    allowAnimations: true, // if false, no animations will be performed
 
     heatmapCanvasBackgroundColor: 0xffffff, // background color of the heatmap
     labelBackgroundColor: 0xeeeeee, // background color of the row labels

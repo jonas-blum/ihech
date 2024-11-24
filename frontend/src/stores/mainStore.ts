@@ -695,6 +695,7 @@ export const useMainStore = defineStore('mainStore', {
       if (this.itemTree) {
         this.itemTree.sort()
         this.itemTree.updatePositionsAndDepth()
+        this.itemTree.updateHeatmapVisibilityOfRows()
       }
     },
 

@@ -97,10 +97,11 @@ export class PixiRow extends PixiContainer {
     }
 
     // this is our custom culling mechanism -> prevent rendering if not in visible viewport
-    this.visible =
-      this.row.position !== -1 &&
-      this.row.position >= heatmapLayoutStore.firstVisibleRowIndex &&
-      this.row.position <= heatmapLayoutStore.lastVisibleRowIndex
+    // TODO: disabled for debugging
+    // this.visible =
+    //   this.row.position !== -1 &&
+    //   this.row.position >= heatmapLayoutStore.firstVisibleRowIndex &&
+    //   this.row.position <= heatmapLayoutStore.lastVisibleRowIndex
   }
 
   updateHighlightedDisplay(highlighted: boolean) {

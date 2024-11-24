@@ -12,6 +12,7 @@ import { gsap } from 'gsap'
 export class PixiRowsContainer extends PixiContainer {
   constructor() {
     super()
+
   }
 
   addRow(row: PixiRow) {

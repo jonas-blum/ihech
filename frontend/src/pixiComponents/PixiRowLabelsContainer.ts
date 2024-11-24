@@ -4,7 +4,7 @@ import { Row } from '@/classes/Row'
 import { Column } from '@/classes/Column'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
-import { PixiRow } from '@/pixiComponents/PixiRow'
+import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
@@ -14,26 +14,14 @@ import { gsap } from 'gsap'
 export class PixiRowLabelsContainer extends PixiContainer {
   constructor() {
     super()
-
-    this.addMask()
-
-    this.updatePosition()
-    this.updateMask()
   }
 
-  updatePosition() {
-    // TODO: implement (for scrolling effect)
-    this.position.y = 0
+  addRowLabel(rowlabel: PixiRowLabel) {
+    this.addChild(rowlabel)
   }
 
-  updateMask() {
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-    // the height of the mask needs to adapt based on the amount of sticky rows
-    super.updateMask(
-      0,
-      0,
-      heatmapLayoutStore.rowLabelWidth,
-      heatmapLayoutStore.availableHeightForRows,
-    )
+  removeRowLabel(rowlabel: PixiRowLabel) {
+    this.removeChild(rowlabel)
+    rowlabel.destroy()
   }
 }

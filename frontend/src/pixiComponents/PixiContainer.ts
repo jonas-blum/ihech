@@ -42,11 +42,11 @@ export class PixiContainer extends Container {
 
   addMask(x: number = 0, y: number = 0, width: number = this.width, height: number = this.height) {
     const mask = new Sprite(Texture.WHITE)
+    this.addChild(mask)
     mask.x = x
     mask.y = y
     mask.width = width
     mask.height = height
-    this.addChild(mask)
     this.mask = mask
     this.maskSprite = mask
   }
@@ -61,12 +61,18 @@ export class PixiContainer extends Container {
   updateMask(x: number, y: number, width: number, height: number) {
     console.log('🥽 super.updateMask')
 
-    if (this.maskSprite) {
-      this.maskSprite.x = x
-      this.maskSprite.y = y
-      this.maskSprite.width = width
-      this.maskSprite.height = height
-    }
+    // TODO: clearing and re-addding the mask is probably not the most efficient way to update the mask
+    this.removeMask()
+    this.addMask(x, y, width, height)
+
+    // if (this.maskSprite) {
+    //   this.maskSprite.x = x
+    //   this.maskSprite.y = y
+    //   this.maskSprite.width = width
+    //   this.maskSprite.height = height
+    // }
+    // // this.mask = null
+    // this.mask = this.maskSprite
   }
 
   setBackgroundColor(color: number) {

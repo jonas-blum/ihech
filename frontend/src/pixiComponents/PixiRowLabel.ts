@@ -5,7 +5,6 @@ import { useHeatmapStore } from '@/stores/heatmapStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
-
 export class PixiRowLabel extends PixiContainer {
   public row: Row // reference to data structure Row
   public isSticky: boolean // true for sticky rows
@@ -70,28 +69,25 @@ export class PixiRowLabel extends PixiContainer {
     const heatmapLayoutStore = useHeatmapLayoutStore()
     // differntiate between sticky and non-sticky rows
     if (this.isSticky) {
-      this.x = 0
-      this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding)
+      this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth)
     } else {
       this.x = this.row.depth * heatmapLayoutStore.rowLabelDepthIndent
-      this.setBackgroundWidth(
-        heatmapLayoutStore.rowLabelWidth -
-          this.row.depth * heatmapLayoutStore.rowLabelDepthIndent -
-          2 * heatmapLayoutStore.tilePadding,
+      this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth)
+
+      const startPosition =
+        this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
+      gsap.fromTo(
+        this,
+        { y: startPosition * heatmapLayoutStore.rowHeight },
+        {
+          y: this.row.position * heatmapLayoutStore.rowHeight,
+          duration:
+            animate && heatmapLayoutStore.allowAnimations
+              ? heatmapLayoutStore.animationDuration
+              : 0,
+        },
       )
     }
-
-    const startPosition =
-      this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
-    gsap.fromTo(
-      this,
-      { y: startPosition * heatmapLayoutStore.rowHeight },
-      {
-        y: this.row.position * heatmapLayoutStore.rowHeight,
-        duration:
-          animate && heatmapLayoutStore.allowAnimations ? heatmapLayoutStore.animationDuration : 0,
-      },
-    )
   }
 
   updateVisibility() {

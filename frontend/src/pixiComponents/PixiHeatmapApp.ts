@@ -55,14 +55,6 @@ export class PixiHeatmapApp extends Application {
     this.rowLabelTile.rowLabelsContainer.removeChildren()
   }
 
-  addColumnLabel(columnLabel: PixiColumnLabel) {
-    this.columnLabelTile.columnLabelsContainer.addChild(columnLabel)
-  }
-
-  addRowLabel(rowLabel: PixiRowLabel) {
-    this.rowLabelTile.rowLabelsContainer.addChild(rowLabel)
-  }
-
   generateHeatmapCellTexture() {
     console.log('generateHeatmapCellTexture')
     const heatmapLayoutStore = useHeatmapLayoutStore()

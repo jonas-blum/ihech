@@ -137,8 +137,7 @@ watch(
           pixiHeatmapApp?.matrixTile.stickyRowsContainer.removeRow(row.stickyPixiRow)
         }
         if (row.stickyPixiRowLabel instanceof PixiRowLabel) {
-          // TODO
-          // pixiHeatmapApp?.removeRowLabel(row.stickyPixiRowLabel)
+          pixiHeatmapApp?.rowLabelTile.stickyRowLabelsContainer.removeRowLabel(row.stickyPixiRowLabel)
         }
       }
     })
@@ -148,16 +147,23 @@ watch(
       const pixiRow = new PixiRow(row, pixiHeatmapApp!.heatmapCellTexture, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiHeatmapApp?.matrixTile.stickyRowsContainer.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
+    
+      const pixiRowLabel = new PixiRowLabel(row, true) // create PixiRowLabel with reference to the Row
+      row.stickyPixiRowLabel = pixiRowLabel // set the reference to the (sticky) PixiRowLabel in the Row
+      pixiHeatmapApp?.rowLabelTile.stickyRowLabelsContainer.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmapApp.stickyRowLabelsContainer
     })
 
     // update the position of all rows
     newStickyRows?.forEach((row, index) => {
       if (row.stickyPixiRow) {
         row.stickyPixiRow.position.y = index * heatmapLayoutStore.rowHeight // Set position based on index
+        row.stickyPixiRowLabel!.position.y = index * heatmapLayoutStore.rowHeight // Set position based on index
       }
     })
 
     // TODO: Update the vertical position of the row container (and the mask) to account for sticky rows
+    pixiHeatmapApp?.matrixTile.updateVerticalPosition()
+    pixiHeatmapApp?.rowLabelTile.updateVerticalPosition()
   },
 )
 
@@ -249,8 +255,8 @@ watch(
       pixiHeatmapApp.verticalScrollbar.update()
 
       // this sliding of the containers results in the scrolling effect
-      pixiHeatmapApp.matrixTile.rowsContainer.position.y = -newVerticalScrollPosition
-      pixiHeatmapApp.rowLabelTile.rowLabelsContainer.position.y = -newVerticalScrollPosition
+      pixiHeatmapApp.matrixTile.updateVerticalPosition()
+      pixiHeatmapApp.rowLabelTile.updateVerticalPosition()
 
       // update visibility of all rows (because they might be outside the viewport)
       // TODO: this causes laggy scrolling. a less strict culling mechanism would be better
@@ -272,8 +278,7 @@ watch(
     if (pixiHeatmapApp) {
       pixiHeatmapApp.horizontalScrollbar.update()
 
-      pixiHeatmapApp.matrixTile.rowsContainer.position.x = -newHorizontalScrollPosition
-      // TODO: update position of the sticky rows container as well
+      pixiHeatmapApp.matrixTile.updateHorizontalPosition()
       pixiHeatmapApp.columnLabelTile.columnLabelsContainer.position.x = -newHorizontalScrollPosition
     }
   },
@@ -355,7 +360,7 @@ function update() {
       // TODO: create row labels
       let pixiRowLabel = new PixiRowLabel(row) // create PixiRowLabel with reference to the Row
       row.pixiRowLabel = pixiRowLabel // set the reference to the PixiRowLabel in the Row
-      pixiHeatmapApp.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmapApp
+      pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmapApp
     }
 
     // traverse the attribute tree with all columns and create the pixiColumnLabels
@@ -368,8 +373,12 @@ function update() {
     for (let column of columns) {
       let pixiColumnLabel = new PixiColumnLabel(column) // create PixiColumnLabel with reference to the Column
       column.pixiColumnLabel = pixiColumnLabel // set the reference to the PixiColumnLabel in the Column
-      pixiHeatmapApp.addColumnLabel(pixiColumnLabel) // adds the PixiColumnLabel to the PixiHeatmapApp
+      pixiHeatmapApp.columnLabelTile.columnLabelsContainer.addColumnLabel(pixiColumnLabel) // adds the PixiColumnLabel to the PixiHeatmapApp
     }
+
+    pixiHeatmapApp.matrixTile.updateHorizontalPosition()
+    pixiHeatmapApp.matrixTile.updateVerticalPosition()
+    pixiHeatmapApp.rowLabelTile.updateVerticalPosition()
 
     console.log('💨 Pixi Heatmap components are created', pixiHeatmapApp)
     pixiHeatmapInitialized.value = true
@@ -387,6 +396,11 @@ function debug() {
   console.log('🐞', pixiHeatmapApp)
 
   if (pixiHeatmapApp) {
+    // test if the updateMask functionalitiy of the PixiContainer is even working
+    console.log('🎭', pixiHeatmapApp.matrixTile)
+    pixiHeatmapApp.matrixTile.content.updateMask(0, 0, 100, 100)
+    console.log('🎭', pixiHeatmapApp.matrixTile)
+
   }
 }
 
@@ -407,12 +421,12 @@ onMounted(async () => {
 
 <template>
   <div class="w-full h-full relative p-0">
-    <!-- <span class="absolute"
+    <span class="absolute top-[1rem]"
       >{{ heatmapLayoutStore.requiredHeightOfRows }} /
       {{ heatmapLayoutStore.availableHeightForRows }} /
       {{ heatmapLayoutStore.verticalScrollbarVisible }} /
       {{ heatmapLayoutStore.verticalScrollPosition }}</span
-    > -->
+    >
 
     <span class="absolute z-[1000]"
       >{{ heatmapLayoutStore.requiredWidthOfColumns }} /

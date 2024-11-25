@@ -20,9 +20,6 @@ export class PixiHeatmapApp extends Application {
   public matrixTile: MatrixTile = new MatrixTile() 
 
   constructor(canvasElement: HTMLCanvasElement) {
-    console.log('PixiHeatmapApp constructor', canvasElement)
-    console.log('width', useHeatmapLayoutStore().canvasWidth)
-    console.log('height', useHeatmapLayoutStore().canvasHeight)
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     super()
@@ -56,7 +53,6 @@ export class PixiHeatmapApp extends Application {
   }
 
   generateHeatmapCellTexture() {
-    console.log('generateHeatmapCellTexture')
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     const heatmapCellGraphic = new Graphics()

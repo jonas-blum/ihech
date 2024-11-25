@@ -709,7 +709,6 @@ export const useMainStore = defineStore('mainStore', {
     },
 
     updateCellPositionsOfCurrentlyDisplayedRows() {
-      const t0 = performance.now()
       const rowsVisibleInHeatmap = this.itemTree?.getRowsVisibleInHeatmap()
       rowsVisibleInHeatmap!.forEach((row) => {
         row.pixiRow?.updateCellPositions()
@@ -718,8 +717,6 @@ export const useMainStore = defineStore('mainStore', {
       stickyRows!.forEach((row) => {
         row.stickyPixiRow?.updateCellPositions()
       })
-      const t1 = performance.now()
-      console.log('⏱️ updateCellPositionsOfCurrentlyDisplayedRows took', t1 - t0, 'milliseconds.')
     },
 
     handleRowClick(row: Row) {

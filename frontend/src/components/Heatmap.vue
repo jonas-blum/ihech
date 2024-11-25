@@ -199,13 +199,6 @@ watch(
 watch(
   () => heatmapLayoutStore.availableHeightForRows,
   (newAvailableHeightForRows, oldAvailableHeightForRows) => {
-    console.log(
-      'availableHeightForRows changed from',
-      oldAvailableHeightForRows,
-      'to',
-      newAvailableHeightForRows,
-    )
-
     // update the vertical scrollbar
     if (pixiHeatmapApp) {
       pixiHeatmapApp.verticalScrollbar.update()
@@ -344,9 +337,7 @@ function update() {
   console.log('🔄 Heatmap.vue update')
   const startTime = performance.now()
 
-  const canvasStart = performance.now()
   updateCanvasDimensions()
-  console.log(`⏱️ updateCanvasDimensions took ${performance.now() - canvasStart}ms`)
 
   if (!pixiHeatmapApp) {
     console.warn('pixiHeatmapApp is not set')
@@ -355,17 +346,13 @@ function update() {
 
   if (!pixiHeatmapInitialized.value) {
     const initStart = performance.now()
-    console.log('🔧 Initializing Pixi containers and graphics')
 
-    const rowsStart = performance.now()
     let rows = mainStore.itemTree?.rowsAsArray
     if (!rows) {
       console.warn('rows is not set')
       return
     }
-    console.log(`✅ Fetched rows in ${performance.now() - rowsStart}ms`)
 
-    const rowsLoopStart = performance.now()
     for (let row of rows) {
       let pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture)
       row.pixiRow = pixiRow
@@ -376,32 +363,25 @@ function update() {
       row.pixiRowLabel = pixiRowLabel
       pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel)
     }
-    console.log(`⏱️ Processed all rows in ${performance.now() - rowsLoopStart}ms`)
 
-    const columnsStart = performance.now()
     let columns = mainStore.attributeTree?.columnsAsArray
     if (!columns) {
       console.warn('columns is not set')
       return
     }
-    console.log(`✅ Fetched columns in ${performance.now() - columnsStart}ms`)
 
-    const columnsLoopStart = performance.now()
     for (let column of columns) {
       let pixiColumnLabel = new PixiColumnLabel(column)
       column.pixiColumnLabel = pixiColumnLabel
       pixiHeatmapApp.columnLabelTile.columnLabelsContainer.addColumnLabel(pixiColumnLabel)
     }
-    console.log(`⏱️ Processed all columns in ${performance.now() - columnsLoopStart}ms`)
 
-    const updatesStart = performance.now()
     pixiHeatmapApp.matrixTile.updateHorizontalPosition()
     pixiHeatmapApp.matrixTile.updateVerticalPosition()
     pixiHeatmapApp.rowLabelTile.updateVerticalPosition()
     mainStore.itemTree?.updateHeatmapVisibilityOfRows()
     mainStore.attributeTree?.updateHeatmapVisibilityOfColumns()
     mainStore.updateCellPositionsOfCurrentlyDisplayedRows()
-    console.log(`⏱️ Updates took ${performance.now() - updatesStart}ms`)
 
     console.log('💨 Pixi Heatmap components are created', pixiHeatmapApp)
     pixiHeatmapInitialized.value = true
@@ -435,11 +415,10 @@ watch(
       // we are about to fetch new data, so this is a good time to clear the canvas
       // stop first, because we don't want to update the canvas while it is being cleared
       if (pixiHeatmapApp) {
-        pixiHeatmapApp.stop() 
+        pixiHeatmapApp.stop()
       }
       // now clear all kinds of PIXI stuff
       clear()
-
     } else {
       // we have new data, so we need to update the canvas
       update()

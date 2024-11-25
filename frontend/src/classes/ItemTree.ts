@@ -30,8 +30,6 @@ export class ItemTree {
     this.assignColorToTopLevelRows()
 
     this.rowsAsArray = this.getAllRows()
-
-    console.log('🎨', this.colorScheme)
   }
 
   buildItemTree(itemNameAndData: any, parent: Row | null = null): Row {
@@ -118,7 +116,6 @@ export class ItemTree {
   }
 
   updatePositionsAndDepth(startRow: Row = this.root) {
-    console.log('updatePositionsAndDepth')
     let pointer: Row | null = startRow // By default start at the root, otherwise start traversal at the specified row
     let position = pointer.position
     let depth = pointer.depth
@@ -244,7 +241,6 @@ export class ItemTree {
   }
 
   toggleStickyRow(row: ItemRow) {
-    console.log('toggleStickyRow')
     if (this.stickyRows.includes(row)) {
       this.removeStickyRow(row)
     } else {
@@ -253,8 +249,6 @@ export class ItemTree {
 
     // sort the sticky
     this.rowSorter.sort(this.stickyRows)
-
-    console.log(this.stickyRows)
   }
 
   addStickyRow(row: ItemRow) {

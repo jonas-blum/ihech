@@ -2,7 +2,7 @@ import { Container, Text, Graphics } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { Column } from '@/classes/Column'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
@@ -17,6 +17,7 @@ export class PixiColumnLabel extends PixiContainer {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     // background box
+    this.addBackground(heatmapLayoutStore.labelBackgroundColor)
     const backgroundHeight =
       heatmapLayoutStore.columnLabelHeight - 2 * heatmapLayoutStore.tilePadding
     this.setBackgroundRect(
@@ -25,7 +26,6 @@ export class PixiColumnLabel extends PixiContainer {
       heatmapLayoutStore.columnWidth - 2 * heatmapLayoutStore.cellPadding,
       backgroundHeight,
     )
-    this.setBackgroundColor(heatmapLayoutStore.labelBackgroundColor)
 
     // create the text for the column label
     this.text = new Text({
@@ -48,23 +48,23 @@ export class PixiColumnLabel extends PixiContainer {
     this.addChild(this.text)
     // TODO: icons and other stuff can be added here
 
-    this.updatePosition()
     this.updateVisibility()
+    this.updatePosition()
 
     // event listeners
     this.eventMode = 'static'
     this.cursor = 'pointer'
     // @ts-ignore: Property 'on' does not exist
     this.on('click', () => {
-      useHeatmapStore()?.columnLabelClickEvent(this.column)
+      useMainStore()?.columnLabelClickEvent(this.column)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseover', () => {
-      useHeatmapStore()?.setHoveredPixiColumnLabel(this)
+      useMainStore()?.setHoveredPixiColumnLabel(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseout', () => {
-      useHeatmapStore()?.setHoveredPixiColumnLabel(null)
+      useMainStore()?.setHoveredPixiColumnLabel(null)
     })
   }
 
@@ -79,11 +79,12 @@ export class PixiColumnLabel extends PixiContainer {
       { x: startPosition * heatmapLayoutStore.columnWidth },
       {
         x: this.column.position * heatmapLayoutStore.columnWidth,
-        duration: animate ? heatmapLayoutStore.animationDuration : 0,
+        duration:
+          animate && heatmapLayoutStore.allowAnimations ? heatmapLayoutStore.animationDuration : 0,
       },
     )
 
-    const maxDepth = useHeatmapStore()?.attributesMaxDepth ?? 0
+    const maxDepth = useMainStore()?.attributesMaxDepth ?? 0
     // BIG TODO: I need to figure out how I want to align the hierarchical column labels
     // this.y = this.column.depth * heatmapLayoutStore.columnLabelDepthIndent - maxDepth * heatmapLayoutStore.columnLabelDepthIndent
     this.text.y =
@@ -94,7 +95,7 @@ export class PixiColumnLabel extends PixiContainer {
   }
 
   updateVisibility() {
-    this.visible = this.column.position !== -1
+    this.visible = this.column.heatmapVisibility
   }
 
   updateHighlightedDisplay(highlighted: boolean) {
@@ -102,7 +103,7 @@ export class PixiColumnLabel extends PixiContainer {
     this.text.style.fontWeight = highlighted ? 'bold' : 'normal'
 
     // make background of column label glow
-    this.background.filters = highlighted ? [new GlowFilter()] : []
+    this.background!.filters = highlighted ? [new GlowFilter()] : []
     // make sure the higlighted column is rendered last, otherwise the glow filter is not visible
     if (highlighted && this.parent) {
       this.parent.setChildIndex(this, this.parent.children.length - 1)

@@ -12,6 +12,7 @@ export abstract class Column {
   prevSibling: Column | null = null
   nextSibling: Column | null = null
   pixiColumnLabel: PixiColumnLabel | null = null
+  heatmapVisibility: boolean = false // whether the row is visible in the heatmap; used for culling
 
   protected constructor(
     name: string,
@@ -43,6 +44,14 @@ export abstract class Column {
 
     // rendering side effects
     this.pixiColumnLabel?.updatePosition()
+  }
+
+  // TODO: Work in progress; for more efficient culling
+  setHeatmapVisibility(visibility: boolean) {
+    if (this.heatmapVisibility !== visibility) {
+      this.heatmapVisibility = visibility
+      this.pixiColumnLabel?.updateVisibility()
+    }
   }
 }
 

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { DimReductionAlgoEnum, mapDimReductionAlgoEnum } from '@/helpers/helpers'
 import { ref, computed, watch } from 'vue'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { Icon } from '@iconify/vue'
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 const heatmapLayoutStore = useHeatmapLayoutStore()
 
 // Get the first algorithm from the enum as the default
@@ -16,8 +16,8 @@ const selectedDimReductionAlgo = ref<DimReductionAlgoEnum>(firstDimReductionAlgo
 
 async function updateDimReductionAlgo(dimReductionAlgo: DimReductionAlgoEnum) {
     console.log('updateDimReductionAlgo', dimReductionAlgo)
-  heatmapStore.setDimReductionAlgo(dimReductionAlgo)
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setDimReductionAlgo(dimReductionAlgo)
+  mainStore.setIsOutOfSync(true)
 }
 </script>
 

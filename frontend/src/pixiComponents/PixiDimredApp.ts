@@ -1,15 +1,17 @@
 import { Application, Container, Texture, Graphics, Rectangle } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
+import { DimredTile } from '@/pixiComponents/PixiTile'
+import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiDimredApp extends Application {
-  public bubbleContainer: Container = new Container() // PixiBubble[] as children
+  public bubbleContainer: PixiContainer = new PixiContainer() // PixiBubble[] as children
   public bubbleTexture: Texture = new Texture() // texture used to efficiently render bubbles as sprites
   public stickyBubbleTexture: Texture = new Texture() // texture used to encode sticky rows in the dimred
-  public dimredTile: Graphics = new Graphics() // purely visual; disconnected from actual Pixi objects
+  public dimredTile: DimredTile = new DimredTile() 
 
   constructor(canvasElement: HTMLCanvasElement) {
     super()
@@ -27,27 +29,9 @@ export class PixiDimredApp extends Application {
       // autoDensity: true, // not sure what this does
     })
 
-    this.stage.position.set(dimredLayoutStore.tileMargin, dimredLayoutStore.tileMargin)
-
-    // tile for border effect
-    this.dimredTile
-      .rect(
-        0,
-        0,
-        dimredLayoutStore.canvasInnerWidth + dimredLayoutStore.tileMargin - 1,
-        dimredLayoutStore.canvasInnerHeight,
-      )
-      .fill(0xffffff)
-    this.dimredTile.filters = [
-      new DropShadowFilter({
-        offset: { x: 0, y: 0 },
-        blur: 1,
-        alpha: 1,
-      }),
-    ]
     this.stage.addChild(this.dimredTile)
 
-    this.stage.addChild(this.bubbleContainer)
+    this.dimredTile.content.addChild(this.bubbleContainer)
     // center the dimred, ensure it is quadratic
     this.bubbleContainer.width = dimredLayoutStore.dimredSize
     this.bubbleContainer.height = dimredLayoutStore.dimredSize
@@ -55,10 +39,16 @@ export class PixiDimredApp extends Application {
       dimredLayoutStore.dimredXPadding,
       dimredLayoutStore.dimredYPadding,
     )
+    // for debugging the bubbleContainer position
+    // this.bubbleContainer.addBackground(0x00ffff)
+    // this.bubbleContainer.setBackgroundDimensions(
+    //   dimredLayoutStore.dimredSize,
+    //   dimredLayoutStore.dimredSize,
+    // )
   }
 
   clear() {
-    this.bubbleContainer.removeChildren()
+    this.dimredTile.clear()
   }
 
   addBubble(bubble: PixiBubble) {

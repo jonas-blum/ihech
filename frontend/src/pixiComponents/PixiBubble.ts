@@ -3,7 +3,7 @@ import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 import { gsap } from 'gsap'
@@ -16,7 +16,7 @@ export class PixiBubble extends Container {
     super()
     this.row = row
 
-    const heatmapStore = useHeatmapStore()
+    const mainStore = useMainStore()
 
     this.addChild(this.bubbleGraphic)
     this.changeTexture(texture)
@@ -33,15 +33,15 @@ export class PixiBubble extends Container {
     // event listeners
     // @ts-ignore: Property 'on' does not exist
     this.on('click', () => {
-      heatmapStore?.bubbleClickEvent(this)
+      mainStore?.bubbleClickEvent(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseover', () => {
-      heatmapStore?.setHoveredPixiBubble(this)
+      mainStore?.setHoveredPixiBubble(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseout', () => {
-      heatmapStore?.setHoveredPixiBubble(null)
+      mainStore?.setHoveredPixiBubble(null)
     })
     
   }
@@ -144,12 +144,12 @@ export class PixiBubble extends Container {
     // NOTE: initially I planned to scale the bubbles based on the depth of the tree
     // but I think it makes more sense to scale the bubbles based on the number of items.. TBD
 
-    // let maxDepth = useHeatmapStore()?.itemsMaxDepth
+    // let maxDepth = useMainStore()?.itemsMaxDepth
     // let scaleFactor =
     //   (1 + (maxDepth - this.row.depth)) * useDimredLayoutStore().bubbleSizeDepthIncrement
     // // console.log(`maxDepth: ${maxDepth}`)
 
-    const itemsTotal = (useHeatmapStore()?.itemTree?.root?.totalChildrenCount ?? 0) + 1
+    const itemsTotal = (useMainStore()?.itemTree?.root?.totalChildrenCount ?? 0) + 1
     const itemsAmount = 1 + this.row.totalChildrenCount
 
     const maxScaleFactor =

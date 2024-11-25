@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { onMounted, ref, watch } from 'vue'
 import * as dataForge from 'data-forge'
 import {
@@ -23,7 +23,7 @@ const CSV_UPLOAD_CONTENT_HEIGHT_FINAL =
 const MAX_CELL_WIDTH = 300
 const TABLE_PADDING = 10
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 
 const hierarchyLayers: ('None' | number)[] = ['None', 1, 2, 3, 4]
 
@@ -32,23 +32,23 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const dataTablesList = ref<HTMLUListElement | null>(null)
 
 function toggleAccordion() {
-  heatmapStore.setCsvUploadOpen(!heatmapStore.isCsvUploadOpen)
+  mainStore.setCsvUploadOpen(!mainStore.isCsvUploadOpen)
 }
 
 function selectDataTable(dataTable: CsvDataTableProfile) {
-  heatmapStore.setActiveDataTable(dataTable)
-  heatmapStore.fetchHeatmap()
+  mainStore.setActiveDataTable(dataTable)
+  mainStore.fetchData()
 }
 function triggerFileInput() {
   fileInput.value?.click()
-  heatmapStore.setCsvUploadOpen(true)
+  mainStore.setCsvUploadOpen(true)
 }
 
 function isNumeric(value: any): boolean {
   return !isNaN(parseFloat(value)) && isFinite(value)
 }
 
-function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap = true) {
+function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = true) {
   let df: dataForge.IDataFrame = dataForge
     .fromCSV(contents, { skipEmptyLines: true })
     .resetIndex()
@@ -72,7 +72,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
 
   const csvFile = df.toCSV()
   let fileNameNoExtension = fileName.split('.').slice(0, -1).join('.')
-  while (heatmapStore.getAllDataTableNames.includes(fileNameNoExtension)) {
+  while (mainStore.getAllDataTableNames.includes(fileNameNoExtension)) {
     fileNameNoExtension = '1_' + fileNameNoExtension
     console.log(
       'File name already exists, adding 1 to the beginning of the file name',
@@ -122,7 +122,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchHeatmap 
     coloringHeatmap: ColoringHeatmapEnum.ABSOLUTE,
   }
 
-  heatmapStore.saveDataTable(newDataTable, fetchHeatmap)
+  mainStore.saveDataTable(newDataTable, fetchData)
 }
 
 function uploadCsvFile(event: Event) {
@@ -138,10 +138,10 @@ function uploadCsvFile(event: Event) {
 }
 
 function getColumnCollectionHierarchy(columnName: string): 'None' | number {
-  if (heatmapStore.getActiveDataTable === null) {
+  if (mainStore.getActiveDataTable === null) {
     return 'None'
   }
-  const foundIndex = heatmapStore.getActiveDataTable.collectionColumnNames.indexOf(columnName)
+  const foundIndex = mainStore.getActiveDataTable.collectionColumnNames.indexOf(columnName)
   if (foundIndex === -1) {
     return 'None'
   } else {
@@ -150,62 +150,62 @@ function getColumnCollectionHierarchy(columnName: string): 'None' | number {
 }
 
 function updateItemCollectionMap() {
-  if (heatmapStore.getActiveDataTable === null) {
+  if (mainStore.getActiveDataTable === null) {
     return
   }
-  if (heatmapStore.getActiveDataTable.collectionColumnNames.length === 0) {
-    heatmapStore.getActiveDataTable.itemCollectionMap = {}
+  if (mainStore.getActiveDataTable.collectionColumnNames.length === 0) {
+    mainStore.getActiveDataTable.itemCollectionMap = {}
     return
   }
 
-  const collectionColumnName = heatmapStore.getActiveDataTable.collectionColumnNames[0]
+  const collectionColumnName = mainStore.getActiveDataTable.collectionColumnNames[0]
 
   const itemCollectionMap: Record<number, string> = {}
-  heatmapStore.getActiveDataTable.df.forEach((row, index) => {
+  mainStore.getActiveDataTable.df.forEach((row, index) => {
     itemCollectionMap[index] = row[collectionColumnName]
   })
-  heatmapStore.getActiveDataTable.itemCollectionMap = itemCollectionMap
+  mainStore.getActiveDataTable.itemCollectionMap = itemCollectionMap
 }
 
 function resetFirstLayerCollectionNames() {
-  if (heatmapStore.getActiveDataTable === null) {
+  if (mainStore.getActiveDataTable === null) {
     return
   }
-  if (heatmapStore.getActiveDataTable.collectionColumnNames.length === 0) {
-    heatmapStore.getActiveDataTable.firstLayerCollectionNames = []
-    heatmapStore.getActiveDataTable.selectedFirstLayerCollections = []
+  if (mainStore.getActiveDataTable.collectionColumnNames.length === 0) {
+    mainStore.getActiveDataTable.firstLayerCollectionNames = []
+    mainStore.getActiveDataTable.selectedFirstLayerCollections = []
     return
   }
 
-  const collectionColumnName = heatmapStore.getActiveDataTable.collectionColumnNames[0]
+  const collectionColumnName = mainStore.getActiveDataTable.collectionColumnNames[0]
   const newFirstLayerCollectionNames: string[] = []
-  heatmapStore.getActiveDataTable.df.forEach((row, index) => {
+  mainStore.getActiveDataTable.df.forEach((row, index) => {
     newFirstLayerCollectionNames.push(row[collectionColumnName])
   })
   const uniqueFirstLayerCollectionNames = [...new Set(newFirstLayerCollectionNames)]
-  heatmapStore.getActiveDataTable.firstLayerCollectionNames = uniqueFirstLayerCollectionNames
-  heatmapStore.getActiveDataTable.selectedFirstLayerCollections = uniqueFirstLayerCollectionNames
+  mainStore.getActiveDataTable.firstLayerCollectionNames = uniqueFirstLayerCollectionNames
+  mainStore.getActiveDataTable.selectedFirstLayerCollections = uniqueFirstLayerCollectionNames
 }
 
 function resetCollectionColorMap(): void {
-  if (heatmapStore.getActiveDataTable === null) {
+  if (mainStore.getActiveDataTable === null) {
     return
   }
-  if (heatmapStore.getActiveDataTable.firstLayerCollectionNames.length === 0) {
-    heatmapStore.getActiveDataTable.collectionColorMap = {}
+  if (mainStore.getActiveDataTable.firstLayerCollectionNames.length === 0) {
+    mainStore.getActiveDataTable.collectionColorMap = {}
     return
   }
 
   const colorMap: Record<string, string> = {}
   let index = 0
-  heatmapStore.getActiveDataTable.firstLayerCollectionNames.forEach((collection) => {
+  mainStore.getActiveDataTable.firstLayerCollectionNames.forEach((collection) => {
     if (collection in colorMap) {
       return
     }
     colorMap[collection] = getDistinctColor(index)
     index++
   })
-  heatmapStore.getActiveDataTable.collectionColorMap = colorMap
+  mainStore.getActiveDataTable.collectionColorMap = colorMap
 }
 
 function handleHierarchyLayerInput(event: Event, columnName: string) {
@@ -218,69 +218,69 @@ function handleHierarchyLayerInput(event: Event, columnName: string) {
 }
 
 function updateHierarchyLayer(selectedHierarchyLayer: string, columnName: string) {
-  if (heatmapStore.getActiveDataTable === null) {
+  if (mainStore.getActiveDataTable === null) {
     return
   }
 
-  heatmapStore.getActiveDataTable.selectedAttributes =
-    heatmapStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== columnName)
+  mainStore.getActiveDataTable.selectedAttributes =
+    mainStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== columnName)
 
   if (selectedHierarchyLayer === 'None') {
     //Remove the column name from the collectionColumnNames array
-    const foundIndex = heatmapStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
+    const foundIndex = mainStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
     if (foundIndex !== undefined && foundIndex !== -1) {
-      heatmapStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
+      mainStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
     }
   } else {
     // Insert the column name at the selected hierarchy layer
     const hierarchyLayer = parseInt(selectedHierarchyLayer)
-    const foundIndex = heatmapStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
+    const foundIndex = mainStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
     if (foundIndex !== undefined && foundIndex !== -1) {
-      heatmapStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
+      mainStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
     }
-    heatmapStore.getActiveDataTable?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
+    mainStore.getActiveDataTable?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
   }
-  if (heatmapStore.getActiveDataTable.collectionColumnNames.length > 4) {
-    heatmapStore.getActiveDataTable.collectionColumnNames =
-      heatmapStore.getActiveDataTable.collectionColumnNames.slice(0, 4)
+  if (mainStore.getActiveDataTable.collectionColumnNames.length > 4) {
+    mainStore.getActiveDataTable.collectionColumnNames =
+      mainStore.getActiveDataTable.collectionColumnNames.slice(0, 4)
   }
   resetFirstLayerCollectionNames()
   updateItemCollectionMap()
   resetCollectionColorMap()
-  heatmapStore.updateSelectedItemIndexesBasedOnSelectedCollections()
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.updateSelectedItemIndexesBasedOnSelectedCollections()
+  mainStore.setIsOutOfSync(true)
 }
 
 function updateItemNamesColumn(columName: string) {
-  if (heatmapStore.getActiveDataTable === null) {
+  if (mainStore.getActiveDataTable === null) {
     return
   }
-  heatmapStore.getActiveDataTable.itemNamesColumnName = columName
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.getActiveDataTable.itemNamesColumnName = columName
+  mainStore.setIsOutOfSync(true)
 }
 
 function toggleAttribute(attribute: string) {
-  if (heatmapStore.getActiveDataTable === null) return
-  if (heatmapStore.getActiveDataTable.selectedAttributes.includes(attribute)) {
-    heatmapStore.getActiveDataTable.selectedAttributes =
-      heatmapStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== attribute)
+  if (mainStore.getActiveDataTable === null) return
+  if (mainStore.getActiveDataTable.selectedAttributes.includes(attribute)) {
+    mainStore.getActiveDataTable.selectedAttributes =
+      mainStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== attribute)
   } else {
-    heatmapStore.getActiveDataTable.selectedAttributes.push(attribute)
+    mainStore.getActiveDataTable.selectedAttributes.push(attribute)
   }
-  heatmapStore.setIsOutOfSync(true)
+  mainStore.setIsOutOfSync(true)
 }
 
-async function fetchCsvFileByFileName(fileName: string, fetchHeatmap: boolean) {
+async function fetchCsvFileByFileName(fileName: string, fetchData: boolean) {
   const response = await fetch(fileName)
   if (!response.ok) {
     throw new Error('Failed to fetch the CSV file.')
   }
   const csvText = await response.text()
-  uploadCsvFileFromFile(csvText, fileName, fetchHeatmap)
+  uploadCsvFileFromFile(csvText, fileName, fetchData)
 }
 
 function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
-  const activeDataTableName = heatmapStore.getActiveDataTable?.tableName
+  const activeDataTableName = mainStore.getActiveDataTable?.tableName
   if (activeDataTableName && dataTablesList.value) {
     const activeDataTableElement = dataTablesList.value.querySelector(
       `#dataTableEntry-${activeDataTableName}`,
@@ -294,7 +294,7 @@ function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
 }
 
 onMounted(async () => {
-  if (heatmapStore.getAllDataTableNames.length === 0) {
+  if (mainStore.getAllDataTableNames.length === 0) {
     // await fetchCsvFileByFileName('amount_different_attributes.csv', false)
     // updateHierarchyLayer('1', 'edition')
     // await fetchCsvFileByFileName('length_of_content_inside_tag.csv', false)
@@ -324,31 +324,37 @@ onMounted(async () => {
     await fetchCsvFileByFileName('voting_Institution.csv', false)
     updateHierarchyLayer('1', 'Sprachregion')
     updateHierarchyLayer('2', 'Kanton')
-    await fetchCsvFileByFileName('voting_Vote trigger.csv', false)
+    await fetchCsvFileByFileName('DEBUG-voting_Institution.csv', false)
     updateHierarchyLayer('1', 'Sprachregion')
     updateHierarchyLayer('2', 'Kanton')
-    await fetchCsvFileByFileName('voting_Vote trigger actor.csv', false)
-    updateHierarchyLayer('1', 'Sprachregion')
-    updateHierarchyLayer('2', 'Kanton')
-    await fetchCsvFileByFileName('voting_Theme 1.csv', false)
-    updateHierarchyLayer('1', 'Sprachregion')
-    updateHierarchyLayer('2', 'Kanton')
-    await fetchCsvFileByFileName('voting_Theme 2.csv', false)
-    updateHierarchyLayer('1', 'Sprachregion')
-    updateHierarchyLayer('2', 'Kanton')
-    await fetchCsvFileByFileName('voting_Theme 3.csv', false)
-    updateHierarchyLayer('1', 'Sprachregion')
-    updateHierarchyLayer('2', 'Kanton')
-    await fetchCsvFileByFileName('2019_age_groups_2-layers.csv', false)
-    updateHierarchyLayer('1', 'Sprachregion')
-    updateHierarchyLayer('2', 'Kanton')
+    // await fetchCsvFileByFileName('voting_Vote trigger.csv', false)
+    // updateHierarchyLayer('1', 'Sprachregion')
+    // updateHierarchyLayer('2', 'Kanton')
+    // await fetchCsvFileByFileName('voting_Vote trigger actor.csv', false)
+    // updateHierarchyLayer('1', 'Sprachregion')
+    // updateHierarchyLayer('2', 'Kanton')
+    // await fetchCsvFileByFileName('voting_Theme 1.csv', false)
+    // updateHierarchyLayer('1', 'Sprachregion')
+    // updateHierarchyLayer('2', 'Kanton')
+    // await fetchCsvFileByFileName('voting_Theme 2.csv', false)
+    // updateHierarchyLayer('1', 'Sprachregion')
+    // updateHierarchyLayer('2', 'Kanton')
+    // await fetchCsvFileByFileName('voting_Theme 3.csv', false)
+    // updateHierarchyLayer('1', 'Sprachregion')
+    // updateHierarchyLayer('2', 'Kanton')
+    // await fetchCsvFileByFileName('2019_age_groups_2-layers.csv', false)
+    // updateHierarchyLayer('1', 'Sprachregion')
+    // updateHierarchyLayer('2', 'Kanton')
     await fetchCsvFileByFileName('2019_age_groups_1-layer.csv', false)
     updateHierarchyLayer('1', 'Sprachregion')
     updateHierarchyLayer('2', 'Kanton')
+    // await fetchCsvFileByFileName('DEBUG-2019_age_groups_1-layer.csv', false)
+    // updateHierarchyLayer('1', 'Sprachregion')
+    // updateHierarchyLayer('2', 'Kanton')
 
     focusActiveDataTable('smooth')
 
-    await heatmapStore.fetchHeatmap()
+    await mainStore.fetchData()
   } else {
     focusActiveDataTable()
   }
@@ -358,7 +364,7 @@ onMounted(async () => {
 <template>
   <div class="box-content">
     <div class="collapse collapse-arrow bg-base-200">
-      <input type="checkbox" class="hidden" v-model="heatmapStore.isCsvUploadOpen" />
+      <input type="checkbox" class="hidden" v-model="mainStore.isCsvUploadOpen" />
 
       <div
         class="collapse-title"
@@ -373,7 +379,7 @@ onMounted(async () => {
         @click.stop="toggleAccordion"
       >
         <div :style="{ display: 'flex', alignItems: 'center', gap: '20px' }">
-          <div v-if="heatmapStore.isCsvUploadOpen">
+          <div v-if="mainStore.isCsvUploadOpen">
             <button
               :style="{ width: '120px' }"
               class="btn btn-info"
@@ -395,7 +401,7 @@ onMounted(async () => {
         <button class="btn btn-warning" @click.stop="discardChanges">Discard Changes</button> -->
 
         <h1
-          v-if="heatmapStore.getActiveDataTable"
+          v-if="mainStore.getActiveDataTable"
           class="font-bold text-2xl"
           :style="{
             overflow: 'hidden',
@@ -405,7 +411,7 @@ onMounted(async () => {
             margin: '0px 30px',
           }"
         >
-          {{ heatmapStore.getActiveDataTable?.tableName }}
+          {{ mainStore.getActiveDataTable?.tableName }}
         </h1>
       </div>
 
@@ -418,7 +424,7 @@ onMounted(async () => {
           height: CSV_UPLOAD_CONTENT_HEIGHT_FINAL + 'px',
         }"
         class="collapse-content content-grid"
-        v-if="heatmapStore.isCsvUploadOpen"
+        v-if="mainStore.isCsvUploadOpen"
         @click.stop
       >
         <div
@@ -438,7 +444,7 @@ onMounted(async () => {
           >
             <li
               :key="index"
-              v-for="(dataTable, index) in heatmapStore.getAllDataTables"
+              v-for="(dataTable, index) in mainStore.getAllDataTables"
               :id="`dataTableEntry-${dataTable.tableName}`"
             >
               <button
@@ -446,7 +452,7 @@ onMounted(async () => {
                   btn: true,
                   'btn-outline': true,
                   'btn-primary': true,
-                  'btn-active': heatmapStore.getActiveDataTable?.tableName === dataTable.tableName,
+                  'btn-active': mainStore.getActiveDataTable?.tableName === dataTable.tableName,
                 }"
                 @click.stop="selectDataTable(dataTable)"
                 :style="{ width: '220px' }"
@@ -464,11 +470,11 @@ onMounted(async () => {
               </button>
             </li>
 
-            <li v-if="heatmapStore.getAllDataTables.length === 0">Upload a CSV File first</li>
+            <li v-if="mainStore.getAllDataTables.length === 0">Upload a CSV File first</li>
           </ul>
         </div>
         <div
-          v-if="heatmapStore.getActiveDataTable"
+          v-if="mainStore.getActiveDataTable"
           :style="{
             flexDirection: 'column',
             display: 'flex',
@@ -478,7 +484,7 @@ onMounted(async () => {
             <thead>
               <th
                 :key="index"
-                v-for="(columnName, index) in heatmapStore.getActiveDataTable?.df.getColumnNames()"
+                v-for="(columnName, index) in mainStore.getActiveDataTable?.df.getColumnNames()"
                 :style="{
                   padding: TABLE_PADDING + 'px',
                 }"
@@ -531,7 +537,7 @@ onMounted(async () => {
                               type="checkbox"
                               class="toggle"
                               :checked="
-                                heatmapStore.getActiveDataTable?.itemNamesColumnName === columnName
+                                mainStore.getActiveDataTable?.itemNamesColumnName === columnName
                               "
                             />
                           </a>
@@ -603,10 +609,10 @@ onMounted(async () => {
                       @click.stop="toggleAttribute(columnName)"
                       type="checkbox"
                       :checked="
-                        heatmapStore.getActiveDataTable?.selectedAttributes.includes(columnName)
+                        mainStore.getActiveDataTable?.selectedAttributes.includes(columnName)
                       "
                       :disabled="
-                        heatmapStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
+                        mainStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
                       "
                     />
                     <div
@@ -625,7 +631,7 @@ onMounted(async () => {
             <tbody>
               <tr
                 :key="index"
-                v-for="(row, index) in heatmapStore.getActiveDataTable?.df.head(5).toArray()"
+                v-for="(row, index) in mainStore.getActiveDataTable?.df.head(5).toArray()"
                 :style="{ maxWidth: MAX_CELL_WIDTH - 2 * TABLE_PADDING + 'px' }"
               >
                 <td

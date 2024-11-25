@@ -1,10 +1,10 @@
 export class LinearColorMap {
   min: number = 0
   max: number = 100
-  minColor: number = 0xefefff
-  maxColor: number = 0x0000ff
+  minColor: number = 0xf2f2f2
+  maxColor: number = 0x424242
   isZeroSpecial: boolean = false
-  colorZero: number = 0x111111
+  colorZero: number = 0xffffff
 
   constructor(
     min?: number,

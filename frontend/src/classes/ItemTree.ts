@@ -1,6 +1,13 @@
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
 import { RowSorter } from '@/classes/RowSorter'
-import { scaleSequential, scaleOrdinal, interpolateRainbow, schemePaired, schemeCategory10 } from 'd3'
+import {
+  scaleSequential,
+  scaleOrdinal,
+  interpolateRainbow,
+  schemePaired,
+  schemeCategory10,
+} from 'd3'
+import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class ItemTree {
   root: AggregatedRow
@@ -9,6 +16,7 @@ export class ItemTree {
   stickyRows: ItemRow[] = [] // for now we only allow sticky rows to be ItemRows; might change in the future
   maxDepth: number = 0 // keeps track of the maximum depth of the tree; used for several display purposes
   colorScheme: any
+  rowsAsArray: Row[] = []
 
   constructor(itemNameAndData: any, rowSorter: RowSorter) {
     this.root = this.buildItemTree(itemNameAndData) as AggregatedRow
@@ -21,7 +29,7 @@ export class ItemTree {
     this.calculateMaxDepth()
     this.assignColorToTopLevelRows()
 
-    console.log('🎨', this.colorScheme)
+    this.rowsAsArray = this.getAllRows()
   }
 
   buildItemTree(itemNameAndData: any, parent: Row | null = null): Row {
@@ -76,12 +84,13 @@ export class ItemTree {
   expandRow(row: AggregatedRow) {
     row.open()
     this.updatePositionsAndDepth(row)
-    this.updateCellPositions(row, false)
 
     // update the maxDepth if necessary
     if (row.depth >= this.maxDepth) {
       this.maxDepth = row.depth + 1
     }
+
+    this.updateHeatmapVisibilityOfRows()
   }
 
   closeRow(row: AggregatedRow) {
@@ -92,6 +101,8 @@ export class ItemTree {
     // NOTE: I am not happy how inefficient this is, as we have to traverse the whole tree to find the new maxDepth
     //      but I don't see a better way right now
     this.calculateMaxDepth()
+
+    this.updateHeatmapVisibilityOfRows()
   }
 
   calculateMaxDepth() {
@@ -105,7 +116,6 @@ export class ItemTree {
   }
 
   updatePositionsAndDepth(startRow: Row = this.root) {
-    console.log('updatePositionsAndDepth')
     let pointer: Row | null = startRow // By default start at the root, otherwise start traversal at the specified row
     let position = pointer.position
     let depth = pointer.depth
@@ -136,30 +146,21 @@ export class ItemTree {
     }
   }
 
-  // traverses through the tree and calls the updateCellPositions method for each row (which is open for efficiency reasons)
-  updateCellPositions(startRow: Row = this.root, animate: boolean = true) {
-    let pointer: Row | null = startRow
-
-    while (pointer !== null) {
-      pointer.pixiRow?.updateCellPositions(animate)
-
-      // Start traversal of the children if the current row is an aggregated row and is open
-      if (pointer instanceof AggregatedRow && pointer.isOpen && pointer.hasChildren()) {
-        pointer = pointer.findFirstChild()
-      } else {
-        // Traverse to the next sibling, or backtrack to the parent if no siblings are available
-        while (pointer.nextSibling === null && pointer.parent !== null) {
-          pointer = pointer.parent
-        }
-        // Move to the next sibling or set pointer to null if end of traversal
-        pointer = pointer.nextSibling
-      }
-    }
-
-    // also update the sticky rows
-    this.stickyRows.forEach((stickyRow) => stickyRow.stickyPixiRow?.updateCellPositions(animate))
+  // this function might be moved to the heatmapLayoutStore
+  updateHeatmapVisibilityOfRows() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    const firstVisibleRowIndex = heatmapLayoutStore.firstVisibleRowIndex
+    const lastVisibleRowIndex = heatmapLayoutStore.lastVisibleRowIndex
+    this.rowsAsArray.forEach((row) => {
+      row.setHeatmapVisibility(
+        row.position !== -1 &&
+          row.position >= firstVisibleRowIndex &&
+          row.position <= lastVisibleRowIndex,
+      )
+    })
   }
 
+  // NOTE: because I need access to all rows in a flat array quite often, maybe I should store them in a flat array for instant access without traversal
   getAllRows(): Row[] {
     const rows: Row[] = []
     let pointer: Row | null = this.root
@@ -185,6 +186,12 @@ export class ItemTree {
     return rows
   }
 
+  // "visible" in the sense of which rows are currently displayed in the heatmap
+  getRowsVisibleInHeatmap(): Row[] {
+    return this.rowsAsArray.filter((row) => row.heatmapVisibility)
+  }
+
+  // "visible" in the sense of  the data structure, not the rendering
   getVisibleRows(): Row[] {
     const rows: Row[] = []
     let pointer: Row | null = this.root
@@ -234,7 +241,6 @@ export class ItemTree {
   }
 
   toggleStickyRow(row: ItemRow) {
-    console.log('toggleStickyRow')
     if (this.stickyRows.includes(row)) {
       this.removeStickyRow(row)
     } else {
@@ -243,8 +249,6 @@ export class ItemTree {
 
     // sort the sticky
     this.rowSorter.sort(this.stickyRows)
-
-    console.log(this.stickyRows)
   }
 
   addStickyRow(row: ItemRow) {
@@ -263,17 +267,17 @@ export class ItemTree {
   }
 
   getAllRowsCount(): number {
-    return this.getAllRows().length
+    return this.rowsAsArray.length
   }
 
   expandAllRows() {
-    // this.getAllRows().forEach((row) => {
+    // this.rowsAsArray.forEach((row) => {
     //   if (row instanceof AggregatedRow && !row.isOpen) {
     //     this.expandRow(row)
     //   }
     // })
-  
-    this.getAllRows().forEach((row) => {
+
+    this.rowsAsArray.forEach((row) => {
       if (row instanceof AggregatedRow) {
         row.open()
       }
@@ -281,6 +285,7 @@ export class ItemTree {
 
     this.updatePositionsAndDepth()
     this.calculateMaxDepth()
+    this.updateHeatmapVisibilityOfRows()
   }
 
   assignColorToTopLevelRows() {

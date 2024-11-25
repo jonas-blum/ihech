@@ -1,5 +1,5 @@
 import { Column } from '@/classes/Column'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 
 export class ColumnSorter {
   private criteria: ColumnSorterCriterion[]
@@ -40,7 +40,7 @@ export class ColumnSorter {
     this.criteria.splice(newIndex, 0, criterion) // Insert at the new index
 
     // trigger re-sorting of the columns
-    useHeatmapStore().sortColumns()
+    useMainStore().sortColumns()
   }
 
   // Retrieve all criteria (useful for displaying current order)
@@ -73,7 +73,7 @@ export abstract class ColumnSorterCriterion {
     this.reverse = !this.reverse
 
     // trigger re-sorting of the rows
-    useHeatmapStore().sortColumns()
+    useMainStore().sortColumns()
   }
 }
 

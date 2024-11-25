@@ -1,6 +1,6 @@
 import { Graphics, Container, Rectangle, Texture, Sprite } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class PixiHeatmapCell extends Container {
@@ -20,7 +20,7 @@ export class PixiHeatmapCell extends Container {
   ) {
     super()
 
-    const heatmapStore = useHeatmapStore()
+    const mainStore = useMainStore()
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     this.cellGraphic = new Sprite(cellTexture)
@@ -33,7 +33,7 @@ export class PixiHeatmapCell extends Container {
     //   heatmapLayoutStore.columnWidth - heatmapLayoutStore.cellPadding,
     //   heatmapLayoutStore.rowHeight - heatmapLayoutStore.cellPadding,
     // )
-    this.updateTint(heatmapStore?.colorMap.getColor(adjustedValue))
+    this.updateTint(mainStore?.colorMap.getColor(adjustedValue))
     this.position.x = this.originalColumnIndex * heatmapLayoutStore.columnWidth
 
     this.eventMode = 'static'
@@ -44,21 +44,17 @@ export class PixiHeatmapCell extends Container {
     // event listeners
     // @ts-ignore: Property 'on' does not exist
     this.on('click', () => {
-      heatmapStore?.cellClickEvent(this)
+      mainStore?.cellClickEvent(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseover', () => {
-      heatmapStore?.setHoveredPixiHeatmapCell(this)
+      mainStore?.setHoveredPixiHeatmapCell(this)
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('mouseout', () => {
-      heatmapStore?.setHoveredPixiHeatmapCell(null)
+      mainStore?.setHoveredPixiHeatmapCell(null)
     })
   }
-
-  // drawCellGraphic(width: number, height: number) {
-  //   this.cellGraphic.rect(0, 0, width, height).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
-  // }
 
   updateTint(color: number) {
     this.cellGraphic.tint = color

@@ -3,7 +3,7 @@ import { defineProps, ref, computed, watch, nextTick, onUpdated, onMounted } fro
 import { type ItemNameAndData } from '@helpers/helpers'
 import ChevronRight from '@assets/chevron-right.svg'
 
-import { useHeatmapStore } from '@stores/heatmapStore'
+import { useMainStore } from '@stores/mainStore'
 
 const props = defineProps<{
   row: ItemNameAndData
@@ -82,29 +82,29 @@ function applyMultipleColors(colors: string[]) {
 }
 
 function doColoring() {
-  const colorsOfItem = heatmapStore.getColorsOfItem(props.row)
+  const colorsOfItem = mainStore.getColorsOfItem(props.row)
   applyMultipleColors(colorsOfItem)
 }
 
 const marginTop = computed(() => {
-  if (props.needsStickyItemsMargin && heatmapStore.isStickyItemsGapVisible) {
+  if (props.needsStickyItemsMargin && mainStore.isStickyItemsGapVisible) {
     return props.stickyItemsGapSize
   }
   return 0
 })
 
 function updateIsRowHighlighted() {
-  if (isRowHighlighted.value !== (heatmapStore.getHighlightedRow === props.row)) {
-    isRowHighlighted.value = heatmapStore.getHighlightedRow === props.row
+  if (isRowHighlighted.value !== (mainStore.getHighlightedRow === props.row)) {
+    isRowHighlighted.value = mainStore.getHighlightedRow === props.row
   }
 }
 
 function toggleOpen() {
-  heatmapStore.toggleOpenRow(props.row)
+  mainStore.toggleOpenRow(props.row)
 }
 
 function updateTooltipContent() {
-  const collectionNamesOfItem = heatmapStore.getCollectionNamesOfItem(props.row)
+  const collectionNamesOfItem = mainStore.getCollectionNamesOfItem(props.row)
 
   const collectionsString = collectionNamesOfItem.join(' | ')
   if (collectionsString.length === 0) {
@@ -114,17 +114,17 @@ function updateTooltipContent() {
   }
 }
 
-const heatmapStore = useHeatmapStore()
+const mainStore = useMainStore()
 
 watch(
-  () => heatmapStore.getHighlightedRow,
+  () => mainStore.getHighlightedRow,
   () => {
     updateIsRowHighlighted()
   },
 )
 
 watch(
-  () => heatmapStore.getDataChanging,
+  () => mainStore.getDataChanging,
   () => {
     doColoring()
   },
@@ -200,7 +200,7 @@ onUpdated(() => {
               height: buttonSize + 'px',
             }"
             class="sticky-button"
-            @click="heatmapStore.toggleStickyItem(props.row)"
+            @click="mainStore.toggleStickyItem(props.row)"
             v-if="!props.row.children"
           >
             <div
@@ -213,7 +213,7 @@ onUpdated(() => {
               }"
             >
               {{
-                heatmapStore?.getActiveDataTable?.stickyItemIndexes.includes(props.row.index ?? -1)
+                mainStore?.getActiveDataTable?.stickyItemIndexes.includes(props.row.index ?? -1)
                   ? '-'
                   : '+'
               }}

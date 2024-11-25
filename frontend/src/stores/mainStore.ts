@@ -41,7 +41,7 @@ import { LinearColorMap } from '@/classes/LinearColorMap'
 import { nextTick, setDevtoolsHook } from 'vue'
 
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
-export const useHeatmapStore = defineStore('heatmapStore', {
+export const useMainStore = defineStore('mainStore', {
   state: () => ({
     dataTables: [] as CsvDataTableProfile[],
     activeDataTable: null as CsvDataTableProfile | null,
@@ -92,26 +92,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return this.attributeTree?.maxDepth ?? 0
     },
 
-    // this getter is needed because the PixiRow consists of the PixiRowLabel and the PixiHeatmapCells
-    hoveredPixiRow(): PixiRow | null {
-      if (this.hoveredPixiRowLabel) {
-        // if row label (which is child of pixiRow) is currently hovered, we can return the pixiRow
-        return this.hoveredPixiRowLabel.parent as PixiRow
-      }
-      if (this.hoveredPixiHeatmapCell) {
-        // if heatmap cell (which is child of a pixiRow) is hovered, this parent row is highlighted
-        return this.hoveredPixiHeatmapCell.parent.parent as PixiRow
-      }
-      // if none of the above is the case, no row is highlighted
-      return null
-    },
-
     highlightedRow(): Row | null {
-      if (this.hoveredPixiRow) {
-        return this.hoveredPixiRow?.row ?? null
+      if (this.hoveredPixiRowLabel) {
+        return this.hoveredPixiRowLabel.row as Row
+      } else if (this.hoveredPixiHeatmapCell) {
+        return this.hoveredPixiHeatmapCell.parent?.row as Row
       } else if (this.hoveredPixiBubble) {
         return (this.hoveredPixiBubble?.row as Row) ?? null
-      }
+      } 
       return null
     },
 
@@ -195,7 +183,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
     },
   },
   actions: {
-    saveDataTable(dataTable: CsvDataTableProfile, fetchHeatmap = true) {
+    saveDataTable(dataTable: CsvDataTableProfile, fetchData = true) {
       if (
         dataTable.tableName === null ||
         dataTable.df === null ||
@@ -210,8 +198,8 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.dataTables.push(dataTable)
       }
       this.setActiveDataTable(dataTable)
-      if (fetchHeatmap) {
-        this.fetchHeatmap()
+      if (fetchData) {
+        this.fetchData()
       }
     },
     setActiveDataTable(dataTable: CsvDataTableProfile) {
@@ -243,13 +231,13 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       return this.heatmap.attributeDissimilarities[initialIdx]
     },
 
-    async fetchHeatmap() {
+    async fetchData() {
       if (this.reloadingScheduled) {
-        console.log('Reloading scheduled, skipping fetchHeatmap')
+        console.log('Reloading scheduled, skipping fetchData')
         return
       }
       if (this.isLoading) {
-        console.log('Already loading, skipping fetchHeatmap, queuing reload')
+        console.log('Already loading, skipping fetchData, queuing reload')
         this.reloadingScheduled = true
         return
       }
@@ -366,7 +354,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
         this.loading = false
         if (this.reloadingScheduled) {
           this.reloadingScheduled = false
-          this.fetchHeatmap()
+          this.fetchData()
         }
       }
     },
@@ -707,6 +695,7 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       if (this.itemTree) {
         this.itemTree.sort()
         this.itemTree.updatePositionsAndDepth()
+        this.itemTree.updateHeatmapVisibilityOfRows()
       }
     },
 
@@ -715,12 +704,19 @@ export const useHeatmapStore = defineStore('heatmapStore', {
       if (this.attributeTree) {
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
-        this.itemTree?.updateCellPositions()
+        this.updateCellPositionsOfCurrentlyDisplayedRows()
       }
     },
 
-    updateCellPositionsOfItemTree() {
-      this.itemTree?.updateCellPositions()
+    updateCellPositionsOfCurrentlyDisplayedRows() {
+      const rowsVisibleInHeatmap = this.itemTree?.getRowsVisibleInHeatmap()
+      rowsVisibleInHeatmap!.forEach((row) => {
+        row.pixiRow?.updateCellPositions()
+      })
+      const stickyRows = this.itemTree?.stickyRows
+      stickyRows!.forEach((row) => {
+        row.stickyPixiRow?.updateCellPositions()
+      })
     },
 
     handleRowClick(row: Row) {
@@ -750,14 +746,14 @@ export const useHeatmapStore = defineStore('heatmapStore', {
 
     cellClickEvent(cell: PixiHeatmapCell) {
       console.log('cellClickEvent', cell)
-      const row = (cell.parent.parent as PixiRow).row
+      const row = (cell.parent as PixiRow).row
       // let column = cell.column // not used at the moment
 
       this.handleRowClick(row)
     },
 
     rowLabelClickEvent(pixiRowLabel: PixiRowLabel) {
-      const row = (pixiRowLabel.parent as PixiRow).row
+      const row = pixiRowLabel.row
       this.handleRowClick(row)
     },
 

@@ -1,43 +1,60 @@
-import { Container, Texture } from 'pixi.js'
+import { Container, Graphics, Texture } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { Row } from '@/classes/Row'
 import { Column } from '@/classes/Column'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
-import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { PixiContainer } from '@/pixiComponents/PixiContainer'
+import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
-export class PixiRow extends Container {
-  public pixiHeatmapCellsContainer: Container = new Container() // PixiHeatmapCell[] as children
+export class PixiRow extends PixiContainer {
   public isSticky: boolean // true for sticky rows
-  public pixiRowLabel: PixiRowLabel | null // reference to the corresponding PixiRowLabel for rendering
   public row: Row // reference to data structure Row
+  public mainStore: ReturnType<typeof useMainStore>
+  public heatmapLayoutStore: ReturnType<typeof useHeatmapLayoutStore>
+  public cellsCreated: boolean = false
+  public cellTexture: Texture
 
   constructor(row: Row, cellTexture: Texture, isSticky: boolean = false) {
     super()
     this.row = row
     this.isSticky = isSticky
-    this.pixiRowLabel = new PixiRowLabel(row, isSticky)
+    this.cellTexture = cellTexture
+    // this.cullable = true
 
-    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.heatmapLayoutStore = useHeatmapLayoutStore()
+    this.mainStore = useMainStore()
 
-    this.addChild(this.pixiHeatmapCellsContainer)
-    this.addChild(this.pixiRowLabel)
-
-    this.pixiHeatmapCellsContainer.position.set(heatmapLayoutStore.rowLabelWidth + heatmapLayoutStore.tileMargin, 0)
-
-    // create all the cells for the row
-    for (let i = 0; i < row.data.length; i++) {
-      const value = row.data[i]
-      const adjustedValue = row.dataAdjusted[i]
-      const cell = new PixiHeatmapCell(cellTexture, value, adjustedValue, i)
-      this.pixiHeatmapCellsContainer.addChild(cell)
-    }
+    // WIP: experimenting with lazy loading
+    // this.createCells()
 
     // this.updatePosition()
     this.updateVisibility()
     this.updateCellPositions(false)
+  }
+
+  createCells() {
+    // create all the cells for the row
+    for (let i = 0; i < this.row.data.length; i++) {
+      const value = this.row.data[i]
+      const adjustedValue = this.row.dataAdjusted[i]
+      const cell = new PixiHeatmapCell(this.cellTexture, value, adjustedValue, i)
+      this.addChild(cell)
+    }
+
+    // for WHATEVER MYSTICAL REASON, this needs to be called. otherwise the cells are only being rendered after the first mouse interaction
+    if (this.parent) {
+      this.parent.setChildIndex(this, this.parent.children.length - 1)
+    }
+  }
+
+  destroyCells() {
+    this.children.forEach((child) => {
+      if (child instanceof PixiHeatmapCell) {
+        child.destroy()
+      }
+    })
   }
 
   updatePosition(animate: boolean = true) {
@@ -46,80 +63,93 @@ export class PixiRow extends Container {
       this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
     gsap.fromTo(
       this,
-      { y: startPosition * useHeatmapLayoutStore().rowHeight },
+      { y: startPosition * this.heatmapLayoutStore.rowHeight },
       {
-        y: this.row.position * useHeatmapLayoutStore().rowHeight,
-        duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+        y: this.row.position * this.heatmapLayoutStore.rowHeight,
+        duration:
+          animate && this.heatmapLayoutStore.allowAnimations
+            ? this.heatmapLayoutStore.animationDuration
+            : 0,
       },
     )
-    this.pixiRowLabel?.updatePosition()
   }
 
   updateCellPositions(animate: boolean = true) {
-    for (let i = 0; i < this.pixiHeatmapCellsContainer.children.length; i++) {
-      const cell = this.pixiHeatmapCellsContainer.children[i] as Container
+    // only proceed if the row is visible (or sticky); otherwise we can skip
+    if (!this.row.heatmapVisibility && !this.isSticky) {
+      return
+    }
+
+    // create cells if they don't exist yet
+    if (!this.cellsCreated) {
+      this.createCells()
+      this.cellsCreated = true
+    }
+
+    for (let i = 0; i < this.children.length; i++) {
+      const cell = this.children[i] as Container
+      // console.log('cell', cell)
 
       // lookup the position of the column
-      const column = useHeatmapStore()?.attributeTree?.originalIndexToColumn.get(i)
+      const column = this.mainStore?.attributeTree?.originalIndexToColumn.get(i)
+      if (column?.heatmapVisibility == false) {
+        cell.visible = false
+        continue
+      }
 
-      // update visibility of the cell
-      cell.visible = column?.position !== -1
+      cell.visible = true
 
       // if the oldPosition is -1, we want to animate from the parent column position (if available)
       const startPosition =
         column?.oldPosition === -1 ? (column?.parent?.position ?? 0) : (column?.oldPosition ?? 0)
       const endPosition = column?.position ?? column?.parent?.position ?? 0
 
+      if (startPosition === endPosition) {
+        cell.x = endPosition * this.heatmapLayoutStore.columnWidth
+        continue
+      }
+
+      if (!animate || !this.heatmapLayoutStore.allowAnimations) {
+        cell.x = endPosition * this.heatmapLayoutStore.columnWidth
+        continue
+      }
+
       gsap.fromTo(
         cell,
-        { x: startPosition * useHeatmapLayoutStore().columnWidth },
+        { x: startPosition * this.heatmapLayoutStore.columnWidth },
         {
-          x: endPosition * useHeatmapLayoutStore().columnWidth,
-          duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+          x: endPosition * this.heatmapLayoutStore.columnWidth,
+          duration: this.heatmapLayoutStore.animationDuration,
         },
       )
     }
   }
 
   updateCellColoring() {
-    for (let i = 0; i < this.pixiHeatmapCellsContainer.children.length; i++) {
-      const cell = this.pixiHeatmapCellsContainer.children[i] as PixiHeatmapCell
-      const color = useHeatmapStore()?.colorMap?.getColor(cell.adjustedValue)
+    for (let i = 0; i < this.children.length; i++) {
+      const cell = this.children[i] as PixiHeatmapCell
+      const color = this.mainStore?.colorMap?.getColor(cell.adjustedValue)
       cell.updateTint(color)
     }
   }
 
   updateVisibility() {
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-
     if (this.isSticky) {
       this.visible = true
       return
     }
 
-    // this is our custom culling mechanism -> prevent rendering if not in visible viewport
-    this.visible =
-      this.row.position !== -1 &&
-      this.row.position >= heatmapLayoutStore.firstVisibleRowIndex &&
-      this.row.position <= heatmapLayoutStore.lastVisibleRowIndex
+    this.visible = this.row.heatmapVisibility
   }
 
   updateHighlightedDisplay(highlighted: boolean) {
-    if (this.pixiRowLabel) {
-      // make font bold of text object
-      this.pixiRowLabel.text.style.fontWeight = highlighted ? 'bold' : 'normal'
-
-      // make background of row label glow
-      this.pixiRowLabel.background.filters = highlighted ? [new GlowFilter()] : []
-    }
-
     // make sure the higlighted row is rendered last, otherwise the glow filter is not visible
     if (highlighted && this.parent) {
       this.parent.setChildIndex(this, this.parent.children.length - 1)
     }
 
-    // this.pixiHeatmapCellsContainer.filters = highlighted ? [new OutlineFilter()] : []
-    // this.pixiHeatmapCellsContainer.filters = highlighted ? [new DropShadowFilter()] : []
-    this.pixiHeatmapCellsContainer.filters = highlighted ? [new GlowFilter()] : []
+    // this.filters = highlighted ? [new OutlineFilter()] : []
+    // this.filters = highlighted ? [new DropShadowFilter()] : []
+    this.filters = highlighted ? [new GlowFilter()] : []
   }
 }

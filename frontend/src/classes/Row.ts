@@ -1,6 +1,7 @@
-import { PixiRow } from '@/pixiComponents/PixiRow'
-import { useHeatmapStore } from '@/stores/heatmapStore'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
+import { useMainStore } from '@/stores/mainStore'
+import { PixiRow } from '@/pixiComponents/PixiRow'
+import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import type { PixiBubble } from '@/pixiComponents/PixiBubble'
 
 interface DimredPosition {
@@ -22,8 +23,11 @@ export abstract class Row {
   prevSibling: Row | null = null
   nextSibling: Row | null = null
   pixiRow: PixiRow | null = null // reference to the corresponding PixiRow for rendering
+  pixiRowLabel: PixiRowLabel | null = null // reference to the corresponding PixiRowLabel for rendering
   stickyPixiRow: PixiRow | null = null // reference to the corresponding (sticky!) PixiRow for rendering
+  stickyPixiRowLabel: PixiRowLabel | null = null // reference to the corresponding (sticky!) PixiRowLabel for rendering
   pixiBubble: PixiBubble | null = null // reference to the corresponding PixiBubble for rendering
+  heatmapVisibility: boolean = false // wheter the row is visible in the heatmap; used for culling
 
   protected constructor(
     name: string,
@@ -44,27 +48,27 @@ export abstract class Row {
 
   static computeAdjustedData(data: number[]): number[] {
     if (
-      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
+      useMainStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
     ) {
       const maxValue = Math.max(...data)
       return data.map((value) => value / maxValue)
     } else if (
-      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap ===
+      useMainStore()?.getActiveDataTable?.coloringHeatmap ===
       ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
     ) {
       const adjustedData = []
       for (let i = 0; i < data.length; i++) {
-        const minAttributeValue = useHeatmapStore()?.getMinAttributeValues[i]
-        const maxAttributeValue = useHeatmapStore()?.getMaxAttributeValues[i]
+        const minAttributeValue = useMainStore()?.getMinAttributeValues[i]
+        const maxAttributeValue = useMainStore()?.getMaxAttributeValues[i]
         const difference =
           maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
         adjustedData.push((data[i] - minAttributeValue) / difference)
       }
       return adjustedData
     } else if (
-      useHeatmapStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
+      useMainStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
     ) {
-      return data.map((value) => Math.log(value + useHeatmapStore()?.getLogShiftValue))
+      return data.map((value) => Math.log(value + useMainStore()?.getLogShiftValue))
     } else {
       return data
     }
@@ -75,8 +79,10 @@ export abstract class Row {
     this.position = position
 
     // update the pixiRow rendering
-    this.pixiRow?.updatePosition()
     this.pixiRow?.updateVisibility()
+    // this.pixiRow?.updatePosition()
+    this.pixiRowLabel?.updateVisibility()
+    this.pixiRowLabel?.updatePosition()
 
     // update the pixiBubble rendering
     this.pixiBubble?.updatePositionAndVisibility()
@@ -87,9 +93,20 @@ export abstract class Row {
 
     // update the pixiRow rendering
     this.pixiRow?.updatePosition()
+    this.pixiRowLabel?.updatePosition()
 
     // update the pixiBubble rendering
     this.pixiBubble?.updateSize()
+  }
+
+  // TODO: Work in progress; for more efficient culling
+  setHeatmapVisibility(visibility: boolean) {
+    if (this.heatmapVisibility !== visibility) {
+      this.heatmapVisibility = visibility
+      this.pixiRow?.updateVisibility()
+      this.pixiRow?.updateCellPositions(false)
+      this.pixiRowLabel?.updateVisibility()
+    }
   }
 
   getColor(): number {

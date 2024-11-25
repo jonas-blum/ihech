@@ -1,5 +1,5 @@
 import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
-import { useHeatmapStore } from '@/stores/heatmapStore'
+import { useMainStore } from '@/stores/mainStore'
 
 export class RowSorter {
   private criteria: RowSorterCriterion[]
@@ -43,7 +43,7 @@ export class RowSorter {
     this.criteria.splice(newIndex, 0, criterion) // Insert at the new index
 
     // trigger re-sorting of the rows
-    useHeatmapStore().sortRows()
+    useMainStore().sortRows()
   }
 
   // Retrieve all criteria (useful for displaying current order)
@@ -76,7 +76,7 @@ export abstract class RowSorterCriterion {
     this.reverse = !this.reverse
 
     // trigger re-sorting of the rows
-    useHeatmapStore().sortRows()
+    useMainStore().sortRows()
   }
 }
 

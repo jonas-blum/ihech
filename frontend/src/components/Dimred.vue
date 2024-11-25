@@ -196,7 +196,9 @@ watch(
     if (loading === true) {
       // we are about to fetch new data, so this is a good time to clear the canvas
       // stop first, because we don't want to update the canvas while it is being cleared
-      pixiDimredApp?.stop() 
+      if (pixiDimredApp) {
+        pixiDimredApp.stop() 
+      }
       // now clear all kinds of PIXI stuff
       clear()
 

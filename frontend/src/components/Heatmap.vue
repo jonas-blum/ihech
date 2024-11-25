@@ -434,7 +434,9 @@ watch(
     if (loading === true) {
       // we are about to fetch new data, so this is a good time to clear the canvas
       // stop first, because we don't want to update the canvas while it is being cleared
-      pixiHeatmapApp?.stop() 
+      if (pixiHeatmapApp) {
+        pixiHeatmapApp.stop() 
+      }
       // now clear all kinds of PIXI stuff
       clear()
 

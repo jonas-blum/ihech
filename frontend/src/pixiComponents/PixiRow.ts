@@ -13,27 +13,45 @@ export class PixiRow extends PixiContainer {
   public row: Row // reference to data structure Row
   public mainStore: ReturnType<typeof useMainStore>
   public heatmapLayoutStore: ReturnType<typeof useHeatmapLayoutStore>
+  public cellsCreated: boolean = false
+  public cellTexture: Texture
 
   constructor(row: Row, cellTexture: Texture, isSticky: boolean = false) {
     super()
     this.row = row
     this.isSticky = isSticky
+    this.cellTexture = cellTexture
     // this.cullable = true
 
     this.heatmapLayoutStore = useHeatmapLayoutStore()
     this.mainStore = useMainStore()
 
-    // create all the cells for the row
-    for (let i = 0; i < row.data.length; i++) {
-      const value = row.data[i]
-      const adjustedValue = row.dataAdjusted[i]
-      const cell = new PixiHeatmapCell(cellTexture, value, adjustedValue, i)
-      this.addChild(cell)
-    }
+    // WIP: experimenting with lazy loading
+    // this.createCells(cellTexture)
 
     // this.updatePosition()
     this.updateVisibility()
     this.updateCellPositions(false)
+  }
+
+  createCells() {
+    console.log('⛺ createCells for row', this.row.name)
+    // create all the cells for the row
+    for (let i = 0; i < this.row.data.length; i++) {
+      const value = this.row.data[i]
+      const adjustedValue = this.row.dataAdjusted[i]
+      const cell = new PixiHeatmapCell(this.cellTexture, value, adjustedValue, i)
+      this.addChild(cell)
+    }
+    this.cellsCreated = true
+  }
+
+  destroyCells() {
+    this.children.forEach((child) => {
+      if (child instanceof PixiHeatmapCell) {
+        child.destroy()
+      }
+    })
   }
 
   updatePosition(animate: boolean = true) {
@@ -57,6 +75,12 @@ export class PixiRow extends PixiContainer {
     // only proceed if the row is visible (or sticky); otherwise we can skip
     if (!this.row.heatmapVisibility && !this.isSticky) {
       return
+    }
+
+    // create cells if they don't exist yet
+    if (!this.cellsCreated) {
+      this.createCells()
+      this.cellsCreated = true
     }
 
     for (let i = 0; i < this.children.length; i++) {

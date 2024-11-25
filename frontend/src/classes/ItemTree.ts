@@ -86,7 +86,6 @@ export class ItemTree {
   expandRow(row: AggregatedRow) {
     row.open()
     this.updatePositionsAndDepth(row)
-    // this.updateCellPositions(row, false)
 
     // update the maxDepth if necessary
     if (row.depth >= this.maxDepth) {
@@ -163,31 +162,6 @@ export class ItemTree {
       )
     })
   }
-
-  // NOTE: I feel with the amount of times this function is called, it is a performance bottleneck!?
-  // traverses through the tree and calls the updateCellPositions method for each row (which is open for efficiency reasons)
-  // updateCellPositions(startRow: Row = this.root, animate: boolean = true) {
-  //   let pointer: Row | null = startRow
-
-  //   while (pointer !== null) {
-  //     pointer.pixiRow?.updateCellPositions(animate)
-
-  //     // Start traversal of the children if the current row is an aggregated row and is open
-  //     if (pointer instanceof AggregatedRow && pointer.isOpen && pointer.hasChildren()) {
-  //       pointer = pointer.findFirstChild()
-  //     } else {
-  //       // Traverse to the next sibling, or backtrack to the parent if no siblings are available
-  //       while (pointer.nextSibling === null && pointer.parent !== null) {
-  //         pointer = pointer.parent
-  //       }
-  //       // Move to the next sibling or set pointer to null if end of traversal
-  //       pointer = pointer.nextSibling
-  //     }
-  //   }
-
-  //   // also update the sticky rows
-  //   this.stickyRows.forEach((stickyRow) => stickyRow.stickyPixiRow?.updateCellPositions(animate))
-  // }
 
   // NOTE: because I need access to all rows in a flat array quite often, maybe I should store them in a flat array for instant access without traversal
   getAllRows(): Row[] {

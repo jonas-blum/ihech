@@ -27,7 +27,7 @@ export class PixiRow extends PixiContainer {
     this.mainStore = useMainStore()
 
     // WIP: experimenting with lazy loading
-    // this.createCells(cellTexture)
+    // this.createCells()
 
     // this.updatePosition()
     this.updateVisibility()
@@ -35,7 +35,6 @@ export class PixiRow extends PixiContainer {
   }
 
   createCells() {
-    console.log('⛺ createCells for row', this.row.name)
     // create all the cells for the row
     for (let i = 0; i < this.row.data.length; i++) {
       const value = this.row.data[i]
@@ -43,7 +42,11 @@ export class PixiRow extends PixiContainer {
       const cell = new PixiHeatmapCell(this.cellTexture, value, adjustedValue, i)
       this.addChild(cell)
     }
-    this.cellsCreated = true
+
+    // for WHATEVER MYSTICAL REASON, this needs to be called. otherwise the cells are only being rendered after the first mouse interaction
+    if (this.parent) {
+      this.parent.setChildIndex(this, this.parent.children.length - 1)
+    }
   }
 
   destroyCells() {

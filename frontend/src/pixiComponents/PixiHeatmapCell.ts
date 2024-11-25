@@ -56,10 +56,6 @@ export class PixiHeatmapCell extends Container {
     })
   }
 
-  // drawCellGraphic(width: number, height: number) {
-  //   this.cellGraphic.rect(0, 0, width, height).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
-  // }
-
   updateTint(color: number) {
     this.cellGraphic.tint = color
   }

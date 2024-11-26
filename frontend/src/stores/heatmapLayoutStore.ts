@@ -39,11 +39,6 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
     scrollbarThumbColor: 0x000000, // color of the scrollbar thumb
     chevronColor: 0x000000, // color of the chevrons
-
-    // textures
-    heatmapCellTexture: new Texture(),  
-    chevronTexture: new Texture(),
-    circleTexture: new Texture(),
   }),
   getters: {
     // canvas width without the left and right margins

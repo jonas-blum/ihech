@@ -4,6 +4,7 @@ import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { AggregateRow, Row } from '@/classes/Row'
 import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { useTextureStore } from '@/stores/textureStore'
 import { gsap } from 'gsap'
 
 export class PixiRowLabel extends PixiContainer {
@@ -126,7 +127,7 @@ export class PixiItemRowLabel extends PixiRowLabel {
 
   createIcon(): void {
     const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.icon = new Sprite(heatmapLayoutStore.circleTexture)
+    this.icon = new Sprite(useTextureStore().circleTexture)
     this.icon.anchor.set(0.5)
     this.icon.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
     this.icon.y = heatmapLayoutStore.rowHeight / 2
@@ -155,7 +156,7 @@ export class PixiAggregateRowLabel extends PixiRowLabel {
 
   createIcon(): void {
     const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.icon = new Sprite(heatmapLayoutStore.chevronTexture)
+    this.icon = new Sprite(useTextureStore().chevronTexture)
     this.icon.anchor.set(0.5)
     this.icon.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
     this.icon.y = heatmapLayoutStore.rowHeight / 2

@@ -6,11 +6,10 @@ import { PixiBubble } from '@/pixiComponents/PixiBubble'
 import { DimredTile } from '@/pixiComponents/PixiTile'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { useTextureStore } from '@/stores/textureStore'
 
 export class PixiDimredApp extends Application {
   public bubbleContainer: PixiContainer = new PixiContainer() // PixiBubble[] as children
-  public bubbleTexture: Texture = new Texture() // texture used to efficiently render bubbles as sprites
-  public stickyBubbleTexture: Texture = new Texture() // texture used to encode sticky rows in the dimred
   public dimredTile: DimredTile = new DimredTile() 
 
   constructor(canvasElement: HTMLCanvasElement) {
@@ -55,25 +54,25 @@ export class PixiDimredApp extends Application {
     this.bubbleContainer.addChild(bubble)
   }
 
-  generateBubbleTexture() {
-    const size = useDimredLayoutStore().bubbleSize
+  generateTextures() {
+    const dimredLayoutStore = useDimredLayoutStore()
+    const textureStore = useTextureStore()
+    const bubbleSize = dimredLayoutStore.bubbleSize
 
     const bubbleGraphic = new Graphics()
-    bubbleGraphic.circle(0, 0, size).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
-    this.bubbleTexture = this.renderer.generateTexture({
+    bubbleGraphic.circle(0, 0, bubbleSize).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
+    textureStore.bubbleTexture = this.renderer.generateTexture({
       target: bubbleGraphic,
       resolution: 8,
     })
-  }
 
-  generateStickyBubbleTexture() {
-    const dimredLayoutStore = useDimredLayoutStore()
+    // sticky bubble texture
     const starScaleFactor = 2
-    const size = dimredLayoutStore.bubbleSize * starScaleFactor
+    const starSize = dimredLayoutStore.bubbleSize * starScaleFactor
 
-    const graphic = new Graphics().star(0, 0, 5, size).fill(0xffffff)
+    const graphic = new Graphics().star(0, 0, 5, starSize).fill(0xffffff)
 
-    this.stickyBubbleTexture = this.renderer.generateTexture({
+    textureStore.stickyBubbleTexture = this.renderer.generateTexture({
       target: graphic,
       resolution: 8, // Optional: Keep this if you want higher resolution
     })

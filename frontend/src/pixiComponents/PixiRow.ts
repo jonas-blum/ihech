@@ -6,12 +6,14 @@ import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { useTextureStore } from '@/stores/textureStore'
 import { gsap } from 'gsap'
 
 export class PixiRow extends PixiContainer {
   public row: Row // reference to data structure Row
   public mainStore: ReturnType<typeof useMainStore>
   public heatmapLayoutStore: ReturnType<typeof useHeatmapLayoutStore>
+  public textureStore: ReturnType<typeof useTextureStore>
   public cellsCreated: boolean = false
 
   constructor(row: Row) {
@@ -20,6 +22,7 @@ export class PixiRow extends PixiContainer {
 
     this.heatmapLayoutStore = useHeatmapLayoutStore()
     this.mainStore = useMainStore()
+    this.textureStore = useTextureStore()
 
     // this.updatePosition()
     this.updateVisibility()
@@ -36,7 +39,7 @@ export class PixiRow extends PixiContainer {
       const value = this.row.data[i]
       const adjustedValue = this.row.dataAdjusted[i]
       const cell = new PixiHeatmapCell(
-        this.heatmapLayoutStore.heatmapCellTexture as Texture,
+        this.textureStore.heatmapCellTexture as Texture,
         value,
         adjustedValue,
         i,

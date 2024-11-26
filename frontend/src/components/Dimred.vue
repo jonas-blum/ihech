@@ -4,6 +4,7 @@ import { useMouse } from '@vueuse/core'
 
 import { useMainStore } from '@/stores/mainStore'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
+import { useTextureStore } from '@/stores/textureStore'
 
 import { PixiDimredApp } from '@/pixiComponents/PixiDimredApp'
 import { Row } from '@/classes/Row'
@@ -13,6 +14,7 @@ import DimredAlgoSelection from '@components/DimredAlgoSelection.vue'
 
 const mainStore = useMainStore()
 const dimredLayoutStore = useDimredLayoutStore()
+const textureStore = useTextureStore()
 const dimredCanvas = ref<HTMLCanvasElement | null>(null)
 
 const { x: mouseX, y: mouseY } = useMouse()
@@ -102,11 +104,11 @@ watch(
     )
 
     stickyRowsToRemove?.forEach((row, index) => {
-      row.pixiBubble?.changeTexture(pixiDimredApp!.bubbleTexture)
+      row.pixiBubble?.changeTexture(textureStore.bubbleTexture)
     })
 
     stickyRowsToAdd?.forEach((row, index) => {
-      row.pixiBubble?.changeTexture(pixiDimredApp!.stickyBubbleTexture)
+      row.pixiBubble?.changeTexture(textureStore.stickyBubbleTexture)
     })
   },
 )
@@ -143,8 +145,7 @@ function init() {
   }
 
   ensureRendererReady(() => {
-    pixiDimredApp?.generateBubbleTexture()
-    pixiDimredApp?.generateStickyBubbleTexture()
+    pixiDimredApp?.generateTextures()
   })
 }
 
@@ -170,8 +171,6 @@ function update() {
     for (let row of rows) {
       let pixiBubble = new PixiBubble(
         row,
-        pixiDimredApp.bubbleTexture,
-        pixiDimredApp.stickyBubbleTexture,
       ) // create PixiBubble with reference to the Row
       row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
       pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp

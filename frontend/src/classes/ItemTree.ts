@@ -1,4 +1,4 @@
-import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
+import { Row, AggregateRow, ItemRow } from '@/classes/Row'
 import { RowSorter } from '@/classes/RowSorter'
 import {
   scaleSequential,
@@ -10,7 +10,7 @@ import {
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class ItemTree {
-  root: AggregatedRow
+  root: AggregateRow
   rowSorter: RowSorter
   // NOTE: to allow change detection in the sticky rows via shallow watchers, always replace the array instead of modifying it
   stickyRows: ItemRow[] = [] // for now we only allow sticky rows to be ItemRows; might change in the future
@@ -19,7 +19,7 @@ export class ItemTree {
   rowsAsArray: Row[] = []
 
   constructor(itemNameAndData: any, rowSorter: RowSorter) {
-    this.root = this.buildItemTree(itemNameAndData) as AggregatedRow
+    this.root = this.buildItemTree(itemNameAndData) as AggregateRow
     this.rowSorter = rowSorter
     // this.colorScheme = scaleSequential(interpolateRainbow)
     this.colorScheme = scaleOrdinal(schemeCategory10)
@@ -37,7 +37,7 @@ export class ItemTree {
 
     if (itemNameAndData.children) {
       // Create the row instance first, without children initially
-      row = new AggregatedRow(
+      row = new AggregateRow(
         itemNameAndData.itemName,
         itemNameAndData.amountOfDataPoints,
         itemNameAndData.data,
@@ -48,7 +48,7 @@ export class ItemTree {
 
       // Now create children, correctly passing `row` as the parent
       const children = itemNameAndData.children.map((child: any) => this.buildItemTree(child, row))
-      // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
+      // @ts-ignore - we can be sure that row is an AggregateRow here and has a children property
       row.children = children // Assign children to the row after they've been created
 
       // // Set prevSibling and nextSibling for each child
@@ -73,7 +73,7 @@ export class ItemTree {
     return row
   }
 
-  toggleRowExpansion(row: AggregatedRow) {
+  toggleRowExpansion(row: AggregateRow) {
     if (row.isOpen) {
       this.closeRow(row)
     } else {
@@ -81,7 +81,7 @@ export class ItemTree {
     }
   }
 
-  expandRow(row: AggregatedRow) {
+  expandRow(row: AggregateRow) {
     row.open()
     this.updatePositionsAndDepth(row)
 
@@ -93,7 +93,7 @@ export class ItemTree {
     this.updateHeatmapVisibilityOfRows()
   }
 
-  closeRow(row: AggregatedRow) {
+  closeRow(row: AggregateRow) {
     row.close()
     this.updatePositionsAndDepth(row)
 
@@ -131,7 +131,7 @@ export class ItemTree {
       position++
 
       // Start traversal of the children if the current row is an aggregated row and is open
-      if (pointer instanceof AggregatedRow && pointer.isOpen && pointer.hasChildren()) {
+      if (pointer instanceof AggregateRow && pointer.isOpen && pointer.hasChildren()) {
         pointer = pointer.findFirstChild()
         depth++
       } else {
@@ -169,7 +169,7 @@ export class ItemTree {
       rows.push(pointer)
 
       // Traverse to the first child if there is one
-      if (pointer instanceof AggregatedRow && pointer.hasChildren()) {
+      if (pointer instanceof AggregateRow && pointer.hasChildren()) {
         pointer = pointer.findFirstChild()
       } else {
         // Move to the next sibling if possible
@@ -200,7 +200,7 @@ export class ItemTree {
       rows.push(pointer)
 
       // Start traversal of the children if the current row is an aggregated row and is open
-      if (pointer instanceof AggregatedRow && pointer.isOpen && pointer.hasChildren()) {
+      if (pointer instanceof AggregateRow && pointer.isOpen && pointer.hasChildren()) {
         pointer = pointer.findFirstChild()
       } else {
         // Traverse to the next sibling, or backtrack to the parent if no siblings are available
@@ -217,7 +217,7 @@ export class ItemTree {
 
   // NOTE: should only be called when the rowSorter changed! for other operations, the updatePositionsAndDepth method should be used
   // apply the rowSorter to all rows on the same depth level
-  sort(parent: AggregatedRow = this.root) {
+  sort(parent: AggregateRow = this.root) {
     if (!parent.hasChildren()) {
       return
     }
@@ -233,9 +233,9 @@ export class ItemTree {
       child.prevSibling = i > 0 ? childrensSorted[i - 1] : null
       child.nextSibling = i < childrensSorted.length - 1 ? childrensSorted[i + 1] : null
 
-      // Recursively sort children if they are AggregatedRows
-      if (child instanceof AggregatedRow) {
-        this.sort(child as AggregatedRow)
+      // Recursively sort children if they are AggregateRows
+      if (child instanceof AggregateRow) {
+        this.sort(child as AggregateRow)
       }
     }
   }
@@ -272,13 +272,13 @@ export class ItemTree {
 
   expandAllRows() {
     // this.rowsAsArray.forEach((row) => {
-    //   if (row instanceof AggregatedRow && !row.isOpen) {
+    //   if (row instanceof AggregateRow && !row.isOpen) {
     //     this.expandRow(row)
     //   }
     // })
 
     this.rowsAsArray.forEach((row) => {
-      if (row instanceof AggregatedRow) {
+      if (row instanceof AggregateRow) {
         row.open()
       }
     })

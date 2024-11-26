@@ -130,7 +130,7 @@ export class ItemRow extends Row {
   }
 }
 
-export class AggregatedRow extends Row {
+export class AggregateRow extends Row {
   isOpen: boolean
   children: Row[] = []
 
@@ -180,7 +180,7 @@ export class AggregatedRow extends Row {
     this.children.forEach((child) => {
       // set position to -1 to not render it anymore
       child.setPosition(-1)
-      if (child instanceof AggregatedRow) {
+      if (child instanceof AggregateRow) {
         // recursively close all children
         child.close()
       }

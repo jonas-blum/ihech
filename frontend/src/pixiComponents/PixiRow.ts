@@ -156,7 +156,7 @@ export class PixiItemRow extends PixiRow {
   }
 }
 
-export class PixiAggregatedRow extends PixiRow {
+export class PixiAggregateRow extends PixiRow {
   constructor(row: Row) {
     super(row)
   }

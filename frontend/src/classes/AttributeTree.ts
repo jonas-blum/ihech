@@ -45,7 +45,7 @@ export class AttributeTree {
       const children = hierarchicalAttribute.children.map((child: HierarchicalAttribute) =>
         this.buildAttributeTree(child, column),
       )
-      // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
+      // @ts-ignore - we can be sure that row is an AggregateRow here and has a children property
       column.children = children
     } else {
       column = new AttributeColumn(

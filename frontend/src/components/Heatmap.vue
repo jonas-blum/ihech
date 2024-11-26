@@ -7,10 +7,10 @@ import { useMainStore } from '@stores/mainStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
 import { PixiHeatmapApp } from '@/pixiComponents/PixiHeatmapApp'
-import { PixiRow, PixiStickyRow, PixiItemRow, PixiAggregatedRow } from '@/pixiComponents/PixiRow'
+import { PixiRow, PixiStickyRow, PixiItemRow, PixiAggregateRow } from '@/pixiComponents/PixiRow'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
-import { AggregatedRow, ItemRow, Row } from '@/classes/Row'
+import { AggregateRow, ItemRow, Row } from '@/classes/Row'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
@@ -357,8 +357,8 @@ function update() {
       let pixiRow: PixiRow | null = null
       if (row instanceof ItemRow) {
         pixiRow = new PixiItemRow(row)
-      } else if (row instanceof AggregatedRow) {
-        pixiRow = new PixiAggregatedRow(row)
+      } else if (row instanceof AggregateRow) {
+        pixiRow = new PixiAggregateRow(row)
       } 
       
       if (pixiRow) {

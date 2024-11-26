@@ -14,13 +14,11 @@ export class PixiRow extends PixiContainer {
   public mainStore: ReturnType<typeof useMainStore>
   public heatmapLayoutStore: ReturnType<typeof useHeatmapLayoutStore>
   public cellsCreated: boolean = false
-  public cellTexture: Texture
 
-  constructor(row: Row, cellTexture: Texture, isSticky: boolean = false) {
+  constructor(row: Row, isSticky: boolean = false) {
     super()
     this.row = row
     this.isSticky = isSticky
-    this.cellTexture = cellTexture
     // this.cullable = true
 
     this.heatmapLayoutStore = useHeatmapLayoutStore()
@@ -39,7 +37,7 @@ export class PixiRow extends PixiContainer {
     for (let i = 0; i < this.row.data.length; i++) {
       const value = this.row.data[i]
       const adjustedValue = this.row.dataAdjusted[i]
-      const cell = new PixiHeatmapCell(this.cellTexture, value, adjustedValue, i)
+      const cell = new PixiHeatmapCell(this.heatmapLayoutStore.heatmapCellTexture as Texture, value, adjustedValue, i)
       this.addChild(cell)
     }
 

@@ -150,7 +150,7 @@ watch(
 
     // add new sticky rows
     stickyRowsToAdd?.forEach((row, index) => {
-      const pixiRow = new PixiRow(row, pixiHeatmapApp!.heatmapCellTexture, true) // create PixiRow with reference to the Row
+      const pixiRow = new PixiRow(row, true) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiHeatmapApp?.matrixTile.stickyRowsContainer.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
 
@@ -354,7 +354,7 @@ function update() {
     }
 
     for (let row of rows) {
-      let pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture)
+      let pixiRow = new PixiRow(row)
       row.pixiRow = pixiRow
       pixiRow.updatePosition()
       pixiHeatmapApp.matrixTile.rowsContainer.addRow(pixiRow)

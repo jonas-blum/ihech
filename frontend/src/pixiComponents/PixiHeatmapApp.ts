@@ -14,7 +14,6 @@ import { PixiContainer } from '@/pixiComponents/PixiContainer'
 export class PixiHeatmapApp extends Application {
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
   public horizontalScrollbar: PixiHorizontalScrollbar = new PixiHorizontalScrollbar()
-  public heatmapCellTexture: Texture = new Texture() // used to efficiently render heatmap cells as sprites
   public rowLabelTile: RowLabelTile = new RowLabelTile() 
   public columnLabelTile: ColumnLabelTile = new ColumnLabelTile() 
   public matrixTile: MatrixTile = new MatrixTile() 
@@ -64,6 +63,6 @@ export class PixiHeatmapApp extends Application {
         heatmapLayoutStore.rowHeight - heatmapLayoutStore.cellPadding,
       )
       .fill(0xffffff)
-    this.heatmapCellTexture = this.renderer.generateTexture(heatmapCellGraphic)
+    heatmapLayoutStore.heatmapCellTexture = this.renderer.generateTexture(heatmapCellGraphic)
   }
 }

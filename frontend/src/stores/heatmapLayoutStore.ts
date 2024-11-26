@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useMainStore } from '@/stores/mainStore'
-import { set } from '@vueuse/core'
+import { Texture } from 'pixi.js'
 
 export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
   state: () => ({
@@ -38,6 +38,10 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     labelBackgroundColor: 0xeeeeee, // background color of the row labels
     scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
     scrollbarThumbColor: 0x000000, // color of the scrollbar thumb
+
+    // textures
+    heatmapCellTexture: new Texture(),  
+    chevronTexture: new Texture(),
   }),
   getters: {
     // canvas width without the left and right margins

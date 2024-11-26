@@ -8,7 +8,7 @@ import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
 import { PixiHeatmapApp } from '@/pixiComponents/PixiHeatmapApp'
 import { PixiRow, PixiStickyRow, PixiItemRow, PixiAggregateRow } from '@/pixiComponents/PixiRow'
-import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
+import { PixiRowLabel, PixiStickyRowLabel, PixiItemRowLabel, PixiAggregateRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { AggregateRow, ItemRow, Row } from '@/classes/Row'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
@@ -154,7 +154,7 @@ watch(
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiHeatmapApp?.matrixTile.stickyRowsContainer.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
 
-      const pixiRowLabel = new PixiRowLabel(row, true) // create PixiRowLabel with reference to the Row
+      const pixiRowLabel = new PixiStickyRowLabel(row) // create PixiRowLabel with reference to the Row
       row.stickyPixiRowLabel = pixiRowLabel // set the reference to the (sticky) PixiRowLabel in the Row
       pixiHeatmapApp?.rowLabelTile.stickyRowLabelsContainer.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmapApp.stickyRowLabelsContainer
     })
@@ -366,7 +366,12 @@ function update() {
         pixiRow.updatePosition()
         pixiHeatmapApp.matrixTile.rowsContainer.addRow(pixiRow)
 
-        let pixiRowLabel = new PixiRowLabel(row)
+        let pixiRowLabel: PixiRowLabel | null = null
+        if (row instanceof ItemRow) {
+          pixiRowLabel = new PixiItemRowLabel(row)
+        } else if (row instanceof AggregateRow) {
+          pixiRowLabel = new PixiAggregateRowLabel(row)
+        }
         row.pixiRowLabel = pixiRowLabel
         pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel)
       }

@@ -1,21 +1,19 @@
 import { Container, Text, Rectangle, Graphics, Sprite } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
-import { Row } from '@/classes/Row'
+import { AggregateRow, Row } from '@/classes/Row'
 import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { gsap } from 'gsap'
 
 export class PixiRowLabel extends PixiContainer {
   public row: Row // reference to data structure Row
-  public isSticky: boolean // true for sticky rows
   public text: Text
-  public chevron: Sprite
+  public icon: Sprite | null = null
 
-  constructor(row: Row, isSticky: boolean = false) {
+  constructor(row: Row) {
     super()
     this.row = row
-    this.isSticky = isSticky
 
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
@@ -29,15 +27,6 @@ export class PixiRowLabel extends PixiContainer {
     //   heatmapLayoutStore.rowHeight - 2 * heatmapLayoutStore.cellPadding,
     // )
 
-    // this.addBackground(heatmapLayoutStore.labelBackgroundColor)
-    // // this.addBackground(0x000000)
-    // this.setBackgroundRect(
-    //   heatmapLayoutStore.rowLabelTextPaddingLeft,
-    //   heatmapLayoutStore.rowHeight - 1,
-    //   backgroundWidth - heatmapLayoutStore.rowLabelTextPaddingLeft,
-    //   1,
-    // )
-
     const width = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
     const separatorLine = new Graphics()
       .lineTo(width - heatmapLayoutStore.rowLabelTextPaddingLeft, 0)
@@ -45,12 +34,6 @@ export class PixiRowLabel extends PixiContainer {
     separatorLine.x = heatmapLayoutStore.rowLabelTextPaddingLeft
     separatorLine.y = heatmapLayoutStore.rowHeight - 1
     this.addChild(separatorLine)
-
-    this.chevron = new Sprite(heatmapLayoutStore.chevronTexture)
-    this.chevron.anchor.set(0.5)
-    this.chevron.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
-    this.chevron.y = heatmapLayoutStore.rowHeight / 2
-    this.addChild(this.chevron)
 
     this.hitArea = new Rectangle(0, 0, width, heatmapLayoutStore.rowHeight)
 
@@ -94,46 +77,37 @@ export class PixiRowLabel extends PixiContainer {
 
   updatePosition(animate: boolean = true) {
     const heatmapLayoutStore = useHeatmapLayoutStore()
-    // differntiate between sticky and non-sticky rows
-    if (this.isSticky) {
-      this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth)
-    } else {
-      this.x = this.row.depth * heatmapLayoutStore.rowLabelDepthIndent
-      this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth)
+    this.x = this.row.depth * heatmapLayoutStore.rowLabelDepthIndent
+    this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth)
 
-      const startPosition =
-        this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
-      gsap.fromTo(
-        this,
-        { y: startPosition * heatmapLayoutStore.rowHeight },
-        {
-          y: this.row.position * heatmapLayoutStore.rowHeight,
-          duration:
-            animate && heatmapLayoutStore.allowAnimations
-              ? heatmapLayoutStore.animationDuration
-              : 0,
-        },
-      )
+    const startPosition =
+      this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
+    gsap.fromTo(
+      this,
+      { y: startPosition * heatmapLayoutStore.rowHeight },
+      {
+        y: this.row.position * heatmapLayoutStore.rowHeight,
+        duration:
+          animate && heatmapLayoutStore.allowAnimations ? heatmapLayoutStore.animationDuration : 0,
+      },
+    )
+
+    this.updateIcon()
+  }
+
+  updateIcon() {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    // create icon if it does not exist
+    if (!this.icon) {
+      this.icon = new Sprite(heatmapLayoutStore.chevronTexture)
+      this.icon.anchor.set(0.5)
+      this.icon.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
+      this.icon.y = heatmapLayoutStore.rowHeight / 2
+      this.addChild(this.icon)
     }
   }
 
-  // TODO
-  // updateChevron() {
-  //   if (this.row.isOpen) {
-  //     this.chevron.rotation = Math.PI / 2
-  //   } else {
-  //     this.chevron.rotation = 0
-  //   }
-  // }
-
   updateVisibility() {
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-
-    if (this.isSticky) {
-      this.visible = true
-      return
-    }
-
     this.visible = this.row.heatmapVisibility
   }
 
@@ -143,5 +117,56 @@ export class PixiRowLabel extends PixiContainer {
 
     // make background of row label glow
     // this.background!.filters = highlighted ? [new GlowFilter()] : []
+  }
+}
+
+export class PixiItemRowLabel extends PixiRowLabel {
+  constructor(row: Row) {
+    super(row)
+    this.updateIcon()
+  }
+
+  updateIcon(): void {
+    // for now item rows do not have icons, but I could imagine them as a dot in their color
+  }
+}
+
+export class PixiAggregateRowLabel extends PixiRowLabel {
+  row: AggregateRow
+
+  constructor(row: AggregateRow) {
+    super(row)
+    this.row = row
+    this.updateIcon()
+  }
+
+  updateIcon(animate: boolean = true): void {
+    super.updateIcon()
+
+    gsap.to(this.icon, {
+      rotation: this.row.isOpen ? 0 : -Math.PI / 2,
+      duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+    })
+
+    // this.icon!.rotation = this.row.isOpen ? 0 : -Math.PI / 2
+  }
+}
+
+export class PixiStickyRowLabel extends PixiRowLabel {
+  constructor(row: Row) {
+    super(row)
+  }
+
+  updatePosition(animate?: boolean): void {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth)
+  }
+
+  updateVisibility(): void {
+    this.visible = true
+  }
+
+  updateIcon(): void {
+    // for now sticky rows do not have icons
   }
 }

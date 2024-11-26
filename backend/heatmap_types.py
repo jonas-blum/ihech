@@ -179,8 +179,8 @@ class HeatmapJSON:
 class HeatmapSettings:
     csvFile: str
 
-    itemNamesColumnName: str
     collectionColumnNames: List[str]
+    collectionItemNames: List[str]
 
     selectedItemIndexes: List[str]
     selectedAttributes: List[str]
@@ -205,8 +205,8 @@ class HeatmapSettings:
     def __init__(self, dict):
         self.csvFile = dict["csvFile"]
 
-        self.itemNamesColumnName = dict["itemNamesColumnName"]
         self.collectionColumnNames = dict["collectionColumnNames"]
+        self.collectionItemNames = dict["collectionItemNames"]
 
         self.selectedItemIndexes = dict["selectedItemIndexes"]
         self.selectedAttributes = dict["selectedAttributes"]

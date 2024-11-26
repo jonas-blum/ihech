@@ -164,17 +164,41 @@ def create_heatmap(
     logger.info("Starting Filtering...")
     start_filtering = start_heatmap
 
-    attribute_hierarchies = original_df.head(5)
-    original_df = original_df.iloc[5:]
+    empty_col_index = original_df.columns[original_df.isnull().all()].tolist()
+    if empty_col_index:
+        first_empty_col = empty_col_index[0]
+        split_index = original_df.columns.get_loc(first_empty_col)
+
+        before_first_empty_col = original_df.iloc[:, :split_index]
+        after_first_empty_col = original_df.iloc[:, split_index + 1 :]
+    else:
+        raise Exception("No empty column found")
+
+    first_empty_row_index = original_df.isna().all(axis=1).idxmax()
+    before_first_empty_row = original_df.iloc[:first_empty_row_index]
+    after__first_empty_row = original_df.iloc[first_empty_row_index + 1 :]
+
+    number_columns_before_first_empty_col = before_first_empty_col.shape[1]
+    number_rows_before_first_empty_row = before_first_empty_row.shape[0]
+
+    row_metadata_df = original_df.iloc[
+        :number_rows_before_first_empty_row, number_columns_before_first_empty_col:
+    ]
+    column_metadata_df = original_df.iloc[
+        number_rows_before_first_empty_row:, :number_columns_before_first_empty_col
+    ]
+    raw_data_df = original_df.iloc[
+        number_rows_before_first_empty_row:, number_columns_before_first_empty_col:
+    ]
 
     settings.stickyAttributes = [
-        attr for attr in settings.stickyAttributes if attr in original_df.columns
+        attr for attr in settings.stickyAttributes if attr in raw_data_df.columns
     ]
     settings.stickyItemIndexes = [
-        index for index in settings.stickyItemIndexes if index in original_df.index
+        index for index in settings.stickyItemIndexes if index in raw_data_df.index
     ]
 
-    original_filtered_df = filter_attributes_and_items(original_df, settings)
+    raw_data_df = filter_attributes_and_items(original_df, settings)
 
     original_filtered_dropped = drop_columns(
         original_filtered_df,

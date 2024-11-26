@@ -329,7 +329,7 @@ function init() {
   }
 
   ensureRendererReady(() => {
-    pixiHeatmapApp?.generateHeatmapCellTexture()
+    pixiHeatmapApp?.generateTextures()
   })
 }
 

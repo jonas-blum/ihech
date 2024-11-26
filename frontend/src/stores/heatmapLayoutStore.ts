@@ -16,8 +16,8 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     rowLabelPaddingRight: 5, // prevent row labels from touching the cells
     cellPadding: 1, // inset padding of the cells (will create a gap between cells)
     gapAfterStickyRows: 10, // gap between sticky rows and the rest of the heatmap rows
-    rowLabelDepthIndent: 10, // indent for each depth level in the row labels
-    columnLabelDepthIndent: 10, // indent for each depth level in the row labels
+    rowLabelDepthIndent: 15, // indent for each depth level in the row labels
+    columnLabelDepthIndent: 15, // indent for each depth level in the row labels
     heatmapLeftMargin: 5, // prevent the heatmap from touching the left border
     heatmapRightMargin: 5, // prevent the heatmap from touching the right border
     heatmapTopMargin: 5, // prevent the heatmap from touching the top border
@@ -38,6 +38,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     labelBackgroundColor: 0xeeeeee, // background color of the row labels
     scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
     scrollbarThumbColor: 0x000000, // color of the scrollbar thumb
+    chevronColor: 0x000000, // color of the chevrons
 
     // textures
     heatmapCellTexture: new Texture(),  

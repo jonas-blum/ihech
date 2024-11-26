@@ -14,9 +14,9 @@ import { PixiContainer } from '@/pixiComponents/PixiContainer'
 export class PixiHeatmapApp extends Application {
   public verticalScrollbar: PixiVerticalScrollbar = new PixiVerticalScrollbar()
   public horizontalScrollbar: PixiHorizontalScrollbar = new PixiHorizontalScrollbar()
-  public rowLabelTile: RowLabelTile = new RowLabelTile() 
-  public columnLabelTile: ColumnLabelTile = new ColumnLabelTile() 
-  public matrixTile: MatrixTile = new MatrixTile() 
+  public rowLabelTile: RowLabelTile = new RowLabelTile()
+  public columnLabelTile: ColumnLabelTile = new ColumnLabelTile()
+  public matrixTile: MatrixTile = new MatrixTile()
 
   constructor(canvasElement: HTMLCanvasElement) {
     const heatmapLayoutStore = useHeatmapLayoutStore()
@@ -51,9 +51,10 @@ export class PixiHeatmapApp extends Application {
     this.matrixTile.clear()
   }
 
-  generateHeatmapCellTexture() {
+  generateTextures() {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
+    // heatmap cell texture
     const heatmapCellGraphic = new Graphics()
     heatmapCellGraphic
       .rect(
@@ -64,5 +65,15 @@ export class PixiHeatmapApp extends Application {
       )
       .fill(0xffffff)
     heatmapLayoutStore.heatmapCellTexture = this.renderer.generateTexture(heatmapCellGraphic)
+
+    // chevron texture
+    const chevronWidth = 10
+    const chevronHeight = 6
+    const chevronGraphic = new Graphics()
+    chevronGraphic
+      .lineTo(chevronWidth / 2, chevronHeight)
+      .lineTo(chevronWidth, 0)
+      .stroke({ width: 1, color: heatmapLayoutStore.chevronColor })
+    heatmapLayoutStore.chevronTexture = this.renderer.generateTexture(chevronGraphic)
   }
 }

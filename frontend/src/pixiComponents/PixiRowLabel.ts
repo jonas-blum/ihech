@@ -1,4 +1,4 @@
-import { Container, Text, Rectangle, Graphics } from 'pixi.js'
+import { Container, Text, Rectangle, Graphics, Sprite } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { Row } from '@/classes/Row'
@@ -10,6 +10,7 @@ export class PixiRowLabel extends PixiContainer {
   public row: Row // reference to data structure Row
   public isSticky: boolean // true for sticky rows
   public text: Text
+  public chevron: Sprite
 
   constructor(row: Row, isSticky: boolean = false) {
     super()
@@ -19,14 +20,39 @@ export class PixiRowLabel extends PixiContainer {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
     // background box
-    this.addBackground(heatmapLayoutStore.labelBackgroundColor)
-    const backgroundWidth = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
-    this.setBackgroundRect(
-      0,
-      heatmapLayoutStore.cellPadding,
-      backgroundWidth,
-      heatmapLayoutStore.rowHeight - 2 * heatmapLayoutStore.cellPadding,
-    )
+    // this.addBackground(heatmapLayoutStore.labelBackgroundColor)
+    // const backgroundWidth = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
+    // this.setBackgroundRect(
+    //   0,
+    //   heatmapLayoutStore.cellPadding,
+    //   backgroundWidth,
+    //   heatmapLayoutStore.rowHeight - 2 * heatmapLayoutStore.cellPadding,
+    // )
+
+    // this.addBackground(heatmapLayoutStore.labelBackgroundColor)
+    // // this.addBackground(0x000000)
+    // this.setBackgroundRect(
+    //   heatmapLayoutStore.rowLabelTextPaddingLeft,
+    //   heatmapLayoutStore.rowHeight - 1,
+    //   backgroundWidth - heatmapLayoutStore.rowLabelTextPaddingLeft,
+    //   1,
+    // )
+
+    const width = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
+    const separatorLine = new Graphics()
+      .lineTo(width - heatmapLayoutStore.rowLabelTextPaddingLeft, 0)
+      .stroke({ width: 1, color: heatmapLayoutStore.labelBackgroundColor })
+    separatorLine.x = heatmapLayoutStore.rowLabelTextPaddingLeft
+    separatorLine.y = heatmapLayoutStore.rowHeight - 1
+    this.addChild(separatorLine)
+
+    this.chevron = new Sprite(heatmapLayoutStore.chevronTexture)
+    this.chevron.anchor.set(0.5)
+    this.chevron.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
+    this.chevron.y = heatmapLayoutStore.rowHeight / 2
+    this.addChild(this.chevron)
+
+    this.hitArea = new Rectangle(0, 0, width, heatmapLayoutStore.rowHeight)
 
     // create the text for the row label
     this.text = new Text({
@@ -41,7 +67,7 @@ export class PixiRowLabel extends PixiContainer {
     this.text.x = heatmapLayoutStore.rowLabelTextPaddingLeft
     this.text.width = Math.min(
       this.text.width,
-      backgroundWidth - 2 * heatmapLayoutStore.rowLabelTextPaddingLeft,
+      width - 2 * heatmapLayoutStore.rowLabelTextPaddingLeft,
     )
 
     this.addChild(this.text)
@@ -91,6 +117,15 @@ export class PixiRowLabel extends PixiContainer {
     }
   }
 
+  // TODO
+  // updateChevron() {
+  //   if (this.row.isOpen) {
+  //     this.chevron.rotation = Math.PI / 2
+  //   } else {
+  //     this.chevron.rotation = 0
+  //   }
+  // }
+
   updateVisibility() {
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
@@ -100,12 +135,6 @@ export class PixiRowLabel extends PixiContainer {
     }
 
     this.visible = this.row.heatmapVisibility
-
-    // this is our custom culling mechanism -> prevent rendering if not in visible viewport
-    // this.visible =
-    //   this.row.position !== -1 &&
-    //   this.row.position >= heatmapLayoutStore.firstVisibleRowIndex &&
-    //   this.row.position <= heatmapLayoutStore.lastVisibleRowIndex
   }
 
   updateHighlightedDisplay(highlighted: boolean) {
@@ -113,6 +142,6 @@ export class PixiRowLabel extends PixiContainer {
     this.text.style.fontWeight = highlighted ? 'bold' : 'normal'
 
     // make background of row label glow
-    this.background!.filters = highlighted ? [new GlowFilter()] : []
+    // this.background!.filters = highlighted ? [new GlowFilter()] : []
   }
 }

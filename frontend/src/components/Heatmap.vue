@@ -7,10 +7,10 @@ import { useMainStore } from '@stores/mainStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
 import { PixiHeatmapApp } from '@/pixiComponents/PixiHeatmapApp'
-import { PixiRow } from '@/pixiComponents/PixiRow'
+import { PixiRow, PixiStickyRow, PixiItemRow, PixiAggregatedRow } from '@/pixiComponents/PixiRow'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
-import { Row } from '@/classes/Row'
+import { AggregatedRow, ItemRow, Row } from '@/classes/Row'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
@@ -150,7 +150,7 @@ watch(
 
     // add new sticky rows
     stickyRowsToAdd?.forEach((row, index) => {
-      const pixiRow = new PixiRow(row, true) // create PixiRow with reference to the Row
+      const pixiRow = new PixiStickyRow(row) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiHeatmapApp?.matrixTile.stickyRowsContainer.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
 
@@ -354,14 +354,22 @@ function update() {
     }
 
     for (let row of rows) {
-      let pixiRow = new PixiRow(row)
-      row.pixiRow = pixiRow
-      pixiRow.updatePosition()
-      pixiHeatmapApp.matrixTile.rowsContainer.addRow(pixiRow)
+      let pixiRow: PixiRow | null = null
+      if (row instanceof ItemRow) {
+        pixiRow = new PixiItemRow(row)
+      } else if (row instanceof AggregatedRow) {
+        pixiRow = new PixiAggregatedRow(row)
+      } 
+      
+      if (pixiRow) {
+        row.pixiRow = pixiRow
+        pixiRow.updatePosition()
+        pixiHeatmapApp.matrixTile.rowsContainer.addRow(pixiRow)
 
-      let pixiRowLabel = new PixiRowLabel(row)
-      row.pixiRowLabel = pixiRowLabel
-      pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel)
+        let pixiRowLabel = new PixiRowLabel(row)
+        row.pixiRowLabel = pixiRowLabel
+        pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel)
+      }
     }
 
     let columns = mainStore.attributeTree?.columnsAsArray

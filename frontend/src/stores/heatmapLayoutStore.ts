@@ -43,6 +43,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     // textures
     heatmapCellTexture: new Texture(),  
     chevronTexture: new Texture(),
+    circleTexture: new Texture(),
   }),
   getters: {
     // canvas width without the left and right margins

@@ -9,7 +9,7 @@ import { gsap } from 'gsap'
 export class PixiRowLabel extends PixiContainer {
   public row: Row // reference to data structure Row
   public text: Text
-  public icon: Sprite | null = null
+  public icon: Sprite = new Sprite() // maybe not the most efficient to initialize them with empty sprite, however, it is the easiest way to avoid null checks
 
   constructor(row: Row) {
     super()
@@ -42,6 +42,7 @@ export class PixiRowLabel extends PixiContainer {
       text: row.name,
       style: {
         fill: this.row.getColor(),
+        // fill: 0x000000,
         fontSize: 12,
         fontFamily: 'Arial',
       },
@@ -95,16 +96,12 @@ export class PixiRowLabel extends PixiContainer {
     this.updateIcon()
   }
 
+  createIcon() {
+    // needs to be implemented by the subclasses
+  }
+
   updateIcon() {
-    const heatmapLayoutStore = useHeatmapLayoutStore()
-    // create icon if it does not exist
-    if (!this.icon) {
-      this.icon = new Sprite(heatmapLayoutStore.chevronTexture)
-      this.icon.anchor.set(0.5)
-      this.icon.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
-      this.icon.y = heatmapLayoutStore.rowHeight / 2
-      this.addChild(this.icon)
-    }
+    // needs to be implemented by the subclasses
   }
 
   updateVisibility() {
@@ -123,11 +120,27 @@ export class PixiRowLabel extends PixiContainer {
 export class PixiItemRowLabel extends PixiRowLabel {
   constructor(row: Row) {
     super(row)
-    this.updateIcon()
+    this.createIcon()
+    this.updateHighlightedDisplay(false)
+  }
+
+  createIcon(): void {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.icon = new Sprite(heatmapLayoutStore.circleTexture)
+    this.icon.anchor.set(0.5)
+    this.icon.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
+    this.icon.y = heatmapLayoutStore.rowHeight / 2
+    this.addChild(this.icon)
   }
 
   updateIcon(): void {
-    // for now item rows do not have icons, but I could imagine them as a dot in their color
+    this.icon.tint = this.row.getColor()
+  }
+
+  updateHighlightedDisplay(highlighted: boolean): void {
+    super.updateHighlightedDisplay(highlighted)
+    // update opacity of the icon
+    this.icon.alpha = highlighted ? 1 : 0.5
   }
 }
 
@@ -137,18 +150,23 @@ export class PixiAggregateRowLabel extends PixiRowLabel {
   constructor(row: AggregateRow) {
     super(row)
     this.row = row
-    this.updateIcon()
+    this.createIcon()
+  }
+
+  createIcon(): void {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.icon = new Sprite(heatmapLayoutStore.chevronTexture)
+    this.icon.anchor.set(0.5)
+    this.icon.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
+    this.icon.y = heatmapLayoutStore.rowHeight / 2
+    this.addChild(this.icon)
   }
 
   updateIcon(animate: boolean = true): void {
-    super.updateIcon()
-
     gsap.to(this.icon, {
       rotation: this.row.isOpen ? 0 : -Math.PI / 2,
       duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
     })
-
-    // this.icon!.rotation = this.row.isOpen ? 0 : -Math.PI / 2
   }
 }
 
@@ -168,5 +186,11 @@ export class PixiStickyRowLabel extends PixiRowLabel {
 
   updateIcon(): void {
     // for now sticky rows do not have icons
+  }
+
+  updateHighlightedDisplay(highlighted: boolean): void {
+    super.updateHighlightedDisplay(highlighted)
+    // update opacity of the icon
+    this.icon.alpha = highlighted ? 1 : 0.5
   }
 }

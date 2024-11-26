@@ -75,5 +75,11 @@ export class PixiHeatmapApp extends Application {
       .lineTo(chevronWidth, 0)
       .stroke({ width: 1, color: heatmapLayoutStore.chevronColor })
     heatmapLayoutStore.chevronTexture = this.renderer.generateTexture(chevronGraphic)
+    
+    // circle texture (used for PixiItemRowLabel)
+    const circleGraphic = new Graphics()
+    circleGraphic.circle(0, 0, 5).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
+    heatmapLayoutStore.circleTexture = this.renderer.generateTexture(circleGraphic)
   }
+
 }

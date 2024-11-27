@@ -269,7 +269,7 @@ function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
 
 onMounted(async () => {
   if (mainStore.getAllDataTableNames.length === 0) {
-    await fetchCsvFileByFileName('voting-data.csv', true)
+    await fetchCsvFileByFileName('voting-data.csv', false)
     await fetchCsvFileByFileName('2019_age_groups.csv', true)
 
     focusActiveDataTable('smooth')

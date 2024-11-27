@@ -182,7 +182,7 @@ class HeatmapData:
 
     def create_data_frame_csv(self, settings: HeatmapSettings) -> pd.DataFrame:
         filtered_df = self.vectors_df[
-            self.vectors_df["document_id"].isin(settings.selectedItemIndexes)
+            self.vectors_df["document_id"].isin(settings.selectedItemsRowIndexes)
         ]
 
         original_df = do_aggregation_of_df(

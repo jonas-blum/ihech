@@ -30,31 +30,36 @@ logger = logging.getLogger("IHECH Logger")
 
 
 def filter_attributes_and_items(
-    row_metadata_df: pd.DataFrame,
-    column_metadata_df: pd.DataFrame,
+    item_names_df: pd.DataFrame,
+    hierarchical_rows_metadata_df: pd.DataFrame,
+    hierarchical_columns_metadata_df: pd.DataFrame,
     raw_data_df: pd.DataFrame,
     settings: HeatmapSettings,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
     valid_indexes = list(
-        set(settings.selectedItemIndexes).intersection(raw_data_df.index)
+        set(settings.selectedItemsRowIndexes).intersection(raw_data_df.index)
     )
     valid_columns = [
-        col for col in settings.selectedAttributes if col in raw_data_df.columns
+        col
+        for col in settings.selectedAttributesColumnNames
+        if col in raw_data_df.columns
     ]
 
     raw_data_df = raw_data_df.loc[valid_indexes]
-    column_metadata_df = column_metadata_df.loc[valid_indexes]
+    hierarchical_rows_metadata_df = hierarchical_rows_metadata_df.loc[valid_indexes]
+    item_names_df = item_names_df.loc[valid_indexes]
 
     raw_data_df = raw_data_df[valid_columns]
-    row_metadata_df = row_metadata_df[valid_columns]
+    hierarchical_columns_metadata_df = hierarchical_columns_metadata_df[valid_columns]
 
     for col in valid_columns:
         raw_data_df[col] = pd.to_numeric(raw_data_df[col], errors="coerce")
 
     na_row_indexes = raw_data_df[raw_data_df.isna().all(axis=1)].index
     raw_data_df = raw_data_df.drop(na_row_indexes)
-    column_metadata_df = column_metadata_df.drop(na_row_indexes)
+    hierarchical_rows_metadata_df = hierarchical_rows_metadata_df.drop(na_row_indexes)
+    item_names_df = item_names_df.drop(na_row_indexes)
 
     medians = raw_data_df.median()
     raw_data_df = raw_data_df.fillna(medians)
@@ -62,7 +67,12 @@ def filter_attributes_and_items(
     if raw_data_df.empty:
         raise ValueError("No attributes left after filtering")
 
-    return row_metadata_df, column_metadata_df, raw_data_df
+    return (
+        item_names_df,
+        hierarchical_rows_metadata_df,
+        hierarchical_columns_metadata_df,
+        raw_data_df,
+    )
 
 
 def do_scaling(
@@ -76,6 +86,9 @@ def do_scaling(
     elif settings.scaling == "STANDARDIZING":
         scaler = StandardScaler()
         scaled_df = scaler.fit_transform(raw_data_df)
+        scaled_df = pd.DataFrame(
+            scaled_df, index=raw_data_df.index, columns=raw_data_df.columns
+        )
         return scaled_df
     else:
         raise ValueError("Invalid absRelLog value")
@@ -86,6 +99,7 @@ def create_heatmap(
 ) -> HeatmapJSON:
     logger.info("Starting Filtering...")
     start_filtering = start_heatmap
+    print("original_df", original_df.head())
 
     empty_col_index = original_df.columns[original_df.isnull().all()].tolist()
     if empty_col_index:
@@ -104,25 +118,37 @@ def create_heatmap(
     number_columns_before_first_empty_col = before_first_empty_col.shape[1]
     number_rows_before_first_empty_row = before_first_empty_row.shape[0]
 
-    row_metadata_df = original_df.iloc[
+    hierarchical_columns_metadata_df = original_df.iloc[
         :number_rows_before_first_empty_row, number_columns_before_first_empty_col:
     ]
-    column_metadata_df = original_df.iloc[
-        number_rows_before_first_empty_row:, :number_columns_before_first_empty_col
+    hierarchical_rows_metadata_df = original_df.iloc[
+        number_rows_before_first_empty_row:, 1:number_columns_before_first_empty_col
     ]
     raw_data_df = original_df.iloc[
         number_rows_before_first_empty_row:, number_columns_before_first_empty_col:
     ]
+    item_names_df = original_df.iloc[number_rows_before_first_empty_row:, :1]
 
-    settings.stickyAttributes = [
-        attr for attr in settings.stickyAttributes if attr in raw_data_df.columns
+    settings.stickyAttributesColumnNames = [
+        attr
+        for attr in settings.stickyAttributesColumnNames
+        if attr in raw_data_df.columns
     ]
-    settings.stickyItemIndexes = [
-        index for index in settings.stickyItemIndexes if index in raw_data_df.index
+    settings.stickyItemsRowIndexes = [
+        index for index in settings.stickyItemsRowIndexes if index in raw_data_df.index
     ]
 
-    row_metadata_df, column_metadata_df, raw_data_df = filter_attributes_and_items(
-        row_metadata_df, column_metadata_df, raw_data_df, settings
+    (
+        item_names_df,
+        hierarchical_rows_metadata_df,
+        hierarchical_columns_metadata_df,
+        raw_data_df,
+    ) = filter_attributes_and_items(
+        item_names_df,
+        hierarchical_rows_metadata_df,
+        hierarchical_columns_metadata_df,
+        raw_data_df,
+        settings,
     )
 
     scaled_raw_data_df = do_scaling(raw_data_df, settings)
@@ -130,7 +156,7 @@ def create_heatmap(
     if settings.clusterItemsBasedOnStickyAttributes:
         sticky_columns = [
             col
-            for col in settings.stickyAttributes
+            for col in settings.stickyAttributesColumnNames
             if col in scaled_raw_data_df.columns
         ]
         scaled_filtered_sticky_df = scaled_raw_data_df[sticky_columns]
@@ -144,19 +170,19 @@ def create_heatmap(
     )
     logger.info(
         "Number of attributes before filtering selected: "
-        + str(len(settings.selectedAttributes))
+        + str(len(settings.selectedAttributesColumnNames))
     )
     logger.info(
         "Number of attributes after filtering: "
-        + str(original_filtered_df.shape[1] - len(settings.collectionColumnNames) - 1)
+        + str(
+            raw_data_df.shape[1] - len(settings.hierarchicalRowsMetadataColumnNames) - 1
+        )
     )
     logger.info(
         "Number of items before filtering selected: "
-        + str(len(settings.selectedItemIndexes))
+        + str(len(settings.selectedItemsRowIndexes))
     )
-    logger.info(
-        "Number of items after filtering: " + str(original_filtered_df.shape[0])
-    )
+    logger.info("Number of items after filtering: " + str(raw_data_df.shape[0]))
 
     logger.info("Starting dim reduction...")
     start_dim_red = time.perf_counter()
@@ -188,10 +214,10 @@ def create_heatmap(
     dim_red_df = pd.DataFrame({0: x_scaled, 1: y_scaled}, index=dim_red_df.index)
 
     if (
-        len(settings.stickyItemIndexes) >= 2
+        len(settings.stickyItemsRowIndexes) >= 2
         and settings.sortAttributesBasedOnStickyItems
     ):
-        original_dropped_sticky_df = raw_data_df.loc[settings.stickyItemIndexes]
+        original_dropped_sticky_df = raw_data_df.loc[settings.stickyItemsRowIndexes]
         std_devs = original_dropped_sticky_df.std()
     else:
         std_devs = raw_data_df.std()
@@ -208,9 +234,6 @@ def create_heatmap(
     if "null_col" in scaled_raw_data_df.columns:
         scaled_raw_data_df = scaled_raw_data_df.drop("null_col", axis=1)
 
-    if "null_col" in dim_red_df.columns:
-        dim_red_df = dim_red_df.drop("null_col", axis=1)
-
     if settings.clusterAfterDimRed:
         scaled_raw_data_df = dim_red_df.copy()
 
@@ -226,25 +249,26 @@ def create_heatmap(
     logger.info("Starting clustering items...")
     start_clustering_items = time.perf_counter()
 
-    # cluster_column = pd.DataFrame(
-    #     {"cluster": [-1] * len(original_filtered_df)}, index=original_filtered_df.index
-    # )
-    # original_filtered_df = pd.concat([original_filtered_df, cluster_column], axis=1)
-
-    # Copying dataframes so they are "clean" in memory
     raw_data_df = raw_data_df.copy()
     scaled_raw_data_df = scaled_raw_data_df.copy()
     dim_red_df = dim_red_df.copy()
 
+    print("raw_data_df\n", raw_data_df)
+    print("scaled_raw_data_df\n", scaled_raw_data_df)
+    print("dim_red_df\n", dim_red_df)
+    print("item_names_df\n", item_names_df)
+    print("hierarchical_rows_metadata_df\n", hierarchical_rows_metadata_df)
+    print("hierarchical_columns_metadata_df\n", hierarchical_columns_metadata_df)
+
     item_names_and_data = cluster_items_recursively(
-        original_filtered_df,
-        original_filtered_df_dropped,
-        scaled_filtered_df,
+        raw_data_df,
+        hierarchical_rows_metadata_df,
+        item_names_df,
+        scaled_raw_data_df,
         dim_red_df,
         settings.itemsClusterSize,
-        settings.itemNamesColumnName,
         settings.clusterItemsByCollections,
-        filtered_collection_column_names,
+        settings.hierarchicalRowsMetadataColumnNames,
         level=0,
     )
 

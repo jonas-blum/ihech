@@ -169,17 +169,17 @@ export interface HeatmapJSON {
 export interface HeatmapSettings {
   csvFile: string
 
-  itemNamesColumnName: string
-  collectionColumnNames: string[]
+  hierarchicalRowsMetadataColumnNames: string[]
+  hierarchicalColumnsMetadataRowIndexes: number[]
 
-  selectedItemIndexes: number[]
-  selectedAttributes: string[]
+  selectedItemsRowIndexes: number[]
+  selectedAttributesColumnNames: string[]
 
-  stickyAttributes: string[]
+  stickyAttributesColumnNames: string[]
   sortAttributesBasedOnStickyItems: boolean
   sortOrderAttributes: SortOrderAttributes
 
-  stickyItemIndexes: number[]
+  stickyItemsRowIndexes: number[]
   clusterItemsBasedOnStickyAttributes: boolean
 
   clusterItemsByCollections: boolean

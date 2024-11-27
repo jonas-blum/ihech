@@ -99,7 +99,7 @@ export const useMainStore = defineStore('mainStore', {
         return this.hoveredPixiHeatmapCell.parent?.row as Row
       } else if (this.hoveredPixiBubble) {
         return (this.hoveredPixiBubble?.row as Row) ?? null
-      } 
+      }
       return null
     },
 
@@ -449,17 +449,17 @@ export const useMainStore = defineStore('mainStore', {
       return {
         csvFile: this.activeDataTable.csvFile,
 
-        itemNamesColumnName: this.activeDataTable.itemNamesColumnName,
-        collectionColumnNames: this.activeDataTable.collectionColumnNames,
+        hierarchicalRowsMetadataColumnNames: this.activeDataTable.collectionColumnNames,
+        hierarchicalColumnsMetadataRowIndexes: [],
 
-        selectedItemIndexes: this.activeDataTable.selectedItemIndexes,
-        selectedAttributes: this.activeDataTable.selectedAttributes,
+        selectedItemsRowIndexes: this.activeDataTable.selectedItemIndexes,
+        selectedAttributesColumnNames: this.activeDataTable.selectedAttributes,
 
-        stickyAttributes: this.activeDataTable.stickyAttributes,
+        stickyAttributesColumnNames: this.activeDataTable.stickyAttributes,
         sortAttributesBasedOnStickyItems: this.activeDataTable.sortAttributesBasedOnStickyItems,
         sortOrderAttributes: this.activeDataTable.sortOrderAttributes,
 
-        stickyItemIndexes: this.activeDataTable.stickyItemIndexes,
+        stickyItemsRowIndexes: this.activeDataTable.stickyItemIndexes,
         clusterItemsBasedOnStickyAttributes:
           this.activeDataTable.clusterItemsBasedOnStickyAttributes,
 

@@ -64,6 +64,7 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
   const itemNameColumnName = df.getColumnNames()[0]
   const rowsBeforeFirstEmptyRow: IndexLabelInterface[] = []
 
+  let selectRow = true
   for (const [rowIndex, row] of df.toPairs()) {
     if (Object.values(row).find((cell) => cell !== '') === undefined) {
       break
@@ -71,12 +72,14 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     rowsBeforeFirstEmptyRow.push({
       index: rowIndex,
       label: row[itemNameColumnName],
-      selected: true,
+      selected: selectRow,
     })
+    selectRow = false
   }
 
   let columnNamesBeforeFirstEmptyColumn: IndexLabelInterface[] = []
   let notYetSkippedFirstColumn = true
+  let selectColumn = true
   let i = 0
   for (const column of df.getColumns()) {
     if (notYetSkippedFirstColumn === true) {
@@ -89,8 +92,9 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     columnNamesBeforeFirstEmptyColumn.push({
       index: i++,
       label: column.name,
-      selected: true,
+      selected: selectColumn,
     })
+    selectColumn = false
   }
 
   const newDataTable: CsvDataTableProfile = {
@@ -266,7 +270,7 @@ function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
 onMounted(async () => {
   if (mainStore.getAllDataTableNames.length === 0) {
     await fetchCsvFileByFileName('voting-data.csv', true)
-    // await fetchCsvFileByFileName('2019_age_groups.csv', true)
+    await fetchCsvFileByFileName('2019_age_groups.csv', true)
 
     focusActiveDataTable('smooth')
 

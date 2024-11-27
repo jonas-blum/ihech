@@ -11,6 +11,7 @@ import {
   getDistinctColor,
   CSV_UPLOAD_COLLAPSED_HEIGHT,
   CSV_UPLOAD_CONTENT_HEIGHT,
+  type IndexLabelInterface,
 } from '@/helpers/helpers'
 import SettingsIcon from '@assets/settings.svg'
 
@@ -44,31 +45,11 @@ function triggerFileInput() {
   mainStore.setCsvUploadOpen(true)
 }
 
-function isNumeric(value: any): boolean {
-  return !isNaN(parseFloat(value)) && isFinite(value)
-}
-
 function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = true) {
   let df: dataForge.IDataFrame = dataForge
     .fromCSV(contents, { skipEmptyLines: true })
     .resetIndex()
     .bake()
-
-  const firstRow = df.first()
-
-  let numericColumns = []
-  let nonNumericColumns = []
-
-  for (const column of df.getColumnNames()) {
-    const firstValue = firstRow[column]
-    if (isNumeric(firstValue)) {
-      numericColumns.push(column)
-    } else {
-      nonNumericColumns.push(column)
-    }
-  }
-
-  df = df.subset(nonNumericColumns.concat(numericColumns))
 
   const csvFile = df.toCSV()
   let fileNameNoExtension = fileName.split('.').slice(0, -1).join('.')
@@ -80,12 +61,45 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     )
   }
 
+  const itemNameColumnName = df.getColumnNames()[0]
+  const rowsBeforeFirstEmptyRow: IndexLabelInterface[] = []
+
+  let selectRow = true
+  for (const [rowIndex, row] of df.toPairs()) {
+    if (Object.values(row).find((cell) => cell !== '') === undefined) {
+      break
+    }
+    rowsBeforeFirstEmptyRow.push({
+      index: rowIndex,
+      label: row[itemNameColumnName],
+      selected: selectRow,
+    })
+    selectRow = false
+  }
+
+  let columnNamesBeforeFirstEmptyColumn: IndexLabelInterface[] = []
+  let notYetSkippedFirstColumn = true
+  let selectColumn = true
+  let i = 0
+  for (const column of df.getColumns()) {
+    if (notYetSkippedFirstColumn === true) {
+      notYetSkippedFirstColumn = false
+      continue
+    }
+    if (column.series.toArray().find((cell) => cell !== '') === undefined) {
+      break
+    }
+    columnNamesBeforeFirstEmptyColumn.push({
+      index: i++,
+      label: column.name,
+      selected: selectColumn,
+    })
+    selectColumn = false
+  }
+
   const newDataTable: CsvDataTableProfile = {
     tableName: fileNameNoExtension,
     df: df,
-
-    nanColumns: [],
-    nonNanColumns: [],
 
     collectionColorMap: {},
     itemCollectionMap: {},
@@ -97,7 +111,8 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     csvFile: csvFile,
 
     itemNamesColumnName: df.getColumnNames()[0],
-    collectionColumnNames: [],
+    hierarchicalRowsMetadataColumnNames: columnNamesBeforeFirstEmptyColumn,
+    hierarchicalColumnsMetadataRowIndexes: rowsBeforeFirstEmptyRow,
 
     selectedItemIndexes: df.getIndex().toArray(),
     selectedAttributes: df.getColumnNames(),
@@ -141,7 +156,9 @@ function getColumnCollectionHierarchy(columnName: string): 'None' | number {
   if (mainStore.getActiveDataTable === null) {
     return 'None'
   }
-  const foundIndex = mainStore.getActiveDataTable.collectionColumnNames.indexOf(columnName)
+  const foundIndex = mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.findIndex(
+    (c) => c.label === columnName,
+  )
   if (foundIndex === -1) {
     return 'None'
   } else {
@@ -153,16 +170,16 @@ function updateItemCollectionMap() {
   if (mainStore.getActiveDataTable === null) {
     return
   }
-  if (mainStore.getActiveDataTable.collectionColumnNames.length === 0) {
+  if (mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.length === 0) {
     mainStore.getActiveDataTable.itemCollectionMap = {}
     return
   }
 
-  const collectionColumnName = mainStore.getActiveDataTable.collectionColumnNames[0]
+  const collectionColumnName = mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames[0]
 
   const itemCollectionMap: Record<number, string> = {}
   mainStore.getActiveDataTable.df.forEach((row, index) => {
-    itemCollectionMap[index] = row[collectionColumnName]
+    itemCollectionMap[index] = row[collectionColumnName.label]
   })
   mainStore.getActiveDataTable.itemCollectionMap = itemCollectionMap
 }
@@ -171,16 +188,16 @@ function resetFirstLayerCollectionNames() {
   if (mainStore.getActiveDataTable === null) {
     return
   }
-  if (mainStore.getActiveDataTable.collectionColumnNames.length === 0) {
+  if (mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.length === 0) {
     mainStore.getActiveDataTable.firstLayerCollectionNames = []
     mainStore.getActiveDataTable.selectedFirstLayerCollections = []
     return
   }
 
-  const collectionColumnName = mainStore.getActiveDataTable.collectionColumnNames[0]
+  const collectionColumnName = mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames[0]
   const newFirstLayerCollectionNames: string[] = []
   mainStore.getActiveDataTable.df.forEach((row, index) => {
-    newFirstLayerCollectionNames.push(row[collectionColumnName])
+    newFirstLayerCollectionNames.push(row[collectionColumnName.label])
   })
   const uniqueFirstLayerCollectionNames = [...new Set(newFirstLayerCollectionNames)]
   mainStore.getActiveDataTable.firstLayerCollectionNames = uniqueFirstLayerCollectionNames
@@ -206,49 +223,6 @@ function resetCollectionColorMap(): void {
     index++
   })
   mainStore.getActiveDataTable.collectionColorMap = colorMap
-}
-
-function handleHierarchyLayerInput(event: Event, columnName: string) {
-  if (!(event.target instanceof HTMLSelectElement)) {
-    console.error('Event target is not an HTMLSelectElement:', event.target)
-    return
-  }
-  const selectedHierarchyLayer = event.target.value
-  updateHierarchyLayer(selectedHierarchyLayer, columnName)
-}
-
-function updateHierarchyLayer(selectedHierarchyLayer: string, columnName: string) {
-  if (mainStore.getActiveDataTable === null) {
-    return
-  }
-
-  mainStore.getActiveDataTable.selectedAttributes =
-    mainStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== columnName)
-
-  if (selectedHierarchyLayer === 'None') {
-    //Remove the column name from the collectionColumnNames array
-    const foundIndex = mainStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
-    if (foundIndex !== undefined && foundIndex !== -1) {
-      mainStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
-    }
-  } else {
-    // Insert the column name at the selected hierarchy layer
-    const hierarchyLayer = parseInt(selectedHierarchyLayer)
-    const foundIndex = mainStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
-    if (foundIndex !== undefined && foundIndex !== -1) {
-      mainStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
-    }
-    mainStore.getActiveDataTable?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
-  }
-  if (mainStore.getActiveDataTable.collectionColumnNames.length > 4) {
-    mainStore.getActiveDataTable.collectionColumnNames =
-      mainStore.getActiveDataTable.collectionColumnNames.slice(0, 4)
-  }
-  resetFirstLayerCollectionNames()
-  updateItemCollectionMap()
-  resetCollectionColorMap()
-  mainStore.updateSelectedItemIndexesBasedOnSelectedCollections()
-  mainStore.setIsOutOfSync(true)
 }
 
 function updateItemNamesColumn(columName: string) {
@@ -295,62 +269,8 @@ function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
 
 onMounted(async () => {
   if (mainStore.getAllDataTableNames.length === 0) {
-    // await fetchCsvFileByFileName('amount_different_attributes.csv', false)
-    // updateHierarchyLayer('1', 'edition')
-    // await fetchCsvFileByFileName('length_of_content_inside_tag.csv', false)
-    // updateHierarchyLayer('1', 'edition')
-    // await fetchCsvFileByFileName('tag_count.csv', false)
-    // updateHierarchyLayer('1', 'edition')
-    // await fetchCsvFileByFileName('tag_depth.csv', false)
-    // updateHierarchyLayer('1', 'edition')
-    // await fetchCsvFileByFileName('frauen_stimmbeteiligung.csv', false)
-    // await fetchCsvFileByFileName('stadt_zuerich_abstimmungen.csv', false)
-    // await fetchCsvFileByFileName('zeitreihen_parteien.csv', true)
-    // await fetchCsvFileByFileName('2019_neue_fahrzeuge_absolute.csv', false)
-    // updateHierarchyLayer('1', 'Kanton')
-    // await fetchCsvFileByFileName('2019_neue_fahrzeuge_relative.csv', false)
-    // updateHierarchyLayer('1', 'Kanton')
-    // await fetchCsvFileByFileName('Beteiligung_in_Prozent_Volksabstimmungen.csv', false)
-    // updateHierarchyLayer('1', 'Kanton')
-    // await fetchCsvFileByFileName('Ja_in_Prozent_Volksabstimmungen.csv', false)
-    // updateHierarchyLayer('1', 'Kanton')
-    // await fetchCsvFileByFileName('2019_staatsangehörigkeit_absolute.csv', false)
-    // updateHierarchyLayer('1', 'Kanton')
-    // await fetchCsvFileByFileName('2019_staatsangehörigkeit_relative.csv', false)
-    // updateHierarchyLayer('1', 'Kanton')
-    // await fetchCsvFileByFileName('2019_altersklassen_absolute.csv', false)
-    // updateHierarchyLayer('1', 'Kanton')
-    // await fetchCsvFileByFileName('2019_altersklassen_relative.csv', false)
-    await fetchCsvFileByFileName('voting_Institution.csv', false)
-    updateHierarchyLayer('1', 'Sprachregion')
-    updateHierarchyLayer('2', 'Kanton')
-    await fetchCsvFileByFileName('DEBUG-voting_Institution.csv', false)
-    updateHierarchyLayer('1', 'Sprachregion')
-    updateHierarchyLayer('2', 'Kanton')
-    // await fetchCsvFileByFileName('voting_Vote trigger.csv', false)
-    // updateHierarchyLayer('1', 'Sprachregion')
-    // updateHierarchyLayer('2', 'Kanton')
-    // await fetchCsvFileByFileName('voting_Vote trigger actor.csv', false)
-    // updateHierarchyLayer('1', 'Sprachregion')
-    // updateHierarchyLayer('2', 'Kanton')
-    // await fetchCsvFileByFileName('voting_Theme 1.csv', false)
-    // updateHierarchyLayer('1', 'Sprachregion')
-    // updateHierarchyLayer('2', 'Kanton')
-    // await fetchCsvFileByFileName('voting_Theme 2.csv', false)
-    // updateHierarchyLayer('1', 'Sprachregion')
-    // updateHierarchyLayer('2', 'Kanton')
-    // await fetchCsvFileByFileName('voting_Theme 3.csv', false)
-    // updateHierarchyLayer('1', 'Sprachregion')
-    // updateHierarchyLayer('2', 'Kanton')
-    // await fetchCsvFileByFileName('2019_age_groups_2-layers.csv', false)
-    // updateHierarchyLayer('1', 'Sprachregion')
-    // updateHierarchyLayer('2', 'Kanton')
-    await fetchCsvFileByFileName('2019_age_groups_1-layer.csv', false)
-    updateHierarchyLayer('1', 'Sprachregion')
-    updateHierarchyLayer('2', 'Kanton')
-    // await fetchCsvFileByFileName('DEBUG-2019_age_groups_1-layer.csv', false)
-    // updateHierarchyLayer('1', 'Sprachregion')
-    // updateHierarchyLayer('2', 'Kanton')
+    await fetchCsvFileByFileName('voting-data.csv', false)
+    await fetchCsvFileByFileName('2019_age_groups.csv', true)
 
     focusActiveDataTable('smooth')
 
@@ -575,11 +495,7 @@ onMounted(async () => {
                             }"
                           >
                             <p>Hierarchy Layer:</p>
-                            <select
-                              @change="handleHierarchyLayerInput($event, columnName)"
-                              @click.stop
-                              class="select select-primary max-w-xs"
-                            >
+                            <select @click.stop class="select select-primary max-w-xs">
                               <option
                                 :selected="
                                   getColumnCollectionHierarchy(columnName) === hierarchyLayer
@@ -610,9 +526,6 @@ onMounted(async () => {
                       type="checkbox"
                       :checked="
                         mainStore.getActiveDataTable?.selectedAttributes.includes(columnName)
-                      "
-                      :disabled="
-                        mainStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
                       "
                     />
                     <div

@@ -61,23 +61,6 @@ def get_heatmap():
         csv_file = StringIO(heatmap_settings.csvFile)
         original_df = pd.read_csv(csv_file)
 
-        if heatmap_settings.itemNamesColumnName in heatmap_settings.selectedAttributes:
-            new_item_names_column_name = heatmap_settings.itemNamesColumnName + "_copy1"
-            original_df[new_item_names_column_name] = original_df[
-                heatmap_settings.itemNamesColumnName
-            ]
-            heatmap_settings.itemNamesColumnName = new_item_names_column_name
-
-        elif (
-            heatmap_settings.itemNamesColumnName
-            in heatmap_settings.collectionColumnNames
-        ):
-            new_item_names_column_name = heatmap_settings.itemNamesColumnName + "_copy2"
-            original_df[new_item_names_column_name] = original_df[
-                heatmap_settings.itemNamesColumnName
-            ]
-            heatmap_settings.itemNamesColumnName = new_item_names_column_name
-
         logger.info(
             f"Finished reading csv file: {round(time.perf_counter() - start_heatmap, 2)}"
         )

@@ -63,23 +63,25 @@ def get_current_data_length(item_names_and_data: List[ItemNameAndData]):
 
 
 def cluster_attributes_recursively(
+    rotated_raw_data_df: pd.DataFrame,
     rotated_scaled_raw_data_df: pd.DataFrame,
     rotated_hierarchical_columns_metadata_df: pd.DataFrame,
     rotated_column_names_df: pd.DataFrame,
     item_names_and_data: List[ItemNameAndData],
     cluster_size: int,
     cluster_by_collections: bool,
-    hierarchical_column_metadata_row_indexes: List[str],
+    hierarchical_column_metadata_row_indexes: List[int],
     level: int,
 ) -> Union[List[ItemNameAndData], None]:
     # Case: root level
     if level == 0:
         indexes = list(range(rotated_scaled_raw_data_df.shape[0]))
+        new_attribute_index = get_current_data_length(item_names_and_data)
         append_all_average_items_by_attribute_indexes(indexes, item_names_and_data)
         new_attribute_name = f"All_Attributes {str(len(indexes))}"
-        new_attribute_index = len(indexes)
 
         children_0 = cluster_attributes_recursively(
+            rotated_raw_data_df,
             rotated_scaled_raw_data_df,
             rotated_hierarchical_columns_metadata_df,
             rotated_column_names_df,
@@ -105,17 +107,28 @@ def cluster_attributes_recursively(
     if cluster_by_collections and len(hierarchical_column_metadata_row_indexes) > 0:
         new_collection_hierarchical_attributes: List[Tuple[ItemNameAndData, float]] = []
         collection_row_index = hierarchical_column_metadata_row_indexes[0]
+        print("collection_row_index", collection_row_index)
+
         for (
             collection,
             rotated_hierarchical_columns_metadata_group_df,
-        ) in rotated_hierarchical_columns_metadata_df.groupby(collection_row_index):
+        ) in rotated_hierarchical_columns_metadata_df.groupby(
+            str(collection_row_index)
+        ):
             indexes_of_current_group = (
                 rotated_hierarchical_columns_metadata_group_df.index
+            )
+            group_data_attribute_index = get_current_data_length(item_names_and_data)
+            append_all_average_items_by_attribute_indexes(
+                indexes_of_current_group, item_names_and_data
             )
             remaining_collection_row_indexes = hierarchical_column_metadata_row_indexes[
                 1:
             ]
 
+            rotated_raw_data_group_df = rotated_raw_data_df.loc[
+                indexes_of_current_group
+            ]
             rotated_scaled_raw_data_group_df = rotated_scaled_raw_data_df.loc[
                 indexes_of_current_group
             ]
@@ -123,6 +136,9 @@ def cluster_attributes_recursively(
                 indexes_of_current_group
             ]
 
+            new_hierarchical_attribute_std = rotated_raw_data_group_df.std(
+                axis=1
+            ).mean()
             new_hierarchical_attribute_names = (
                 str(collection)
                 + " "
@@ -133,26 +149,24 @@ def cluster_attributes_recursively(
                 rotated_hierarchical_columns_metadata_group_df.shape[0] == 1
                 and len(remaining_collection_row_indexes) == 0
             ):
-                solo_child_name = str(
-                    rotated_column_names_df.loc[
-                        rotated_hierarchical_columns_metadata_group_df.iloc[0].index
-                    ]
-                )
+                solo_child_name = str(rotated_column_names_group_df.iloc[0, 0])
                 solo_child_attribute_index = (
                     rotated_hierarchical_columns_metadata_group_df.index[0]
                 )
-
+                solo_child_std = rotated_raw_data_group_df.iloc[0, :].std()
                 new_children = [
                     HierarchicalAttribute(
                         attributeName=solo_child_name,
                         dataAttributeIndex=solo_child_attribute_index,
-                        std=-1000,
+                        std=float(solo_child_std),
                         originalAttributeOrder=solo_child_attribute_index,
+                        isOpen=False,
                         children=None,
                     )
                 ]
             else:
                 new_children = cluster_attributes_recursively(
+                    rotated_raw_data_group_df,
                     rotated_scaled_raw_data_group_df,
                     rotated_hierarchical_columns_metadata_group_df,
                     rotated_column_names_group_df,
@@ -162,15 +176,17 @@ def cluster_attributes_recursively(
                     remaining_collection_row_indexes,
                     level + 1,
                 )
-            group_data_attribute_index = get_current_data_length(item_names_and_data)
+
             average_hierarchical_attribute_index = np.mean(
                 indexes_of_current_group.tolist()
             )
+
             new_hierarchical_attribute = HierarchicalAttribute(
                 attributeName=new_hierarchical_attribute_names,
                 dataAttributeIndex=group_data_attribute_index,
-                std=-1000,
+                std=float(new_hierarchical_attribute_std),
                 originalAttributeOrder=average_hierarchical_attribute_index,
+                isOpen=False,
                 children=new_children,
             )
 
@@ -195,10 +211,11 @@ def cluster_attributes_recursively(
 
         for i in range(rotated_scaled_raw_data_df.shape[0]):
             new_attribute_index = new_attribute_indexes[i]
+            new_attribute_std = rotated_raw_data_df.iloc[i, :].std()
             new_attribute = HierarchicalAttribute(
                 attributeName=new_attribute_names[i],
                 dataAttributeIndex=new_attribute_index,
-                std=-1000,
+                std=float(new_attribute_std),
                 originalAttributeOrder=new_attribute_index,
                 isOpen=False,
                 children=None,
@@ -227,7 +244,9 @@ def cluster_attributes_recursively(
         }
 
         for _, current_cluster_indexes in cluster_indices.items():
-
+            rotated_raw_data_cluster_df = rotated_raw_data_df.loc[
+                current_cluster_indexes
+            ]
             rotated_scaled_raw_data_cluster_df = rotated_scaled_raw_data_df.loc[
                 current_cluster_indexes
             ]
@@ -251,10 +270,11 @@ def cluster_attributes_recursively(
                 )
 
                 for i in range(rotated_scaled_raw_data_cluster_df.shape[0]):
+                    new_attribute_std = rotated_raw_data_cluster_df.iloc[i, :].std()
                     new_attribute = HierarchicalAttribute(
                         attributeName=new_cluster_attribute_names[i],
                         dataAttributeIndex=rotated_scaled_raw_data_cluster_df.index[i],
-                        std=-1000,
+                        std=float(new_attribute_std),
                         originalAttributeOrder=rotated_scaled_raw_data_cluster_df.index[
                             i
                         ],
@@ -267,11 +287,11 @@ def cluster_attributes_recursively(
 
             if rotated_scaled_raw_data_cluster_df.shape[0] == 1:
                 new_attribute_name = rotated_column_names_cluster_df.iloc[0, 0]
-
+                new_attribute_std = rotated_raw_data_cluster_df.iloc[0, :].std()
                 new_attribute = HierarchicalAttribute(
                     attributeName=new_attribute_name,
                     dataAttributeIndex=rotated_scaled_raw_data_cluster_df.index[0],
-                    std=-1000,
+                    std=float(new_attribute_std),
                     originalAttributeOrder=rotated_scaled_raw_data_cluster_df.index[0],
                     isOpen=False,
                     children=None,
@@ -280,6 +300,7 @@ def cluster_attributes_recursively(
                 continue
 
             children = cluster_attributes_recursively(
+                rotated_raw_data_cluster_df,
                 rotated_scaled_raw_data_cluster_df,
                 rotated_hierarchical_columns_metadata_cluster_df,
                 rotated_column_names_cluster_df,
@@ -298,10 +319,13 @@ def cluster_attributes_recursively(
             new_hierarchical_attribute_name = str(
                 rotated_scaled_raw_data_cluster_df.shape[0]
             )
+            new_hierarchical_attribute_std = rotated_raw_data_cluster_df.std(
+                axis=1
+            ).mean()
             new_hierarchical_attribute = HierarchicalAttribute(
                 attributeName=new_hierarchical_attribute_name,
                 dataAttributeIndex=new_index,
-                std=-1000,
+                std=float(new_hierarchical_attribute_std),
                 originalAttributeOrder=average_index,
                 isOpen=False,
                 children=children,

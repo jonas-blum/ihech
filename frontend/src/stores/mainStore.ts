@@ -450,7 +450,7 @@ export const useMainStore = defineStore('mainStore', {
         csvFile: this.activeDataTable.csvFile,
 
         hierarchicalRowsMetadataColumnNames: this.activeDataTable.collectionColumnNames,
-        hierarchicalColumnsMetadataRowIndexes: [],
+        hierarchicalColumnsMetadataRowIndexes: [0, 1],
 
         selectedItemsRowIndexes: this.activeDataTable.selectedItemIndexes,
         selectedAttributesColumnNames: this.activeDataTable.selectedAttributes,

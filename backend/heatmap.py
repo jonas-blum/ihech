@@ -253,6 +253,7 @@ def create_heatmap(
     scaled_raw_data_df = scaled_raw_data_df.copy()
     dim_red_df = dim_red_df.copy()
 
+    rotated_raw_data_df = raw_data_df.T.reset_index(drop=True).copy()
     rotated_scaled_raw_data_df = scaled_raw_data_df.T.reset_index(drop=True).copy()
     rotated_hierarchical_columns_metadata_df = (
         hierarchical_columns_metadata_df.T.reset_index(drop=True).copy()
@@ -260,6 +261,10 @@ def create_heatmap(
     rotated_hierarchical_columns_metadata_df.columns = (
         hierarchical_columns_metadata_df.index
     )
+    rotated_hierarchical_columns_metadata_df.columns = (
+        rotated_hierarchical_columns_metadata_df.columns.map(str)
+    )
+
     rotated_column_names_df = pd.DataFrame(raw_data_df.columns)
 
     print("raw_data_df\n", raw_data_df)
@@ -292,7 +297,15 @@ def create_heatmap(
     logger.info("Starting clustering attributes...")
     start_clustering_attributes = time.perf_counter()
 
+    print("rotated_scaled_raw_data_df\n", rotated_scaled_raw_data_df)
+    print(
+        "rotated_hierarchical_columns_metadata_df\n",
+        rotated_hierarchical_columns_metadata_df,
+    )
+    print("rotated_column_names_df\n", rotated_column_names_df)
+
     hierarchical_attributes = cluster_attributes_recursively(
+        rotated_raw_data_df,
         rotated_scaled_raw_data_df,
         rotated_hierarchical_columns_metadata_df,
         rotated_column_names_df,
@@ -303,7 +316,6 @@ def create_heatmap(
         0,
     )
     heatmap_json.hierarchicalAttributes = hierarchical_attributes
-    calculate_attribute_std(item_names_and_data, hierarchical_attributes)
     logger.info(
         f"Clustering attributes done: {round(time.perf_counter() - start_clustering_attributes, 2)}"
     )

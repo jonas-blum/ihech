@@ -49,40 +49,30 @@ async function updateAttributesClusterByCollections(event: Event) {
   mainStore.setIsOutOfSync(true)
 }
 
-function toggleHierarchicalColumnsMetadataRowIndexes(event: Event) {
-  if (!(event.target instanceof HTMLSelectElement)) {
-    console.error('Event target is not an HTMLSelectElement:', event.target)
-    return
-  }
-  const selectedElement = JSON.parse(event.target.value)
-  mainStore.getHierarchicalColumnsMetadataRowIndexes.forEach((element) => {
-    if (element.index == selectedElement.index) {
-      element.selected = !selectedElement.selected
-    }
-  })
-  console.log(mainStore.getHierarchicalColumnsMetadataRowIndexes)
-}
-
-function toggleHierarchicalRowsMetadataColumnNames(event: Event) {
-  if (!(event.target instanceof HTMLSelectElement)) {
-    console.error('Event target is not an HTMLSelectElement:', event.target)
-    return
-  }
-  const selectedElement = JSON.parse(event.target.value)
-  mainStore.getHierarchicalRowsMetadataColumnNames.forEach((element) => {
-    if (element.index == selectedElement.index) {
-      element.selected = !selectedElement.selected
-    }
-  })
-  console.log(mainStore.getHierarchicalRowsMetadataColumnNames)
-}
-
-const hierarchicalRowsMetadataColumnNames = computed(() => {
-  return mainStore.getHierarchicalRowsMetadataColumnNames
+const hierarchicalColumnsMetadataRowIndexes = computed({
+  get() {
+    return mainStore.getHierarchicalColumnsMetadataRowIndexes.map((item) => item)
+  },
+  set(selectedOptions) {
+    const selectedIndexes = selectedOptions.map((item) => item.index)
+    mainStore.getHierarchicalColumnsMetadataRowIndexes.forEach((item) => {
+      item.selected = selectedIndexes.includes(item.index)
+    })
+    mainStore.setIsOutOfSync(true)
+  },
 })
 
-const hierarchicalColumnsMetadataRowIndexes = computed(() => {
-  return mainStore.getHierarchicalColumnsMetadataRowIndexes
+const hierarchicalRowsMetadataColumnNames = computed({
+  get() {
+    return mainStore.getHierarchicalRowsMetadataColumnNames.map((item) => item)
+  },
+  set(selectedOptions) {
+    const selectedIndexes = selectedOptions.map((item) => item.index)
+    mainStore.getHierarchicalRowsMetadataColumnNames.forEach((item) => {
+      item.selected = selectedIndexes.includes(item.index)
+    })
+    mainStore.setIsOutOfSync(true)
+  },
 })
 </script>
 
@@ -105,13 +95,14 @@ const hierarchicalColumnsMetadataRowIndexes = computed(() => {
       <span v-if="mainStore.getActiveDataTable?.clusterItemsByCollections">
         by
         <select
-          @change="toggleHierarchicalRowsMetadataColumnNames($event)"
+          multiple
+          v-model="hierarchicalRowsMetadataColumnNames"
           class="select select-bordered select-xs w-min mx-1"
         >
           <option
-            multiple
-            v-for="option in hierarchicalRowsMetadataColumnNames"
-            :value="JSON.stringify(option)"
+            v-for="option in mainStore.getHierarchicalRowsMetadataColumnNames"
+            :key="option.index"
+            :value="option"
             :selected="option.selected"
           >
             {{ option.label }}
@@ -158,22 +149,21 @@ const hierarchicalColumnsMetadataRowIndexes = computed(() => {
         :checked="mainStore.getActiveDataTable?.clusterAttributesByCollections"
       />
       )
-      <span v-if="mainStore.getActiveDataTable?.clusterAttributesByCollections">
-        by
-        <select
-          multiple
-          @change="toggleHierarchicalColumnsMetadataRowIndexes($event)"
-          class="select select-bordered select-xs w-min mx-1"
+      <span v-if="mainStore.getActiveDataTable?.clusterAttributesByCollections"> by </span>
+      <select
+        multiple
+        v-model="hierarchicalColumnsMetadataRowIndexes"
+        class="select select-bordered select-xs w-min mx-1"
+      >
+        <option
+          v-for="option in mainStore.getHierarchicalColumnsMetadataRowIndexes"
+          :key="option.index"
+          :value="option"
+          :selected="option.selected"
         >
-          <option
-            :selected="option.selected"
-            v-for="option in hierarchicalColumnsMetadataRowIndexes"
-            :value="JSON.stringify(option)"
-          >
-            {{ option.label }}
-          </option>
-        </select>
-      </span>
+          {{ option.label }}
+        </option>
+      </select>
       .
       <!-- TODO: here I could add the k-means attribute clustering parameter. for now I "disabled" it by settings the parameter to -1 -->
     </p>

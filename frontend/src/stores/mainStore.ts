@@ -454,10 +454,12 @@ export const useMainStore = defineStore('mainStore', {
       return {
         csvFile: this.activeDataTable.csvFile,
 
-        hierarchicalRowsMetadataColumnNames:
-          this.activeDataTable.hierarchicalRowsMetadataColumnNames.map((i) => i.label),
-        hierarchicalColumnsMetadataRowIndexes:
-          this.activeDataTable.hierarchicalColumnsMetadataRowIndexes.map((i) => i.index),
+        hierarchicalRowsMetadataColumnNames: this.getHierarchicalRowsMetadataColumnNames
+          .filter((i) => i.selected)
+          .map((i) => i.label),
+        hierarchicalColumnsMetadataRowIndexes: this.getHierarchicalColumnsMetadataRowIndexes
+          .filter((i) => i.selected)
+          .map((i) => i.index),
 
         selectedItemsRowIndexes: this.activeDataTable.selectedItemIndexes,
         selectedAttributesColumnNames: this.activeDataTable.selectedAttributes,
@@ -536,7 +538,7 @@ export const useMainStore = defineStore('mainStore', {
         const collectionColumnName = this.activeDataTable.hierarchicalRowsMetadataColumnNames[0]
 
         this.activeDataTable.df.forEach((row, index) => {
-          const rowCollection = row[collectionColumnName]
+          const rowCollection = row[collectionColumnName.label]
           if (selectedCollections.includes(rowCollection)) {
             newSelectedItemIndexes.push(index)
           }

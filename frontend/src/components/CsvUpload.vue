@@ -68,7 +68,6 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     if (Object.values(row).find((cell) => cell !== '') === undefined) {
       break
     }
-
     rowsBeforeFirstEmptyRow.push({
       index: rowIndex,
       label: row[itemNameColumnName],
@@ -153,8 +152,9 @@ function getColumnCollectionHierarchy(columnName: string): 'None' | number {
   if (mainStore.getActiveDataTable === null) {
     return 'None'
   }
-  const foundIndex =
-    mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.indexOf(columnName)
+  const foundIndex = mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.findIndex(
+    (c) => c.label === columnName,
+  )
   if (foundIndex === -1) {
     return 'None'
   } else {
@@ -175,7 +175,7 @@ function updateItemCollectionMap() {
 
   const itemCollectionMap: Record<number, string> = {}
   mainStore.getActiveDataTable.df.forEach((row, index) => {
-    itemCollectionMap[index] = row[collectionColumnName]
+    itemCollectionMap[index] = row[collectionColumnName.label]
   })
   mainStore.getActiveDataTable.itemCollectionMap = itemCollectionMap
 }
@@ -193,7 +193,7 @@ function resetFirstLayerCollectionNames() {
   const collectionColumnName = mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames[0]
   const newFirstLayerCollectionNames: string[] = []
   mainStore.getActiveDataTable.df.forEach((row, index) => {
-    newFirstLayerCollectionNames.push(row[collectionColumnName])
+    newFirstLayerCollectionNames.push(row[collectionColumnName.label])
   })
   const uniqueFirstLayerCollectionNames = [...new Set(newFirstLayerCollectionNames)]
   mainStore.getActiveDataTable.firstLayerCollectionNames = uniqueFirstLayerCollectionNames
@@ -219,55 +219,6 @@ function resetCollectionColorMap(): void {
     index++
   })
   mainStore.getActiveDataTable.collectionColorMap = colorMap
-}
-
-function handleHierarchyLayerInput(event: Event, columnName: string) {
-  if (!(event.target instanceof HTMLSelectElement)) {
-    console.error('Event target is not an HTMLSelectElement:', event.target)
-    return
-  }
-  const selectedHierarchyLayer = event.target.value
-  updateHierarchyLayer(selectedHierarchyLayer, columnName)
-}
-
-function updateHierarchyLayer(selectedHierarchyLayer: string, columnName: string) {
-  if (mainStore.getActiveDataTable === null) {
-    return
-  }
-
-  mainStore.getActiveDataTable.selectedAttributes =
-    mainStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== columnName)
-
-  if (selectedHierarchyLayer === 'None') {
-    //Remove the column name from the collectionColumnNames array
-    const foundIndex =
-      mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.indexOf(columnName)
-    if (foundIndex !== undefined && foundIndex !== -1) {
-      mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.splice(foundIndex, 1)
-    }
-  } else {
-    // Insert the column name at the selected hierarchy layer
-    const hierarchyLayer = parseInt(selectedHierarchyLayer)
-    const foundIndex =
-      mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.indexOf(columnName)
-    if (foundIndex !== undefined && foundIndex !== -1) {
-      mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.splice(foundIndex, 1)
-    }
-    mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.splice(
-      hierarchyLayer - 1,
-      0,
-      columnName,
-    )
-  }
-  if (mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.length > 4) {
-    mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames =
-      mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.slice(0, 4)
-  }
-  resetFirstLayerCollectionNames()
-  updateItemCollectionMap()
-  resetCollectionColorMap()
-  mainStore.updateSelectedItemIndexesBasedOnSelectedCollections()
-  mainStore.setIsOutOfSync(true)
 }
 
 function updateItemNamesColumn(columName: string) {
@@ -539,11 +490,7 @@ onMounted(async () => {
                             }"
                           >
                             <p>Hierarchy Layer:</p>
-                            <select
-                              @change="handleHierarchyLayerInput($event, columnName)"
-                              @click.stop
-                              class="select select-primary max-w-xs"
-                            >
+                            <select @click.stop class="select select-primary max-w-xs">
                               <option
                                 :selected="
                                   getColumnCollectionHierarchy(columnName) === hierarchyLayer
@@ -574,11 +521,6 @@ onMounted(async () => {
                       type="checkbox"
                       :checked="
                         mainStore.getActiveDataTable?.selectedAttributes.includes(columnName)
-                      "
-                      :disabled="
-                        mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.includes(
-                          columnName,
-                        )
                       "
                     />
                     <div

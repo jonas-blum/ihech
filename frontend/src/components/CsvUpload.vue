@@ -54,22 +54,6 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     .resetIndex()
     .bake()
 
-  const firstRow = df.first()
-
-  let numericColumns = []
-  let nonNumericColumns = []
-
-  for (const column of df.getColumnNames()) {
-    const firstValue = firstRow[column]
-    if (isNumeric(firstValue)) {
-      numericColumns.push(column)
-    } else {
-      nonNumericColumns.push(column)
-    }
-  }
-
-  df = df.subset(nonNumericColumns.concat(numericColumns))
-
   const csvFile = df.toCSV()
   let fileNameNoExtension = fileName.split('.').slice(0, -1).join('.')
   while (mainStore.getAllDataTableNames.includes(fileNameNoExtension)) {
@@ -80,12 +64,13 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     )
   }
 
+  const firstEmptyRowIndex = df.where((row) => row.isNaN())
+
+  console.log('firstEmptyRowIndex', firstEmptyRowIndex)
+
   const newDataTable: CsvDataTableProfile = {
     tableName: fileNameNoExtension,
     df: df,
-
-    nanColumns: [],
-    nonNanColumns: [],
 
     collectionColorMap: {},
     itemCollectionMap: {},
@@ -97,7 +82,8 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     csvFile: csvFile,
 
     itemNamesColumnName: df.getColumnNames()[0],
-    collectionColumnNames: [],
+    hierarchicalRowsMetadataColumnNames: [],
+    hierarchicalColumnsMetadataRowIndexesMap: {},
 
     selectedItemIndexes: df.getIndex().toArray(),
     selectedAttributes: df.getColumnNames(),
@@ -141,7 +127,8 @@ function getColumnCollectionHierarchy(columnName: string): 'None' | number {
   if (mainStore.getActiveDataTable === null) {
     return 'None'
   }
-  const foundIndex = mainStore.getActiveDataTable.collectionColumnNames.indexOf(columnName)
+  const foundIndex =
+    mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.indexOf(columnName)
   if (foundIndex === -1) {
     return 'None'
   } else {
@@ -153,12 +140,12 @@ function updateItemCollectionMap() {
   if (mainStore.getActiveDataTable === null) {
     return
   }
-  if (mainStore.getActiveDataTable.collectionColumnNames.length === 0) {
+  if (mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.length === 0) {
     mainStore.getActiveDataTable.itemCollectionMap = {}
     return
   }
 
-  const collectionColumnName = mainStore.getActiveDataTable.collectionColumnNames[0]
+  const collectionColumnName = mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames[0]
 
   const itemCollectionMap: Record<number, string> = {}
   mainStore.getActiveDataTable.df.forEach((row, index) => {
@@ -171,13 +158,13 @@ function resetFirstLayerCollectionNames() {
   if (mainStore.getActiveDataTable === null) {
     return
   }
-  if (mainStore.getActiveDataTable.collectionColumnNames.length === 0) {
+  if (mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.length === 0) {
     mainStore.getActiveDataTable.firstLayerCollectionNames = []
     mainStore.getActiveDataTable.selectedFirstLayerCollections = []
     return
   }
 
-  const collectionColumnName = mainStore.getActiveDataTable.collectionColumnNames[0]
+  const collectionColumnName = mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames[0]
   const newFirstLayerCollectionNames: string[] = []
   mainStore.getActiveDataTable.df.forEach((row, index) => {
     newFirstLayerCollectionNames.push(row[collectionColumnName])
@@ -227,22 +214,28 @@ function updateHierarchyLayer(selectedHierarchyLayer: string, columnName: string
 
   if (selectedHierarchyLayer === 'None') {
     //Remove the column name from the collectionColumnNames array
-    const foundIndex = mainStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
+    const foundIndex =
+      mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.indexOf(columnName)
     if (foundIndex !== undefined && foundIndex !== -1) {
-      mainStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
+      mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.splice(foundIndex, 1)
     }
   } else {
     // Insert the column name at the selected hierarchy layer
     const hierarchyLayer = parseInt(selectedHierarchyLayer)
-    const foundIndex = mainStore.getActiveDataTable?.collectionColumnNames.indexOf(columnName)
+    const foundIndex =
+      mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.indexOf(columnName)
     if (foundIndex !== undefined && foundIndex !== -1) {
-      mainStore.getActiveDataTable?.collectionColumnNames.splice(foundIndex, 1)
+      mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.splice(foundIndex, 1)
     }
-    mainStore.getActiveDataTable?.collectionColumnNames.splice(hierarchyLayer - 1, 0, columnName)
+    mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.splice(
+      hierarchyLayer - 1,
+      0,
+      columnName,
+    )
   }
-  if (mainStore.getActiveDataTable.collectionColumnNames.length > 4) {
-    mainStore.getActiveDataTable.collectionColumnNames =
-      mainStore.getActiveDataTable.collectionColumnNames.slice(0, 4)
+  if (mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.length > 4) {
+    mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames =
+      mainStore.getActiveDataTable.hierarchicalRowsMetadataColumnNames.slice(0, 4)
   }
   resetFirstLayerCollectionNames()
   updateItemCollectionMap()
@@ -557,7 +550,9 @@ onMounted(async () => {
                         mainStore.getActiveDataTable?.selectedAttributes.includes(columnName)
                       "
                       :disabled="
-                        mainStore.getActiveDataTable?.collectionColumnNames.includes(columnName)
+                        mainStore.getActiveDataTable?.hierarchicalRowsMetadataColumnNames.includes(
+                          columnName,
+                        )
                       "
                     />
                     <div

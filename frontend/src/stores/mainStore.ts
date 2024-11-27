@@ -449,7 +449,8 @@ export const useMainStore = defineStore('mainStore', {
       return {
         csvFile: this.activeDataTable.csvFile,
 
-        hierarchicalRowsMetadataColumnNames: this.activeDataTable.collectionColumnNames,
+        hierarchicalRowsMetadataColumnNames:
+          this.activeDataTable.hierarchicalRowsMetadataColumnNames,
         hierarchicalColumnsMetadataRowIndexes: [0, 1],
 
         selectedItemsRowIndexes: this.activeDataTable.selectedItemIndexes,
@@ -518,7 +519,7 @@ export const useMainStore = defineStore('mainStore', {
       }
       const newSelectedItemIndexes: number[] = []
       if (
-        this.activeDataTable.collectionColumnNames.length === 0 ||
+        this.activeDataTable.hierarchicalRowsMetadataColumnNames.length === 0 ||
         this.activeDataTable.selectedFirstLayerCollections.length === 0
       ) {
         this.activeDataTable.df.forEach((row, index) => {
@@ -526,7 +527,7 @@ export const useMainStore = defineStore('mainStore', {
         })
       } else {
         const selectedCollections = this.activeDataTable.selectedFirstLayerCollections
-        const collectionColumnName = this.activeDataTable.collectionColumnNames[0]
+        const collectionColumnName = this.activeDataTable.hierarchicalRowsMetadataColumnNames[0]
 
         this.activeDataTable.df.forEach((row, index) => {
           const rowCollection = row[collectionColumnName]
@@ -609,7 +610,7 @@ export const useMainStore = defineStore('mainStore', {
         console.error('No active data table')
         return ['black']
       }
-      if (this.activeDataTable.collectionColumnNames.length === 0) {
+      if (this.activeDataTable.hierarchicalRowsMetadataColumnNames.length === 0) {
         let topMostParent = item
         while (topMostParent.parent !== null && topMostParent.parent.parent !== null) {
           topMostParent = topMostParent.parent

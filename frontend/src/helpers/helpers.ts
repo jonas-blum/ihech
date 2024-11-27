@@ -197,9 +197,6 @@ export interface CsvDataTableProfile {
   tableName: string | null
   df: dataForge.IDataFrame<any, any>
 
-  nanColumns: string[]
-  nonNanColumns: string[]
-
   collectionColorMap: Record<string, string>
   itemCollectionMap: Record<number, string>
   firstLayerCollectionNames: string[]
@@ -213,7 +210,8 @@ export interface CsvDataTableProfile {
   csvFile: string
 
   itemNamesColumnName: string
-  collectionColumnNames: string[]
+  hierarchicalRowsMetadataColumnNames: string[]
+  hierarchicalColumnsMetadataRowIndexesMap: Record<number, string>
 
   selectedItemIndexes: number[]
   selectedAttributes: string[]

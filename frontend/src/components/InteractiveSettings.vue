@@ -134,7 +134,7 @@ watch(
       >
         <option
           v-for="option in kOptions"
-          :value="JSON.stringify(option)"
+          :value="option.value"
           :selected="mainStore.getActiveDataTable?.itemsClusterSize === option.value"
         >
           {{ option.label }}

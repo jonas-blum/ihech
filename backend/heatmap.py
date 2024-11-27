@@ -253,6 +253,15 @@ def create_heatmap(
     scaled_raw_data_df = scaled_raw_data_df.copy()
     dim_red_df = dim_red_df.copy()
 
+    rotated_scaled_raw_data_df = scaled_raw_data_df.T.reset_index(drop=True).copy()
+    rotated_hierarchical_columns_metadata_df = (
+        hierarchical_columns_metadata_df.T.reset_index(drop=True).copy()
+    )
+    rotated_hierarchical_columns_metadata_df.columns = (
+        hierarchical_columns_metadata_df.index
+    )
+    rotated_column_names_df = pd.DataFrame(raw_data_df.columns)
+
     print("raw_data_df\n", raw_data_df)
     print("scaled_raw_data_df\n", scaled_raw_data_df)
     print("dim_red_df\n", dim_red_df)
@@ -283,30 +292,15 @@ def create_heatmap(
     logger.info("Starting clustering attributes...")
     start_clustering_attributes = time.perf_counter()
 
-    original_columns = original_filtered_df_dropped.columns
-    rotated_original_filtered_df = original_filtered_df_dropped.T.reset_index(
-        drop=True
-    ).copy()
-    rotated_original_filtered_df["OriginalColumnNames"] = original_columns
-    rotated_original_filtered_df_dropped = original_filtered_df_dropped.T.reset_index(
-        drop=True
-    ).copy()
-
-    attributes_hierarchies_df = (
-        attribute_hierarchies.dropna(how="all")
-        if attribute_hierarchies is not None
-        else None
-    )
-
     hierarchical_attributes = cluster_attributes_recursively(
-        rotated_original_filtered_df,
-        rotated_original_filtered_df_dropped,
+        rotated_scaled_raw_data_df,
+        rotated_hierarchical_columns_metadata_df,
+        rotated_column_names_df,
+        item_names_and_data,
         settings.attributesClusterSize,
         settings.clusterAttributesByCollections,
+        settings.hierarchicalColumnsMetadataRowIndexes,
         0,
-        item_names_and_data,
-        attributes_hierarchies_df,
-        original_columns_list,
     )
     heatmap_json.hierarchicalAttributes = hierarchical_attributes
     calculate_attribute_std(item_names_and_data, hierarchical_attributes)

@@ -193,6 +193,11 @@ export interface HeatmapSettings {
   scaling: ScalingEnum
 }
 
+export interface IndexLabelInterface {
+  index: number
+  label: string
+  selected: boolean
+}
 export interface CsvDataTableProfile {
   tableName: string | null
   df: dataForge.IDataFrame<any, any>
@@ -210,8 +215,9 @@ export interface CsvDataTableProfile {
   csvFile: string
 
   itemNamesColumnName: string
-  hierarchicalRowsMetadataColumnNames: string[]
-  hierarchicalColumnsMetadataRowIndexesMap: Record<number, string>
+
+  hierarchicalRowsMetadataColumnNames: IndexLabelInterface[]
+  hierarchicalColumnsMetadataRowIndexes: IndexLabelInterface[]
 
   selectedItemIndexes: number[]
   selectedAttributes: string[]

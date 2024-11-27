@@ -11,6 +11,7 @@ import {
   getDistinctColor,
   CSV_UPLOAD_COLLAPSED_HEIGHT,
   CSV_UPLOAD_CONTENT_HEIGHT,
+  type IndexLabelInterface,
 } from '@/helpers/helpers'
 import SettingsIcon from '@assets/settings.svg'
 
@@ -44,10 +45,6 @@ function triggerFileInput() {
   mainStore.setCsvUploadOpen(true)
 }
 
-function isNumeric(value: any): boolean {
-  return !isNaN(parseFloat(value)) && isFinite(value)
-}
-
 function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = true) {
   let df: dataForge.IDataFrame = dataForge
     .fromCSV(contents, { skipEmptyLines: true })
@@ -64,9 +61,38 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     )
   }
 
-  const firstEmptyRowIndex = df.where((row) => row.isNaN())
+  const itemNameColumnName = df.getColumnNames()[0]
+  const rowsBeforeFirstEmptyRow: IndexLabelInterface[] = []
 
-  console.log('firstEmptyRowIndex', firstEmptyRowIndex)
+  for (const [rowIndex, row] of df.toPairs()) {
+    if (Object.values(row).find((cell) => cell !== '') === undefined) {
+      break
+    }
+
+    rowsBeforeFirstEmptyRow.push({
+      index: rowIndex,
+      label: row[itemNameColumnName],
+      selected: true,
+    })
+  }
+
+  let columnNamesBeforeFirstEmptyColumn: IndexLabelInterface[] = []
+  let notYetSkippedFirstColumn = true
+  let i = 0
+  for (const column of df.getColumns()) {
+    if (notYetSkippedFirstColumn === true) {
+      notYetSkippedFirstColumn = false
+      continue
+    }
+    if (column.series.toArray().find((cell) => cell !== '') === undefined) {
+      break
+    }
+    columnNamesBeforeFirstEmptyColumn.push({
+      index: i++,
+      label: column.name,
+      selected: true,
+    })
+  }
 
   const newDataTable: CsvDataTableProfile = {
     tableName: fileNameNoExtension,
@@ -82,8 +108,8 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     csvFile: csvFile,
 
     itemNamesColumnName: df.getColumnNames()[0],
-    hierarchicalRowsMetadataColumnNames: [],
-    hierarchicalColumnsMetadataRowIndexesMap: {},
+    hierarchicalRowsMetadataColumnNames: columnNamesBeforeFirstEmptyColumn,
+    hierarchicalColumnsMetadataRowIndexes: rowsBeforeFirstEmptyRow,
 
     selectedItemIndexes: df.getIndex().toArray(),
     selectedAttributes: df.getColumnNames(),

@@ -1,20 +1,8 @@
 <script setup lang="ts">
 import { useMainStore } from '@stores/mainStore'
-import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
-import { Icon } from '@iconify/vue'
+import { computed } from 'vue'
 
 const mainStore = useMainStore()
-
-const itemGroupingOptions = [
-  { label: 'Kanton', value: 'kanton' },
-  { label: 'District', value: 'district' },
-  { label: 'Language Region', value: 'language' },
-]
-
-const attributeGroupingOptions = [
-  { label: 'Age Group', value: 'age' },
-  { label: '???', value: '???' },
-]
 
 const kOptions = [
   { label: 'k=2', value: 2 },
@@ -60,6 +48,42 @@ async function updateAttributesClusterByCollections(event: Event) {
   mainStore.setClusterAttributesByCollections(event.target.checked)
   mainStore.setIsOutOfSync(true)
 }
+
+function toggleHierarchicalColumnsMetadataRowIndexes(event: Event) {
+  if (!(event.target instanceof HTMLSelectElement)) {
+    console.error('Event target is not an HTMLSelectElement:', event.target)
+    return
+  }
+  const selectedElement = JSON.parse(event.target.value)
+  mainStore.getHierarchicalColumnsMetadataRowIndexes.forEach((element) => {
+    if (element.index == selectedElement.index) {
+      element.selected = !selectedElement.selected
+    }
+  })
+  console.log(mainStore.getHierarchicalColumnsMetadataRowIndexes)
+}
+
+function toggleHierarchicalRowsMetadataColumnNames(event: Event) {
+  if (!(event.target instanceof HTMLSelectElement)) {
+    console.error('Event target is not an HTMLSelectElement:', event.target)
+    return
+  }
+  const selectedElement = JSON.parse(event.target.value)
+  mainStore.getHierarchicalRowsMetadataColumnNames.forEach((element) => {
+    if (element.index == selectedElement.index) {
+      element.selected = !selectedElement.selected
+    }
+  })
+  console.log(mainStore.getHierarchicalRowsMetadataColumnNames)
+}
+
+const hierarchicalRowsMetadataColumnNames = computed(() => {
+  return mainStore.getHierarchicalRowsMetadataColumnNames
+})
+
+const hierarchicalColumnsMetadataRowIndexes = computed(() => {
+  return mainStore.getHierarchicalColumnsMetadataRowIndexes
+})
 </script>
 
 <template>
@@ -80,8 +104,16 @@ async function updateAttributesClusterByCollections(event: Event) {
       )
       <span v-if="mainStore.getActiveDataTable?.clusterItemsByCollections">
         by
-        <select class="select select-bordered select-xs w-min mx-1">
-          <option v-for="option in itemGroupingOptions" :value="option.value">
+        <select
+          @change="toggleHierarchicalRowsMetadataColumnNames($event)"
+          class="select select-bordered select-xs w-min mx-1"
+        >
+          <option
+            multiple
+            v-for="option in hierarchicalRowsMetadataColumnNames"
+            :value="JSON.stringify(option)"
+            :selected="option.selected"
+          >
             {{ option.label }}
           </option>
         </select>
@@ -93,7 +125,7 @@ async function updateAttributesClusterByCollections(event: Event) {
       >
         <option
           v-for="option in kOptions"
-          :value="option.value"
+          :value="JSON.stringify(option)"
           :selected="mainStore.getActiveDataTable?.itemsClusterSize === option.value"
         >
           {{ option.label }}
@@ -128,8 +160,16 @@ async function updateAttributesClusterByCollections(event: Event) {
       )
       <span v-if="mainStore.getActiveDataTable?.clusterAttributesByCollections">
         by
-        <select class="select select-bordered select-xs w-min mx-1">
-          <option v-for="option in attributeGroupingOptions" :value="option.value">
+        <select
+          multiple
+          @change="toggleHierarchicalColumnsMetadataRowIndexes($event)"
+          class="select select-bordered select-xs w-min mx-1"
+        >
+          <option
+            :selected="option.selected"
+            v-for="option in hierarchicalColumnsMetadataRowIndexes"
+            :value="JSON.stringify(option)"
+          >
             {{ option.label }}
           </option>
         </select>

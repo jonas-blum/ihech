@@ -38,7 +38,7 @@ import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
 import { LinearColorMap } from '@/classes/LinearColorMap'
-import { nextTick, setDevtoolsHook } from 'vue'
+import { nextTick } from 'vue'
 
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
 export const useMainStore = defineStore('mainStore', {
@@ -159,6 +159,11 @@ export const useMainStore = defineStore('mainStore', {
       }
       return state.heatmap.itemNamesAndData.slice(state.activeDataTable.stickyItemIndexes.length)
     },
+
+    getHierarchicalRowsMetadataColumnNames: (state) =>
+      state.activeDataTable?.hierarchicalRowsMetadataColumnNames ?? [],
+    getHierarchicalColumnsMetadataRowIndexes: (state) =>
+      state.activeDataTable?.hierarchicalColumnsMetadataRowIndexes ?? [],
 
     getAllItems: (state) => state.allItems,
 
@@ -450,8 +455,9 @@ export const useMainStore = defineStore('mainStore', {
         csvFile: this.activeDataTable.csvFile,
 
         hierarchicalRowsMetadataColumnNames:
-          this.activeDataTable.hierarchicalRowsMetadataColumnNames,
-        hierarchicalColumnsMetadataRowIndexes: [0, 1],
+          this.activeDataTable.hierarchicalRowsMetadataColumnNames.map((i) => i.label),
+        hierarchicalColumnsMetadataRowIndexes:
+          this.activeDataTable.hierarchicalColumnsMetadataRowIndexes.map((i) => i.index),
 
         selectedItemsRowIndexes: this.activeDataTable.selectedItemIndexes,
         selectedAttributesColumnNames: this.activeDataTable.selectedAttributes,

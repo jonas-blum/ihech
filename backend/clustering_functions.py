@@ -403,7 +403,7 @@ def cluster_items_recursively(
             item_names_group_df = item_names_df.loc[indexes_of_current_group]
 
             tag_data_aggregated = np.round(
-                hierarchical_rows_metadata_group_df.mean(), rounding_precision
+                raw_data_group_df.mean(), rounding_precision
             ).tolist()
 
             dim_reduction_aggregated = np.round(
@@ -419,9 +419,7 @@ def cluster_items_recursively(
                 raw_data_group_df.shape[0] == 1
                 and len(remaining_collection_column_names) == 0
             ):
-                solo_child_name = str(
-                    item_names_df.loc[hierarchical_rows_metadata_group_df.iloc[0].index]
-                )
+                solo_child_name = str(item_names_df.iloc[0, 0])
                 solo_child_data = np.round(
                     raw_data_group_df.iloc[0], rounding_precision
                 ).tolist()

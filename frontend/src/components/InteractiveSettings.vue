@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { IndexLabelInterface } from '@/helpers/helpers'
 import { useMainStore } from '@stores/mainStore'
-import { computed } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
+import Multiselect from 'vue-multiselect'
 
 const mainStore = useMainStore()
 
@@ -49,31 +51,46 @@ async function updateAttributesClusterByCollections(event: Event) {
   mainStore.setIsOutOfSync(true)
 }
 
-const hierarchicalColumnsMetadataRowIndexes = computed({
-  get() {
-    return mainStore.getHierarchicalColumnsMetadataRowIndexes.map((item) => item)
-  },
-  set(selectedOptions) {
-    const selectedIndexes = selectedOptions.map((item) => item.index)
-    mainStore.getHierarchicalColumnsMetadataRowIndexes.forEach((item) => {
-      item.selected = selectedIndexes.includes(item.index)
-    })
-    mainStore.setIsOutOfSync(true)
-  },
-})
+const selectedHierarchicalRowsMetadataColumnNames = ref<IndexLabelInterface[]>(
+  mainStore.getHierarchicalRowsMetadataColumnNames.filter((item) => item.selected),
+)
+const selectedHierarchicalColumnsMetadataRowIndexes = ref<IndexLabelInterface[]>(
+  mainStore.getHierarchicalColumnsMetadataRowIndexes.filter((item) => item.selected),
+)
 
-const hierarchicalRowsMetadataColumnNames = computed({
-  get() {
-    return mainStore.getHierarchicalRowsMetadataColumnNames.map((item) => item)
+function updateHierarchicalRowsMetadataColumnNames(option: IndexLabelInterface, id: number) {
+  mainStore.getHierarchicalRowsMetadataColumnNames.forEach((item) => {
+    item.selected = selectedHierarchicalRowsMetadataColumnNames.value.includes(item)
+  })
+  mainStore.getHierarchicalRowsMetadataColumnNames.sort(
+    (a, b) =>
+      selectedHierarchicalRowsMetadataColumnNames.value.indexOf(a) -
+      selectedHierarchicalRowsMetadataColumnNames.value.indexOf(b),
+  )
+  mainStore.setIsOutOfSync(true)
+}
+
+function updateHierarchicalColumnsMetadataRowIndexes(option: IndexLabelInterface, id: number) {
+  mainStore.getHierarchicalColumnsMetadataRowIndexes.forEach((item) => {
+    item.selected = selectedHierarchicalColumnsMetadataRowIndexes.value.includes(item)
+  })
+  mainStore.getHierarchicalColumnsMetadataRowIndexes.sort(
+    (a, b) =>
+      selectedHierarchicalColumnsMetadataRowIndexes.value.indexOf(a) -
+      selectedHierarchicalColumnsMetadataRowIndexes.value.indexOf(b),
+  )
+  mainStore.setIsOutOfSync(true)
+}
+
+watch(
+  () => mainStore.getDataChanging,
+  () => {
+    selectedHierarchicalRowsMetadataColumnNames.value =
+      mainStore.getHierarchicalRowsMetadataColumnNames.filter((item) => item.selected)
+    selectedHierarchicalColumnsMetadataRowIndexes.value =
+      mainStore.getHierarchicalColumnsMetadataRowIndexes.filter((item) => item.selected)
   },
-  set(selectedOptions) {
-    const selectedIndexes = selectedOptions.map((item) => item.index)
-    mainStore.getHierarchicalRowsMetadataColumnNames.forEach((item) => {
-      item.selected = selectedIndexes.includes(item.index)
-    })
-    mainStore.setIsOutOfSync(true)
-  },
-})
+)
 </script>
 
 <template>
@@ -94,20 +111,21 @@ const hierarchicalRowsMetadataColumnNames = computed({
       )
       <span v-if="mainStore.getActiveDataTable?.clusterItemsByCollections">
         by
-        <select
-          multiple
-          v-model="hierarchicalRowsMetadataColumnNames"
-          class="select select-bordered select-xs w-min mx-1"
+
+        <multiselect
+          class="inline-block w-64 mx-2 align-middle"
+          v-model="selectedHierarchicalRowsMetadataColumnNames"
+          :options="mainStore.getHierarchicalRowsMetadataColumnNames"
+          track-by="index"
+          :show-labels="false"
+          :multiple="true"
+          label="label"
+          :searchable="false"
+          :close-on-select="true"
+          @select="updateHierarchicalRowsMetadataColumnNames"
+          @remove="updateHierarchicalRowsMetadataColumnNames"
         >
-          <option
-            v-for="option in mainStore.getHierarchicalRowsMetadataColumnNames"
-            :key="option.index"
-            :value="option"
-            :selected="option.selected"
-          >
-            {{ option.label }}
-          </option>
-        </select>
+        </multiselect>
       </span>
       and recursively clustered using the k-means algorithm with
       <select
@@ -150,21 +168,20 @@ const hierarchicalRowsMetadataColumnNames = computed({
       />
       )
       <span v-if="mainStore.getActiveDataTable?.clusterAttributesByCollections"> by </span>
-      <select
-        multiple
-        v-model="hierarchicalColumnsMetadataRowIndexes"
-        class="select select-bordered select-xs w-min mx-1"
+      <multiselect
+        class="inline-block w-64 mx-2 align-middle"
+        v-model="selectedHierarchicalColumnsMetadataRowIndexes"
+        :options="mainStore.getHierarchicalColumnsMetadataRowIndexes"
+        track-by="index"
+        :show-labels="false"
+        :multiple="true"
+        label="label"
+        :searchable="false"
+        :close-on-select="true"
+        @select="updateHierarchicalColumnsMetadataRowIndexes"
+        @remove="updateHierarchicalColumnsMetadataRowIndexes"
       >
-        <option
-          v-for="option in mainStore.getHierarchicalColumnsMetadataRowIndexes"
-          :key="option.index"
-          :value="option"
-          :selected="option.selected"
-        >
-          {{ option.label }}
-        </option>
-      </select>
-      .
+      </multiselect>
       <!-- TODO: here I could add the k-means attribute clustering parameter. for now I "disabled" it by settings the parameter to -1 -->
     </p>
   </div>

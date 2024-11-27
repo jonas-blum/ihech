@@ -99,7 +99,6 @@ def create_heatmap(
 ) -> HeatmapJSON:
     logger.info("Starting Filtering...")
     start_filtering = start_heatmap
-    print("original_df", original_df.head())
 
     empty_col_index = original_df.columns[original_df.isnull().all()].tolist()
     if empty_col_index:
@@ -267,13 +266,6 @@ def create_heatmap(
 
     rotated_column_names_df = pd.DataFrame(raw_data_df.columns)
 
-    print("raw_data_df\n", raw_data_df)
-    print("scaled_raw_data_df\n", scaled_raw_data_df)
-    print("dim_red_df\n", dim_red_df)
-    print("item_names_df\n", item_names_df)
-    print("hierarchical_rows_metadata_df\n", hierarchical_rows_metadata_df)
-    print("hierarchical_columns_metadata_df\n", hierarchical_columns_metadata_df)
-
     item_names_and_data = cluster_items_recursively(
         raw_data_df,
         hierarchical_rows_metadata_df,
@@ -296,13 +288,6 @@ def create_heatmap(
     )
     logger.info("Starting clustering attributes...")
     start_clustering_attributes = time.perf_counter()
-
-    print("rotated_scaled_raw_data_df\n", rotated_scaled_raw_data_df)
-    print(
-        "rotated_hierarchical_columns_metadata_df\n",
-        rotated_hierarchical_columns_metadata_df,
-    )
-    print("rotated_column_names_df\n", rotated_column_names_df)
 
     hierarchical_attributes = cluster_attributes_recursively(
         rotated_raw_data_df,

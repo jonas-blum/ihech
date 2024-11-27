@@ -107,7 +107,6 @@ def cluster_attributes_recursively(
     if cluster_by_collections and len(hierarchical_column_metadata_row_indexes) > 0:
         new_collection_hierarchical_attributes: List[Tuple[ItemNameAndData, float]] = []
         collection_row_index = hierarchical_column_metadata_row_indexes[0]
-        print("collection_row_index", collection_row_index)
 
         for (
             collection,

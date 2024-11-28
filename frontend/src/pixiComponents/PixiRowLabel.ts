@@ -30,9 +30,9 @@ export class PixiRowLabel extends PixiContainer {
 
     const width = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
     const separatorLine = new Graphics()
-      .lineTo(width - heatmapLayoutStore.rowLabelTextPaddingLeft, 0)
+      .lineTo(width, 0)
       .stroke({ width: 1, color: heatmapLayoutStore.labelBackgroundColor })
-    separatorLine.x = heatmapLayoutStore.rowLabelTextPaddingLeft
+    // separatorLine.x = heatmapLayoutStore.rowLabelTextPaddingLeft
     separatorLine.y = heatmapLayoutStore.rowHeight - 1
     this.addChild(separatorLine)
 
@@ -80,7 +80,7 @@ export class PixiRowLabel extends PixiContainer {
   updatePosition(animate: boolean = true) {
     const heatmapLayoutStore = useHeatmapLayoutStore()
     this.x = this.row.depth * heatmapLayoutStore.rowLabelDepthIndent
-    this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth)
+    // this.setBackgroundWidth(heatmapLayoutStore.rowLabelWidth)
 
     const startPosition =
       this.row.oldPosition === -1 ? (this.row.parent?.position ?? 0) : this.row.oldPosition
@@ -118,6 +118,32 @@ export class PixiRowLabel extends PixiContainer {
   }
 }
 
+export class PixiAggregateRowLabel extends PixiRowLabel {
+  row: AggregateRow
+
+  constructor(row: AggregateRow) {
+    super(row)
+    this.row = row
+    this.createIcon()
+  }
+
+  createIcon(): void {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    this.icon = new Sprite(useTextureStore().chevronTexture)
+    this.icon.anchor.set(0.5)
+    this.icon.x = this.icon.width / 2
+    this.icon.y = heatmapLayoutStore.rowHeight / 2
+    this.addChild(this.icon)
+  }
+
+  updateIcon(animate: boolean = true): void {
+    gsap.to(this.icon, {
+      rotation: this.row.isOpen ? 0 : -Math.PI / 2,
+      duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+    })
+  }
+}
+
 export class PixiItemRowLabel extends PixiRowLabel {
   constructor(row: Row) {
     super(row)
@@ -129,7 +155,7 @@ export class PixiItemRowLabel extends PixiRowLabel {
     const heatmapLayoutStore = useHeatmapLayoutStore()
     this.icon = new Sprite(useTextureStore().circleTexture)
     this.icon.anchor.set(0.5)
-    this.icon.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
+    this.icon.x = this.icon.width / 2
     this.icon.y = heatmapLayoutStore.rowHeight / 2
     this.addChild(this.icon)
   }
@@ -145,35 +171,22 @@ export class PixiItemRowLabel extends PixiRowLabel {
   }
 }
 
-export class PixiAggregateRowLabel extends PixiRowLabel {
-  row: AggregateRow
-
-  constructor(row: AggregateRow) {
+// NOTE: this extends the PixiItemRowLabel
+export class PixiStickyRowLabel extends PixiItemRowLabel {
+  constructor(row: Row) {
     super(row)
-    this.row = row
     this.createIcon()
+    this.updateHighlightedDisplay(false)
   }
 
   createIcon(): void {
     const heatmapLayoutStore = useHeatmapLayoutStore()
-    this.icon = new Sprite(useTextureStore().chevronTexture)
+    this.icon = new Sprite(useTextureStore().starTexture) // TODO: change to sticky icon
     this.icon.anchor.set(0.5)
-    this.icon.x = -heatmapLayoutStore.rowLabelTextPaddingLeft
-    this.icon.y = heatmapLayoutStore.rowHeight / 2
+    this.icon.x = this.icon.width / 2
+    this.icon.y = heatmapLayoutStore.rowHeight / 2 - 1
     this.addChild(this.icon)
-  }
-
-  updateIcon(animate: boolean = true): void {
-    gsap.to(this.icon, {
-      rotation: this.row.isOpen ? 0 : -Math.PI / 2,
-      duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
-    })
-  }
-}
-
-export class PixiStickyRowLabel extends PixiRowLabel {
-  constructor(row: Row) {
-    super(row)
+    this.updateIcon()
   }
 
   updatePosition(animate?: boolean): void {
@@ -183,15 +196,5 @@ export class PixiStickyRowLabel extends PixiRowLabel {
 
   updateVisibility(): void {
     this.visible = true
-  }
-
-  updateIcon(): void {
-    // for now sticky rows do not have icons
-  }
-
-  updateHighlightedDisplay(highlighted: boolean): void {
-    super.updateHighlightedDisplay(highlighted)
-    // update opacity of the icon
-    this.icon.alpha = highlighted ? 1 : 0.5
   }
 }

@@ -12,7 +12,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     columnLabelPaddingBottom: 5, // prevent column labels from touching the cells
     columnLabelTextPaddingBottom: 5, // bottom padding of the column label text compared to the column label background
     rowLabelWidth: 200, // left margin until the columns start
-    rowLabelTextPaddingLeft: 5, // left padding of the row label text compared to the row label background
+    rowLabelTextPaddingLeft: 15, // left padding of the row label text compared to the row label background
     rowLabelPaddingRight: 5, // prevent row labels from touching the cells
     cellPadding: 1, // inset padding of the cells (will create a gap between cells)
     gapAfterStickyRows: 10, // gap between sticky rows and the rest of the heatmap rows

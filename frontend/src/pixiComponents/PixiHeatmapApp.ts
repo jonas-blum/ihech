@@ -82,5 +82,13 @@ export class PixiHeatmapApp extends Application {
     const circleGraphic = new Graphics()
     circleGraphic.circle(0, 0, 5).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
     textureStore.circleTexture = this.renderer.generateTexture(circleGraphic)
+  
+      // star texture
+    const starGraphic = new Graphics()
+    starGraphic.star(0, 0, 5, 6).fill(0xffffff)
+    textureStore.starTexture = this.renderer.generateTexture({
+      target: starGraphic,
+      resolution: 4,
+    })
   }
 }

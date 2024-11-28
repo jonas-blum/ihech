@@ -7,10 +7,11 @@ import { useMainStore } from '@stores/mainStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
 import { PixiHeatmapApp } from '@/pixiComponents/PixiHeatmapApp'
-import { PixiRow } from '@/pixiComponents/PixiRow'
-import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
-import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
-import { Row } from '@/classes/Row'
+import { PixiRow, PixiStickyRow, PixiItemRow, PixiAggregateRow } from '@/pixiComponents/PixiRow'
+import { PixiRowLabel, PixiStickyRowLabel, PixiItemRowLabel, PixiAggregateRowLabel } from '@/pixiComponents/PixiRowLabel'
+import { PixiColumnLabel, PixiAttributeColumnLabel, PixiAggregateColumnLabel } from '@/pixiComponents/PixiColumnLabel'
+import { AggregateRow, ItemRow, Row } from '@/classes/Row'
+import { AggregateColumn, AttributeColumn, Column } from '@/classes/Column'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
@@ -150,11 +151,11 @@ watch(
 
     // add new sticky rows
     stickyRowsToAdd?.forEach((row, index) => {
-      const pixiRow = new PixiRow(row, pixiHeatmapApp!.heatmapCellTexture, true) // create PixiRow with reference to the Row
+      const pixiRow = new PixiStickyRow(row as Row) // create PixiRow with reference to the Row
       row.stickyPixiRow = pixiRow // set the reference to the (sticky) PixiRow in the Row
       pixiHeatmapApp?.matrixTile.stickyRowsContainer.addRow(pixiRow) // adds the PixiRow to the PixiHeatmapApp.stickyRowsContainer
 
-      const pixiRowLabel = new PixiRowLabel(row, true) // create PixiRowLabel with reference to the Row
+      const pixiRowLabel = new PixiStickyRowLabel(row as Row) // create PixiRowLabel with reference to the Row
       row.stickyPixiRowLabel = pixiRowLabel // set the reference to the (sticky) PixiRowLabel in the Row
       pixiHeatmapApp?.rowLabelTile.stickyRowLabelsContainer.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmapApp.stickyRowLabelsContainer
     })
@@ -329,7 +330,7 @@ function init() {
   }
 
   ensureRendererReady(() => {
-    pixiHeatmapApp?.generateHeatmapCellTexture()
+    pixiHeatmapApp?.generateTextures()
   })
 }
 
@@ -354,14 +355,29 @@ function update() {
     }
 
     for (let row of rows) {
-      let pixiRow = new PixiRow(row, pixiHeatmapApp.heatmapCellTexture)
-      row.pixiRow = pixiRow
-      pixiRow.updatePosition()
-      pixiHeatmapApp.matrixTile.rowsContainer.addRow(pixiRow)
+      let pixiRow: PixiRow | null = null
+      if (row instanceof ItemRow) {
+        pixiRow = new PixiItemRow(row)
+      } else if (row instanceof AggregateRow) {
+        pixiRow = new PixiAggregateRow(row)
+      } 
+      
+      if (pixiRow) {
+        row.pixiRow = pixiRow
+        pixiRow.updatePosition()
+        pixiHeatmapApp.matrixTile.rowsContainer.addRow(pixiRow)
 
-      let pixiRowLabel = new PixiRowLabel(row)
-      row.pixiRowLabel = pixiRowLabel
-      pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel)
+        let pixiRowLabel: PixiRowLabel | null = null
+        if (row instanceof ItemRow) {
+          pixiRowLabel = new PixiItemRowLabel(row)
+        } else if (row instanceof AggregateRow) {
+          pixiRowLabel = new PixiAggregateRowLabel(row)
+        }
+        row.pixiRowLabel = pixiRowLabel
+        if (pixiRowLabel) {
+          pixiHeatmapApp.rowLabelTile.rowLabelsContainer.addRowLabel(pixiRowLabel)
+        }
+      }
     }
 
     let columns = mainStore.attributeTree?.columnsAsArray
@@ -371,9 +387,16 @@ function update() {
     }
 
     for (let column of columns) {
-      let pixiColumnLabel = new PixiColumnLabel(column)
+      let pixiColumnLabel: PixiColumnLabel | null = null
+      if (column instanceof AggregateColumn) {
+        pixiColumnLabel = new PixiAggregateColumnLabel(column)
+      } else if (column instanceof AttributeColumn) {
+        pixiColumnLabel = new PixiAttributeColumnLabel(column)
+      }
       column.pixiColumnLabel = pixiColumnLabel
-      pixiHeatmapApp.columnLabelTile.columnLabelsContainer.addColumnLabel(pixiColumnLabel)
+      if (pixiColumnLabel) {
+        pixiHeatmapApp.columnLabelTile.columnLabelsContainer.addColumnLabel(pixiColumnLabel)
+      }
     }
 
     pixiHeatmapApp.matrixTile.updateHorizontalPosition()
@@ -469,7 +492,8 @@ onMounted(async () => {
     <RowSorterSettings
       class="absolute"
       :style="{
-        top: `${heatmapLayoutStore.rowLabelsTileFrame.y + heatmapLayoutStore.requiredHeightOfStickyRows + 2}px`,
+        // top: `${heatmapLayoutStore.rowLabelsTileFrame.y + heatmapLayoutStore.requiredHeightOfStickyRows + 2}px`,
+        top: `${heatmapLayoutStore.rowLabelsTileFrame.y - 22}px`,
         left: `${heatmapLayoutStore.rowLabelWidth - 0}px`,
       }"
     />
@@ -477,7 +501,7 @@ onMounted(async () => {
       class="absolute"
       :style="{
         top: `${heatmapLayoutStore.tileMargin}px`,
-        left: `${heatmapLayoutStore.columnLabelsTileFrame.x + 7}px`,
+        left: `${heatmapLayoutStore.columnLabelsTileFrame.x - 20}px`,
       }"
     />
     <ColorMap

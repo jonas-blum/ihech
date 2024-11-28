@@ -6,40 +6,44 @@ import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { useTextureStore } from '@/stores/textureStore'
 import { gsap } from 'gsap'
 
 export class PixiRow extends PixiContainer {
-  public isSticky: boolean // true for sticky rows
   public row: Row // reference to data structure Row
   public mainStore: ReturnType<typeof useMainStore>
   public heatmapLayoutStore: ReturnType<typeof useHeatmapLayoutStore>
+  public textureStore: ReturnType<typeof useTextureStore>
   public cellsCreated: boolean = false
-  public cellTexture: Texture
 
-  constructor(row: Row, cellTexture: Texture, isSticky: boolean = false) {
+  constructor(row: Row) {
     super()
     this.row = row
-    this.isSticky = isSticky
-    this.cellTexture = cellTexture
-    // this.cullable = true
 
     this.heatmapLayoutStore = useHeatmapLayoutStore()
     this.mainStore = useMainStore()
-
-    // WIP: experimenting with lazy loading
-    // this.createCells()
+    this.textureStore = useTextureStore()
 
     // this.updatePosition()
     this.updateVisibility()
     this.updateCellPositions(false)
   }
 
-  createCells() {
+  createCellsIfNotExisting() {
+    if (this.cellsCreated) {
+      return
+    }
+
     // create all the cells for the row
     for (let i = 0; i < this.row.data.length; i++) {
       const value = this.row.data[i]
       const adjustedValue = this.row.dataAdjusted[i]
-      const cell = new PixiHeatmapCell(this.cellTexture, value, adjustedValue, i)
+      const cell = new PixiHeatmapCell(
+        this.textureStore.heatmapCellTexture as Texture,
+        value,
+        adjustedValue,
+        i,
+      )
       this.addChild(cell)
     }
 
@@ -47,6 +51,8 @@ export class PixiRow extends PixiContainer {
     if (this.parent) {
       this.parent.setChildIndex(this, this.parent.children.length - 1)
     }
+
+    this.cellsCreated = true
   }
 
   destroyCells() {
@@ -75,22 +81,12 @@ export class PixiRow extends PixiContainer {
   }
 
   updateCellPositions(animate: boolean = true) {
-    // only proceed if the row is visible (or sticky); otherwise we can skip
-    if (!this.row.heatmapVisibility && !this.isSticky) {
-      return
-    }
-
-    // create cells if they don't exist yet
-    if (!this.cellsCreated) {
-      this.createCells()
-      this.cellsCreated = true
-    }
+    this.createCellsIfNotExisting()
 
     for (let i = 0; i < this.children.length; i++) {
       const cell = this.children[i] as Container
-      // console.log('cell', cell)
 
-      // lookup the position of the column
+      // get the column object from the index
       const column = this.mainStore?.attributeTree?.originalIndexToColumn.get(i)
       if (column?.heatmapVisibility == false) {
         cell.visible = false
@@ -134,11 +130,6 @@ export class PixiRow extends PixiContainer {
   }
 
   updateVisibility() {
-    if (this.isSticky) {
-      this.visible = true
-      return
-    }
-
     this.visible = this.row.heatmapVisibility
   }
 
@@ -151,5 +142,43 @@ export class PixiRow extends PixiContainer {
     // this.filters = highlighted ? [new OutlineFilter()] : []
     // this.filters = highlighted ? [new DropShadowFilter()] : []
     this.filters = highlighted ? [new GlowFilter()] : []
+  }
+}
+
+export class PixiItemRow extends PixiRow {
+  constructor(row: Row) {
+    super(row)
+  }
+
+  updateCellPositions(animate: boolean = true) {
+    if (!this.row.heatmapVisibility) {
+      return
+    }
+
+    super.updateCellPositions(animate)
+  }
+}
+
+export class PixiAggregateRow extends PixiRow {
+  constructor(row: Row) {
+    super(row)
+  }
+
+  updateCellPositions(animate: boolean = true) {
+    if (!this.row.heatmapVisibility) {
+      return
+    }
+
+    super.updateCellPositions(animate)
+  }
+}
+
+export class PixiStickyRow extends PixiRow {
+  constructor(row: Row) {
+    super(row)
+  }
+
+  updateVisibility() {
+    this.visible = true
   }
 }

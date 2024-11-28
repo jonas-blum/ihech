@@ -1,4 +1,4 @@
-import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
+import { Row, AggregateRow, ItemRow } from '@/classes/Row'
 import { useMainStore } from '@/stores/mainStore'
 
 export class RowSorter {

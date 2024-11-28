@@ -14,9 +14,9 @@ import {
   type HierarchicalAttribute,
 } from '@/helpers/helpers'
 import { ItemTree } from '@/classes/ItemTree'
-import { Row, AggregatedRow, ItemRow } from '@/classes/Row'
+import { Row, AggregateRow, ItemRow } from '@/classes/Row'
 import { AttributeTree } from '@/classes/AttributeTree'
-import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
+import { Column, AggregateColumn, AttributeColumn } from '@/classes/Column'
 import {
   RowSorter,
   RowSorterCriterion,
@@ -730,7 +730,7 @@ export const useMainStore = defineStore('mainStore', {
 
     handleRowClick(row: Row) {
       console.log('handleRowClick', row)
-      if (row instanceof AggregatedRow) {
+      if (row instanceof AggregateRow) {
         this.itemTree?.toggleRowExpansion(row)
       } else if (row instanceof ItemRow) {
         this.itemTree?.toggleStickyRow(row)
@@ -769,7 +769,7 @@ export const useMainStore = defineStore('mainStore', {
     columnLabelClickEvent(column: Column) {
       console.log('clicked the label of', column)
 
-      if (column instanceof AggregatedColumn) {
+      if (column instanceof AggregateColumn) {
         this.attributeTree?.toggleColumnExpansion(column)
       }
     },

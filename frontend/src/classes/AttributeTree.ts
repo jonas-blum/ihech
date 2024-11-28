@@ -1,11 +1,11 @@
-import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
+import { Column, AggregateColumn, AttributeColumn } from '@/classes/Column'
 import type { ColumnSorter } from '@/classes/ColumnSorter'
 import type { HierarchicalAttribute } from '@/helpers/helpers'
 import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 
 export class AttributeTree {
-  root: AggregatedColumn
+  root: AggregateColumn
   columnSorter: ColumnSorter
   // this mapping will allow the rows to do a O(1) lookup of the updated cell position
   // TODO: this mapping is updated every time the columns are reordered (??? necessary ???)
@@ -21,7 +21,7 @@ export class AttributeTree {
     attributeDissimilarities: number[],
     columnSorter: ColumnSorter,
   ) {
-    this.root = this.buildAttributeTree(hierarchicalAttribute) as AggregatedColumn
+    this.root = this.buildAttributeTree(hierarchicalAttribute) as AggregateColumn
     this.columnSorter = columnSorter
     this.sort()
     this.columnsAsArray = this.getAllColumns()
@@ -34,7 +34,7 @@ export class AttributeTree {
     let column: Column
 
     if (hierarchicalAttribute.children) {
-      column = new AggregatedColumn(
+      column = new AggregateColumn(
         hierarchicalAttribute.attributeName,
         hierarchicalAttribute.dataAttributeIndex,
         hierarchicalAttribute.std,
@@ -45,7 +45,7 @@ export class AttributeTree {
       const children = hierarchicalAttribute.children.map((child: HierarchicalAttribute) =>
         this.buildAttributeTree(child, column),
       )
-      // @ts-ignore - we can be sure that row is an AggregatedRow here and has a children property
+      // @ts-ignore - we can be sure that row is an AggregateRow here and has a children property
       column.children = children
     } else {
       column = new AttributeColumn(
@@ -60,7 +60,7 @@ export class AttributeTree {
     return column
   }
 
-  toggleColumnExpansion(column: AggregatedColumn) {
+  toggleColumnExpansion(column: AggregateColumn) {
     if (column.isOpen) {
       this.closeColumn(column)
     } else {
@@ -69,7 +69,7 @@ export class AttributeTree {
     useMainStore().updateCellPositionsOfCurrentlyDisplayedRows()
   }
 
-  expandColumn(column: AggregatedColumn) {
+  expandColumn(column: AggregateColumn) {
     column.open()
     this.updatePositionsAndDepth()
 
@@ -81,7 +81,7 @@ export class AttributeTree {
     this.updateHeatmapVisibilityOfColumns()
   }
 
-  closeColumn(column: AggregatedColumn) {
+  closeColumn(column: AggregateColumn) {
     column.close()
     this.updatePositionsAndDepth()
 
@@ -119,7 +119,7 @@ export class AttributeTree {
       position++
 
       // Start traversal of the children if the current column is an aggregated column and is open
-      if (pointer instanceof AggregatedColumn && pointer.isOpen && pointer.hasChildren()) {
+      if (pointer instanceof AggregateColumn && pointer.isOpen && pointer.hasChildren()) {
         pointer = pointer.findFirstChild()
         depth++
       } else {
@@ -156,7 +156,7 @@ export class AttributeTree {
       columns.push(pointer)
 
       // Traverse to the first child if there is one
-      if (pointer instanceof AggregatedColumn && pointer.hasChildren()) {
+      if (pointer instanceof AggregateColumn && pointer.hasChildren()) {
         pointer = pointer.findFirstChild()
       } else {
         // Move to the next sibling if possible
@@ -181,7 +181,7 @@ export class AttributeTree {
       columns.push(pointer)
 
       // Start traversal of the children if the current column is an aggregated column and is open
-      if (pointer instanceof AggregatedColumn && pointer.isOpen && pointer.hasChildren()) {
+      if (pointer instanceof AggregateColumn && pointer.isOpen && pointer.hasChildren()) {
         pointer = pointer.findFirstChild()
       } else {
         // Traverse to the next sibling, or backtrack to the parent if no siblings are available
@@ -202,7 +202,7 @@ export class AttributeTree {
 
   // NOTE: should only be called when the columnSorter changed! for other operations, the updatePositionsAndDepth method should be used
   // apply the columnSorter to all columns on the same depth level
-  sort(parent: AggregatedColumn = this.root) {
+  sort(parent: AggregateColumn = this.root) {
     if (!parent.hasChildren()) {
       return
     }
@@ -218,9 +218,9 @@ export class AttributeTree {
       child.prevSibling = i > 0 ? childrenSorted[i - 1] : null
       child.nextSibling = i < childrenSorted.length - 1 ? childrenSorted[i + 1] : null
 
-      // Recursively sort children if they are AggregatedColumns
-      if (child instanceof AggregatedColumn) {
-        this.sort(child as AggregatedColumn)
+      // Recursively sort children if they are AggregateColumns
+      if (child instanceof AggregateColumn) {
+        this.sort(child as AggregateColumn)
       }
     }
   }
@@ -232,7 +232,7 @@ export class AttributeTree {
 
   expandAllColumns() {
     this.columnsAsArray.forEach((column) => {
-      if (column instanceof AggregatedColumn && !column.isOpen) {
+      if (column instanceof AggregateColumn && !column.isOpen) {
         this.expandColumn(column)
       }
     })

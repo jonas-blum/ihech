@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { useMainStore } from '@/stores/mainStore'
-import { set } from '@vueuse/core'
+import { Texture } from 'pixi.js'
 
 export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
   state: () => ({
@@ -10,14 +10,14 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     columnWidth: 20, // width of a column in the heatmap
     columnLabelHeight: 200, // top margin until the rows start
     columnLabelPaddingBottom: 5, // prevent column labels from touching the cells
-    columnLabelTextPaddingBottom: 5, // bottom padding of the column label text compared to the column label background
+    columnLabelTextPaddingTop: 15, // bottom padding of the column label text compared to the column label background
     rowLabelWidth: 200, // left margin until the columns start
-    rowLabelTextPaddingLeft: 5, // left padding of the row label text compared to the row label background
+    rowLabelTextPaddingLeft: 15, // left padding of the row label text compared to the row label background
     rowLabelPaddingRight: 5, // prevent row labels from touching the cells
     cellPadding: 1, // inset padding of the cells (will create a gap between cells)
     gapAfterStickyRows: 10, // gap between sticky rows and the rest of the heatmap rows
-    rowLabelDepthIndent: 10, // indent for each depth level in the row labels
-    columnLabelDepthIndent: 10, // indent for each depth level in the row labels
+    rowLabelDepthIndent: 15, // indent for each depth level in the row labels
+    columnLabelDepthIndent: 15, // indent for each depth level in the row labels
     heatmapLeftMargin: 5, // prevent the heatmap from touching the left border
     heatmapRightMargin: 5, // prevent the heatmap from touching the right border
     heatmapTopMargin: 5, // prevent the heatmap from touching the top border
@@ -38,6 +38,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     labelBackgroundColor: 0xeeeeee, // background color of the row labels
     scrollbarBackgroundColor: 0xf0ece1, // background color of the scrollbar
     scrollbarThumbColor: 0x000000, // color of the scrollbar thumb
+    chevronColor: 0x000000, // color of the chevrons
   }),
   getters: {
     // canvas width without the left and right margins

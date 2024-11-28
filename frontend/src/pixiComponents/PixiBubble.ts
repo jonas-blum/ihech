@@ -7,19 +7,21 @@ import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 import { gsap } from 'gsap'
+import { useTextureStore } from '@/stores/textureStore'
 
 export class PixiBubble extends Container {
   public row: Row // reference to data structure Row
   public bubbleGraphic: Sprite = new Sprite()
 
-  constructor(row: Row, texture: Texture, stickyBubbleTexture: Texture) {
+  constructor(row: Row) {
     super()
     this.row = row
 
     const mainStore = useMainStore()
+    const textureStore = useTextureStore()
 
     this.addChild(this.bubbleGraphic)
-    this.changeTexture(texture)
+    this.changeTexture(textureStore.bubbleTexture as Texture)
     this.updateTint(this.row.getColor())
     this.updateOpacity(0.5)
     this.updatePositionAndVisibility(false)

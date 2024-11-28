@@ -8,8 +8,17 @@ import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
 
 import { PixiHeatmapApp } from '@/pixiComponents/PixiHeatmapApp'
 import { PixiRow, PixiStickyRow, PixiItemRow, PixiAggregateRow } from '@/pixiComponents/PixiRow'
-import { PixiRowLabel, PixiStickyRowLabel, PixiItemRowLabel, PixiAggregateRowLabel } from '@/pixiComponents/PixiRowLabel'
-import { PixiColumnLabel, PixiAttributeColumnLabel, PixiAggregateColumnLabel } from '@/pixiComponents/PixiColumnLabel'
+import {
+  PixiRowLabel,
+  PixiStickyRowLabel,
+  PixiItemRowLabel,
+  PixiAggregateRowLabel,
+} from '@/pixiComponents/PixiRowLabel'
+import {
+  PixiColumnLabel,
+  PixiAttributeColumnLabel,
+  PixiAggregateColumnLabel,
+} from '@/pixiComponents/PixiColumnLabel'
 import { AggregateRow, ItemRow, Row } from '@/classes/Row'
 import { AggregateColumn, AttributeColumn, Column } from '@/classes/Column'
 import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
@@ -360,8 +369,8 @@ function update() {
         pixiRow = new PixiItemRow(row)
       } else if (row instanceof AggregateRow) {
         pixiRow = new PixiAggregateRow(row)
-      } 
-      
+      }
+
       if (pixiRow) {
         row.pixiRow = pixiRow
         pixiRow.updatePosition()
@@ -426,8 +435,16 @@ function debug() {
 
   if (pixiHeatmapApp) {
     const debugTImer = performance.now()
-    // test if the updateMask functionalitiy of the PixiContainer is even working
-    clear()
+    pixiHeatmapApp.activateLoadingState()
+  }
+}
+
+function debug2() {
+  console.log('🐞', pixiHeatmapApp)
+
+  if (pixiHeatmapApp) {
+    const debugTImer = performance.now()
+    pixiHeatmapApp.deactivateLoadingState()
   }
 }
 
@@ -438,25 +455,24 @@ watch(
       // we are about to fetch new data, so this is a good time to clear the canvas
       // stop first, because we don't want to update the canvas while it is being cleared
       if (pixiHeatmapApp) {
+        // stop the auto-renderer (essentially freezes the canvas)
         pixiHeatmapApp.stop()
+        // activate loading state
+        pixiHeatmapApp?.activateLoadingState()
+        // render once more to display the loading state
+        pixiHeatmapApp?.render()
       }
+
       // now clear all kinds of PIXI stuff
       clear()
     } else {
       // we have new data, so we need to update the canvas
       update()
       pixiHeatmapApp?.start() // start again
+      pixiHeatmapApp?.deactivateLoadingState()
     }
   },
 )
-
-// watch(
-//   () => mainStore.getDataChanging,
-//   () => {
-//     clear()
-//     update()
-//   },
-// )
 
 onMounted(async () => {
   // window.addEventListener('resize', () => mainStore.changeHeatmap())
@@ -486,6 +502,7 @@ onMounted(async () => {
       </span> -->
 
     <button @click="debug" class="absolute z-[1000] btn btn-xs">Debug</button>
+    <button @click="debug2" class="absolute z-[1000] btn btn-xs" style="top: 2rem">Debug2</button>
 
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->

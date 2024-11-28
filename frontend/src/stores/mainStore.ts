@@ -304,9 +304,8 @@ export const useMainStore = defineStore('mainStore', {
           console.error('No active data table')
           return
         }
-
+        
         this.heatmap = receivedHeatmap
-
         console.log('Received heatmap:', this.heatmap)
 
         // initialize rowSorter

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from 'vue'
 import { useMouse } from '@vueuse/core'
+import { Texture } from 'pixi.js'
 
 import { useMainStore } from '@/stores/mainStore'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
@@ -104,11 +105,11 @@ watch(
     )
 
     stickyRowsToRemove?.forEach((row, index) => {
-      row.pixiBubble?.changeTexture(textureStore.bubbleTexture)
+      row.pixiBubble?.changeTexture(textureStore.bubbleTexture as Texture)
     })
 
     stickyRowsToAdd?.forEach((row, index) => {
-      row.pixiBubble?.changeTexture(textureStore.stickyBubbleTexture)
+      row.pixiBubble?.changeTexture(textureStore.stickyBubbleTexture as Texture)
     })
   },
 )
@@ -170,7 +171,7 @@ function update() {
 
     for (let row of rows) {
       let pixiBubble = new PixiBubble(
-        row,
+        row as Row,
       ) // create PixiBubble with reference to the Row
       row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
       pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp
@@ -196,7 +197,12 @@ watch(
       // we are about to fetch new data, so this is a good time to clear the canvas
       // stop first, because we don't want to update the canvas while it is being cleared
       if (pixiDimredApp && pixiDimredApp?.renderer) {
-        pixiDimredApp?.stop() 
+        // stop the auto-renderer (essentially freezes the canvas)
+        pixiDimredApp.stop()
+        // activate loading state
+        pixiDimredApp?.activateLoadingState()
+        // render once more to display the loading state
+        pixiDimredApp?.render()
       }
       // now clear all kinds of PIXI stuff
       clear()
@@ -205,17 +211,10 @@ watch(
       // we have new data, so we need to update the canvas
       update()
       pixiDimredApp?.start() // start again
+      pixiDimredApp?.deactivateLoadingState()
     }
   },
 )
-
-// watch(
-//   () => mainStore.getDataChanging,
-//   () => {
-//     clear()
-//     update()
-//   },
-// )
 
 onMounted(async () => {
   window.addEventListener('resize', () => mainStore.changeHeatmap())

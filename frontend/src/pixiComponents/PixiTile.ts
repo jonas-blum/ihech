@@ -1,4 +1,4 @@
-import { Graphics } from 'pixi.js'
+import { Graphics, BlurFilter } from 'pixi.js'
 import { DropShadowFilter } from 'pixi-filters'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
@@ -45,6 +45,20 @@ export class PixiTile extends PixiContainer {
         child.children[0].destroy({ children: true, texture: false, textureSource: false })
       }
     })
+  }
+
+  activateLoadingState() {
+    this.content.filters = [new BlurFilter()]
+    this.content.eventMode = 'none'
+    this.content.alpha = 0.5
+    console.log('🔴 activateLoadingState')
+  }
+
+  deactivateLoadingState() {
+    console.log('🟢 deactivateLoadingState')
+    this.content.filters = []
+    this.content.eventMode = 'static'
+    this.content.alpha = 1
   }
 }
 

@@ -49,6 +49,10 @@ export class PixiBubble extends Container {
   }
 
   changeTexture(texture: Texture) {
+    // NOTE: this is a quick fix to avoid errors when the data is updated
+    if (!this.bubbleGraphic.pivot) {
+      return
+    }
     this.bubbleGraphic.texture = texture
     this.bubbleGraphic.pivot = new Point(texture.width / 2, texture.height / 2)
   }

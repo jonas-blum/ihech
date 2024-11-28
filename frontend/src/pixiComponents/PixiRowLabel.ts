@@ -31,6 +31,7 @@ export class PixiRowLabel extends PixiContainer {
 
     // create the text for the row label
     this.text = new Text({
+      // TODO: text: `${row.name} Municipalities`,
       text: row.name,
       style: {
         fill: this.row.getColor(),

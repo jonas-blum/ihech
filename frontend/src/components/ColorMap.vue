@@ -32,7 +32,7 @@ const handleColorZeroChange = (event: Event) => {
 </script>
 
 <template>
-  <div class="dropdown w-full p-2 -translate-y-2 custom-shadow">
+  <div class="dropdown w-full p-2 -translate-y-2 custom-shadow bg-white">
     <!-- NOTE: use this to disable the box-shadow around the color legend -->
     <!-- <div class="dropdown w-full"> -->
     <!-- Button to toggle the dropdown -->

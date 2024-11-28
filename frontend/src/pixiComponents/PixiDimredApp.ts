@@ -50,6 +50,14 @@ export class PixiDimredApp extends Application {
     this.dimredTile.clear()
   }
 
+  activateLoadingState() {
+    this.dimredTile.activateLoadingState()
+  }
+
+  deactivateLoadingState() {
+    this.dimredTile.deactivateLoadingState()
+  }
+
   addBubble(bubble: PixiBubble) {
     this.bubbleContainer.addChild(bubble)
   }

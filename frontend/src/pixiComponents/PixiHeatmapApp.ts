@@ -45,6 +45,18 @@ export class PixiHeatmapApp extends Application {
     this.horizontalScrollbar.update()
   }
 
+  activateLoadingState() {
+    this.matrixTile.activateLoadingState()
+    this.rowLabelTile.activateLoadingState()
+    this.columnLabelTile.activateLoadingState()
+  }
+
+  deactivateLoadingState() {
+    this.matrixTile.deactivateLoadingState()
+    this.rowLabelTile.deactivateLoadingState()
+    this.columnLabelTile.deactivateLoadingState()
+  }
+
   clear() {
     // DOCS: https://pixijs.download/release/docs/app.Application.html#destroy
     this.rowLabelTile.clear()

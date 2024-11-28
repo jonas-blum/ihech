@@ -38,12 +38,9 @@ export class PixiColumnLabel extends PixiContainer {
     })
 
     // rotate and position text
-    this.text.x = (heatmapLayoutStore.columnWidth - this.text.height) / 2
-    this.text.rotation = -Math.PI / 2
-    this.text.y =
-      heatmapLayoutStore.columnLabelHeight -
-      heatmapLayoutStore.tilePadding -
-      heatmapLayoutStore.columnLabelTextPaddingBottom
+    this.text.rotation = Math.PI / 2
+    this.text.x = (heatmapLayoutStore.columnWidth - this.text.height) / 2 + this.text.height
+    this.text.y = heatmapLayoutStore.columnLabelTextPaddingTop
 
     this.addChild(this.text)
     // TODO: icons and other stuff can be added here
@@ -84,14 +81,9 @@ export class PixiColumnLabel extends PixiContainer {
       },
     )
 
+    // TODO: max Depth might not be needed
     const maxDepth = useMainStore()?.attributesMaxDepth ?? 0
-    // BIG TODO: I need to figure out how I want to align the hierarchical column labels
-    // this.y = this.column.depth * heatmapLayoutStore.columnLabelDepthIndent - maxDepth * heatmapLayoutStore.columnLabelDepthIndent
-    this.text.y =
-      heatmapLayoutStore.columnLabelHeight -
-      heatmapLayoutStore.tilePadding -
-      heatmapLayoutStore.columnLabelTextPaddingBottom -
-      (maxDepth - this.column.depth) * heatmapLayoutStore.columnLabelDepthIndent
+    this.y = this.column.depth * heatmapLayoutStore.columnLabelDepthIndent
   }
 
   updateVisibility() {
@@ -108,5 +100,17 @@ export class PixiColumnLabel extends PixiContainer {
     if (highlighted && this.parent) {
       this.parent.setChildIndex(this, this.parent.children.length - 1)
     }
+  }
+}
+
+export class PixiAggregateColumnLabel extends PixiColumnLabel {
+  constructor(column: Column) {
+    super(column)
+  }
+}
+
+export class PixiAttributeColumnLabel extends PixiColumnLabel {
+  constructor(column: Column) {
+    super(column)
   }
 }

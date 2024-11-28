@@ -10,7 +10,7 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     columnWidth: 20, // width of a column in the heatmap
     columnLabelHeight: 200, // top margin until the rows start
     columnLabelPaddingBottom: 5, // prevent column labels from touching the cells
-    columnLabelTextPaddingBottom: 5, // bottom padding of the column label text compared to the column label background
+    columnLabelTextPaddingTop: 15, // bottom padding of the column label text compared to the column label background
     rowLabelWidth: 200, // left margin until the columns start
     rowLabelTextPaddingLeft: 15, // left padding of the row label text compared to the row label background
     rowLabelPaddingRight: 5, // prevent row labels from touching the cells

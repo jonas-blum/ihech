@@ -16,7 +16,7 @@ import {
 import { ItemTree } from '@/classes/ItemTree'
 import { Row, AggregateRow, ItemRow } from '@/classes/Row'
 import { AttributeTree } from '@/classes/AttributeTree'
-import { Column, AggregatedColumn, AttributeColumn } from '@/classes/Column'
+import { Column, AggregateColumn, AttributeColumn } from '@/classes/Column'
 import {
   RowSorter,
   RowSorterCriterion,
@@ -760,7 +760,7 @@ export const useMainStore = defineStore('mainStore', {
     columnLabelClickEvent(column: Column) {
       console.log('clicked the label of', column)
 
-      if (column instanceof AggregatedColumn) {
+      if (column instanceof AggregateColumn) {
         this.attributeTree?.toggleColumnExpansion(column)
       }
     },

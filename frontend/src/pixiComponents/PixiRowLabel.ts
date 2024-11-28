@@ -18,16 +18,6 @@ export class PixiRowLabel extends PixiContainer {
 
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
-    // background box
-    // this.addBackground(heatmapLayoutStore.labelBackgroundColor)
-    // const backgroundWidth = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
-    // this.setBackgroundRect(
-    //   0,
-    //   heatmapLayoutStore.cellPadding,
-    //   backgroundWidth,
-    //   heatmapLayoutStore.rowHeight - 2 * heatmapLayoutStore.cellPadding,
-    // )
-
     const width = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
     const separatorLine = new Graphics()
       .lineTo(width, 0)

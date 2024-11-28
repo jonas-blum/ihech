@@ -71,7 +71,7 @@ export class AttributeColumn extends Column {
   }
 }
 
-export class AggregatedColumn extends Column {
+export class AggregateColumn extends Column {
   isOpen: boolean
   children: Column[] = []
 
@@ -120,7 +120,7 @@ export class AggregatedColumn extends Column {
     this.children.forEach((child) => {
       // set position to -1 to not render it anymore
       child.setPosition(-1)
-      if (child instanceof AggregatedColumn) {
+      if (child instanceof AggregateColumn) {
         child.close()
       }
     })

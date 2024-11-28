@@ -38,7 +38,7 @@ import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
 import { LinearColorMap } from '@/classes/LinearColorMap'
-import { nextTick, setDevtoolsHook } from 'vue'
+import { nextTick } from 'vue'
 
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
 export const useMainStore = defineStore('mainStore', {
@@ -99,7 +99,7 @@ export const useMainStore = defineStore('mainStore', {
         return this.hoveredPixiHeatmapCell.parent?.row as Row
       } else if (this.hoveredPixiBubble) {
         return (this.hoveredPixiBubble?.row as Row) ?? null
-      } 
+      }
       return null
     },
 
@@ -159,6 +159,11 @@ export const useMainStore = defineStore('mainStore', {
       }
       return state.heatmap.itemNamesAndData.slice(state.activeDataTable.stickyItemIndexes.length)
     },
+
+    getHierarchicalRowsMetadataColumnNames: (state) =>
+      state.activeDataTable?.hierarchicalRowsMetadataColumnNames ?? [],
+    getHierarchicalColumnsMetadataRowIndexes: (state) =>
+      state.activeDataTable?.hierarchicalColumnsMetadataRowIndexes ?? [],
 
     getAllItems: (state) => state.allItems,
 
@@ -449,17 +454,21 @@ export const useMainStore = defineStore('mainStore', {
       return {
         csvFile: this.activeDataTable.csvFile,
 
-        itemNamesColumnName: this.activeDataTable.itemNamesColumnName,
-        collectionColumnNames: this.activeDataTable.collectionColumnNames,
+        hierarchicalRowsMetadataColumnNames: this.getHierarchicalRowsMetadataColumnNames
+          .filter((i) => i.selected)
+          .map((i) => i.label),
+        hierarchicalColumnsMetadataRowIndexes: this.getHierarchicalColumnsMetadataRowIndexes
+          .filter((i) => i.selected)
+          .map((i) => i.index),
 
-        selectedItemIndexes: this.activeDataTable.selectedItemIndexes,
-        selectedAttributes: this.activeDataTable.selectedAttributes,
+        selectedItemsRowIndexes: this.activeDataTable.selectedItemIndexes,
+        selectedAttributesColumnNames: this.activeDataTable.selectedAttributes,
 
-        stickyAttributes: this.activeDataTable.stickyAttributes,
+        stickyAttributesColumnNames: this.activeDataTable.stickyAttributes,
         sortAttributesBasedOnStickyItems: this.activeDataTable.sortAttributesBasedOnStickyItems,
         sortOrderAttributes: this.activeDataTable.sortOrderAttributes,
 
-        stickyItemIndexes: this.activeDataTable.stickyItemIndexes,
+        stickyItemsRowIndexes: this.activeDataTable.stickyItemIndexes,
         clusterItemsBasedOnStickyAttributes:
           this.activeDataTable.clusterItemsBasedOnStickyAttributes,
 
@@ -518,7 +527,7 @@ export const useMainStore = defineStore('mainStore', {
       }
       const newSelectedItemIndexes: number[] = []
       if (
-        this.activeDataTable.collectionColumnNames.length === 0 ||
+        this.activeDataTable.hierarchicalRowsMetadataColumnNames.length === 0 ||
         this.activeDataTable.selectedFirstLayerCollections.length === 0
       ) {
         this.activeDataTable.df.forEach((row, index) => {
@@ -526,10 +535,10 @@ export const useMainStore = defineStore('mainStore', {
         })
       } else {
         const selectedCollections = this.activeDataTable.selectedFirstLayerCollections
-        const collectionColumnName = this.activeDataTable.collectionColumnNames[0]
+        const collectionColumnName = this.activeDataTable.hierarchicalRowsMetadataColumnNames[0]
 
         this.activeDataTable.df.forEach((row, index) => {
-          const rowCollection = row[collectionColumnName]
+          const rowCollection = row[collectionColumnName.label]
           if (selectedCollections.includes(rowCollection)) {
             newSelectedItemIndexes.push(index)
           }
@@ -609,7 +618,7 @@ export const useMainStore = defineStore('mainStore', {
         console.error('No active data table')
         return ['black']
       }
-      if (this.activeDataTable.collectionColumnNames.length === 0) {
+      if (this.activeDataTable.hierarchicalRowsMetadataColumnNames.length === 0) {
         let topMostParent = item
         while (topMostParent.parent !== null && topMostParent.parent.parent !== null) {
           topMostParent = topMostParent.parent

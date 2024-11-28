@@ -179,17 +179,17 @@ class HeatmapJSON:
 class HeatmapSettings:
     csvFile: str
 
-    itemNamesColumnName: str
-    collectionColumnNames: List[str]
+    hierarchicalRowsMetadataColumnNames: List[str]
+    hierarchicalColumnsMetadataRowIndexes: List[int]
 
-    selectedItemIndexes: List[str]
-    selectedAttributes: List[str]
+    selectedItemsRowIndexes: List[str]
+    selectedAttributesColumnNames: List[str]
 
-    stickyAttributes: List[str]
+    stickyAttributesColumnNames: List[str]
     sortAttributesBasedOnStickyItems: bool
     sortOrderAttributes: SortOrderAttributes
 
-    stickyItemIndexes: List[str]
+    stickyItemsRowIndexes: List[str]
     clusterItemsBasedOnStickyAttributes: bool
 
     clusterItemsByCollections: bool
@@ -205,17 +205,21 @@ class HeatmapSettings:
     def __init__(self, dict):
         self.csvFile = dict["csvFile"]
 
-        self.itemNamesColumnName = dict["itemNamesColumnName"]
-        self.collectionColumnNames = dict["collectionColumnNames"]
+        self.hierarchicalRowsMetadataColumnNames = dict[
+            "hierarchicalRowsMetadataColumnNames"
+        ]
+        self.hierarchicalColumnsMetadataRowIndexes = dict[
+            "hierarchicalColumnsMetadataRowIndexes"
+        ]
 
-        self.selectedItemIndexes = dict["selectedItemIndexes"]
-        self.selectedAttributes = dict["selectedAttributes"]
+        self.selectedItemsRowIndexes = dict["selectedItemsRowIndexes"]
+        self.selectedAttributesColumnNames = dict["selectedAttributesColumnNames"]
 
-        self.stickyAttributes = dict["stickyAttributes"]
+        self.stickyAttributesColumnNames = dict["stickyAttributesColumnNames"]
         self.sortAttributesBasedOnStickyItems = dict["sortAttributesBasedOnStickyItems"]
         self.sortOrderAttributes = dict["sortOrderAttributes"]
 
-        self.stickyItemIndexes = dict["stickyItemIndexes"]
+        self.stickyItemsRowIndexes = dict["stickyItemsRowIndexes"]
         self.clusterItemsBasedOnStickyAttributes = dict[
             "clusterItemsBasedOnStickyAttributes"
         ]

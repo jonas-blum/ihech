@@ -169,17 +169,17 @@ export interface HeatmapJSON {
 export interface HeatmapSettings {
   csvFile: string
 
-  itemNamesColumnName: string
-  collectionColumnNames: string[]
+  hierarchicalRowsMetadataColumnNames: string[]
+  hierarchicalColumnsMetadataRowIndexes: number[]
 
-  selectedItemIndexes: number[]
-  selectedAttributes: string[]
+  selectedItemsRowIndexes: number[]
+  selectedAttributesColumnNames: string[]
 
-  stickyAttributes: string[]
+  stickyAttributesColumnNames: string[]
   sortAttributesBasedOnStickyItems: boolean
   sortOrderAttributes: SortOrderAttributes
 
-  stickyItemIndexes: number[]
+  stickyItemsRowIndexes: number[]
   clusterItemsBasedOnStickyAttributes: boolean
 
   clusterItemsByCollections: boolean
@@ -193,12 +193,14 @@ export interface HeatmapSettings {
   scaling: ScalingEnum
 }
 
+export interface IndexLabelInterface {
+  index: number
+  label: string
+  selected: boolean
+}
 export interface CsvDataTableProfile {
   tableName: string | null
   df: dataForge.IDataFrame<any, any>
-
-  nanColumns: string[]
-  nonNanColumns: string[]
 
   collectionColorMap: Record<string, string>
   itemCollectionMap: Record<number, string>
@@ -213,7 +215,9 @@ export interface CsvDataTableProfile {
   csvFile: string
 
   itemNamesColumnName: string
-  collectionColumnNames: string[]
+
+  hierarchicalRowsMetadataColumnNames: IndexLabelInterface[]
+  hierarchicalColumnsMetadataRowIndexes: IndexLabelInterface[]
 
   selectedItemIndexes: number[]
   selectedAttributes: string[]

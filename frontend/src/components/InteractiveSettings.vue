@@ -1,20 +1,10 @@
 <script setup lang="ts">
+import type { IndexLabelInterface } from '@/helpers/helpers'
 import { useMainStore } from '@stores/mainStore'
-import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
-import { Icon } from '@iconify/vue'
+import { computed, ref, watch, watchEffect } from 'vue'
+import Multiselect from 'vue-multiselect'
 
 const mainStore = useMainStore()
-
-const itemGroupingOptions = [
-  { label: 'Kanton', value: 'kanton' },
-  { label: 'District', value: 'district' },
-  { label: 'Language Region', value: 'language' },
-]
-
-const attributeGroupingOptions = [
-  { label: 'Age Group', value: 'age' },
-  { label: '???', value: '???' },
-]
 
 const kOptions = [
   { label: 'k=2', value: 2 },
@@ -60,6 +50,47 @@ async function updateAttributesClusterByCollections(event: Event) {
   mainStore.setClusterAttributesByCollections(event.target.checked)
   mainStore.setIsOutOfSync(true)
 }
+
+const selectedHierarchicalRowsMetadataColumnNames = ref<IndexLabelInterface[]>(
+  mainStore.getHierarchicalRowsMetadataColumnNames.filter((item) => item.selected),
+)
+const selectedHierarchicalColumnsMetadataRowIndexes = ref<IndexLabelInterface[]>(
+  mainStore.getHierarchicalColumnsMetadataRowIndexes.filter((item) => item.selected),
+)
+
+function updateHierarchicalRowsMetadataColumnNames(option: IndexLabelInterface, id: number) {
+  mainStore.getHierarchicalRowsMetadataColumnNames.forEach((item) => {
+    item.selected = selectedHierarchicalRowsMetadataColumnNames.value.includes(item)
+  })
+  mainStore.getHierarchicalRowsMetadataColumnNames.sort(
+    (a, b) =>
+      selectedHierarchicalRowsMetadataColumnNames.value.indexOf(a) -
+      selectedHierarchicalRowsMetadataColumnNames.value.indexOf(b),
+  )
+  mainStore.setIsOutOfSync(true)
+}
+
+function updateHierarchicalColumnsMetadataRowIndexes(option: IndexLabelInterface, id: number) {
+  mainStore.getHierarchicalColumnsMetadataRowIndexes.forEach((item) => {
+    item.selected = selectedHierarchicalColumnsMetadataRowIndexes.value.includes(item)
+  })
+  mainStore.getHierarchicalColumnsMetadataRowIndexes.sort(
+    (a, b) =>
+      selectedHierarchicalColumnsMetadataRowIndexes.value.indexOf(a) -
+      selectedHierarchicalColumnsMetadataRowIndexes.value.indexOf(b),
+  )
+  mainStore.setIsOutOfSync(true)
+}
+
+watch(
+  () => mainStore.getDataChanging,
+  () => {
+    selectedHierarchicalRowsMetadataColumnNames.value =
+      mainStore.getHierarchicalRowsMetadataColumnNames.filter((item) => item.selected)
+    selectedHierarchicalColumnsMetadataRowIndexes.value =
+      mainStore.getHierarchicalColumnsMetadataRowIndexes.filter((item) => item.selected)
+  },
+)
 </script>
 
 <template>
@@ -80,11 +111,21 @@ async function updateAttributesClusterByCollections(event: Event) {
       )
       <span v-if="mainStore.getActiveDataTable?.clusterItemsByCollections">
         by
-        <select class="select select-bordered select-xs w-min mx-1">
-          <option v-for="option in itemGroupingOptions" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
+
+        <multiselect
+          class="inline-block w-64 mx-2 align-middle"
+          v-model="selectedHierarchicalRowsMetadataColumnNames"
+          :options="mainStore.getHierarchicalRowsMetadataColumnNames"
+          track-by="index"
+          :show-labels="false"
+          :multiple="true"
+          label="label"
+          :searchable="false"
+          :close-on-select="true"
+          @select="updateHierarchicalRowsMetadataColumnNames"
+          @remove="updateHierarchicalRowsMetadataColumnNames"
+        >
+        </multiselect>
       </span>
       and recursively clustered using the k-means algorithm with
       <select
@@ -126,15 +167,21 @@ async function updateAttributesClusterByCollections(event: Event) {
         :checked="mainStore.getActiveDataTable?.clusterAttributesByCollections"
       />
       )
-      <span v-if="mainStore.getActiveDataTable?.clusterAttributesByCollections">
-        by
-        <select class="select select-bordered select-xs w-min mx-1">
-          <option v-for="option in attributeGroupingOptions" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
-      </span>
-      .
+      <span v-if="mainStore.getActiveDataTable?.clusterAttributesByCollections"> by </span>
+      <multiselect
+        class="inline-block w-64 mx-2 align-middle"
+        v-model="selectedHierarchicalColumnsMetadataRowIndexes"
+        :options="mainStore.getHierarchicalColumnsMetadataRowIndexes"
+        track-by="index"
+        :show-labels="false"
+        :multiple="true"
+        label="label"
+        :searchable="false"
+        :close-on-select="true"
+        @select="updateHierarchicalColumnsMetadataRowIndexes"
+        @remove="updateHierarchicalColumnsMetadataRowIndexes"
+      >
+      </multiselect>
       <!-- TODO: here I could add the k-means attribute clustering parameter. for now I "disabled" it by settings the parameter to -1 -->
     </p>
   </div>

@@ -18,6 +18,7 @@ export class PixiRowLabel extends PixiContainer {
 
     const heatmapLayoutStore = useHeatmapLayoutStore()
 
+    // TODO: would a texture for the separator line be more efficient?
     const width = heatmapLayoutStore.rowLabelWidth - 2 * heatmapLayoutStore.tilePadding
     const separatorLine = new Graphics()
       .lineTo(width, 0)
@@ -44,9 +45,7 @@ export class PixiRowLabel extends PixiContainer {
       this.text.width,
       width - 2 * heatmapLayoutStore.rowLabelTextPaddingLeft,
     )
-
     this.addChild(this.text)
-    // TODO: icons and other stuff can be added here
 
     this.updatePosition()
 
@@ -102,10 +101,7 @@ export class PixiRowLabel extends PixiContainer {
   updateHighlightedDisplay(highlighted: boolean) {
     // make font bold of text object
     this.text.style.fontWeight = highlighted ? 'bold' : 'normal'
-
-    // make background of row label glow
-    // this.background!.filters = highlighted ? [new GlowFilter()] : []
-  }
+}
 }
 
 export class PixiAggregateRowLabel extends PixiRowLabel {
@@ -124,6 +120,7 @@ export class PixiAggregateRowLabel extends PixiRowLabel {
     this.icon.x = this.icon.width / 2
     this.icon.y = heatmapLayoutStore.rowHeight / 2
     this.addChild(this.icon)
+    this.updateIcon(false)
   }
 
   updateIcon(animate: boolean = true): void {

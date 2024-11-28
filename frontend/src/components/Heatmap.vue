@@ -25,6 +25,7 @@ import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
 import ColorMap from '@/components/ColorMap.vue'
+import { ColoringHeatmapEnum } from '@/helpers/helpers'
 
 const { x: mouseX, y: mouseY } = useMouse()
 
@@ -308,6 +309,15 @@ watch(
   },
 )
 
+// watch coloringHeatmap change
+watch(
+  () => mainStore.activeDataTable?.coloringHeatmap,
+  (newColoringHeatmap, oldColoringHeatmap) => {
+    // console.log('coloringHeatmap changed from', oldColoringHeatmap, 'to', newColoringHeatmap)
+    mainStore.itemTree?.computeAdjustedData()
+  },
+)
+
 function clear() {
   console.log('🧹 Heatmap.vue clear')
   const clearStart = performance.now()
@@ -501,8 +511,8 @@ onMounted(async () => {
         {{ heatmapLayoutStore.lastVisibleColumnIndex }}
       </span> -->
 
-    <button @click="debug" class="absolute z-[1000] btn btn-xs">Debug</button>
-    <button @click="debug2" class="absolute z-[1000] btn btn-xs" style="top: 2rem">Debug2</button>
+    <!-- <button @click="debug" class="absolute z-[1000] btn btn-xs">Debug</button>
+    <button @click="debug2" class="absolute z-[1000] btn btn-xs" style="top: 2rem">Debug2</button> -->
 
     <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
@@ -522,7 +532,6 @@ onMounted(async () => {
       }"
     />
     <ColorMap
-      :colorMap="mainStore.colorMap"
       class="absolute z-10 -translate-y-[100%]"
       :style="{
         top: `${heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin}px`,

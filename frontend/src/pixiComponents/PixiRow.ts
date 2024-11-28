@@ -124,6 +124,9 @@ export class PixiRow extends PixiContainer {
   updateCellColoring() {
     for (let i = 0; i < this.children.length; i++) {
       const cell = this.children[i] as PixiHeatmapCell
+      let prevValue = cell.adjustedValue
+      cell.adjustedValue = this.row.dataAdjusted[i]
+      // console.log('..updateCellColoring', prevValue, cell.adjustedValue)
       const color = this.mainStore?.colorMap?.getColor(cell.adjustedValue)
       cell.updateTint(color)
     }

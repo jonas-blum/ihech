@@ -37,7 +37,7 @@ import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
-import { LinearColorMap } from '@/classes/LinearColorMap'
+import { Breakpoint, ColorMap } from '@/classes/ColorMap'
 import { nextTick } from 'vue'
 
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
@@ -54,7 +54,7 @@ export const useMainStore = defineStore('mainStore', {
     hoveredPixiColumnLabel: null as PixiColumnLabel | null,
     hoveredPixiBubble: null as PixiBubble | null,
 
-    colorMap: new LinearColorMap(),
+    colorMap: new ColorMap(),
 
     heatmap: {
       attributeDissimilarities: [] as number[],
@@ -304,7 +304,7 @@ export const useMainStore = defineStore('mainStore', {
           console.error('No active data table')
           return
         }
-        
+
         this.heatmap = receivedHeatmap
         console.log('Received heatmap:', this.heatmap)
 
@@ -342,9 +342,19 @@ export const useMainStore = defineStore('mainStore', {
         this.attributeTree.calculateMaxDepth()
         console.log('AttributeTree:', this.attributeTree)
 
-        // update the colorMap
-        this.colorMap.setMin(this.heatmap.minHeatmapValue)
-        this.colorMap.setMax(this.heatmap.maxHeatmapValue)
+        // divergent color map
+        const b1 = new Breakpoint(0, 0xff0000)
+        const b2 = new Breakpoint(50, 0xffffff)
+        const b3 = new Breakpoint(100, 0x0000ff)
+        this.colorMap.addBreakpoint(b1)
+        this.colorMap.addBreakpoint(b2)
+        this.colorMap.addBreakpoint(b3)
+
+        // uniform color map
+        // const b1 = new Breakpoint(0, 0xffffff)
+        // const b2 = new Breakpoint(100, 0x000000)
+        // this.colorMap.addBreakpoint(b1)
+        // this.colorMap.addBreakpoint(b2)
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)

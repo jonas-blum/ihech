@@ -13,7 +13,7 @@ export abstract class Row {
   name: string
   totalChildrenCount: number // corresponds to the 'amountOfDataPoints' in the backend data
   data: number[]
-  dataAdjusted: number[]
+  dataAdjusted: number[] = []
   dimredPosition: DimredPosition
   parent: Row | null
   position: number = -1 // position in the list of rows; -1 if not visible
@@ -39,39 +39,38 @@ export abstract class Row {
     this.name = name
     this.totalChildrenCount = totalChildrenCount
     this.data = data
-    this.dataAdjusted = Row.computeAdjustedData(data)
+    this.computeAdjustedData()
     this.dimredPosition = dimredPosition
     this.parent = parent
   }
 
   abstract hasChildren(): boolean
 
-  static computeAdjustedData(data: number[]): number[] {
-    if (
-      useMainStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE
-    ) {
+  computeAdjustedData(): void {
+    const data = this.data
+    let dataAdjusted: number[] = []
+    if (useMainStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE) {
       const maxValue = Math.max(...data)
-      return data.map((value) => value / maxValue)
+      dataAdjusted = data.map((value) => value / maxValue)
     } else if (
-      useMainStore()?.getActiveDataTable?.coloringHeatmap ===
-      ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
+      useMainStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
     ) {
-      const adjustedData = []
       for (let i = 0; i < data.length; i++) {
         const minAttributeValue = useMainStore()?.getMinAttributeValues[i]
         const maxAttributeValue = useMainStore()?.getMaxAttributeValues[i]
         const difference =
           maxAttributeValue - minAttributeValue === 0 ? 1 : maxAttributeValue - minAttributeValue
-        adjustedData.push((data[i] - minAttributeValue) / difference)
+        dataAdjusted.push((data[i] - minAttributeValue) / difference)
       }
-      return adjustedData
     } else if (
       useMainStore()?.getActiveDataTable?.coloringHeatmap === ColoringHeatmapEnum.LOGARITHMIC
     ) {
-      return data.map((value) => Math.log(value + useMainStore()?.getLogShiftValue))
+      dataAdjusted = data.map((value) => Math.log(value + useMainStore()?.getLogShiftValue))
     } else {
-      return data
+      dataAdjusted = data
     }
+
+    this.dataAdjusted = dataAdjusted
   }
 
   setPosition(position: number) {

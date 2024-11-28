@@ -1,124 +1,124 @@
 <script setup lang="ts">
-import { defineProps, computed } from 'vue'
-import { LinearColorMap } from '@/classes/LinearColorMap'
+import { defineProps, computed, ref, watch } from 'vue'
+import { ColorMap, Breakpoint } from '@/classes/ColorMap'
+import { ColoringHeatmapEnum, mapColoringHeatmapEnum } from '@/helpers/helpers'
+import { useMainStore } from '@/stores/mainStore'
 
-interface Props {
-  colorMap: LinearColorMap
+const mainStore = useMainStore()
+
+// Compute the CSS gradient string based on the breakpoints of the color map
+const gradientStyle = ref('')
+
+const updateGradientStyle = () => {
+  const gradient = mainStore.colorMap.breakpoints
+    .map(
+      (breakpoint: Breakpoint) =>
+        `#${breakpoint.color.toString(16).padStart(6, '0')} ${breakpoint.value}%`,
+    )
+    .join(', ')
+  gradientStyle.value = `linear-gradient(to right, ${gradient})`
 }
 
-const props = defineProps<Props>()
+// Watch for changes in the colorMap breakpoints and update the gradient style
+watch(
+  () => mainStore.colorMap.breakpoints,
+  () => {
+    updateGradientStyle()
+  },
+  { deep: true, immediate: true },
+)
 
-// Compute the CSS gradient string based on the color map
-const gradientStyle = computed(() => {
-  const minColor = `#${props.colorMap.minColor.toString(16).padStart(6, '0')}`
-  const maxColor = `#${props.colorMap.maxColor.toString(16).padStart(6, '0')}`
-  return `linear-gradient(to right, ${minColor}, ${maxColor})`
-})
+const templateBreakpoint = ref(new Breakpoint(0, 0))
+const breakpointFormOpen = ref(false)
 
-const handleMinColorChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  props.colorMap.setMinColor(parseInt(target.value.replace('#', ''), 16))
+const toggleBreakpointForm = () => {
+  breakpointFormOpen.value = !breakpointFormOpen.value
 }
 
-const handleMaxColorChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  props.colorMap.setMaxColor(parseInt(target.value.replace('#', ''), 16))
-}
+const onCreateBreakpoint = () => {
+  const newBreakpoint = new Breakpoint(templateBreakpoint.value.value, templateBreakpoint.value.color)
+  mainStore.colorMap.addBreakpoint(newBreakpoint)
 
-const handleColorZeroChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  props.colorMap.setColorZero(parseInt(target.value.replace('#', ''), 16))
+  toggleBreakpointForm()
 }
 </script>
-
 <template>
-  <div class="dropdown w-full p-2 -translate-y-2 custom-shadow bg-white">
-    <!-- NOTE: use this to disable the box-shadow around the color legend -->
-    <!-- <div class="dropdown w-full"> -->
-    <!-- Button to toggle the dropdown -->
-    <div tabindex="0" class="w-full cursor-pointer" role="button">
-      <div class="w-full h-4" :style="{ background: gradientStyle }"></div>
-      <div class="w-full flex justify-between text-xs mt-1">
-        <span>{{ props.colorMap.min.toFixed(3) }}</span>
-        <span>{{ props.colorMap.max.toFixed(3) }}</span>
+  <details class="collapse w-full p-2 rounded-none custom-shadow bg-white -translate-y-2">
+    <summary class="collapse-title p-0 rounded-none h-[30px] min-h-[20px]">
+      <div class="w-full h-[20px]" :style="{ background: gradientStyle }"></div>
+      <div class="w-full flex justify-between text-xs">
+        <span>{{ mainStore.colorMap.getLowestBreakpoint()?.value ?? '' }}</span>
+        <span>{{ mainStore.colorMap.getHighestBreakpoint()?.value ?? '' }}</span>
       </div>
-    </div>
+    </summary>
 
     <!-- Dropdown content -->
     <div
-      tabindex="0"
-      class="dropdown-content bg-base-100 rounded-sm z-[1] w-full border p-2 shadow text-sm"
+      class="collapse-content rounded-sm w-full p-2 text-sm bg-white custom-shadow"
     >
-      <!-- Minimum settings -->
-      <div class="flex gap-2 items-center justify-between mb-2">
-        <p class="w-min">Minimum:</p>
+      <div
+        v-for="(breakpoint, index) in mainStore.colorMap.breakpoints"
+        :key="index"
+        class="flex gap-2 items-center justify-between mb-2"
+      >
         <input
           type="number"
           class="input input-bordered input-xs w-16"
-          :value="props.colorMap.min"
-          :max="props.colorMap.max - 1"
+          :value="breakpoint.value"
+          @click.stop
           @input="
             (payload: Event) =>
-              props.colorMap.setMin(Number((payload.target as HTMLInputElement).value))
+              breakpoint.setValue(parseInt((payload.target as HTMLInputElement).value))
           "
         />
         <input
           type="color"
-          id="minColor"
           class="w-8 h-[1rem]"
-          name="minColor"
-          :value="`#${props.colorMap.minColor.toString(16).padStart(6, '0')}`"
-          @input="handleMinColorChange"
+          :value="`#${breakpoint.color.toString(16).padStart(6, '0')}`"
+          @click.stop
+          @input="
+            (payload: Event) =>
+              breakpoint.setColor(parseInt((payload.target as HTMLInputElement).value.slice(1), 16))
+          "
         />
+        <button @click.stop="mainStore.colorMap.removeBreakpoint(breakpoint)" class="btn btn-xs">
+          Remove
+        </button>
       </div>
-
-      <!-- Maximum settings -->
-      <div class="flex gap-2 items-center justify-between mb-2">
-        <p class="w-min">Maximum:</p>
+      <button
+        v-if="!breakpointFormOpen"
+        @click.stop="toggleBreakpointForm"
+        class="btn btn-xs btn-block"
+      >
+        New Breakpoint
+      </button>
+      <div v-else class="flex gap-2 items-center justify-between mb-2">
         <input
           type="number"
           class="input input-bordered input-xs w-16"
-          :value="props.colorMap.max"
-          :min="props.colorMap.min + 1"
-          @input="
-            (payload: Event) =>
-              props.colorMap.setMax(Number((payload.target as HTMLInputElement).value))
-          "
+          v-model="templateBreakpoint.value"
+          @click.stop
         />
-        <input
-          type="color"
-          id="maxColor"
-          class="w-8 h-[1rem]"
-          name="maxColor"
-          :value="`#${props.colorMap.maxColor.toString(16).padStart(6, '0')}`"
-          @input="handleMaxColorChange"
-        />
+        <input type="color" class="w-8 h-[1rem]" v-model="templateBreakpoint.color" @click.stop />
+        <button @click.stop="onCreateBreakpoint" class="btn btn-xs">Create</button>
       </div>
 
-      <!-- Zero special settings -->
-      <div class="flex gap-2 justify-between items-center">
-        <p class="">Treat Zero special?</p>
-        <input
-          type="checkbox"
-          :checked="props.colorMap.isZeroSpecial"
-          @change="() => props.colorMap.setIsZeroSpecial(!props.colorMap.isZeroSpecial)"
-          class="checkbox checkbox-xs"
-        />
-        <input
-          type="color"
-          id="colorZero"
-          class="w-8 h-[1rem]"
-          name="colorZero"
-          :value="`#${props.colorMap.colorZero.toString(16).padStart(6, '0')}`"
-          @input="handleColorZeroChange"
-        />
-      </div>
     </div>
-  </div>
+  </details>
 </template>
 
 <style scoped lang="scss">
 .custom-shadow {
   box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.5);
+}
+
+// this is to make the dropdown appear below the summary
+details {
+  overflow: visible
+}
+details[open] .collapse-content {
+  position: absolute;
+  top: 100%; /* Align dropdown to appear below */
+  left: 0;
 }
 </style>

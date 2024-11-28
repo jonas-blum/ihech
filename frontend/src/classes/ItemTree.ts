@@ -115,6 +115,15 @@ export class ItemTree {
     this.maxDepth = maxDepth
   }
 
+  // trigger this to update the data of the rows (e.g. when the coloring mode changes)
+  computeAdjustedData() {
+    this.rowsAsArray.forEach((row) => {
+      row.computeAdjustedData()
+      row.pixiRow?.updateCellColoring()
+      row.stickyPixiRow?.updateCellColoring()
+    })
+  }
+
   updatePositionsAndDepth(startRow: Row = this.root) {
     let pointer: Row | null = startRow // By default start at the root, otherwise start traversal at the specified row
     let position = pointer.position

@@ -51,11 +51,9 @@ export class PixiTile extends PixiContainer {
     this.content.filters = [new BlurFilter()]
     this.content.eventMode = 'none'
     this.content.alpha = 0.5
-    console.log('🔴 activateLoadingState')
   }
 
   deactivateLoadingState() {
-    console.log('🟢 deactivateLoadingState')
     this.content.filters = []
     this.content.eventMode = 'static'
     this.content.alpha = 1

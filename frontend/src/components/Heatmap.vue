@@ -492,7 +492,8 @@ onMounted(async () => {
     <RowSorterSettings
       class="absolute"
       :style="{
-        top: `${heatmapLayoutStore.rowLabelsTileFrame.y + heatmapLayoutStore.requiredHeightOfStickyRows + 2}px`,
+        // top: `${heatmapLayoutStore.rowLabelsTileFrame.y + heatmapLayoutStore.requiredHeightOfStickyRows + 2}px`,
+        top: `${heatmapLayoutStore.rowLabelsTileFrame.y - 22}px`,
         left: `${heatmapLayoutStore.rowLabelWidth - 0}px`,
       }"
     />
@@ -500,7 +501,7 @@ onMounted(async () => {
       class="absolute"
       :style="{
         top: `${heatmapLayoutStore.tileMargin}px`,
-        left: `${heatmapLayoutStore.columnLabelsTileFrame.x + 7}px`,
+        left: `${heatmapLayoutStore.columnLabelsTileFrame.x - 20}px`,
       }"
     />
     <ColorMap

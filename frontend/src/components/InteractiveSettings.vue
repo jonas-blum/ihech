@@ -2,20 +2,31 @@
 import type { IndexLabelInterface } from '@/helpers/helpers'
 import { useMainStore } from '@stores/mainStore'
 import { computed, ref, watch, watchEffect } from 'vue'
-import Multiselect from 'vue-multiselect'
+import ResizableSelect from '@/components/ResizableSelect.vue'
+import MultiSelect from '@/components/MultiSelect.vue'
 
 const mainStore = useMainStore()
 
+const datasetOptions = [
+  { label: 'Voting Data From Switzerland', value: 'voting_data' },
+  { label: 'Age Groups', value: 'age_groups' },
+]
+
 const kOptions = [
-  { label: 'k=2', value: 2 },
-  { label: 'k=3', value: 3 },
-  { label: 'k=4', value: 4 },
-  { label: 'k=5', value: 5 },
-  { label: 'k=6', value: 6 },
-  { label: 'k=7', value: 7 },
-  { label: 'k=8', value: 8 },
-  { label: 'k=9', value: 9 },
-  { label: 'k=10', value: 10 },
+  { label: 'k=2', value: '2' },
+  { label: 'k=3', value: '3' },
+  { label: 'k=4', value: '4' },
+  { label: 'k=5', value: '5' },
+  { label: 'k=6', value: '6' },
+  { label: 'k=7', value: '7' },
+  { label: 'k=8', value: '8' },
+  { label: 'k=9', value: '9' },
+  { label: 'k is equals to 10', value: '10' },
+]
+
+const clusterAfterDimRedOptions = [
+  { label: 'high-dimensional', value: 'false' },
+  { label: 'dimensionality reduced', value: 'true' },
 ]
 
 async function updateItemsClusterSize(event: Event) {
@@ -23,8 +34,7 @@ async function updateItemsClusterSize(event: Event) {
     console.error('Event target is not an HTMLSelectElement:', event.target)
     return
   }
-  const size = event.target.value
-  mainStore.setItemsClusterSize(parseInt(size, 10))
+  mainStore.setItemsClusterSize(parseInt(event.target.value, 10))
   mainStore.setIsOutOfSync(true)
 }
 
@@ -51,138 +61,68 @@ async function updateAttributesClusterByCollections(event: Event) {
   mainStore.setIsOutOfSync(true)
 }
 
-const selectedHierarchicalRowsMetadataColumnNames = ref<IndexLabelInterface[]>(
+const selectedHierarchicalRowsMetadataColumnNames = computed<IndexLabelInterface[]>(() =>
   mainStore.getHierarchicalRowsMetadataColumnNames.filter((item) => item.selected),
 )
-const selectedHierarchicalColumnsMetadataRowIndexes = ref<IndexLabelInterface[]>(
+const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterface[]>(() =>
   mainStore.getHierarchicalColumnsMetadataRowIndexes.filter((item) => item.selected),
-)
-
-function updateHierarchicalRowsMetadataColumnNames(option: IndexLabelInterface, id: number) {
-  mainStore.getHierarchicalRowsMetadataColumnNames.forEach((item) => {
-    item.selected = selectedHierarchicalRowsMetadataColumnNames.value.includes(item)
-  })
-  mainStore.getHierarchicalRowsMetadataColumnNames.sort(
-    (a, b) =>
-      selectedHierarchicalRowsMetadataColumnNames.value.indexOf(a) -
-      selectedHierarchicalRowsMetadataColumnNames.value.indexOf(b),
-  )
-  mainStore.setIsOutOfSync(true)
-}
-
-function updateHierarchicalColumnsMetadataRowIndexes(option: IndexLabelInterface, id: number) {
-  mainStore.getHierarchicalColumnsMetadataRowIndexes.forEach((item) => {
-    item.selected = selectedHierarchicalColumnsMetadataRowIndexes.value.includes(item)
-  })
-  mainStore.getHierarchicalColumnsMetadataRowIndexes.sort(
-    (a, b) =>
-      selectedHierarchicalColumnsMetadataRowIndexes.value.indexOf(a) -
-      selectedHierarchicalColumnsMetadataRowIndexes.value.indexOf(b),
-  )
-  mainStore.setIsOutOfSync(true)
-}
-
-watch(
-  () => mainStore.getDataChanging,
-  () => {
-    selectedHierarchicalRowsMetadataColumnNames.value =
-      mainStore.getHierarchicalRowsMetadataColumnNames.filter((item) => item.selected)
-    selectedHierarchicalColumnsMetadataRowIndexes.value =
-      mainStore.getHierarchicalColumnsMetadataRowIndexes.filter((item) => item.selected)
-  },
 )
 </script>
 
 <template>
   <div class="text-md">
-    <h2 class="text-xl font-bold underline mb-2">C&G Version - 🚧 Work In Progress 🚧</h2>
+    <ResizableSelect
+      class="inline-block"
+      :options="datasetOptions"
+      :selected="String(false)"
+      :callback="() => {}"
+      selectClasses="select select-sm text-md uppercase w-min mr-1 ml-0 pl-0 pb-0 mb-2 text-xl font-bold border-b-1 border-t-0 border-x-0 border-black rounded-none"
+    ></ResizableSelect>
+
     <p>You are exploring the age distribution of residents across municipalities in Switzerland.</p>
 
     <!-- Item Settings -->
     <p>
       Municipalities are
-      <span v-if="!mainStore.getActiveDataTable?.clusterItemsByCollections">not</span> grouped (
-      <input
-        @click="updateClusterItemsByCollections"
-        type="checkbox"
-        class="toggle toggle-xs translate-y-[4px]"
-        :checked="mainStore.getActiveDataTable?.clusterItemsByCollections"
-      />
-      )
-      <span v-if="mainStore.getActiveDataTable?.clusterItemsByCollections">
-        by
-
-        <multiselect
-          class="inline-block w-64 mx-2 align-middle"
-          v-model="selectedHierarchicalRowsMetadataColumnNames"
-          :options="mainStore.getHierarchicalRowsMetadataColumnNames"
-          track-by="index"
-          :show-labels="false"
-          :multiple="true"
-          label="label"
-          :searchable="false"
-          :close-on-select="true"
-          @select="updateHierarchicalRowsMetadataColumnNames"
-          @remove="updateHierarchicalRowsMetadataColumnNames"
-        >
-        </multiselect>
-      </span>
-      and recursively clustered using the k-means algorithm with
-      <select
-        @change="updateItemsClusterSize($event)"
-        class="select select-bordered select-xs w-min mx-1"
+      <span v-if="!selectedHierarchicalRowsMetadataColumnNames.length">not</span>
+      grouped
+      <span>(</span>
+      <MultiSelect :options="mainStore.getHierarchicalRowsMetadataColumnNames"></MultiSelect
+      ><span>) and recursively clustered using the k-means algorithm with </span>
+      <ResizableSelect
+        class="inline-block"
+        :options="kOptions"
+        :selected="String(mainStore.getActiveDataTable?.itemsClusterSize || '')"
+        :callback="updateItemsClusterSize"
+        selectClasses="select select-xs"
       >
-        <option
-          v-for="option in kOptions"
-          :value="option.value"
-          :selected="mainStore.getActiveDataTable?.itemsClusterSize === option.value"
-        >
-          {{ option.label }}
-        </option>
-      </select>
+      </ResizableSelect>
       on the
-      <select
-        @change="updateClusterAfterDimRed"
-        class="select select-bordered select-xs w-min mx-1"
+      <ResizableSelect
+        class="inline-block"
+        :options="clusterAfterDimRedOptions"
+        :selected="String(mainStore.getActiveDataTable?.clusterAfterDimRed)"
+        :callback="updateClusterAfterDimRed"
+        selectClasses="select select-xs"
       >
-        <option :selected="!mainStore.getActiveDataTable?.clusterAfterDimRed">
-          high-dimensional
-        </option>
-        <option :selected="mainStore.getActiveDataTable?.clusterAfterDimRed">
-          dimensionality reduced
-        </option>
-      </select>
+      </ResizableSelect>
       data.
     </p>
 
     <!-- Attribute Settings -->
     <p>
       Age groups are
-      <span v-if="!mainStore.getActiveDataTable?.clusterAttributesByCollections">not</span>
-      grouped (
-      <input
-        @click="updateAttributesClusterByCollections"
-        type="checkbox"
-        class="toggle toggle-xs translate-y-[4px]"
-        :checked="mainStore.getActiveDataTable?.clusterAttributesByCollections"
-      />
-      )
-      <span v-if="mainStore.getActiveDataTable?.clusterAttributesByCollections"> by </span>
-      <multiselect
-        class="inline-block w-64 mx-2 align-middle"
-        v-model="selectedHierarchicalColumnsMetadataRowIndexes"
-        :options="mainStore.getHierarchicalColumnsMetadataRowIndexes"
-        track-by="index"
-        :show-labels="false"
-        :multiple="true"
-        label="label"
-        :searchable="false"
-        :close-on-select="true"
-        @select="updateHierarchicalColumnsMetadataRowIndexes"
-        @remove="updateHierarchicalColumnsMetadataRowIndexes"
-      >
-      </multiselect>
+      <span v-if="!selectedHierarchicalColumnsMetadataRowIndexes.length">not</span>
+      grouped
+      <span>(</span>
+      <MultiSelect :options="mainStore.getHierarchicalColumnsMetadataRowIndexes"></MultiSelect>
+      <span>).</span>
+         <!-- and recursively clustered using the k-means algorithm with -->
+
       <!-- TODO: here I could add the k-means attribute clustering parameter. for now I "disabled" it by settings the parameter to -1 -->
     </p>
   </div>
 </template>
+
+<style scoped lang="scss">
+</style>

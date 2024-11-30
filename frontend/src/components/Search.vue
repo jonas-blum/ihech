@@ -58,10 +58,6 @@ const onItemClick = (item: ItemRow) => {
   mainStore.itemTree?.toggleStickyRow(item)
 }
 
-const isItemSticky = (item: ItemRow): boolean => {
-  return mainStore.itemTree?.stickyRows.includes(item) || false
-}
-
 </script>
 <template>
   <div class="w-full p-2 rounded-none bg-white">
@@ -91,7 +87,7 @@ const isItemSticky = (item: ItemRow): boolean => {
         <li v-for="item in sortedItemSearchResults" @click="onItemClick(item)" class="flex justify-between items-center hover:bg-gray-200 cursor-pointer">
           <div class="flex gap-1 items-center">
             <Icon
-              v-if="isItemSticky(item)"
+              v-if="mainStore.itemTree?.isRowSticky(item)"
               icon="tabler:star-filled"
               class="p-0 text-opacity-50 w-3 h-full rotate-horizontal"
             />

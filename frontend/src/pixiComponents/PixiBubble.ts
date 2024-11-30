@@ -62,9 +62,11 @@ export class PixiBubble extends Container {
 
   updatePositionAndVisibility(animate: boolean = true) {
     const dimredLayoutStore = useDimredLayoutStore()
+  
+    const isRowSticky = useMainStore().itemTree?.isRowSticky(this.row)
 
     // if the position is -1, we hide the bubble
-    if (this.row.position === -1) {
+    if (this.row.position === -1 && !isRowSticky) {
       const startX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
       const startY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
       const endX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
@@ -94,7 +96,7 @@ export class PixiBubble extends Container {
     }
 
     // if the oldPosition is -1, we want to animate from the parent row position (if available)
-    if (this.row.oldPosition === -1) {
+    if (this.row.oldPosition === -1 && !isRowSticky) {
       const startX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
       const startY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
       const endX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
@@ -121,6 +123,12 @@ export class PixiBubble extends Container {
   }
 
   updateVisibility(delay: number = 0) {
+    // always show if it is sticky
+    if (useMainStore().itemTree?.isRowSticky(this.row)) {
+      this.visible = true
+      return
+    }
+
     if (this.row.position === -1) {
       this.visible = false
       return
@@ -146,7 +154,7 @@ export class PixiBubble extends Container {
   }
 
   updateSize() {
-    if (this.row.position === -1) {
+    if (this.row.position === -1 && !useMainStore().itemTree?.isRowSticky(this.row)) {
       return
     }
 

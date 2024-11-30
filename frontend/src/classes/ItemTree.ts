@@ -271,6 +271,10 @@ export class ItemTree {
     }
   }
 
+  isRowSticky(row: ItemRow): boolean {
+    return this.stickyRows.includes(row)
+  }
+
   getVisibleRowsCount(): number {
     return this.getVisibleRows().length
   }

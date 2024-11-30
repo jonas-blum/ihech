@@ -157,6 +157,9 @@ watch(
           )
         }
       }
+
+      // in case the row is not expanded, its bubble should not be visible anymore
+      row?.pixiBubble?.updatePositionAndVisibility(false)
     })
 
     // add new sticky rows
@@ -168,6 +171,9 @@ watch(
       const pixiRowLabel = new PixiStickyRowLabel(row as Row) // create PixiRowLabel with reference to the Row
       row.stickyPixiRowLabel = pixiRowLabel // set the reference to the (sticky) PixiRowLabel in the Row
       pixiHeatmapApp?.rowLabelTile.stickyRowLabelsContainer.addRowLabel(pixiRowLabel) // adds the PixiRowLabel to the PixiHeatmapApp.stickyRowLabelsContainer
+
+      row.pixiBubble?.updatePositionAndVisibility(false)
+      row.pixiBubble?.updateSize()
     })
 
     // update the position of all rows
@@ -547,9 +553,9 @@ onMounted(async () => {
     <Search
       class="absolute z-10 custom-shadow pointer-events-auto"
       :style="{
-      top: `${heatmapLayoutStore.columnLabelHeight - 22}px`,
-      left: `${heatmapLayoutStore.tileMargin}px`,
-      width: `${heatmapLayoutStore.rowLabelWidth}px`,
+        top: `${heatmapLayoutStore.columnLabelHeight - 22}px`,
+        left: `${heatmapLayoutStore.tileMargin}px`,
+        width: `${heatmapLayoutStore.rowLabelWidth}px`,
       }"
     ></Search>
   </div>

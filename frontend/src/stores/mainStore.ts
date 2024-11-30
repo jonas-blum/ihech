@@ -775,6 +775,14 @@ export const useMainStore = defineStore('mainStore', {
       this.handleRowClick(row)
     },
 
+    rowLabelRightClickEvent(pixiRowLabel: PixiRowLabel) {
+      const row = pixiRowLabel.row
+      console.log('rowLabelRightClickEvent', row)
+      if (row instanceof AggregateRow) {
+        this.itemTree?.expandAllRows(row)
+      }
+    },
+
     columnLabelClickEvent(column: Column) {
       console.log('clicked the label of', column)
 

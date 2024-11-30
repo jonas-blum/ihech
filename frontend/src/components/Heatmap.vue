@@ -514,7 +514,7 @@ onMounted(async () => {
     <!-- <button @click="debug" class="absolute z-[1000] btn btn-xs">Debug</button>
     <button @click="debug2" class="absolute z-[1000] btn btn-xs" style="top: 2rem">Debug2</button> -->
 
-    <canvas class="w-full h-full" ref="heatmapCanvas"></canvas>
+    <canvas class="w-full h-full" ref="heatmapCanvas" @contextmenu.prevent></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
     <RowSorterSettings
       class="absolute"

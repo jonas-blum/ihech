@@ -226,7 +226,7 @@ onMounted(async () => {
 <template>
   <div class="w-full h-full relative">
     <!-- might use later: this is the equivalent border shadow of the Pixi.DropShadowFilter -->
-    <canvas class="w-full h-full" ref="dimredCanvas"></canvas>
+    <canvas class="w-full h-full" ref="dimredCanvas" @contextmenu.prevent></canvas>
 
     <DimredAlgoSelection
       class="absolute"

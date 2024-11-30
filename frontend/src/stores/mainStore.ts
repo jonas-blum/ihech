@@ -804,5 +804,13 @@ export const useMainStore = defineStore('mainStore', {
       // NOTE: the term Row is a bit irritating here, but because the the data structure is conceptualized as Rows and Columns, I will keep it like this for now
       this.handleRowClick(row)
     },
+
+    bubbleRightClickEvent(bubble: PixiBubble) {
+      console.log('bubbleRightClickEvent', bubble)
+      const row = bubble.row
+      if (row instanceof AggregateRow) {
+        this.itemTree?.expandAllRows(row)
+      }
+    },
   },
 })

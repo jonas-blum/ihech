@@ -59,6 +59,10 @@ export class PixiColumnLabel extends PixiContainer {
     this.on('mouseout', () => {
       useMainStore()?.setHoveredPixiColumnLabel(null)
     })
+    // @ts-ignore: Property 'on' does not exist
+    this.on('rightclick', () => {
+      useMainStore()?.columnLabelRightClickEvent(this.column)
+    })
   }
 
   updatePosition(animate: boolean = true) {

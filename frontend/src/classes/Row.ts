@@ -173,6 +173,15 @@ export class AggregateRow extends Row {
     this.isOpen = true
   }
 
+  openDeep() {
+    this.open()
+    this.children.forEach((child) => {
+      if (child instanceof AggregateRow) {
+        child.openDeep()
+      }
+    })
+  }
+
   close() {
     this.isOpen = false
     // Close all children

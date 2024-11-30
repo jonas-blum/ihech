@@ -45,7 +45,10 @@ export class PixiBubble extends Container {
     this.on('mouseout', () => {
       mainStore?.setHoveredPixiBubble(null)
     })
-    
+    // @ts-ignore: Property 'on' does not exist
+    this.on('rightclick', () => {
+      mainStore?.bubbleRightClickEvent(this)
+    })
   }
 
   changeTexture(texture: Texture) {

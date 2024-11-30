@@ -114,6 +114,15 @@ export class AggregateColumn extends Column {
     this.isOpen = true
   }
 
+  openDeep() {
+    this.open()
+    this.children.forEach((child) => {
+      if (child instanceof AggregateColumn) {
+        child.openDeep()
+      }
+    })
+  }
+
   close() {
     this.isOpen = false
     // Close all children

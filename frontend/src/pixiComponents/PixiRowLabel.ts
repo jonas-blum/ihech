@@ -65,6 +65,10 @@ export class PixiRowLabel extends PixiContainer {
     this.on('mouseout', () => {
       useMainStore()?.setHoveredPixiRowLabel(null)
     })
+    // @ts-ignore: Property 'on' does not exist
+    this.on('rightclick', () => {
+      useMainStore()?.rowLabelRightClickEvent(this)
+    })
   }
 
   updatePosition(animate: boolean = true) {

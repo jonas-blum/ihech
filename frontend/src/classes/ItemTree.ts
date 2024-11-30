@@ -279,18 +279,20 @@ export class ItemTree {
     return this.rowsAsArray.length
   }
 
-  expandAllRows() {
-    // this.rowsAsArray.forEach((row) => {
-    //   if (row instanceof AggregateRow && !row.isOpen) {
-    //     this.expandRow(row)
-    //   }
-    // })
-
-    this.rowsAsArray.forEach((row) => {
+  expandAllRows(row: Row = this.root) {
+    if (row == this.root) {
+      // if its the root, we can use the array to iterate over all rows
+      this.rowsAsArray.forEach((row) => {
+        if (row instanceof AggregateRow) {
+          row.open()
+        }
+      })
+    } else {
+      // otherwise call the recurive function
       if (row instanceof AggregateRow) {
-        row.open()
+        row.openDeep()
       }
-    })
+    }
 
     this.updatePositionsAndDepth()
     this.calculateMaxDepth()

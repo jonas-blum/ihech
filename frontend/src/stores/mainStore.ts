@@ -726,14 +726,14 @@ export const useMainStore = defineStore('mainStore', {
       }
     },
 
-    updateCellPositionsOfCurrentlyDisplayedRows() {
+    updateCellPositionsOfCurrentlyDisplayedRows(animate: boolean = true) {
       const rowsVisibleInHeatmap = this.itemTree?.getRowsVisibleInHeatmap()
       rowsVisibleInHeatmap!.forEach((row) => {
-        row.pixiRow?.updateCellPositions()
+        row.pixiRow?.updateCellPositions(animate)
       })
       const stickyRows = this.itemTree?.stickyRows
       stickyRows!.forEach((row) => {
-        row.stickyPixiRow?.updateCellPositions()
+        row.stickyPixiRow?.updateCellPositions(animate)
       })
     },
 
@@ -775,6 +775,14 @@ export const useMainStore = defineStore('mainStore', {
       this.handleRowClick(row)
     },
 
+    rowLabelRightClickEvent(pixiRowLabel: PixiRowLabel) {
+      const row = pixiRowLabel.row
+      console.log('rowLabelRightClickEvent', row)
+      if (row instanceof AggregateRow) {
+        this.itemTree?.expandAllRows(row)
+      }
+    },
+
     columnLabelClickEvent(column: Column) {
       console.log('clicked the label of', column)
 
@@ -783,11 +791,26 @@ export const useMainStore = defineStore('mainStore', {
       }
     },
 
+    columnLabelRightClickEvent(column: Column) {
+      console.log('right clicked the label of', column)
+      if (column instanceof AggregateColumn) {
+        this.attributeTree?.expandAllColumns(column)
+      }
+    },
+
     bubbleClickEvent(bubble: PixiBubble) {
       console.log('bubbleClickEvent', bubble)
       const row = bubble.row
       // NOTE: the term Row is a bit irritating here, but because the the data structure is conceptualized as Rows and Columns, I will keep it like this for now
       this.handleRowClick(row)
+    },
+
+    bubbleRightClickEvent(bubble: PixiBubble) {
+      console.log('bubbleRightClickEvent', bubble)
+      const row = bubble.row
+      if (row instanceof AggregateRow) {
+        this.itemTree?.expandAllRows(row)
+      }
     },
   },
 })

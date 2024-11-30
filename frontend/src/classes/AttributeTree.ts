@@ -230,12 +230,21 @@ export class AttributeTree {
     return this.originalIndexToColumn.size
   }
 
-  expandAllColumns() {
-    this.columnsAsArray.forEach((column) => {
-      if (column instanceof AggregateColumn && !column.isOpen) {
-        this.expandColumn(column)
+  expandAllColumns(column: Column = this.root) {
+    if (column === this.root) {
+      this.columnsAsArray.forEach((column) => {
+        if (column instanceof AggregateColumn) {
+          column.open()
+        }
+      })
+    } else {
+      if (column instanceof AggregateColumn) {
+        column.openDeep()
       }
-    })
+    }
+    
+    this.updatePositionsAndDepth()
+    this.calculateMaxDepth()
     this.updateHeatmapVisibilityOfColumns()
     useMainStore().updateCellPositionsOfCurrentlyDisplayedRows()
   }

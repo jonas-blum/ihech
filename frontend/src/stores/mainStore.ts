@@ -791,6 +791,13 @@ export const useMainStore = defineStore('mainStore', {
       }
     },
 
+    columnLabelRightClickEvent(column: Column) {
+      console.log('right clicked the label of', column)
+      if (column instanceof AggregateColumn) {
+        this.attributeTree?.expandAllColumns(column)
+      }
+    },
+
     bubbleClickEvent(bubble: PixiBubble) {
       console.log('bubbleClickEvent', bubble)
       const row = bubble.row

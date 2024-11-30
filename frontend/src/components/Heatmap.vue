@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch, ref } from 'vue'
 import { useMouse, watchThrottled } from '@vueuse/core'
-import { Graphics, Sprite, RenderTexture, Texture, createLevelBuffersFromKTX } from 'pixi.js'
 
 import { useMainStore } from '@stores/mainStore'
 import { useHeatmapLayoutStore } from '@stores/heatmapLayoutStore'
@@ -25,6 +24,7 @@ import type { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
 import ColorMap from '@/components/ColorMap.vue'
+import Search from '@/components/Search.vue'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
 
 const { x: mouseX, y: mouseY } = useMouse()
@@ -529,14 +529,29 @@ onMounted(async () => {
         left: `${heatmapLayoutStore.columnLabelsTileFrame.x - 20}px`,
       }"
     />
-    <ColorMap
+    <!-- <ColorMap
       class="absolute z-10 -translate-y-[100%]"
       :style="{
         top: `${heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin}px`,
         left: `${heatmapLayoutStore.tileMargin}px`,
         width: `${heatmapLayoutStore.rowLabelWidth}px`,
+      }" -->
+    <ColorMap
+      class="absolute z-10 -translate-x-[100%] -translate-y-[100%] custom-shadow"
+      :style="{
+        top: `${heatmapLayoutStore.matrixTileFrame.y + heatmapLayoutStore.matrixTileFrame.height}px`,
+        left: `${heatmapLayoutStore.matrixTileFrame.x + heatmapLayoutStore.matrixTileFrame.width}px`,
+        width: `${heatmapLayoutStore.rowLabelWidth}px`,
       }"
     />
+    <Search
+      class="absolute z-10 custom-shadow pointer-events-auto"
+      :style="{
+      top: `${heatmapLayoutStore.columnLabelHeight - 22}px`,
+      left: `${heatmapLayoutStore.tileMargin}px`,
+      width: `${heatmapLayoutStore.rowLabelWidth}px`,
+      }"
+    ></Search>
   </div>
   <!-- Tooltip -->
   <div
@@ -554,4 +569,8 @@ onMounted(async () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped lang="scss">
+.custom-shadow {
+  box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.5);
+}
+</style>

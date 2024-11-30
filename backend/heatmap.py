@@ -234,7 +234,9 @@ def create_heatmap(
         scaled_raw_data_df = scaled_raw_data_df.drop("null_col", axis=1)
 
     if settings.clusterAfterDimRed:
-        scaled_raw_data_df = dim_red_df.copy()
+        scaled_raw_data_for_clustering_items_df = dim_red_df.copy()
+    else:
+        scaled_raw_data_for_clustering_items_df = scaled_raw_data_df.copy()
 
     heatmap_json = HeatmapJSON()
     heatmap_json.attributeDissimilarities = normalized_dissimilarities.tolist()
@@ -270,7 +272,7 @@ def create_heatmap(
         raw_data_df,
         hierarchical_rows_metadata_df,
         item_names_df,
-        scaled_raw_data_df,
+        scaled_raw_data_for_clustering_items_df,
         dim_red_df,
         settings.itemsClusterSize,
         settings.clusterItemsByCollections,

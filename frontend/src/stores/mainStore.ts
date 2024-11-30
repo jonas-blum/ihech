@@ -726,14 +726,14 @@ export const useMainStore = defineStore('mainStore', {
       }
     },
 
-    updateCellPositionsOfCurrentlyDisplayedRows() {
+    updateCellPositionsOfCurrentlyDisplayedRows(animate: boolean = true) {
       const rowsVisibleInHeatmap = this.itemTree?.getRowsVisibleInHeatmap()
       rowsVisibleInHeatmap!.forEach((row) => {
-        row.pixiRow?.updateCellPositions()
+        row.pixiRow?.updateCellPositions(animate)
       })
       const stickyRows = this.itemTree?.stickyRows
       stickyRows!.forEach((row) => {
-        row.stickyPixiRow?.updateCellPositions()
+        row.stickyPixiRow?.updateCellPositions(animate)
       })
     },
 

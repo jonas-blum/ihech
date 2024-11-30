@@ -257,7 +257,7 @@ watch(
 )
 
 // watch for verticalScrollPosition changes
-watchThrottled(
+watch(
   () => heatmapLayoutStore.verticalScrollPosition,
   (newVerticalScrollPosition, oldVerticalScrollPosition) => {
     // update the vertical position of the row container
@@ -273,11 +273,10 @@ watchThrottled(
       mainStore.itemTree?.updateHeatmapVisibilityOfRows()
     }
   },
-  { throttle: 1 },
 )
 
 // watch for horizontalScrollPosition changes
-watchThrottled(
+watch(
   () => heatmapLayoutStore.horizontalScrollPosition,
   (newHorizontalScrollPosition, oldHorizontalScrollPosition) => {
     // Update the horizontal position of the column container
@@ -289,9 +288,8 @@ watchThrottled(
     }
 
     mainStore.attributeTree?.updateHeatmapVisibilityOfColumns()
-    mainStore.updateCellPositionsOfCurrentlyDisplayedRows()
+    mainStore.updateCellPositionsOfCurrentlyDisplayedRows(false)
   },
-  { throttle: 1 },
 )
 
 // watch for attributesMaxDepth changes

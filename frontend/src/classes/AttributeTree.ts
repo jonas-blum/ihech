@@ -200,6 +200,14 @@ export class AttributeTree {
     return this.getVisibleColumns().length
   }
 
+  // TODO: use this method to get the currently selected attributes
+  // the backend data processing (clustering) should only be done on these selected attributes
+  getSelectedAttributesIndices(): number[] {
+    return this.columnsAsArray
+      .filter((column) => column instanceof AttributeColumn && column.selected)
+      .map((column) => column.originalIndex)
+  }
+
   // NOTE: should only be called when the columnSorter changed! for other operations, the updatePositionsAndDepth method should be used
   // apply the columnSorter to all columns on the same depth level
   sort(parent: AggregateColumn = this.root) {

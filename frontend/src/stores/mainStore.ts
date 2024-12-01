@@ -473,6 +473,7 @@ export const useMainStore = defineStore('mainStore', {
           .map((i) => i.index),
 
         selectedItemsRowIndexes: this.activeDataTable.selectedItemIndexes,
+        // TODO: I assume here is where the AttributeTree.getSelectedAttributesIndices() should be used instead ?
         selectedAttributesColumnNames: this.activeDataTable.selectedAttributes,
 
         stickyAttributesColumnNames: this.activeDataTable.stickyAttributes,

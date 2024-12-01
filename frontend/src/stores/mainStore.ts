@@ -58,6 +58,8 @@ export const useMainStore = defineStore('mainStore', {
 
     colorMap: new ColorMap(),
 
+    searchResultBoxOpen: false as boolean,
+
     heatmap: {
       attributeDissimilarities: [] as number[],
       itemNamesAndData: [] as ItemNameAndData[],

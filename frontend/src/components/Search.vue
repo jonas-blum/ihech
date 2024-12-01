@@ -24,13 +24,13 @@ const sortedAttributeSearchResults = computed(() => {
   return attributeSearchResults.value.sort((a, b) => a.name.localeCompare(b.name))
 })
 
-
 const onSearchChange = (event: Event): void => {
   const searchTerm = (event.target as HTMLInputElement).value
 
   if (!searchTerm) {
     itemSearchResults.value = []
     attributeSearchResults.value = []
+    mainStore.searchResultBoxOpen = false
     return
   }
 
@@ -45,12 +45,18 @@ const onSearchChange = (event: Event): void => {
   })
 
   // search attributes that match the search term
-  const attributes = mainStore.attributeTree?.columnsAsArray.filter((attribute) => {
-    return attribute.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const attributes = mainStore.attributeTree?.columnsAsArray.filter((attribute): attribute is AttributeColumn => {
+    return attribute instanceof AttributeColumn && attribute.name.toLowerCase().includes(searchTerm.toLowerCase())
   })
 
   itemSearchResults.value = items || []
   attributeSearchResults.value = attributes || []
+
+  if (items?.length || attributes?.length) {
+    mainStore.searchResultBoxOpen = true
+  } else {
+    mainStore.searchResultBoxOpen = false
+  }
 }
 
 const onItemClick = (item: ItemRow) => {
@@ -77,11 +83,13 @@ const onAttributeClick = (attribute: AttributeColumn) => {
           type="text"
           class="grow"
           placeholder="Search Item or Attribute"
+          @focus="onSearchChange"
+          @click.stop
         />
         <!-- TODO: replace with itemName and attributeName -->
       </label>
     </div>
-    <div v-if="itemSearchResults.length > 0 || attributeSearchResults.length > 0" class="flex gap-2 w-[500px] max-h-[600px] p-2 absolute bg-white -translate-x-[33%] translate-y-3 custom-shadow">
+    <div v-if="mainStore.searchResultBoxOpen" class="flex gap-2 w-[500px] max-h-[600px] p-2 absolute bg-white -translate-x-[33%] translate-y-3 custom-shadow" @click.stop>
       <ul
         class="w-1/2 rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto"
       >

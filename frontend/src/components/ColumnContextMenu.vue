@@ -47,6 +47,7 @@ watch(
   <div
     class="w-36 p-1 rounded-sm absolute z-[99999999] text-sm"
     :style="contextMenuStyle"
+    @click.stop
   >
     <ul v-if="!isAggregateColumn" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">
       <li>

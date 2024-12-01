@@ -46,7 +46,7 @@ export class AttributeTree {
         this.buildAttributeTree(child, column),
       )
       // @ts-ignore - we can be sure that row is an AggregateRow here and has a children property
-      column.children = children
+      column.addChildren(children)
     } else {
       column = new AttributeColumn(
         hierarchicalAttribute.attributeName,

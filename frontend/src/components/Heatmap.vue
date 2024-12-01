@@ -25,6 +25,7 @@ import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
 import ColorMap from '@/components/ColorMap.vue'
 import Search from '@/components/Search.vue'
+import ColumnContextMenu from '@/components/ColumnContextMenu.vue'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
 
 const { x: mouseX, y: mouseY } = useMouse()
@@ -585,8 +586,7 @@ onMounted(async () => {
   </div>
 
   <!-- right-click menu -->
-
-
+  <ColumnContextMenu class="border-[1px] border-black bg-white shadow-md"></ColumnContextMenu>
 </template>
 
 <style scoped lang="scss">

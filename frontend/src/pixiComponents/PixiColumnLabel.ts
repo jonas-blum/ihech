@@ -61,7 +61,7 @@ export class PixiColumnLabel extends PixiContainer {
     })
     // @ts-ignore: Property 'on' does not exist
     this.on('rightclick', () => {
-      useMainStore()?.columnLabelRightClickEvent(this.column)
+      useMainStore()?.columnLabelRightClickEvent(this)
     })
   }
 
@@ -141,6 +141,11 @@ export class PixiAttributeColumnLabel extends PixiColumnLabel {
     this.column = column
     this.createIcon()
     this.updateHighlightedDisplay(false)
+  }
+
+  updateIcon(animated: boolean = true): void {
+    // dont show the dot if the column is not selected
+    this.icon.visible = this.column.selected
   }
 
   createIcon(): void {

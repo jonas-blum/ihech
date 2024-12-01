@@ -56,6 +56,8 @@ export abstract class Column {
 }
 
 export class AttributeColumn extends Column {
+  selected: boolean = true // if not selected, the column (attribute) is not considered for the dimred calculation
+
   constructor(
     name: string,
     originalIndex: number,
@@ -69,11 +71,42 @@ export class AttributeColumn extends Column {
   hasChildren(): boolean {
     return false
   }
+
+  setSelected(selected: boolean) {
+    this.selected = selected
+
+    if (this.selected) {
+      // recursively increase the selectedChildrenCount of all parents
+      let parent: Column | null = this.parent
+      while (parent !== null) {
+        if (parent instanceof AggregateColumn) {
+          parent.selectedChildrenCount++
+        }
+        parent = parent.parent
+      }
+    } else {
+      // recursively decrease the selectedChildrenCount of all parents
+      let parent: Column | null = this.parent
+      while (parent !== null) {
+        if (parent instanceof AggregateColumn) {
+          parent.selectedChildrenCount--
+        }
+        parent = parent.parent
+      }
+    }
+    this.pixiColumnLabel?.updateIcon()
+  }
+
+  toggleSelected() {
+    this.setSelected(!this.selected)
+  }
 }
 
 export class AggregateColumn extends Column {
   isOpen: boolean
   children: Column[] = []
+  childrenCount: number = 0 // number of AttributeColumn children (not AggregateColumn children)
+  selectedChildrenCount: number = 0 // number of selected AttributeColumn children
 
   constructor(
     name: string,
@@ -85,6 +118,32 @@ export class AggregateColumn extends Column {
   ) {
     super(name, originalIndex, standardDeviation, originalAttributeOrder, parent)
     this.isOpen = isOpen
+  }
+
+  addChildren(children: Column[]) {
+    this.children = children
+    for (const child of children) {
+      if (child instanceof AttributeColumn) {
+        const increaseSelectedChildrenCount = child.selected
+
+        this.childrenCount++
+        if (increaseSelectedChildrenCount) {
+          this.selectedChildrenCount++
+        }
+
+        // increase the counts of the parents as well
+        let parent: Column | null = this.parent
+        while (parent !== null) {
+          if (parent instanceof AggregateColumn) {
+            parent.childrenCount++
+            if (increaseSelectedChildrenCount) {
+              parent.selectedChildrenCount++
+            }
+          }
+          parent = parent.parent
+        }
+      }
+    }
   }
 
   hasChildren(): boolean {
@@ -131,6 +190,26 @@ export class AggregateColumn extends Column {
       child.setPosition(-1)
       if (child instanceof AggregateColumn) {
         child.close()
+      }
+    })
+  }
+
+  selectChildrenDeep() {
+    this.children.forEach((child) => {
+      if (child instanceof AttributeColumn && !child.selected) {
+        child.setSelected(true)
+      } else if (child instanceof AggregateColumn) {
+        child.selectChildrenDeep()
+      }
+    })
+  }
+
+  unselectChildrenDeep() {
+    this.children.forEach((child) => {
+      if (child instanceof AttributeColumn && child.selected) {
+        child.setSelected(false)
+      } else if (child instanceof AggregateColumn) {
+        child.unselectChildrenDeep()
       }
     })
   }

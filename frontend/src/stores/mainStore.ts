@@ -49,10 +49,12 @@ export const useMainStore = defineStore('mainStore', {
     itemTree: null as ItemTree | null,
     attributeTree: null as AttributeTree | null,
 
+    // NOTE: "hovered" means the mouse is over the element, "selected" means the context menu is open
     hoveredPixiHeatmapCell: null as PixiHeatmapCell | null,
     hoveredPixiRowLabel: null as PixiRowLabel | null,
     hoveredPixiColumnLabel: null as PixiColumnLabel | null,
     hoveredPixiBubble: null as PixiBubble | null,
+    selectedPixiColumnLabel: null as PixiColumnLabel | null,
 
     colorMap: new ColorMap(),
 
@@ -791,11 +793,12 @@ export const useMainStore = defineStore('mainStore', {
       }
     },
 
-    columnLabelRightClickEvent(column: Column) {
-      console.log('right clicked the label of', column)
-      if (column instanceof AggregateColumn) {
-        this.attributeTree?.expandAllColumns(column)
-      }
+    columnLabelRightClickEvent(columnLabel: PixiColumnLabel | null) {
+      console.log('right clicked the label of', columnLabel?.column)
+      this.selectedPixiColumnLabel = columnLabel
+      // if (column instanceof AggregateColumn) {
+      //   this.attributeTree?.expandAllColumns(column)
+      // }
     },
 
     bubbleClickEvent(bubble: PixiBubble) {

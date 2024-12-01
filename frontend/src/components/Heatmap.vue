@@ -559,7 +559,8 @@ onMounted(async () => {
       }"
     ></Search>
   </div>
-  <!-- Tooltip -->
+
+  <!-- Heatmap cell Tooltip -->
   <div
     class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
     :style="tooltipStyle"
@@ -573,6 +574,19 @@ onMounted(async () => {
       {{ mainStore.hoveredPixiHeatmapCell?.value }}
     </span>
   </div>
+
+  <!-- Attribute Tooltip -->
+  <div
+    class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
+    :style="tooltipStyle"
+    v-show="mainStore.hoveredPixiColumnLabel"
+  >
+    <span>{{ mainStore.highlightedColumn?.name }}</span>
+  </div>
+
+  <!-- right-click menu -->
+
+
 </template>
 
 <style scoped lang="scss">

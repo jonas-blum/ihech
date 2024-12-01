@@ -50,6 +50,18 @@ const heatmapCanvas = ref<HTMLCanvasElement | null>(null)
 
 const pixiHeatmapInitialized = ref(false)
 
+// this mechanism is needed to prevent interaction on the canvas elements below menus or tooltips
+const mouseOverMenuOrTooltip = ref(false)
+watch(
+  () => mouseOverMenuOrTooltip.value,
+  (value) => {
+    // disable interaction on the whole canvas if hovering over a menu or tooltip
+    if (pixiHeatmapApp) {
+      pixiHeatmapApp.stage.eventMode = value ? 'none' : 'auto'
+    }
+  },
+)
+
 // watch for changes is highlightedRow
 watch(
   () => mainStore.highlightedRow,
@@ -528,6 +540,8 @@ onMounted(async () => {
         top: `${heatmapLayoutStore.rowLabelsTileFrame.y - 22}px`,
         left: `${heatmapLayoutStore.rowLabelWidth - 0}px`,
       }"
+      @mouseenter="mouseOverMenuOrTooltip = true"
+      @mouseleave="mouseOverMenuOrTooltip = false"
     />
     <ColumnSorterSettings
       class="absolute"
@@ -535,6 +549,8 @@ onMounted(async () => {
         top: `${heatmapLayoutStore.tileMargin}px`,
         left: `${heatmapLayoutStore.columnLabelsTileFrame.x - 20}px`,
       }"
+      @mouseenter="mouseOverMenuOrTooltip = true"
+      @mouseleave="mouseOverMenuOrTooltip = false"
     />
     <!-- <ColorMap
       class="absolute z-10 -translate-y-[100%]"
@@ -550,6 +566,8 @@ onMounted(async () => {
         left: `${heatmapLayoutStore.matrixTileFrame.x + heatmapLayoutStore.matrixTileFrame.width}px`,
         width: `${heatmapLayoutStore.rowLabelWidth}px`,
       }"
+      @mouseenter="mouseOverMenuOrTooltip = true"
+      @mouseleave="mouseOverMenuOrTooltip = false"
     />
     <Search
       class="absolute z-10 custom-shadow pointer-events-auto"
@@ -558,6 +576,8 @@ onMounted(async () => {
         left: `${heatmapLayoutStore.tileMargin}px`,
         width: `${heatmapLayoutStore.rowLabelWidth}px`,
       }"
+      @mouseenter="mouseOverMenuOrTooltip = true"
+      @mouseleave="mouseOverMenuOrTooltip = false"
     ></Search>
   </div>
 
@@ -566,6 +586,8 @@ onMounted(async () => {
     class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
     :style="tooltipStyle"
     v-show="mainStore.hoveredPixiHeatmapCell"
+    @mouseenter="mouseOverMenuOrTooltip = true"
+    @mouseleave="mouseOverMenuOrTooltip = false"
   >
     <span>{{ mainStore.highlightedRow?.name }}</span
     ><br />
@@ -581,12 +603,18 @@ onMounted(async () => {
     class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
     :style="tooltipStyle"
     v-show="mainStore.hoveredPixiColumnLabel"
+    @mouseenter="mouseOverMenuOrTooltip = true"
+    @mouseleave="mouseOverMenuOrTooltip = false"
   >
     <span>{{ mainStore.highlightedColumn?.name }}</span>
   </div>
 
   <!-- right-click menu -->
-  <ColumnContextMenu class="border-[1px] border-black bg-white shadow-md"></ColumnContextMenu>
+  <ColumnContextMenu
+    class="border-[1px] border-black bg-white shadow-md"
+    @mouseenter="mouseOverMenuOrTooltip = true"
+    @mouseleave="mouseOverMenuOrTooltip = false"
+  ></ColumnContextMenu>
 </template>
 
 <style scoped lang="scss">

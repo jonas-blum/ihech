@@ -41,9 +41,13 @@ watch(
     }
   },
 )
+
 </script>
 <template>
-  <div class="w-36 p-1 rounded-sm absolute z-1 text-sm" :style="contextMenuStyle">
+  <div
+    class="w-36 p-1 rounded-sm absolute z-[99999999] text-sm"
+    :style="contextMenuStyle"
+  >
     <ul v-if="!isAggregateColumn" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">
       <li>
         <a @click="column?.toggleSelected">{{ column?.selected ? 'Unselect' : 'Select' }}</a>
@@ -61,13 +65,16 @@ watch(
     </ul>
     <ul v-if="isAggregateColumn" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">
       <li>
-        <a v-if="column?.childrenCount === column?.selectedChildrenCount" @click="column?.unselectChildrenDeep">
-        <!-- All children are selected -->
-            Unselect All ({{ column?.selectedChildrenCount }} / {{ column?.childrenCount }})
+        <a
+          v-if="column?.childrenCount === column?.selectedChildrenCount"
+          @click="column?.unselectChildrenDeep"
+        >
+          <!-- All children are selected -->
+          Unselect All ({{ column?.selectedChildrenCount }} / {{ column?.childrenCount }})
         </a>
         <a v-else @click="column?.selectChildrenDeep">
-        <!-- Not all children are selected -->
-            Select All ({{ column?.selectedChildrenCount }} / {{ column?.childrenCount }})
+          <!-- Not all children are selected -->
+          Select All ({{ column?.selectedChildrenCount }} / {{ column?.childrenCount }})
         </a>
       </li>
       <li>

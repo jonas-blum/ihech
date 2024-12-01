@@ -58,6 +58,11 @@ const onItemClick = (item: ItemRow) => {
   mainStore.itemTree?.toggleStickyRow(item)
 }
 
+const onAttributeClick = (attribute: AttributeColumn) => {
+  console.log('Attribute clicked:', attribute)
+  attribute.toggleSelected()
+}
+
 </script>
 <template>
   <div class="w-full p-2 rounded-none bg-white">
@@ -76,10 +81,9 @@ const onItemClick = (item: ItemRow) => {
         <!-- TODO: replace with itemName and attributeName -->
       </label>
     </div>
-    <div>
+    <div v-if="itemSearchResults.length > 0 || attributeSearchResults.length > 0" class="flex gap-2 w-[500px] max-h-[600px] p-2 absolute bg-white -translate-x-[33%] translate-y-3 custom-shadow">
       <ul
-        v-if="itemSearchResults.length > 0"
-        class="w-full rounded-none text-xs mt-2 flex flex-col gap-1"
+        class="w-1/2 rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto"
       >
         <li class="font-bold border-b-2">
           <span>Items ({{ itemSearchResults.length }})</span>
@@ -89,19 +93,46 @@ const onItemClick = (item: ItemRow) => {
             <Icon
               v-if="mainStore.itemTree?.isRowSticky(item)"
               icon="tabler:star-filled"
-              class="p-0 text-opacity-50 w-3 h-full rotate-horizontal"
+              class="p-0 text-opacity-50 w-3 h-full"
+              :style="{color: item.getColor()}"
             />
             <Icon
               v-else
-              icon=""
-              class="p-0 text-opacity-50 w-3 h-full rotate-horizontal"
+              icon="material-symbols:circle"
+              class="p-0 text-opacity-50 w-3 h-full"
+              :style="{color: item.getColor()}"
             />
-            <span>{{ item.name }}</span>
+            <span class="w-full">{{ item.name }}</span>
           </div>
           <!-- <Icon
             icon="material-symbols:search"
             class="p-0 text-opacity-50 w-4 h-full rotate-horizontal"
           /> -->
+        </li>
+      </ul>
+      <div class="divider divider-horizontal"></div>
+      <ul
+        class="w-1/2 rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto"
+      >
+        <li class="font-bold border-b-2">
+          <span>Attributes ({{ attributeSearchResults.length }})</span>
+        </li>
+        <li v-for="attribute in sortedAttributeSearchResults" @click="onAttributeClick(attribute)" class="flex justify-between items-center hover:bg-gray-200 cursor-pointer">
+          <div class="flex gap-2 items-center">
+            <Icon
+              v-if="attribute.selected"
+              icon="material-symbols:circle"
+              class="p-0 text-opacity-50 w-3 h-3"
+              :style="{color: 'darkgray'}"
+            />
+            <Icon
+              v-else
+              icon=""
+              class="p-0 text-opacity-50 w-3 h-3"
+            />
+            <div class="w-full">{{ attribute.name }}</div>
+          </div>
+          
         </li>
       </ul>
     </div>

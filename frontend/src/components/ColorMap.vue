@@ -54,7 +54,7 @@ const onCreateBreakpoint = () => {
 
     <!-- Dropdown content -->
     <div
-      class="collapse-content rounded-sm w-full p-2 text-sm bg-white custom-shadow"
+      class="collapse-content rounded-sm w-full p-2 text-sm bg-white"
     >
       <div
         v-for="(breakpoint, index) in mainStore.colorMap.breakpoints"

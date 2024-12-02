@@ -12,21 +12,17 @@ const columnSorter = computed(() => mainStore.attributeTree?.columnSorter)
 </script>
 
 <template>
-  <div class="dropdown dropdown-hover items-start align-start">
-    <div
-      tabindex="0"
-      role="button"
-      class="btn btn-xs min-h-[0px] p-0 rounded-sm"
-      :style="{ height: `${heatmapLayoutStore.rowHeight - 3}px`, transform: 'translateY(-0px)' }"
-    >
-      <Icon icon="iconoir:sort-down" class="p-0 text-opacity-50 cursor-pointer -rotate-90" />
+  <div class="dropdown dropdown-hover items-start align-start text-xs">
+    <div tabindex="0" role="button" class="p-2 rounded-sm flex gap-2 justify-center">
+      <span>Sort</span>
+      <Icon icon="iconoir:sort-down" class="p-0 w-4 h-4 text-opacity-50 cursor-pointer -rotate-90" />
     </div>
     <div
       v-if="columnSorter"
       tabindex="0"
-      class="dropdown-content bg-base-100 z-[1] w-60 p-2 rounded-sm shadow text-xs"
+      class="dropdown-content bg-base-100 z-[1] w-48 p-2 rounded-sm custom-shadow text-xs"
     >
-      <p class="font-bold">Sort Rows by:</p>
+      <p class="font-bold">Sort Columns by:</p>
       <div
         v-for="(criterion, index) in columnSorter.getCriteria()"
         :key="criterion.technicalName"
@@ -55,4 +51,6 @@ const columnSorter = computed(() => mainStore.attributeTree?.columnSorter)
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+/* Add any necessary custom styles here */
+</style>

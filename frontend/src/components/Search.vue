@@ -89,7 +89,7 @@ const onAttributeClick = (attribute: AttributeColumn) => {
         <!-- TODO: replace with itemName and attributeName -->
       </label>
     </div>
-    <div v-if="mainStore.searchResultBoxOpen" class="flex gap-2 w-[500px] max-h-[600px] p-2 absolute bg-white -translate-x-[33%] translate-y-3 custom-shadow" @click.stop>
+    <div v-if="mainStore.searchResultBoxOpen" class="flex gap-2 w-[500px] max-h-[600px] p-2 absolute z-10 bg-white -translate-x-[33%] translate-y-3 custom-shadow" @click.stop>
       <ul
         class="w-1/2 rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto"
       >

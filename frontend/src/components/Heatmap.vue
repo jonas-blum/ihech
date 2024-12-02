@@ -475,6 +475,11 @@ function debug2() {
   }
 }
 
+function reloadHeatmap() {
+  mainStore.setCsvUploadOpen(false)
+  mainStore.fetchData()
+}
+
 watch(
   () => mainStore.loading,
   (loading) => {
@@ -533,32 +538,51 @@ onMounted(async () => {
 
     <canvas class="w-full h-full" ref="heatmapCanvas" @contextmenu.prevent></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
-    <RowSorterSettings
-      class="absolute"
-      :style="{
-        // top: `${heatmapLayoutStore.rowLabelsTileFrame.y + heatmapLayoutStore.requiredHeightOfStickyRows + 2}px`,
-        top: `${heatmapLayoutStore.rowLabelsTileFrame.y - 22}px`,
-        left: `${heatmapLayoutStore.rowLabelWidth - 0}px`,
-      }"
-      @mouseenter="mouseOverMenuOrTooltip = true"
-      @mouseleave="mouseOverMenuOrTooltip = false"
-    />
-    <ColumnSorterSettings
-      class="absolute"
+
+    <div
+      class="absolute z-10 flex flex-col justify-end gap-4 bg-white"
       :style="{
         top: `${heatmapLayoutStore.tileMargin}px`,
-        left: `${heatmapLayoutStore.columnLabelsTileFrame.x - 20}px`,
-      }"
-      @mouseenter="mouseOverMenuOrTooltip = true"
-      @mouseleave="mouseOverMenuOrTooltip = false"
-    />
-    <!-- <ColorMap
-      class="absolute z-10 -translate-y-[100%]"
-      :style="{
-        top: `${heatmapLayoutStore.columnLabelHeight + heatmapLayoutStore.tileMargin}px`,
         left: `${heatmapLayoutStore.tileMargin}px`,
         width: `${heatmapLayoutStore.rowLabelWidth}px`,
-      }" -->
+        height: `${heatmapLayoutStore.columnLabelHeight}px`,
+      }"
+    >
+      <button
+        @click="reloadHeatmap()"
+        class="btn btn-sm btn-block text-sm rounded-none custom-shadow"
+        :class="{
+          'btn-ghost': !mainStore.isOutOfSync,
+          'btn-warning': mainStore.isOutOfSync,
+        }"
+      >
+        Update
+        <span v-if="mainStore.isOutOfSync">(unsaved changes!)</span>
+        <span v-if="mainStore.isLoading" class="loading loading-spinner"></span>
+      </button>
+      <Search
+        class="custom-shadow"
+        @mouseenter="mouseOverMenuOrTooltip = true"
+        @mouseleave="mouseOverMenuOrTooltip = false"
+      ></Search>
+      <div class="flex w-full gap-4">
+        <RowSorterSettings
+          class="w-full custom-shadow"
+          @mouseenter="mouseOverMenuOrTooltip = true"
+          @mouseleave="mouseOverMenuOrTooltip = false"
+        />
+        <ColumnSorterSettings
+          class="w-full custom-shadow"
+          @mouseenter="mouseOverMenuOrTooltip = true"
+          @mouseleave="mouseOverMenuOrTooltip = false"
+        />
+      </div>
+      <!-- <ColorMap
+      class="custom-shadow"
+      @mouseenter="mouseOverMenuOrTooltip = true"
+      @mouseleave="mouseOverMenuOrTooltip = false"
+      /> -->
+    </div>
     <ColorMap
       class="absolute z-10 -translate-x-[100%] -translate-y-[100%] custom-shadow"
       :style="{
@@ -569,16 +593,6 @@ onMounted(async () => {
       @mouseenter="mouseOverMenuOrTooltip = true"
       @mouseleave="mouseOverMenuOrTooltip = false"
     />
-    <Search
-      class="absolute z-10 custom-shadow pointer-events-auto"
-      :style="{
-        top: `${heatmapLayoutStore.columnLabelHeight - 22}px`,
-        left: `${heatmapLayoutStore.tileMargin}px`,
-        width: `${heatmapLayoutStore.rowLabelWidth}px`,
-      }"
-      @mouseenter="mouseOverMenuOrTooltip = true"
-      @mouseleave="mouseOverMenuOrTooltip = false"
-    ></Search>
   </div>
 
   <!-- Heatmap cell Tooltip -->
@@ -617,6 +631,4 @@ onMounted(async () => {
   ></ColumnContextMenu>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style scoped lang="scss"></style>

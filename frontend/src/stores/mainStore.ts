@@ -3,7 +3,7 @@ import {
   type HeatmapJSON,
   type ItemNameAndData,
   findRowByIndex,
-  type CsvDataTableProfile,
+  type JsonDataTableProfile,
   ScalingEnum,
   DimReductionAlgoEnum,
   SortOrderAttributes,
@@ -43,8 +43,8 @@ import { nextTick } from 'vue'
 // @ts-ignore: weird error because pixi object type cannot be resolved, couldn't find a fix
 export const useMainStore = defineStore('mainStore', {
   state: () => ({
-    dataTables: [] as CsvDataTableProfile[],
-    activeDataTable: null as CsvDataTableProfile | null,
+    dataTables: [] as JsonDataTableProfile[],
+    activeDataTable: null as JsonDataTableProfile | null,
 
     itemTree: null as ItemTree | null,
     attributeTree: null as AttributeTree | null,
@@ -122,7 +122,7 @@ export const useMainStore = defineStore('mainStore', {
     },
 
     getAllDataTables: (state) => state.dataTables,
-    getAllDataTableNames: (state) => state.dataTables.map((table) => table.tableName),
+    getAllDatasetNames: (state) => state.dataTables.map((table) => table.datasetName),
     getActiveDataTable: (state) => state.activeDataTable,
 
     getHeatmap: (state) => state.heatmap,
@@ -179,7 +179,7 @@ export const useMainStore = defineStore('mainStore', {
 
     isOutOfSync: (state) => state.outOfSync,
 
-    isCsvUploadOpen: (state) => state.csvUploadOpen,
+    isJsonUploadOpen: (state) => state.csvUploadOpen,
 
     isColorScaleNotShown: (state) => {
       if (!state.activeDataTable) {
@@ -192,16 +192,18 @@ export const useMainStore = defineStore('mainStore', {
     },
   },
   actions: {
-    saveDataTable(dataTable: CsvDataTableProfile, fetchData = true) {
+    saveDataTable(dataTable: JsonDataTableProfile, fetchData = true) {
       if (
-        dataTable.tableName === null ||
+        dataTable.datasetName === null ||
         dataTable.df === null ||
         dataTable.itemNamesColumnName === null
       ) {
         console.error('Error during adding data table to heatmap store')
       }
-      if (this.getAllDataTableNames.includes(dataTable.tableName)) {
-        const index = this.dataTables.findIndex((table) => table.tableName === dataTable.tableName)
+      if (this.getAllDatasetNames.includes(dataTable.datasetName)) {
+        const index = this.dataTables.findIndex(
+          (table) => table.datasetName === dataTable.datasetName,
+        )
         this.dataTables[index] = dataTable
       } else {
         this.dataTables.push(dataTable)
@@ -211,10 +213,10 @@ export const useMainStore = defineStore('mainStore', {
         this.fetchData()
       }
     },
-    setActiveDataTable(dataTable: CsvDataTableProfile) {
+    setActiveDataTable(dataTable: JsonDataTableProfile) {
       this.activeDataTable = dataTable
     },
-    setCsvUploadOpen(open: boolean) {
+    setJsonUploadOpen(open: boolean) {
       nextTick(() => {
         this.csvUploadOpen = open
       })
@@ -328,7 +330,7 @@ export const useMainStore = defineStore('mainStore', {
 
         // initialize itemTree with the data received from the backend, starting at the root
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]
-        this.itemTree = new ItemTree(itemTreeRoot, rowSorter, this.activeDataTable.tableName)
+        this.itemTree = new ItemTree(itemTreeRoot, rowSorter, this.activeDataTable.datasetName)
 
         console.log('ItemTree:', this.itemTree)
 
@@ -340,7 +342,7 @@ export const useMainStore = defineStore('mainStore', {
           this.heatmap.maxAttributeValues,
           this.heatmap.attributeDissimilarities,
           columnSorter,
-          this.activeDataTable.tableName,
+          this.activeDataTable.datasetName,
         )
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
@@ -466,7 +468,10 @@ export const useMainStore = defineStore('mainStore', {
         throw new Error('No active data table')
       }
       let selectedColumnNames = this.activeDataTable.allColumnNames
-      if (this.attributeTree && this.attributeTree.tableName === this.activeDataTable.tableName) {
+      if (
+        this.attributeTree &&
+        this.attributeTree.datasetName === this.activeDataTable.datasetName
+      ) {
         selectedColumnNames = this.attributeTree.getSelectedAttributesColumnNames()
       }
       return {

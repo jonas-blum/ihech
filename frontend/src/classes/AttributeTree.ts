@@ -12,7 +12,7 @@ export class AttributeTree {
   originalIndexToColumn: Map<number, Column> = new Map()
   maxDepth: number = 0 // keeps track of the maximum depth of the tree; used for several display purposes
   columnsAsArray: Column[] = []
-  tableName: string = '' // the name of the file that was uploaded
+  datasetName: string = '' // the name of the file that was uploaded
 
   // TODO: for now I just roll with the current data structure. this will likely change later.
   constructor(
@@ -21,13 +21,13 @@ export class AttributeTree {
     maxAttributeValues: number[],
     attributeDissimilarities: number[],
     columnSorter: ColumnSorter,
-    tableName: string,
+    datasetName: string,
   ) {
     this.root = this.buildAttributeTree(hierarchicalAttribute) as AggregateColumn
     this.columnSorter = columnSorter
     this.sort()
     this.columnsAsArray = this.getAllColumns()
-    this.tableName = tableName
+    this.datasetName = datasetName
   }
 
   buildAttributeTree(

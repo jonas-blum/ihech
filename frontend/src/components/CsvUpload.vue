@@ -6,19 +6,21 @@ import {
   ScalingEnum,
   DimReductionAlgoEnum,
   SortOrderAttributes,
-  type CsvDataTableProfile,
+  type JsonDataTableProfile,
   ColoringHeatmapEnum,
   getDistinctColor,
   CSV_UPLOAD_COLLAPSED_HEIGHT,
   CSV_UPLOAD_CONTENT_HEIGHT,
   type IndexLabelInterface,
+  type UploadedJsonData,
 } from '@/helpers/helpers'
 import SettingsIcon from '@assets/settings.svg'
+import { timeout } from 'd3'
 
 const GAP_COLLAPSED_EXPANDED = 0
 const PADDING_BOTTOM = 10
 
-const CSV_UPLOAD_CONTENT_HEIGHT_FINAL =
+const JSON_UPLOAD_CONTENT_HEIGHT_FINAL =
   CSV_UPLOAD_CONTENT_HEIGHT - GAP_COLLAPSED_EXPANDED - PADDING_BOTTOM
 
 const MAX_CELL_WIDTH = 300
@@ -33,33 +35,25 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const dataTablesList = ref<HTMLUListElement | null>(null)
 
 function toggleAccordion() {
-  mainStore.setCsvUploadOpen(!mainStore.isCsvUploadOpen)
+  mainStore.setJsonUploadOpen(!mainStore.isJsonUploadOpen)
 }
 
-function selectDataTable(dataTable: CsvDataTableProfile) {
+function selectDataTable(dataTable: JsonDataTableProfile) {
   mainStore.setActiveDataTable(dataTable)
   mainStore.fetchData()
 }
 function triggerFileInput() {
   fileInput.value?.click()
-  mainStore.setCsvUploadOpen(true)
+  mainStore.setJsonUploadOpen(true)
 }
 
-function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = true) {
+function uploadJsonFileFromFile(uploadedJsonData: UploadedJsonData, fetchData = true) {
   let df: dataForge.IDataFrame = dataForge
-    .fromCSV(contents, { skipEmptyLines: true })
+    .fromCSV(uploadedJsonData.csvFile, { skipEmptyLines: true })
     .resetIndex()
     .bake()
 
   const csvFile = df.toCSV()
-  let fileNameNoExtension = fileName.split('.').slice(0, -1).join('.')
-  while (mainStore.getAllDataTableNames.includes(fileNameNoExtension)) {
-    fileNameNoExtension = '1_' + fileNameNoExtension
-    console.log(
-      'File name already exists, adding 1 to the beginning of the file name',
-      fileNameNoExtension,
-    )
-  }
 
   const itemNameColumnName = df.getColumnNames()[0]
   const rowsBeforeFirstEmptyRow: IndexLabelInterface[] = []
@@ -97,8 +91,8 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     selectColumn = false
   }
 
-  const newDataTable: CsvDataTableProfile = {
-    tableName: fileNameNoExtension,
+  const newDataTable: JsonDataTableProfile = {
+    ...uploadedJsonData,
     df: df,
 
     collectionColorMap: {},
@@ -140,14 +134,14 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
   mainStore.saveDataTable(newDataTable, fetchData)
 }
 
-function uploadCsvFile(event: Event) {
+function uploadJsonFile(event: Event) {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
   if (!file) return
   const reader = new FileReader()
   reader.onload = (e) => {
-    const contents = e.target?.result as string
-    uploadCsvFileFromFile(contents, file.name)
+    const contents = JSON.parse(e.target?.result as string)
+    uploadJsonFileFromFile(contents)
   }
   reader.readAsText(file)
 }
@@ -233,40 +227,20 @@ function updateItemNamesColumn(columName: string) {
   mainStore.setIsOutOfSync(true)
 }
 
-async function fetchCsvFileByFileName(fileName: string, fetchData: boolean) {
+async function fetchJsonFileByFileName(fileName: string, fetchData: boolean) {
   const response = await fetch(fileName)
   if (!response.ok) {
-    throw new Error('Failed to fetch the CSV file.')
+    throw new Error('Failed to fetch the JSON file.')
   }
-  const csvText = await response.text()
-  uploadCsvFileFromFile(csvText, fileName, fetchData)
-}
-
-function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
-  const activeDataTableName = mainStore.getActiveDataTable?.tableName
-  if (activeDataTableName && dataTablesList.value) {
-    const activeDataTableElement = dataTablesList.value.querySelector(
-      `#dataTableEntry-${activeDataTableName}`,
-    )
-    if (activeDataTableElement) {
-      activeDataTableElement.scrollIntoView({ behavior: scrollBehavior, block: 'end' })
-    } else {
-      console.error('DataTable element not found:', activeDataTableName)
-    }
-  }
+  const jsonText = JSON.parse(await response.text())
+  uploadJsonFileFromFile(jsonText, fetchData)
 }
 
 onMounted(async () => {
-  if (mainStore.getAllDataTableNames.length === 0) {
-    await fetchCsvFileByFileName('voting-data.csv', false)
-    //await fetchCsvFileByFileName('DEBUG-voting-data.csv', false)
-    await fetchCsvFileByFileName('2019_age_groups.csv', true)
-
-    focusActiveDataTable('smooth')
-
+  if (mainStore.getAllDatasetNames.length === 0) {
+    await fetchJsonFileByFileName('Age-Groups.json', false)
+    await fetchJsonFileByFileName('Voting-Data.json', false)
     await mainStore.fetchData()
-  } else {
-    focusActiveDataTable()
   }
 })
 </script>
@@ -274,7 +248,7 @@ onMounted(async () => {
 <template>
   <div class="box-content">
     <div class="collapse collapse-arrow bg-base-200">
-      <input type="checkbox" class="hidden" v-model="mainStore.isCsvUploadOpen" />
+      <input type="checkbox" class="hidden" v-model="mainStore.isJsonUploadOpen" />
 
       <div
         class="collapse-title"
@@ -289,20 +263,20 @@ onMounted(async () => {
         @click.stop="toggleAccordion"
       >
         <div :style="{ display: 'flex', alignItems: 'center', gap: '20px' }">
-          <div v-if="mainStore.isCsvUploadOpen">
+          <div v-if="mainStore.isJsonUploadOpen">
             <button
               :style="{ width: '120px' }"
               class="btn btn-info"
               @click.stop="triggerFileInput"
               type="button"
             >
-              Upload Csv File
+              Upload JSON File
             </button>
 
             <input
               type="file"
               ref="fileInput"
-              @change="uploadCsvFile($event)"
+              @change="uploadJsonFile($event)"
               style="display: none"
             />
           </div>
@@ -321,7 +295,7 @@ onMounted(async () => {
             margin: '0px 30px',
           }"
         >
-          {{ mainStore.getActiveDataTable?.tableName }}
+          {{ mainStore.getActiveDataTable?.datasetName }}
         </h1>
       </div>
 
@@ -331,10 +305,10 @@ onMounted(async () => {
           paddingLeft: '0px',
           paddingBottom: PADDING_BOTTOM + 'px',
           marginBottom: '0px',
-          height: CSV_UPLOAD_CONTENT_HEIGHT_FINAL + 'px',
+          height: JSON_UPLOAD_CONTENT_HEIGHT_FINAL + 'px',
         }"
         class="collapse-content content-grid"
-        v-if="mainStore.isCsvUploadOpen"
+        v-if="mainStore.isJsonUploadOpen"
         @click.stop
       >
         <div
@@ -348,21 +322,21 @@ onMounted(async () => {
               padding: '10px 0px',
               flexDirection: 'column',
               gap: '5px',
-              height: CSV_UPLOAD_CONTENT_HEIGHT_FINAL - 32 - 5 - 20 - 20 - PADDING_BOTTOM + 'px',
+              height: JSON_UPLOAD_CONTENT_HEIGHT_FINAL - 32 - 5 - 20 - 20 - PADDING_BOTTOM + 'px',
               overflowY: 'auto',
             }"
           >
             <li
               :key="index"
               v-for="(dataTable, index) in mainStore.getAllDataTables"
-              :id="`dataTableEntry-${dataTable.tableName}`"
+              :id="`dataTableEntry-${dataTable.datasetName}`"
             >
               <button
                 :class="{
                   btn: true,
                   'btn-outline': true,
                   'btn-primary': true,
-                  'btn-active': mainStore.getActiveDataTable?.tableName === dataTable.tableName,
+                  'btn-active': mainStore.getActiveDataTable?.datasetName === dataTable.datasetName,
                 }"
                 @click.stop="selectDataTable(dataTable)"
                 :style="{ width: '220px' }"
@@ -375,12 +349,12 @@ onMounted(async () => {
                     width: '100%',
                   }"
                 >
-                  {{ dataTable.tableName }}
+                  {{ dataTable.datasetName }}
                 </div>
               </button>
             </li>
 
-            <li v-if="mainStore.getAllDataTables.length === 0">Upload a CSV File first</li>
+            <li v-if="mainStore.getAllDataTables.length === 0">Upload a JSON File first</li>
           </ul>
         </div>
         <div

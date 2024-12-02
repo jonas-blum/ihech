@@ -198,8 +198,23 @@ export interface IndexLabelInterface {
   label: string
   selected: boolean
 }
-export interface CsvDataTableProfile {
-  tableName: string
+
+export interface UploadedJsonData {
+  datasetName: string
+  csvFile: string
+  descriptionText: string
+  itemNameSingular: string
+  itemNamePlural: string
+  attributeNameSingular: string
+  attributeNamePlural: string
+  cellHoverTextSnippet1: string
+  cellHoverTextSnippet2: { single: string; plural: string }
+  cellHoverTextSnippet3: string
+  defaultMinValue: number
+  defaultMaxValue: number
+  defaultColorBreakpoints: any
+}
+export interface JsonDataTableProfile extends UploadedJsonData {
   df: dataForge.IDataFrame<any, any>
 
   collectionColorMap: Record<string, string>
@@ -212,8 +227,6 @@ export interface CsvDataTableProfile {
   coloringHeatmap: ColoringHeatmapEnum
 
   //Settings for the backend
-  csvFile: string
-
   itemNamesColumnName: string
 
   hierarchicalRowsMetadataColumnNames: IndexLabelInterface[]

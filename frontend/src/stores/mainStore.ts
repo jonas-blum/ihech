@@ -328,7 +328,7 @@ export const useMainStore = defineStore('mainStore', {
 
         // initialize itemTree with the data received from the backend, starting at the root
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]
-        this.itemTree = new ItemTree(itemTreeRoot, rowSorter)
+        this.itemTree = new ItemTree(itemTreeRoot, rowSorter, this.activeDataTable.tableName)
 
         console.log('ItemTree:', this.itemTree)
 
@@ -340,6 +340,7 @@ export const useMainStore = defineStore('mainStore', {
           this.heatmap.maxAttributeValues,
           this.heatmap.attributeDissimilarities,
           columnSorter,
+          this.activeDataTable.tableName,
         )
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
@@ -464,6 +465,10 @@ export const useMainStore = defineStore('mainStore', {
         console.error('No active data table')
         throw new Error('No active data table')
       }
+      let selectedColumnNames = this.activeDataTable.allColumnNames
+      if (this.attributeTree && this.attributeTree.tableName === this.activeDataTable.tableName) {
+        selectedColumnNames = this.attributeTree.getSelectedAttributesColumnNames()
+      }
       return {
         csvFile: this.activeDataTable.csvFile,
 
@@ -474,9 +479,9 @@ export const useMainStore = defineStore('mainStore', {
           .filter((i) => i.selected)
           .map((i) => i.index),
 
-        selectedItemsRowIndexes: this.activeDataTable.selectedItemIndexes,
-        // TODO: I assume here is where the AttributeTree.getSelectedAttributesIndices() should be used instead ?
-        selectedAttributesColumnNames: this.activeDataTable.selectedAttributes,
+        selectedItemsRowIndexes: this.activeDataTable.allRowIndexes,
+
+        selectedAttributesColumnNames: selectedColumnNames,
 
         stickyAttributesColumnNames: this.activeDataTable.stickyAttributes,
         sortAttributesBasedOnStickyItems: this.activeDataTable.sortAttributesBasedOnStickyItems,
@@ -558,7 +563,7 @@ export const useMainStore = defineStore('mainStore', {
           }
         })
       }
-      this.activeDataTable.selectedItemIndexes = newSelectedItemIndexes
+      this.activeDataTable.allRowIndexes = newSelectedItemIndexes
     },
 
     isCollectionEnabled(collection: string): boolean {

@@ -114,8 +114,8 @@ function uploadCsvFileFromFile(contents: string, fileName: string, fetchData = t
     hierarchicalRowsMetadataColumnNames: columnNamesBeforeFirstEmptyColumn,
     hierarchicalColumnsMetadataRowIndexes: rowsBeforeFirstEmptyRow,
 
-    selectedItemIndexes: df.getIndex().toArray(),
-    selectedAttributes: df.getColumnNames(),
+    allRowIndexes: df.getIndex().toArray(),
+    allColumnNames: df.getColumnNames(),
 
     stickyAttributes: [],
     sortAttributesBasedOnStickyItems: false,
@@ -233,17 +233,6 @@ function updateItemNamesColumn(columName: string) {
   mainStore.setIsOutOfSync(true)
 }
 
-function toggleAttribute(attribute: string) {
-  if (mainStore.getActiveDataTable === null) return
-  if (mainStore.getActiveDataTable.selectedAttributes.includes(attribute)) {
-    mainStore.getActiveDataTable.selectedAttributes =
-      mainStore.getActiveDataTable.selectedAttributes.filter((attr) => attr !== attribute)
-  } else {
-    mainStore.getActiveDataTable.selectedAttributes.push(attribute)
-  }
-  mainStore.setIsOutOfSync(true)
-}
-
 async function fetchCsvFileByFileName(fileName: string, fetchData: boolean) {
   const response = await fetch(fileName)
   if (!response.ok) {
@@ -269,9 +258,9 @@ function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
 
 onMounted(async () => {
   if (mainStore.getAllDataTableNames.length === 0) {
-    // await fetchCsvFileByFileName('voting-data.csv', false)
-    await fetchCsvFileByFileName('DEBUG-voting-data.csv', false)
-    // await fetchCsvFileByFileName('2019_age_groups.csv', true)
+    await fetchCsvFileByFileName('voting-data.csv', false)
+    //await fetchCsvFileByFileName('DEBUG-voting-data.csv', false)
+    await fetchCsvFileByFileName('2019_age_groups.csv', true)
 
     focusActiveDataTable('smooth')
 
@@ -523,11 +512,8 @@ onMounted(async () => {
                   >
                     <input
                       :style="{ width: '15px', height: '15px' }"
-                      @click.stop="toggleAttribute(columnName)"
                       type="checkbox"
-                      :checked="
-                        mainStore.getActiveDataTable?.selectedAttributes.includes(columnName)
-                      "
+                      :checked="mainStore.getActiveDataTable?.allColumnNames.includes(columnName)"
                     />
                     <div
                       :style="{

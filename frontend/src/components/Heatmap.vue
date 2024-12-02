@@ -476,7 +476,7 @@ function debug2() {
 }
 
 function reloadHeatmap() {
-  mainStore.setCsvUploadOpen(false)
+  mainStore.setJsonUploadOpen(false)
   mainStore.fetchData()
 }
 

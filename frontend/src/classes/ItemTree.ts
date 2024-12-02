@@ -17,9 +17,9 @@ export class ItemTree {
   maxDepth: number = 0 // keeps track of the maximum depth of the tree; used for several display purposes
   colorScheme: any
   rowsAsArray: Row[] = []
-  tableName: string = '' // the name of the file that was uploaded
+  datasetName: string = '' // the name of the file that was uploaded
 
-  constructor(itemNameAndData: any, rowSorter: RowSorter, tableName: string) {
+  constructor(itemNameAndData: any, rowSorter: RowSorter, datasetName: string) {
     this.root = this.buildItemTree(itemNameAndData) as AggregateRow
     this.rowSorter = rowSorter
     // this.colorScheme = scaleSequential(interpolateRainbow)
@@ -31,7 +31,7 @@ export class ItemTree {
     this.assignColorToTopLevelRows()
 
     this.rowsAsArray = this.getAllRows()
-    this.tableName = tableName
+    this.datasetName = datasetName
   }
 
   buildItemTree(itemNameAndData: any, parent: Row | null = null): Row {

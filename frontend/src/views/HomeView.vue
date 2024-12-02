@@ -13,7 +13,7 @@ const heatmapLayoutStore = useHeatmapLayoutStore()
 const dimredLayoutStore = useDimredLayoutStore()
 
 function reloadHeatmap() {
-  mainStore.setCsvUploadOpen(false)
+  mainStore.setJsonUploadOpen(false)
   mainStore.fetchData()
 }
 
@@ -55,7 +55,7 @@ const closeMenus = () => {
         }"
       >
         <InteractiveSettings
-        class="absolute"
+          class="absolute"
           :style="{
             top: `${dimredLayoutStore.dimredTileFrame.y}px`,
             left: `${dimredLayoutStore.dimredTileFrame.x}px`,

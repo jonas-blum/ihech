@@ -113,7 +113,7 @@ function updateOnlyDimReductionBasedOnStickyItems(event: Event) {
 }
 
 function reloadHeatmap() {
-  mainStore.setCsvUploadOpen(false)
+  mainStore.setJsonUploadOpen(false)
   mainStore.fetchData()
 }
 
@@ -350,8 +350,7 @@ function makeItemStickyAndExpandItem(item: ItemNameAndData | null) {
                   <a
                     @click="updateScaling(scaling)"
                     :class="{
-                      'bg-green-700 text-white':
-                        mainStore.getActiveDataTable?.scaling === scaling,
+                      'bg-green-700 text-white': mainStore.getActiveDataTable?.scaling === scaling,
                     }"
                     >{{ mapScalingEnum(scaling) }}</a
                   >

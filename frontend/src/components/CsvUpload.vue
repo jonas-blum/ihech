@@ -233,17 +233,6 @@ function updateItemNamesColumn(columName: string) {
   mainStore.setIsOutOfSync(true)
 }
 
-function toggleAttribute(attribute: string) {
-  if (mainStore.getActiveDataTable === null) return
-  if (mainStore.getActiveDataTable.allColumnNames.includes(attribute)) {
-    mainStore.getActiveDataTable.allColumnNames =
-      mainStore.getActiveDataTable.allColumnNames.filter((attr) => attr !== attribute)
-  } else {
-    mainStore.getActiveDataTable.allColumnNames.push(attribute)
-  }
-  mainStore.setIsOutOfSync(true)
-}
-
 async function fetchCsvFileByFileName(fileName: string, fetchData: boolean) {
   const response = await fetch(fileName)
   if (!response.ok) {
@@ -523,7 +512,6 @@ onMounted(async () => {
                   >
                     <input
                       :style="{ width: '15px', height: '15px' }"
-                      @click.stop="toggleAttribute(columnName)"
                       type="checkbox"
                       :checked="mainStore.getActiveDataTable?.allColumnNames.includes(columnName)"
                     />

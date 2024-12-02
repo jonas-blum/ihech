@@ -78,7 +78,7 @@ def cluster_attributes_recursively(
         indexes = list(range(rotated_scaled_raw_data_df.shape[0]))
         new_attribute_index = get_current_data_length(item_names_and_data)
         append_all_average_items_by_attribute_indexes(indexes, item_names_and_data)
-        new_attribute_name = f"All_Attributes {str(len(indexes))}"
+        new_attribute_name = f""
 
         children_0 = cluster_attributes_recursively(
             rotated_raw_data_df,
@@ -138,11 +138,7 @@ def cluster_attributes_recursively(
             new_hierarchical_attribute_std = rotated_raw_data_group_df.std(
                 axis=1
             ).mean()
-            new_hierarchical_attribute_names = (
-                str(collection)
-                + " "
-                + str(rotated_hierarchical_columns_metadata_group_df.shape[0])
-            )
+            new_hierarchical_attribute_names = str(collection)
 
             if (
                 rotated_hierarchical_columns_metadata_group_df.shape[0] == 1
@@ -315,9 +311,7 @@ def cluster_attributes_recursively(
                 indices_list, item_names_and_data
             )
             average_index = np.mean(indices_list)
-            new_hierarchical_attribute_name = str(
-                rotated_scaled_raw_data_cluster_df.shape[0]
-            )
+            new_hierarchical_attribute_name = ""
             new_hierarchical_attribute_std = rotated_raw_data_cluster_df.std(
                 axis=1
             ).mean()
@@ -355,7 +349,7 @@ def cluster_items_recursively(
             dim_red_df.mean(), rounding_precision
         ).tolist()
 
-        new_item_name_0 = str(raw_data_df.shape[0])
+        new_item_name_0 = ""
 
         children_0 = cluster_items_recursively(
             raw_data_df,
@@ -409,11 +403,7 @@ def cluster_items_recursively(
             dim_reduction_aggregated = np.round(
                 dim_red_group_df.mean(), rounding_precision
             ).tolist()
-            new_item_name = (
-                str(collection)
-                + " "
-                + str(hierarchical_rows_metadata_group_df.shape[0])
-            )
+            new_item_name = str(collection)
 
             if (
                 raw_data_group_df.shape[0] == 1
@@ -600,7 +590,7 @@ def cluster_items_recursively(
                 dim_red_cluster_df.mean(), rounding_precision
             ).tolist()
 
-            new_item_name = str(raw_data_cluster_df.shape[0])
+            new_item_name = ""
             children = cluster_items_recursively(
                 raw_data_cluster_df,
                 hierarchical_rows_metadata_cluster_df,

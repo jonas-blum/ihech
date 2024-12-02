@@ -199,7 +199,7 @@ export interface IndexLabelInterface {
   selected: boolean
 }
 export interface CsvDataTableProfile {
-  tableName: string | null
+  tableName: string
   df: dataForge.IDataFrame<any, any>
 
   collectionColorMap: Record<string, string>
@@ -219,8 +219,8 @@ export interface CsvDataTableProfile {
   hierarchicalRowsMetadataColumnNames: IndexLabelInterface[]
   hierarchicalColumnsMetadataRowIndexes: IndexLabelInterface[]
 
-  selectedItemIndexes: number[]
-  selectedAttributes: string[]
+  allRowIndexes: number[]
+  allColumnNames: string[]
 
   stickyAttributes: string[]
   sortAttributesBasedOnStickyItems: boolean

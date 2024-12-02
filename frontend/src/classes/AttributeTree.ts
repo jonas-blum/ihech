@@ -11,7 +11,8 @@ export class AttributeTree {
   // TODO: this mapping is updated every time the columns are reordered (??? necessary ???)
   originalIndexToColumn: Map<number, Column> = new Map()
   maxDepth: number = 0 // keeps track of the maximum depth of the tree; used for several display purposes
-  columnsAsArray: Column[] = [] 
+  columnsAsArray: Column[] = []
+  tableName: string = '' // the name of the file that was uploaded
 
   // TODO: for now I just roll with the current data structure. this will likely change later.
   constructor(
@@ -20,11 +21,13 @@ export class AttributeTree {
     maxAttributeValues: number[],
     attributeDissimilarities: number[],
     columnSorter: ColumnSorter,
+    tableName: string,
   ) {
     this.root = this.buildAttributeTree(hierarchicalAttribute) as AggregateColumn
     this.columnSorter = columnSorter
     this.sort()
     this.columnsAsArray = this.getAllColumns()
+    this.tableName = tableName
   }
 
   buildAttributeTree(
@@ -208,6 +211,12 @@ export class AttributeTree {
       .map((column) => column.originalIndex)
   }
 
+  getSelectedAttributesColumnNames(): string[] {
+    return this.columnsAsArray
+      .filter((column) => column instanceof AttributeColumn && column.selected)
+      .map((column) => column.name)
+  }
+
   // NOTE: should only be called when the columnSorter changed! for other operations, the updatePositionsAndDepth method should be used
   // apply the columnSorter to all columns on the same depth level
   sort(parent: AggregateColumn = this.root) {
@@ -250,7 +259,7 @@ export class AttributeTree {
         column.openDeep()
       }
     }
-    
+
     this.updatePositionsAndDepth()
     this.calculateMaxDepth()
     this.updateHeatmapVisibilityOfColumns()

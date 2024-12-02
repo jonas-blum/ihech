@@ -15,6 +15,7 @@ import {
   type UploadedJsonData,
 } from '@/helpers/helpers'
 import SettingsIcon from '@assets/settings.svg'
+import { timeout } from 'd3'
 
 const GAP_COLLAPSED_EXPANDED = 0
 const PADDING_BOTTOM = 10
@@ -48,7 +49,7 @@ function triggerFileInput() {
 
 function uploadJsonFileFromFile(uploadedJsonData: UploadedJsonData, fetchData = true) {
   let df: dataForge.IDataFrame = dataForge
-    .fromCSV(uploadedJsonData.csvData, { skipEmptyLines: true })
+    .fromCSV(uploadedJsonData.csvFile, { skipEmptyLines: true })
     .resetIndex()
     .bake()
 
@@ -237,8 +238,8 @@ async function fetchJsonFileByFileName(fileName: string, fetchData: boolean) {
 
 onMounted(async () => {
   if (mainStore.getAllDatasetNames.length === 0) {
+    await fetchJsonFileByFileName('Age-Groups.json', false)
     await fetchJsonFileByFileName('Voting-Data.json', false)
-    await fetchJsonFileByFileName('Age-Groups.json', true)
     await mainStore.fetchData()
   }
 })

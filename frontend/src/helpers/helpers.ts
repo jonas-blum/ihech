@@ -201,7 +201,7 @@ export interface IndexLabelInterface {
 
 export interface UploadedJsonData {
   datasetName: string
-  csvData: string
+  csvFile: string
   descriptionText: string
   itemNameSingular: string
   itemNamePlural: string
@@ -227,8 +227,6 @@ export interface JsonDataTableProfile extends UploadedJsonData {
   coloringHeatmap: ColoringHeatmapEnum
 
   //Settings for the backend
-  csvFile: string
-
   itemNamesColumnName: string
 
   hierarchicalRowsMetadataColumnNames: IndexLabelInterface[]

@@ -235,30 +235,11 @@ async function fetchJsonFileByFileName(fileName: string, fetchData: boolean) {
   uploadJsonFileFromFile(jsonText, fetchData)
 }
 
-function focusActiveDataTable(scrollBehavior: ScrollBehavior = 'instant') {
-  const activeDataTableName = mainStore.getActiveDataTable?.datasetName
-  if (activeDataTableName && dataTablesList.value) {
-    const activeDataTableElement = dataTablesList.value.querySelector(
-      `#dataTableEntry-${activeDataTableName}`,
-    )
-    if (activeDataTableElement) {
-      activeDataTableElement.scrollIntoView({ behavior: scrollBehavior, block: 'end' })
-    } else {
-      console.error('DataTable element not found:', activeDataTableName)
-    }
-  }
-}
-
 onMounted(async () => {
   if (mainStore.getAllDatasetNames.length === 0) {
     await fetchJsonFileByFileName('Voting-Data.json', false)
     await fetchJsonFileByFileName('Age-Groups.json', true)
-
-    focusActiveDataTable('smooth')
-
     await mainStore.fetchData()
-  } else {
-    focusActiveDataTable()
   }
 })
 </script>

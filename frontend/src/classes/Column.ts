@@ -30,6 +30,10 @@ export abstract class Column {
 
   abstract hasChildren(): boolean
 
+  getName(): string {
+    return this.name
+  }
+
   setPosition(position: number) {
     this.oldPosition = this.position
     this.position = position
@@ -81,6 +85,8 @@ export class AttributeColumn extends Column {
       while (parent !== null) {
         if (parent instanceof AggregateColumn) {
           parent.selectedChildrenCount++
+          // also update the name of the parent
+          parent.pixiColumnLabel?.updateText()
         }
         parent = parent.parent
       }
@@ -90,6 +96,7 @@ export class AttributeColumn extends Column {
       while (parent !== null) {
         if (parent instanceof AggregateColumn) {
           parent.selectedChildrenCount--
+          parent.pixiColumnLabel?.updateText()
         }
         parent = parent.parent
       }
@@ -118,6 +125,15 @@ export class AggregateColumn extends Column {
   ) {
     super(name, originalIndex, standardDeviation, originalAttributeOrder, parent)
     this.isOpen = isOpen
+  }
+
+  getName(): string {
+    // if the backend provided a name, use it because its a semantic cluster
+    if (this.name) {
+      return `${this.name} (${this.selectedChildrenCount} / ${this.childrenCount})`
+    } else {
+      return `${this.childrenCount} Attributes` // TODO: replace with semantic term for Items
+    }
   }
 
   addChildren(children: Column[]) {

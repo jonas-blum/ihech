@@ -31,8 +31,7 @@ export class PixiRowLabel extends PixiContainer {
 
     // create the text for the row label
     this.text = new Text({
-      // TODO: text: `${row.name} Municipalities`,
-      text: row.name,
+      text: '', // NOTE: the text will be set in the subclasses
       style: {
         fill: this.row.getColor(),
         // fill: 0x000000,
@@ -116,6 +115,7 @@ export class PixiAggregateRowLabel extends PixiRowLabel {
     super(row)
     this.row = row
     this.createIcon()
+    this.text.text = row.getName()
   }
 
   createIcon(): void {
@@ -141,6 +141,7 @@ export class PixiItemRowLabel extends PixiRowLabel {
     super(row)
     this.createIcon()
     this.updateHighlightedDisplay(false)
+    this.text.text = row.getName()
   }
 
   createIcon(): void {

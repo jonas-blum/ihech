@@ -73,6 +73,10 @@ export abstract class Row {
     this.dataAdjusted = dataAdjusted
   }
 
+  getName(): string {
+    return this.name
+  }
+
   setPosition(position: number) {
     this.oldPosition = this.position
     this.position = position
@@ -143,6 +147,15 @@ export class AggregateRow extends Row {
   ) {
     super(name, totalChildrenCount, data, dimredPosition, parent)
     this.isOpen = isOpen
+  }
+
+  getName(): string {
+    // if the backend provided a name, use it because its a semantic cluster 
+    if (this.name) {
+      return this.name
+    } else {
+      return `${this.totalChildrenCount} Items` // TODO: replace with semantic term for Items
+    }
   }
 
   hasChildren(): boolean {

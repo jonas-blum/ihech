@@ -603,9 +603,9 @@ onMounted(async () => {
     @mouseenter="mouseOverMenuOrTooltip = true"
     @mouseleave="mouseOverMenuOrTooltip = false"
   >
-    <span>{{ mainStore.highlightedRow?.name }}</span
+    <span>{{ mainStore.highlightedRow?.getName() }}</span
     ><br />
-    <span>{{ mainStore.highlightedColumn?.name }}</span
+    <span>{{ mainStore.highlightedColumn?.getName() }}</span
     ><br />
     <span>
       {{ mainStore.hoveredPixiHeatmapCell?.value }}

@@ -261,7 +261,7 @@ onMounted(async () => {
       <span>{{ mainStore.highlightedColumn?.name }}</span
       ><br /> -->
     <span>
-      {{ mainStore.hoveredPixiBubble?.row.name }}
+      {{ mainStore.hoveredPixiBubble?.row.getName() }}
     </span>
   </div>
 </template>

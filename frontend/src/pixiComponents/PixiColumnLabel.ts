@@ -27,7 +27,7 @@ export class PixiColumnLabel extends PixiContainer {
 
     // create the text for the column label
     this.text = new Text({
-      text: column.name,
+      text: '', // NOTE: this is set in the subclasses
       style: {
         fill: 0x000000,
         fontSize: 12,
@@ -96,6 +96,10 @@ export class PixiColumnLabel extends PixiContainer {
     // needs to be implemented by the subclasses
   }
 
+  updateText() {
+    // needs to be implemented by the subclasses
+  }
+
   updateVisibility() {
     this.visible = this.column.heatmapVisibility
   }
@@ -113,6 +117,7 @@ export class PixiAggregateColumnLabel extends PixiColumnLabel {
     super(column)
     this.column = column
     this.createIcon()
+    this.updateText()
   }
 
   createIcon(): void {
@@ -131,6 +136,10 @@ export class PixiAggregateColumnLabel extends PixiColumnLabel {
       duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
     })
   }
+
+  updateText(): void {
+    this.text.text = this.column.getName()
+  }
 }
 
 export class PixiAttributeColumnLabel extends PixiColumnLabel {
@@ -141,6 +150,7 @@ export class PixiAttributeColumnLabel extends PixiColumnLabel {
     this.column = column
     this.createIcon()
     this.updateHighlightedDisplay(false)
+    this.text.text = column.name
   }
 
   updateIcon(animated: boolean = true): void {

@@ -82,7 +82,7 @@ const onAttributeClick = (attribute: AttributeColumn) => {
           @input="onSearchChange"
           type="text"
           class="grow"
-          placeholder="Search Item or Attribute"
+          :placeholder="`${mainStore.getActiveDataTable?.itemNamePlural} or ${mainStore.getActiveDataTable?.attributeNamePlural}`"
           @focus="onSearchChange"
           @click.stop
         />
@@ -94,7 +94,7 @@ const onAttributeClick = (attribute: AttributeColumn) => {
         class="w-1/2 rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto"
       >
         <li class="font-bold border-b-2">
-          <span>Items ({{ itemSearchResults.length }})</span>
+          <span>{{ mainStore.getActiveDataTable?.itemNamePlural }} ({{ itemSearchResults.length }})</span>
         </li>
         <li v-for="item in sortedItemSearchResults" @click="onItemClick(item)" class="flex justify-between items-center hover:bg-gray-200 cursor-pointer">
           <div class="flex gap-1 items-center">
@@ -123,7 +123,7 @@ const onAttributeClick = (attribute: AttributeColumn) => {
         class="w-1/2 rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto"
       >
         <li class="font-bold border-b-2">
-          <span>Attributes ({{ attributeSearchResults.length }})</span>
+          <span>{{ mainStore.getActiveDataTable?.attributeNamePlural }} ({{ attributeSearchResults.length }})</span>
         </li>
         <li v-for="attribute in sortedAttributeSearchResults" @click="onAttributeClick(attribute)" class="flex justify-between items-center hover:bg-gray-200 cursor-pointer">
           <div class="flex gap-2 items-center">

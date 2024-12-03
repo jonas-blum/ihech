@@ -154,7 +154,7 @@ export class AggregateRow extends Row {
     if (this.name) {
       return this.name
     } else {
-      return `${this.totalChildrenCount} Items` // TODO: replace with semantic term for Items
+      return `${this.totalChildrenCount} ${useMainStore().getActiveDataTable?.itemNamePlural}`
     }
   }
 

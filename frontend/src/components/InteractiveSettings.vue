@@ -13,6 +13,7 @@ const datasetOptions = [
 ]
 
 const kOptions = [
+  { label: 'no clustering', value: '-1' },
   { label: 'k=2', value: '2' },
   { label: 'k=3', value: '3' },
   { label: 'k=4', value: '4' },
@@ -21,7 +22,12 @@ const kOptions = [
   { label: 'k=7', value: '7' },
   { label: 'k=8', value: '8' },
   { label: 'k=9', value: '9' },
-  { label: 'k is equals to 10', value: '10' },
+  { label: 'k=10', value: '10' },
+  { label: 'k=11', value: '11' },
+  { label: 'k=12', value: '12' },
+  { label: 'k=13', value: '13' },
+  { label: 'k=14', value: '14' },
+  { label: 'k=15', value: '15' },
 ]
 
 const clusterAfterDimRedOptions = [
@@ -35,6 +41,15 @@ async function updateItemsClusterSize(event: Event) {
     return
   }
   mainStore.setItemsClusterSize(parseInt(event.target.value, 10))
+  mainStore.setIsOutOfSync(true)
+}
+
+async function updateAttributesClusterSize(event: Event) {
+  if (!(event.target instanceof HTMLSelectElement)) {
+    console.error('Event target is not an HTMLSelectElement:', event.target)
+    return
+  }
+  mainStore.setAttributesClusterSize(parseInt(event.target.value, 10))
   mainStore.setIsOutOfSync(true)
 }
 
@@ -79,16 +94,17 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
       selectClasses="select select-sm text-md uppercase w-min mr-1 ml-0 pl-0 pb-0 mb-2 text-xl font-bold border-b-1 border-t-0 border-x-0 border-black rounded-none"
     ></ResizableSelect>
 
-    <p>You are exploring the age distribution of residents across municipalities in Switzerland.</p>
+    <p>{{ mainStore.getActiveDataTable?.descriptionText }}</p>
 
     <!-- Item Settings -->
     <p>
-      Municipalities are
+      <span class="capitalize">{{ mainStore.getActiveDataTable?.itemNamePlural }}</span>
+      are
       <span v-if="!selectedHierarchicalRowsMetadataColumnNames.length">not</span>
       grouped
       <span>(</span>
       <MultiSelect :options="mainStore.getHierarchicalRowsMetadataColumnNames"></MultiSelect
-      ><span>) and recursively clustered using the k-means algorithm with </span>
+      ><span>) and recursively clustered (</span>
       <ResizableSelect
         class="inline-block"
         :options="kOptions"
@@ -97,7 +113,7 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
         selectClasses="select select-xs"
       >
       </ResizableSelect>
-      on the
+      ) on the
       <ResizableSelect
         class="inline-block"
         :options="clusterAfterDimRedOptions"
@@ -111,18 +127,26 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
 
     <!-- Attribute Settings -->
     <p>
-      Age groups are
+      <span class="capitalize">{{ mainStore.getActiveDataTable?.attributeNamePlural }}</span>
+       are
       <span v-if="!selectedHierarchicalColumnsMetadataRowIndexes.length">not</span>
       grouped
       <span>(</span>
       <MultiSelect :options="mainStore.getHierarchicalColumnsMetadataRowIndexes"></MultiSelect>
-      <span>).</span>
-         <!-- and recursively clustered using the k-means algorithm with -->
+      <span>)</span>
+      and recursively clustered (
+      <ResizableSelect
+        class="inline-block"
+        :options="kOptions"
+        :selected="String(mainStore.getActiveDataTable?.attributesClusterSize || '')"
+        :callback="updateAttributesClusterSize"
+        selectClasses="select select-xs"
+      ></ResizableSelect>
+      ).
 
       <!-- TODO: here I could add the k-means attribute clustering parameter. for now I "disabled" it by settings the parameter to -1 -->
     </p>
   </div>
 </template>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

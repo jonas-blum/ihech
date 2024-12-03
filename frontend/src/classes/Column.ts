@@ -1,4 +1,6 @@
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
+import { useMainStore } from '@/stores/mainStore'
+
 
 export abstract class Column {
   name: string
@@ -132,7 +134,7 @@ export class AggregateColumn extends Column {
     if (this.name) {
       return `${this.name} (${this.selectedChildrenCount} / ${this.childrenCount})`
     } else {
-      return `${this.childrenCount} Attributes` // TODO: replace with semantic term for Items
+      return `${this.childrenCount} ${useMainStore().getActiveDataTable?.attributeNamePlural}`
     }
   }
 

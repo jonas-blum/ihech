@@ -597,19 +597,22 @@ onMounted(async () => {
 
   <!-- Heatmap cell Tooltip -->
   <div
-    class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
+    class="absolute p-[2px] border-[1px] border-black bg-white shadow-md max-w-[400px]"
     :style="tooltipStyle"
     v-show="mainStore.hoveredPixiHeatmapCell"
     @mouseenter="mouseOverMenuOrTooltip = true"
     @mouseleave="mouseOverMenuOrTooltip = false"
   >
-    <span>{{ mainStore.highlightedRow?.getName() }}</span
-    ><br />
-    <span>{{ mainStore.highlightedColumn?.getName() }}</span
-    ><br />
-    <span>
+  <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet1 }}</span>
+    <span class="font-bold mx-[3px]">{{ mainStore.highlightedRow?.getName() }}</span>
+    <span class="mx-[3px]" v-if="(mainStore.highlightedRow instanceof ItemRow)">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet2.single }}</span>
+    <span class="mx-[3px]" v-else>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet2.plural }}</span>
+    <span class="font-bold mx-[3px]">
       {{ mainStore.hoveredPixiHeatmapCell?.value }}
     </span>
+    <span class="mx-[3px]" v-if="(mainStore.highlightedColumn instanceof AttributeColumn)">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3.single }}</span>
+    <span class="mx-[3px]" v-else>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3.plural }}</span>
+    <span class="font-bold mx-[3px]">{{ mainStore.highlightedColumn?.getName() }}</span>
   </div>
 
   <!-- Attribute Tooltip -->
@@ -620,7 +623,7 @@ onMounted(async () => {
     @mouseenter="mouseOverMenuOrTooltip = true"
     @mouseleave="mouseOverMenuOrTooltip = false"
   >
-    <span>{{ mainStore.highlightedColumn?.name }}</span>
+    <span>{{ mainStore.highlightedColumn?.getName() }}</span>
   </div>
 
   <!-- right-click menu -->

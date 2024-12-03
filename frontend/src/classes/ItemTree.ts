@@ -306,6 +306,7 @@ export class ItemTree {
   }
 
   assignColorToTopLevelRows() {
+    // TODO: what about the case when there is no semantic and dynamic clustering?
     this.root.children.forEach((row, index) => {
       row.color = this.colorScheme(index / (this.root.children.length - 1))
     })

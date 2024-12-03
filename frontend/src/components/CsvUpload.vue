@@ -122,7 +122,7 @@ function uploadJsonFileFromFile(uploadedJsonData: UploadedJsonData, fetchData = 
     clusterAttributesByCollections: true,
 
     itemsClusterSize: 7,
-    attributesClusterSize: -1,
+    attributesClusterSize: 4,
     dimReductionAlgo: DimReductionAlgoEnum.PCA,
     clusterAfterDimRed: false,
 

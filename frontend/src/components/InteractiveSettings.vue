@@ -4,13 +4,16 @@ import { useMainStore } from '@stores/mainStore'
 import { computed, ref, watch, watchEffect } from 'vue'
 import ResizableSelect from '@/components/ResizableSelect.vue'
 import MultiSelect from '@/components/MultiSelect.vue'
+import { type JsonDataTableProfile } from '@/helpers/helpers'
 
 const mainStore = useMainStore()
 
-const datasetOptions = [
-  { label: 'Voting Data From Switzerland', value: 'voting_data' },
-  { label: 'Age Groups', value: 'age_groups' },
-]
+const datasetOptions = computed(() => {
+  return mainStore.getAllDataTables.map((dataTable) => ({
+    label: dataTable.datasetName,
+    value: dataTable.datasetName,
+  }))
+})
 
 const kOptions = [
   { label: 'no clustering', value: '-1' },
@@ -35,6 +38,21 @@ const clusterAfterDimRedOptions = [
   { label: 'dimensionality reduced', value: 'true' },
 ]
 
+function selectDataTable(event: Event) {
+  if (!(event.target instanceof HTMLSelectElement)) {
+    console.error('Event target is not an HTMLSelectElement:', event.target)
+    return
+  }
+  const dataTableName = event.target.value
+  const dataTable = mainStore.getAllDataTables.find((dt) => dt.datasetName === dataTableName)
+  if (!dataTable) {
+    console.error('Could not find data table with name:', dataTableName)
+    return
+  }
+  mainStore.setActiveDataTable(dataTable)
+  mainStore.fetchData()
+}
+
 async function updateItemsClusterSize(event: Event) {
   if (!(event.target instanceof HTMLSelectElement)) {
     console.error('Event target is not an HTMLSelectElement:', event.target)
@@ -53,26 +71,8 @@ async function updateAttributesClusterSize(event: Event) {
   mainStore.setIsOutOfSync(true)
 }
 
-async function updateClusterItemsByCollections(event: Event) {
-  if (!(event.target instanceof HTMLInputElement)) {
-    console.error('Event target is not an HTMLInputElement:', event.target)
-    return
-  }
-  mainStore.setClusterItemsByCollections(event.target.checked)
-  mainStore.setIsOutOfSync(true)
-}
-
 async function updateClusterAfterDimRed() {
   mainStore.setClusterAfterDimRed(!mainStore.getActiveDataTable?.clusterAfterDimRed)
-  mainStore.setIsOutOfSync(true)
-}
-
-async function updateAttributesClusterByCollections(event: Event) {
-  if (!(event.target instanceof HTMLInputElement)) {
-    console.error('Event target is not an HTMLInputElement:', event.target)
-    return
-  }
-  mainStore.setClusterAttributesByCollections(event.target.checked)
   mainStore.setIsOutOfSync(true)
 }
 
@@ -89,8 +89,8 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
     <ResizableSelect
       class="inline-block"
       :options="datasetOptions"
-      :selected="String(false)"
-      :callback="() => {}"
+      :selected="String(mainStore.getActiveDataTable?.datasetName || '')"
+      :callback="selectDataTable"
       selectClasses="select select-sm text-md uppercase w-min mr-1 ml-0 pl-0 pb-0 mb-2 text-xl font-bold border-b-1 border-t-0 border-x-0 border-black rounded-none"
     ></ResizableSelect>
 
@@ -128,7 +128,7 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
     <!-- Attribute Settings -->
     <p>
       <span class="capitalize">{{ mainStore.getActiveDataTable?.attributeNamePlural }}</span>
-       are
+      are
       <span v-if="!selectedHierarchicalColumnsMetadataRowIndexes.length">not</span>
       grouped
       <span>(</span>

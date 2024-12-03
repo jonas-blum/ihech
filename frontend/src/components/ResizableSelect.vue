@@ -79,7 +79,7 @@ onMounted(() => {
     <!-- Hidden span to measure the width of the selected option -->
     <span
       ref="hiddenSpanRef"
-      class="text-xs"
+      :class="['select select-bordered w-min', selectClasses]"
       style="
         visibility: hidden;
         white-space: nowrap;

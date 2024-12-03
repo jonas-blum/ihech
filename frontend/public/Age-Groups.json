@@ -1,15 +1,19 @@
 {
-    "datasetName": "Age-Groups",
-    "descriptionText": "This dataset contains age group data",
+    "datasetName": "Age groups of Swiss municipalities",
+    "descriptionText": "You are exploring the age groups of residents of Switzerland.",
     "itemNameSingular": "municipality",
-    "itemNamePlural": "age groups",
+    "itemNamePlural": "municipalities",
     "attributeNameSingular": "age group",
-    "cellHoverTextSnippet1": "The age group of",
+    "attributeNamePlural": "age groups",
+    "cellHoverTextSnippet1": "The residents of",
     "cellHoverTextSnippet2": {
-        "single": "have voted",
-        "plural": "have on average voted"
+        "single": "are",
+        "plural": "are"
     },
-    "cellHoverTextSnippet3": "'Yes' on",
+    "cellHoverTextSnippet3": {
+        "single": "% in the age group",
+        "plural": "% in this cluster of"
+    },
     "defaultMinValue": 0.0,
     "defaultMaxValue": 0.24390243902439024,
     "defaultColorBreakpoints": "",

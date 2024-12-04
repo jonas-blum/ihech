@@ -66,17 +66,17 @@ def cluster_attributes_recursively(
     rotated_raw_data_df: pd.DataFrame,
     rotated_scaled_raw_data_df: pd.DataFrame,
     rotated_hierarchical_columns_metadata_df: pd.DataFrame,
-    all_rotated_column_names_df: pd.DataFrame,
-    selected_column_names: List[str],
+    rotated_column_names_df: pd.DataFrame,
     item_names_and_data: List[ItemNameAndData],
     cluster_size: int,
     cluster_by_collections: bool,
     hierarchical_column_metadata_row_indexes: List[int],
     level: int,
+    selected_attributes: List[str],
 ) -> Union[List[ItemNameAndData], None]:
     # Case: root level
     if level == 0:
-        indexes = list(range(all_rotated_column_names_df.shape[0]))
+        indexes = list(range(rotated_scaled_raw_data_df.shape[0]))
         new_attribute_index = get_current_data_length(item_names_and_data)
         append_all_average_items_by_attribute_indexes(indexes, item_names_and_data)
         new_attribute_name = f""
@@ -85,13 +85,13 @@ def cluster_attributes_recursively(
             rotated_raw_data_df,
             rotated_scaled_raw_data_df,
             rotated_hierarchical_columns_metadata_df,
-            all_rotated_column_names_df,
-            selected_column_names,
+            rotated_column_names_df,
             item_names_and_data,
             cluster_size,
             cluster_by_collections,
             hierarchical_column_metadata_row_indexes,
             level + 1,
+            selected_attributes,
         )
 
         new_hierarchical_attribute = HierarchicalAttribute(
@@ -134,7 +134,7 @@ def cluster_attributes_recursively(
             rotated_scaled_raw_data_group_df = rotated_scaled_raw_data_df.loc[
                 indexes_of_current_group
             ]
-            rotated_column_names_group_df = all_rotated_column_names_df.loc[
+            rotated_column_names_group_df = rotated_column_names_df.loc[
                 indexes_of_current_group
             ]
 
@@ -159,7 +159,7 @@ def cluster_attributes_recursively(
                         std=float(solo_child_std),
                         originalAttributeOrder=solo_child_attribute_index,
                         isOpen=False,
-                        selected=(solo_child_name in selected_column_names),
+                        selected=(solo_child_name in selected_attributes),
                         children=None,
                     )
                 ]
@@ -169,12 +169,12 @@ def cluster_attributes_recursively(
                     rotated_scaled_raw_data_group_df,
                     rotated_hierarchical_columns_metadata_group_df,
                     rotated_column_names_group_df,
-                    selected_column_names,
                     item_names_and_data,
                     cluster_size,
                     cluster_by_collections,
                     remaining_collection_row_indexes,
                     level + 1,
+                    selected_attributes,
                 )
 
             average_hierarchical_attribute_index = np.mean(
@@ -207,22 +207,19 @@ def cluster_attributes_recursively(
             raise Exception("Only one attribute in cluster")
 
         new_attributes: List[HierarchicalAttribute] = []
-        new_attribute_names = (
-            all_rotated_column_names_df.iloc[:, 0].astype(str).tolist()
-        )
+        new_attribute_names = rotated_column_names_df.iloc[:, 0].astype(str).tolist()
         new_attribute_indexes = rotated_scaled_raw_data_df.index.tolist()
 
         for i in range(rotated_scaled_raw_data_df.shape[0]):
             new_attribute_index = new_attribute_indexes[i]
             new_attribute_std = rotated_raw_data_df.iloc[i, :].std()
-            current_attribute_name = new_attribute_names[i]
             new_attribute = HierarchicalAttribute(
-                attributeName=current_attribute_name,
+                attributeName=new_attribute_names[i],
                 dataAttributeIndex=new_attribute_index,
                 std=float(new_attribute_std),
                 originalAttributeOrder=new_attribute_index,
                 isOpen=False,
-                selected=(current_attribute_name in selected_column_names),
+                selected=(new_attribute_names[i] in selected_attributes),
                 children=None,
             )
 
@@ -258,7 +255,7 @@ def cluster_attributes_recursively(
             rotated_hierarchical_columns_metadata_cluster_df = (
                 rotated_hierarchical_columns_metadata_df.loc[current_cluster_indexes]
             )
-            rotated_column_names_cluster_df = all_rotated_column_names_df.loc[
+            rotated_column_names_cluster_df = rotated_column_names_df.loc[
                 current_cluster_indexes
             ]
 
@@ -276,16 +273,17 @@ def cluster_attributes_recursively(
 
                 for i in range(rotated_scaled_raw_data_cluster_df.shape[0]):
                     new_attribute_std = rotated_raw_data_cluster_df.iloc[i, :].std()
-                    current_attribute_name = new_cluster_attribute_names[i]
                     new_attribute = HierarchicalAttribute(
-                        attributeName=current_attribute_name,
+                        attributeName=new_cluster_attribute_names[i],
                         dataAttributeIndex=rotated_scaled_raw_data_cluster_df.index[i],
                         std=float(new_attribute_std),
                         originalAttributeOrder=rotated_scaled_raw_data_cluster_df.index[
                             i
                         ],
                         isOpen=False,
-                        selected=(current_attribute_name in selected_column_names),
+                        selected=(
+                            new_cluster_attribute_names[i] in selected_attributes
+                        ),
                         children=None,
                     )
 
@@ -301,7 +299,7 @@ def cluster_attributes_recursively(
                     std=float(new_attribute_std),
                     originalAttributeOrder=rotated_scaled_raw_data_cluster_df.index[0],
                     isOpen=False,
-                    selected=(new_attribute_name in selected_column_names),
+                    selected=(new_attribute_name in selected_attributes),
                     children=None,
                 )
                 new_clustered_hierarchical_attributes.append(new_attribute)
@@ -312,12 +310,12 @@ def cluster_attributes_recursively(
                 rotated_scaled_raw_data_cluster_df,
                 rotated_hierarchical_columns_metadata_cluster_df,
                 rotated_column_names_cluster_df,
-                selected_column_names,
                 item_names_and_data,
                 cluster_size,
                 cluster_by_collections,
                 hierarchical_column_metadata_row_indexes,
                 level + 1,
+                selected_attributes,
             )
             indices_list = list(current_cluster_indexes)
             new_index = get_current_data_length(item_names_and_data)
@@ -344,8 +342,7 @@ def cluster_attributes_recursively(
 
 
 def cluster_items_recursively(
-    selected_columns_raw_data_df: pd.DataFrame,
-    all_columns_raw_data_df: pd.DataFrame,
+    raw_data_df: pd.DataFrame,
     hierarchical_rows_metadata_df: pd.DataFrame,
     item_names_df: pd.DataFrame,
     scaled_raw_data_df: pd.DataFrame,
@@ -357,9 +354,7 @@ def cluster_items_recursively(
 ) -> Union[List[ItemNameAndData], None]:
     # Case: root level
     if level == 0:
-        tag_data_0_aggregated_mean = all_columns_raw_data_df.loc[
-            selected_columns_raw_data_df.index
-        ].mean()
+        tag_data_0_aggregated_mean = raw_data_df.mean()
         tag_data_0_aggregated = np.round(
             tag_data_0_aggregated_mean, rounding_precision
         ).tolist()
@@ -370,8 +365,7 @@ def cluster_items_recursively(
         new_item_name_0 = ""
 
         children_0 = cluster_items_recursively(
-            selected_columns_raw_data_df,
-            all_columns_raw_data_df,
+            raw_data_df,
             hierarchical_rows_metadata_df,
             item_names_df,
             scaled_raw_data_df,
@@ -387,7 +381,7 @@ def cluster_items_recursively(
             itemName=new_item_name_0,
             isOpen=True,
             data=tag_data_0_aggregated,
-            amountOfDataPoints=selected_columns_raw_data_df.shape[0],
+            amountOfDataPoints=raw_data_df.shape[0],
             dimReductionX=dim_reduction_0_aggregated[0],
             dimReductionY=dim_reduction_0_aggregated[1],
             children=children_0,
@@ -410,16 +404,13 @@ def cluster_items_recursively(
                 1:
             ]
 
-            raw_data_group_df = selected_columns_raw_data_df.loc[
-                indexes_of_current_group
-            ]
+            raw_data_group_df = raw_data_df.loc[indexes_of_current_group]
             scaled_raw_data_group_df = scaled_raw_data_df.loc[indexes_of_current_group]
             dim_red_group_df = dim_red_df.loc[indexes_of_current_group]
             item_names_group_df = item_names_df.loc[indexes_of_current_group]
 
             tag_data_aggregated = np.round(
-                all_columns_raw_data_df.loc[raw_data_group_df.index].mean(),
-                rounding_precision,
+                raw_data_group_df.mean(), rounding_precision
             ).tolist()
 
             dim_reduction_aggregated = np.round(
@@ -433,8 +424,7 @@ def cluster_items_recursively(
             ):
                 solo_child_name = str(item_names_df.iloc[0, 0])
                 solo_child_data = np.round(
-                    all_columns_raw_data_df.loc[raw_data_group_df.index].iloc[0],
-                    rounding_precision,
+                    raw_data_group_df.iloc[0], rounding_precision
                 ).tolist()
                 new_children = [
                     ItemNameAndData(
@@ -457,7 +447,6 @@ def cluster_items_recursively(
             else:
                 new_children = cluster_items_recursively(
                     raw_data_group_df,
-                    all_columns_raw_data_df,
                     hierarchical_rows_metadata_group_df,
                     item_names_group_df,
                     scaled_raw_data_group_df,
@@ -485,28 +474,25 @@ def cluster_items_recursively(
 
     # Case: Only few items left or all items are the same or cluster size set to <= 1
     if (
-        selected_columns_raw_data_df.shape[0] <= cluster_size
+        raw_data_df.shape[0] <= cluster_size
         or all_rows_same(scaled_raw_data_df)
         or cluster_size <= 1
     ):
-        if selected_columns_raw_data_df.shape[0] == 0:
+        if raw_data_df.shape[0] == 0:
             raise Exception("No items in cluster")
-        if selected_columns_raw_data_df.shape[0] == 1:
+        if raw_data_df.shape[0] == 1:
             raise Exception("Only one item in cluster")
 
         new_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
         new_item_names = item_names_df[item_names_df.columns[0]].astype(str).tolist()
         dimReductionsX = np.round(dim_red_df[0], rounding_precision).tolist()
         dimReductionsY = np.round(dim_red_df[1], rounding_precision).tolist()
-        all_data = np.round(
-            all_columns_raw_data_df.loc[selected_columns_raw_data_df.index].values,
-            rounding_precision,
-        ).tolist()
+        all_data = np.round(raw_data_df.values, rounding_precision).tolist()
 
-        for i in range(selected_columns_raw_data_df.shape[0]):
+        for i in range(raw_data_df.shape[0]):
 
             new_item_name_and_data = ItemNameAndData(
-                index=selected_columns_raw_data_df.index[i],
+                index=raw_data_df.index[i],
                 itemName=new_item_names[i],
                 isOpen=is_open,
                 data=all_data[i],
@@ -534,15 +520,13 @@ def cluster_items_recursively(
         new_clustered_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
 
         cluster_indices = {
-            cluster_id: selected_columns_raw_data_df.index[labels == cluster_id]
+            cluster_id: raw_data_df.index[labels == cluster_id]
             for cluster_id in np.unique(labels)
         }
 
         for _, current_cluster_indexes in cluster_indices.items():
 
-            raw_data_cluster_df = selected_columns_raw_data_df.loc[
-                current_cluster_indexes
-            ]
+            raw_data_cluster_df = raw_data_df.loc[current_cluster_indexes]
             scaled_raw_data_cluster_df = scaled_raw_data_df.loc[current_cluster_indexes]
             dim_red_cluster_df = dim_red_df.loc[current_cluster_indexes]
             item_names_cluster_df = item_names_df.loc[current_cluster_indexes]
@@ -553,7 +537,7 @@ def cluster_items_recursively(
             if raw_data_cluster_df.shape[0] <= 0:
                 continue
 
-            if raw_data_cluster_df.shape[0] == selected_columns_raw_data_df.shape[0]:
+            if raw_data_cluster_df.shape[0] == raw_data_df.shape[0]:
 
                 new__cluster_item_names = (
                     item_names_cluster_df[item_names_cluster_df.columns[0]]
@@ -567,8 +551,7 @@ def cluster_items_recursively(
                     dim_red_cluster_df[1], rounding_precision
                 ).tolist()
                 all_data = np.round(
-                    all_columns_raw_data_df.loc[raw_data_cluster_df.index].values,
-                    rounding_precision,
+                    raw_data_cluster_df.values, rounding_precision
                 ).tolist()
 
                 for i in range(raw_data_cluster_df.shape[0]):
@@ -591,8 +574,7 @@ def cluster_items_recursively(
                     item_names_cluster_df.columns[0]
                 ].iloc[0]
                 new_data = np.round(
-                    all_columns_raw_data_df.loc[raw_data_cluster_df.index].iloc[0],
-                    rounding_precision,
+                    raw_data_cluster_df.iloc[0], rounding_precision
                 ).tolist()
                 new_item_name_and_data = ItemNameAndData(
                     index=raw_data_cluster_df.index[0],
@@ -611,9 +593,7 @@ def cluster_items_recursively(
                 new_clustered_item_names_and_data.append(new_item_name_and_data)
                 continue
 
-            tag_data_aggregated_mean = all_columns_raw_data_df.loc[
-                raw_data_cluster_df.index
-            ].mean()
+            tag_data_aggregated_mean = raw_data_cluster_df.mean()
 
             tag_data_aggregated = np.round(
                 tag_data_aggregated_mean, rounding_precision
@@ -626,7 +606,6 @@ def cluster_items_recursively(
             new_item_name = ""
             children = cluster_items_recursively(
                 raw_data_cluster_df,
-                all_columns_raw_data_df,
                 hierarchical_rows_metadata_cluster_df,
                 item_names_cluster_df,
                 scaled_raw_data_cluster_df,

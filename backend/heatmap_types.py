@@ -125,6 +125,7 @@ def custom_encoder(obj):
             "std": obj.std,
             "originalAttributeOrder": obj.originalAttributeOrder,
             "isOpen": obj.isOpen,
+            "selected": obj.selected,
             "children": (
                 [custom_encoder(child) for child in obj.children]
                 if obj.children
@@ -143,6 +144,7 @@ class HierarchicalAttribute:
     std: float
     originalAttributeOrder: float
     isOpen: bool
+    selected: bool
     children: Union["List[HierarchicalAttribute]", None]
 
     def __init__(
@@ -152,6 +154,7 @@ class HierarchicalAttribute:
         std: float,
         originalAttributeOrder: float,
         isOpen: bool,
+        selected: bool,
         children: Union["List[HierarchicalAttribute]", None],
     ):
         self.attributeName: str = attributeName
@@ -159,6 +162,7 @@ class HierarchicalAttribute:
         self.std: float = std
         self.originalAttributeOrder: float = originalAttributeOrder
         self.isOpen: bool = isOpen
+        self.selected: bool = selected
         self.children: Union[List[HierarchicalAttribute], None] = children
 
 

@@ -35,7 +35,7 @@ def filter_attributes_and_items(
     hierarchical_columns_metadata_df: pd.DataFrame,
     raw_data_df: pd.DataFrame,
     settings: HeatmapSettings,
-) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
 
     valid_indexes = list(
         set(settings.selectedItemsRowIndexes).intersection(raw_data_df.index)
@@ -50,28 +50,41 @@ def filter_attributes_and_items(
     hierarchical_rows_metadata_df = hierarchical_rows_metadata_df.loc[valid_indexes]
     item_names_df = item_names_df.loc[valid_indexes]
 
-    raw_data_df = raw_data_df[valid_columns]
+    all_columns_raw_data_df = raw_data_df.copy()
+    selected_columns_raw_data_df = raw_data_df[valid_columns]
     hierarchical_columns_metadata_df = hierarchical_columns_metadata_df[valid_columns]
 
     for col in valid_columns:
-        raw_data_df[col] = pd.to_numeric(raw_data_df[col], errors="coerce")
+        selected_columns_raw_data_df[col] = pd.to_numeric(
+            selected_columns_raw_data_df[col], errors="coerce"
+        )
+    for col in all_columns_raw_data_df.columns:
+        all_columns_raw_data_df[col] = pd.to_numeric(
+            all_columns_raw_data_df[col], errors="coerce"
+        )
 
-    na_row_indexes = raw_data_df[raw_data_df.isna().all(axis=1)].index
-    raw_data_df = raw_data_df.drop(na_row_indexes)
+    na_row_indexes = all_columns_raw_data_df[
+        all_columns_raw_data_df.isna().all(axis=1)
+    ].index
+    selected_columns_raw_data_df = selected_columns_raw_data_df.drop(na_row_indexes)
+    all_columns_raw_data_df = all_columns_raw_data_df.drop(na_row_indexes)
     hierarchical_rows_metadata_df = hierarchical_rows_metadata_df.drop(na_row_indexes)
     item_names_df = item_names_df.drop(na_row_indexes)
 
-    medians = raw_data_df.median()
-    raw_data_df = raw_data_df.fillna(medians)
+    medians = selected_columns_raw_data_df.median()
+    selected_columns_raw_data_df = selected_columns_raw_data_df.fillna(medians)
+    medians_all_columns = all_columns_raw_data_df.median()
+    all_columns_raw_data_df = all_columns_raw_data_df.fillna(medians_all_columns)
 
-    if raw_data_df.empty:
+    if selected_columns_raw_data_df.empty:
         raise ValueError("No attributes left after filtering")
 
     return (
         item_names_df,
         hierarchical_rows_metadata_df,
         hierarchical_columns_metadata_df,
-        raw_data_df,
+        selected_columns_raw_data_df,
+        all_columns_raw_data_df,
     )
 
 
@@ -118,13 +131,14 @@ def create_heatmap(
     number_rows_before_first_empty_row = before_first_empty_row.shape[0]
 
     hierarchical_columns_metadata_df = original_df.iloc[
-        :number_rows_before_first_empty_row, number_columns_before_first_empty_col:
+        :number_rows_before_first_empty_row, number_columns_before_first_empty_col + 1 :
     ]
     hierarchical_rows_metadata_df = original_df.iloc[
-        number_rows_before_first_empty_row:, 1:number_columns_before_first_empty_col
+        number_rows_before_first_empty_row:,
+        1:number_columns_before_first_empty_col,
     ]
     raw_data_df = original_df.iloc[
-        number_rows_before_first_empty_row:, number_columns_before_first_empty_col:
+        number_rows_before_first_empty_row:, number_columns_before_first_empty_col + 1 :
     ]
     item_names_df = original_df.iloc[number_rows_before_first_empty_row:, :1]
 
@@ -141,7 +155,8 @@ def create_heatmap(
         item_names_df,
         hierarchical_rows_metadata_df,
         hierarchical_columns_metadata_df,
-        raw_data_df,
+        selected_columns_raw_data_df,
+        all_columns_raw_data_df,
     ) = filter_attributes_and_items(
         item_names_df,
         hierarchical_rows_metadata_df,
@@ -150,7 +165,7 @@ def create_heatmap(
         settings,
     )
 
-    scaled_raw_data_df = do_scaling(raw_data_df, settings)
+    scaled_raw_data_df = do_scaling(selected_columns_raw_data_df, settings)
 
     if settings.clusterItemsBasedOnStickyAttributes:
         sticky_columns = [
@@ -173,9 +188,7 @@ def create_heatmap(
     )
     logger.info(
         "Number of attributes after filtering: "
-        + str(
-            raw_data_df.shape[1] - len(settings.hierarchicalRowsMetadataColumnNames) - 1
-        )
+        + str(selected_columns_raw_data_df.shape[1])
     )
     logger.info(
         "Number of items before filtering selected: "
@@ -204,7 +217,7 @@ def create_heatmap(
     else:
         raise ValueError("Invalid dim reduction algorithm")
 
-    dim_red_df = pd.DataFrame(dim_red_df, index=raw_data_df.index)
+    dim_red_df = pd.DataFrame(dim_red_df, index=selected_columns_raw_data_df.index)
     x_centered = dim_red_df[0] - dim_red_df[0].mean()
     y_centered = dim_red_df[1] - dim_red_df[1].mean()
     max_range = max(np.abs(x_centered).max(), np.abs(y_centered).max())
@@ -216,10 +229,12 @@ def create_heatmap(
         len(settings.stickyItemsRowIndexes) >= 2
         and settings.sortAttributesBasedOnStickyItems
     ):
-        original_dropped_sticky_df = raw_data_df.loc[settings.stickyItemsRowIndexes]
+        original_dropped_sticky_df = all_columns_raw_data_df.loc[
+            settings.stickyItemsRowIndexes
+        ]
         std_devs = original_dropped_sticky_df.std()
     else:
-        std_devs = raw_data_df.std()
+        std_devs = all_columns_raw_data_df.std()
 
     min_dissimilarity = std_devs.min()
     max_dissimilarity = std_devs.max()
@@ -241,20 +256,21 @@ def create_heatmap(
     heatmap_json = HeatmapJSON()
     heatmap_json.attributeDissimilarities = normalized_dissimilarities.tolist()
 
-    heatmap_json.maxHeatmapValue = raw_data_df.max().max()
-    heatmap_json.minHeatmapValue = raw_data_df.min().min()
-    heatmap_json.minAttributeValues = raw_data_df.min().tolist()
-    heatmap_json.maxAttributeValues = raw_data_df.max().tolist()
+    heatmap_json.maxHeatmapValue = all_columns_raw_data_df.max().max()
+    heatmap_json.minHeatmapValue = all_columns_raw_data_df.min().min()
+    heatmap_json.minAttributeValues = all_columns_raw_data_df.min().tolist()
+    heatmap_json.maxAttributeValues = all_columns_raw_data_df.max().tolist()
 
     logger.info(f"Dim reduction done: {round(time.perf_counter() - start_dim_red, 2)}")
     logger.info("Starting clustering items...")
     start_clustering_items = time.perf_counter()
 
-    raw_data_df = raw_data_df.copy()
+    all_columns_raw_data_df = all_columns_raw_data_df.copy()
+    selected_columns_raw_data_df = selected_columns_raw_data_df.copy()
     scaled_raw_data_df = scaled_raw_data_df.copy()
     dim_red_df = dim_red_df.copy()
 
-    rotated_raw_data_df = raw_data_df.T.reset_index(drop=True).copy()
+    rotated_raw_data_df = selected_columns_raw_data_df.T.reset_index(drop=True).copy()
     rotated_scaled_raw_data_df = scaled_raw_data_df.T.reset_index(drop=True).copy()
     rotated_hierarchical_columns_metadata_df = (
         hierarchical_columns_metadata_df.T.reset_index(drop=True).copy()
@@ -266,10 +282,14 @@ def create_heatmap(
         rotated_hierarchical_columns_metadata_df.columns.map(str)
     )
 
-    rotated_column_names_df = pd.DataFrame(raw_data_df.columns)
+    selected_rotated_column_names_df = pd.DataFrame(
+        selected_columns_raw_data_df.columns
+    )
+    all_rotated_column_names_df = pd.DataFrame(all_columns_raw_data_df.columns)
 
     item_names_and_data = cluster_items_recursively(
-        raw_data_df,
+        selected_columns_raw_data_df,
+        all_columns_raw_data_df,
         hierarchical_rows_metadata_df,
         item_names_df,
         scaled_raw_data_for_clustering_items_df,
@@ -295,7 +315,8 @@ def create_heatmap(
         rotated_raw_data_df,
         rotated_scaled_raw_data_df,
         rotated_hierarchical_columns_metadata_df,
-        rotated_column_names_df,
+        all_rotated_column_names_df,
+        settings.selectedAttributesColumnNames,
         item_names_and_data,
         settings.attributesClusterSize,
         settings.clusterAttributesByCollections,

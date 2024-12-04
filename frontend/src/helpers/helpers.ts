@@ -140,6 +140,7 @@ export interface HierarchicalAttribute {
   std: number
   originalAttributeOrder: number
   isOpen: boolean
+  selected: boolean
   children: HierarchicalAttribute[] | null
 }
 

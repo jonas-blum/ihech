@@ -52,7 +52,6 @@ def filter_attributes_and_items(
 
     all_columns_raw_data_df = raw_data_df.copy()
     selected_columns_raw_data_df = raw_data_df[valid_columns]
-    hierarchical_columns_metadata_df = hierarchical_columns_metadata_df[valid_columns]
 
     for col in valid_columns:
         selected_columns_raw_data_df[col] = pd.to_numeric(

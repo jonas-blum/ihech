@@ -72,6 +72,7 @@ def cluster_attributes_recursively(
     cluster_by_collections: bool,
     hierarchical_column_metadata_row_indexes: List[int],
     level: int,
+    selected_attributes: List[str],
 ) -> Union[List[ItemNameAndData], None]:
     # Case: root level
     if level == 0:
@@ -90,6 +91,7 @@ def cluster_attributes_recursively(
             cluster_by_collections,
             hierarchical_column_metadata_row_indexes,
             level + 1,
+            selected_attributes,
         )
 
         new_hierarchical_attribute = HierarchicalAttribute(
@@ -98,6 +100,7 @@ def cluster_attributes_recursively(
             std=-1000,
             originalAttributeOrder=0,
             isOpen=True,
+            selected=True,
             children=children_0,
         )
 
@@ -156,6 +159,7 @@ def cluster_attributes_recursively(
                         std=float(solo_child_std),
                         originalAttributeOrder=solo_child_attribute_index,
                         isOpen=False,
+                        selected=(solo_child_name in selected_attributes),
                         children=None,
                     )
                 ]
@@ -170,6 +174,7 @@ def cluster_attributes_recursively(
                     cluster_by_collections,
                     remaining_collection_row_indexes,
                     level + 1,
+                    selected_attributes,
                 )
 
             average_hierarchical_attribute_index = np.mean(
@@ -182,6 +187,7 @@ def cluster_attributes_recursively(
                 std=float(new_hierarchical_attribute_std),
                 originalAttributeOrder=average_hierarchical_attribute_index,
                 isOpen=False,
+                selected=True,
                 children=new_children,
             )
 
@@ -213,6 +219,7 @@ def cluster_attributes_recursively(
                 std=float(new_attribute_std),
                 originalAttributeOrder=new_attribute_index,
                 isOpen=False,
+                selected=(new_attribute_names[i] in selected_attributes),
                 children=None,
             )
 
@@ -274,6 +281,9 @@ def cluster_attributes_recursively(
                             i
                         ],
                         isOpen=False,
+                        selected=(
+                            new_cluster_attribute_names[i] in selected_attributes
+                        ),
                         children=None,
                     )
 
@@ -289,6 +299,7 @@ def cluster_attributes_recursively(
                     std=float(new_attribute_std),
                     originalAttributeOrder=rotated_scaled_raw_data_cluster_df.index[0],
                     isOpen=False,
+                    selected=(new_attribute_name in selected_attributes),
                     children=None,
                 )
                 new_clustered_hierarchical_attributes.append(new_attribute)
@@ -304,6 +315,7 @@ def cluster_attributes_recursively(
                 cluster_by_collections,
                 hierarchical_column_metadata_row_indexes,
                 level + 1,
+                selected_attributes,
             )
             indices_list = list(current_cluster_indexes)
             new_index = get_current_data_length(item_names_and_data)
@@ -321,6 +333,7 @@ def cluster_attributes_recursively(
                 std=float(new_hierarchical_attribute_std),
                 originalAttributeOrder=average_index,
                 isOpen=False,
+                selected=True,
                 children=children,
             )
             new_clustered_hierarchical_attributes.append(new_hierarchical_attribute)

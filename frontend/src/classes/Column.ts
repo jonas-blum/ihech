@@ -1,7 +1,6 @@
 import { PixiColumnLabel } from '@/pixiComponents/PixiColumnLabel'
 import { useMainStore } from '@/stores/mainStore'
 
-
 export abstract class Column {
   name: string
   originalIndex: number // corresponds to the 'index' in the backend data; useful for finding the correct PixiHeatmapCell in the PixiRow.pixiHeatmapCellsContainer
@@ -69,9 +68,11 @@ export class AttributeColumn extends Column {
     originalIndex: number,
     originalAttributeOrder: number,
     standardDeviation: number,
+    selected: boolean,
     parent?: Column | null,
   ) {
     super(name, originalIndex, standardDeviation, originalAttributeOrder, parent)
+    this.selected = selected
   }
 
   hasChildren(): boolean {

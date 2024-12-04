@@ -56,6 +56,7 @@ export class AttributeTree {
         hierarchicalAttribute.dataAttributeIndex,
         hierarchicalAttribute.std,
         hierarchicalAttribute.originalAttributeOrder,
+        hierarchicalAttribute.selected,
         parent,
       )
     }

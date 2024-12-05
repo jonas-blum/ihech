@@ -803,6 +803,8 @@ export const useMainStore = defineStore('mainStore', {
 
       if (column instanceof AggregateColumn) {
         this.attributeTree?.toggleColumnExpansion(column)
+      } else if (column instanceof AttributeColumn) {
+        column.toggleSelected()
       }
     },
 

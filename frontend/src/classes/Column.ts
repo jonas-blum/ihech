@@ -135,7 +135,7 @@ export class AggregateColumn extends Column {
     if (this.name) {
       return `${this.name} (${this.selectedChildrenCount} / ${this.childrenCount})`
     } else {
-      return `${this.childrenCount} ${useMainStore().getActiveDataTable?.attributeNamePlural}`
+      return `${this.childrenCount} ${useMainStore().getActiveDataTable?.attributeNamePlural} (${this.selectedChildrenCount} / ${this.childrenCount})`
     }
   }
 

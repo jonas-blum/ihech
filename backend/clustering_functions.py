@@ -7,6 +7,8 @@ from sklearn.cluster import AgglomerativeClustering, KMeans, MiniBatchKMeans
 from sklearn.exceptions import ConvergenceWarning
 from heatmap_types import ItemNameAndData, HierarchicalAttribute
 import warnings
+from line_profiler import LineProfiler
+import atexit
 
 
 warnings.simplefilter("ignore", ConvergenceWarning)
@@ -30,8 +32,10 @@ def append_average_item_by_attribute_indexes(
     average_datas = []
 
     for indexes in list_of_indexes:
-        avg_data = np.round(np.mean(data[indexes]), rounding_precision)
-        average_datas.append(avg_data)
+        selected_data = data[indexes]
+        mean_value = np.mean(selected_data)
+        mean_value = np.round(mean_value, rounding_precision)
+        average_datas.append(mean_value)
 
     item_name_and_data.data = np.append(item_name_and_data.data, average_datas)
 
@@ -45,8 +49,18 @@ def append_average_item_by_attribute_indexes(
 def append_all_average_items_by_attribute_indexes(
     list_of_indexes: List[List[int]], item_names_and_data: List[ItemNameAndData]
 ):
+
+    profiler = LineProfiler()
     for item_name_and_data in item_names_and_data:
-        append_average_item_by_attribute_indexes(list_of_indexes, item_name_and_data)
+        profiler.add_function(append_average_item_by_attribute_indexes)
+        profiler.runcall(
+            append_average_item_by_attribute_indexes,
+            list_of_indexes,
+            item_name_and_data,
+        )
+
+    atexit.register(profiler.print_stats)
+    profiler.print_stats()
 
 
 def cluster_attributes_recursively(

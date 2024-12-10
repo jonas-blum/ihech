@@ -312,10 +312,8 @@ def create_heatmap(
     logger.info("Starting clustering attributes...")
     start_clustering_attributes = time.perf_counter()
     list_of_indexes = []
-    profiler = LineProfiler()
-    profiler.add_function(cluster_attributes_recursively)
-    hierarchical_attributes = profiler.runcall(
-        cluster_attributes_recursively,
+
+    hierarchical_attributes = cluster_attributes_recursively(
         rotated_raw_data_df,
         rotated_scaled_raw_data_df,
         rotated_hierarchical_columns_metadata_df,
@@ -329,9 +327,11 @@ def create_heatmap(
         list_of_indexes,
         len(item_names_and_data[0].data),
     )
-    append_all_average_items_by_attribute_indexes(list_of_indexes, item_names_and_data)
-    atexit.register(profiler.print_stats)
-    profiler.print_stats()
+
+    append_all_average_items_by_attribute_indexes(
+        list_of_indexes,
+        item_names_and_data,
+    )
 
     heatmap_json.hierarchicalAttributes = hierarchical_attributes
     logger.info(

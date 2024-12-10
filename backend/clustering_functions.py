@@ -20,20 +20,21 @@ def all_rows_same(df):
     return (df == df.iloc[0]).all().all()
 
 
-def insert_value_in_list_at_index(
-    value: float, index: int, list_to_insert: List[float]
-) -> List[float]:
-    return list_to_insert[:index] + [value] + list_to_insert[index:]
+def insert_value_in_array_at_index(
+    value: float, index: int, arr: np.ndarray
+) -> np.ndarray:
+    return np.insert(arr, index, value)
 
 
 def insert_value_in_item_name_and_data_at_index(
     value: float, index: int, item_name_and_data: ItemNameAndData
 ) -> None:
-    item_name_and_data.data = insert_value_in_list_at_index(
+    item_name_and_data.data = insert_value_in_array_at_index(
         value, index, item_name_and_data.data
     )
-    for child in item_name_and_data.children:
-        insert_value_in_item_name_and_data_at_index(value, index, child)
+    if item_name_and_data.children is not None:
+        for child in item_name_and_data.children:
+            insert_value_in_item_name_and_data_at_index(value, index, child)
 
 
 def append_average_item_by_attribute_indexes(
@@ -42,8 +43,11 @@ def append_average_item_by_attribute_indexes(
     if item_name_and_data is None:
         return
     data = item_name_and_data.data
-    avg_data = np.round(np.mean([data[i] for i in indexes]), rounding_precision)
-    item_name_and_data.data.append(avg_data)
+
+    avg_data = np.round(np.mean(data[indexes]), rounding_precision)
+
+    item_name_and_data.data = np.append(item_name_and_data.data, avg_data)
+
     if item_name_and_data.children is None:
         return
     for child in item_name_and_data.children:
@@ -355,9 +359,7 @@ def cluster_items_recursively(
     # Case: root level
     if level == 0:
         tag_data_0_aggregated_mean = raw_data_df.mean()
-        tag_data_0_aggregated = np.round(
-            tag_data_0_aggregated_mean, rounding_precision
-        ).tolist()
+        tag_data_0_aggregated = np.round(tag_data_0_aggregated_mean, rounding_precision)
         dim_reduction_0_aggregated = np.round(
             dim_red_df.mean(), rounding_precision
         ).tolist()
@@ -409,9 +411,7 @@ def cluster_items_recursively(
             dim_red_group_df = dim_red_df.loc[indexes_of_current_group]
             item_names_group_df = item_names_df.loc[indexes_of_current_group]
 
-            tag_data_aggregated = np.round(
-                raw_data_group_df.mean(), rounding_precision
-            ).tolist()
+            tag_data_aggregated = np.round(raw_data_group_df.mean(), rounding_precision)
 
             dim_reduction_aggregated = np.round(
                 dim_red_group_df.mean(), rounding_precision
@@ -425,7 +425,7 @@ def cluster_items_recursively(
                 solo_child_name = str(item_names_df.iloc[0, 0])
                 solo_child_data = np.round(
                     raw_data_group_df.iloc[0], rounding_precision
-                ).tolist()
+                )
                 new_children = [
                     ItemNameAndData(
                         index=raw_data_group_df.index[0],
@@ -487,7 +487,7 @@ def cluster_items_recursively(
         new_item_names = item_names_df[item_names_df.columns[0]].astype(str).tolist()
         dimReductionsX = np.round(dim_red_df[0], rounding_precision).tolist()
         dimReductionsY = np.round(dim_red_df[1], rounding_precision).tolist()
-        all_data = np.round(raw_data_df.values, rounding_precision).tolist()
+        all_data = np.round(raw_data_df.values, rounding_precision)
 
         for i in range(raw_data_df.shape[0]):
 
@@ -550,9 +550,7 @@ def cluster_items_recursively(
                 dimReductionsY = np.round(
                     dim_red_cluster_df[1], rounding_precision
                 ).tolist()
-                all_data = np.round(
-                    raw_data_cluster_df.values, rounding_precision
-                ).tolist()
+                all_data = np.round(raw_data_cluster_df.values, rounding_precision)
 
                 for i in range(raw_data_cluster_df.shape[0]):
                     new_item_name_and_data = ItemNameAndData(
@@ -573,9 +571,7 @@ def cluster_items_recursively(
                 new_item_name = item_names_cluster_df[
                     item_names_cluster_df.columns[0]
                 ].iloc[0]
-                new_data = np.round(
-                    raw_data_cluster_df.iloc[0], rounding_precision
-                ).tolist()
+                new_data = np.round(raw_data_cluster_df.iloc[0], rounding_precision)
                 new_item_name_and_data = ItemNameAndData(
                     index=raw_data_cluster_df.index[0],
                     itemName=new_item_name,
@@ -595,9 +591,7 @@ def cluster_items_recursively(
 
             tag_data_aggregated_mean = raw_data_cluster_df.mean()
 
-            tag_data_aggregated = np.round(
-                tag_data_aggregated_mean, rounding_precision
-            ).tolist()
+            tag_data_aggregated = np.round(tag_data_aggregated_mean, rounding_precision)
 
             dim_reduction_aggregated = np.round(
                 dim_red_cluster_df.mean(), rounding_precision

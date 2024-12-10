@@ -50,17 +50,11 @@ def append_all_average_items_by_attribute_indexes(
     list_of_indexes: List[List[int]], item_names_and_data: List[ItemNameAndData]
 ):
 
-    profiler = LineProfiler()
     for item_name_and_data in item_names_and_data:
-        profiler.add_function(append_average_item_by_attribute_indexes)
-        profiler.runcall(
-            append_average_item_by_attribute_indexes,
+        append_average_item_by_attribute_indexes(
             list_of_indexes,
             item_name_and_data,
         )
-
-    atexit.register(profiler.print_stats)
-    profiler.print_stats()
 
 
 def cluster_attributes_recursively(

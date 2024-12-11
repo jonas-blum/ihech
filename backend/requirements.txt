@@ -26,3 +26,4 @@ tqdm==4.66.1
 tzdata==2024.1 
 umap-learn==0.5.3 
 zstandard==0.23.0
+python-dotenv==1.0.1

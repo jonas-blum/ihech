@@ -67,11 +67,23 @@ export class PixiDimredApp extends Application {
     const textureStore = useTextureStore()
     const bubbleSize = dimredLayoutStore.bubbleSize
 
-    const bubbleGraphic = new Graphics()
-    bubbleGraphic.circle(0, 0, bubbleSize).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
+    // bubble texture no border
+    const bubbleGraphic = new Graphics
+    bubbleGraphic.circle(0, 0, bubbleSize).fill(0xffffff)
     textureStore.bubbleTexture = this.renderer.generateTexture({
       target: bubbleGraphic,
       resolution: 8,
+      frame: new Rectangle(-bubbleSize, -bubbleSize, bubbleSize * 2, bubbleSize * 2),
+    })
+
+    // bubble texture with border
+    const bubbleGraphicBordered = new Graphics
+    const strokeWidth = 0.1
+    bubbleGraphicBordered.circle(0, 0, bubbleSize).fill(0xffffff).stroke({width: strokeWidth, color: 0x000000})
+    textureStore.bubbleTextureBordered = this.renderer.generateTexture({
+      target: bubbleGraphicBordered,
+      resolution: 8,
+      frame: new Rectangle(-bubbleSize-strokeWidth, -bubbleSize-strokeWidth, bubbleSize * 2 + 1, bubbleSize * 2 + 1),
     })
 
     // sticky bubble texture
@@ -82,7 +94,7 @@ export class PixiDimredApp extends Application {
 
     textureStore.stickyBubbleTexture = this.renderer.generateTexture({
       target: graphic,
-      resolution: 8, // Optional: Keep this if you want higher resolution
+      resolution: 16, // Optional: Keep this if you want higher resolution
     })
   }
 }

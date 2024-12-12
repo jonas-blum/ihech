@@ -1,6 +1,6 @@
 import { Container, Texture, Graphics, Sprite, Point } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
-import { Row } from '@/classes/Row'
+import { Row, AggregateRow } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
 import { useMainStore } from '@/stores/mainStore'
@@ -21,7 +21,13 @@ export class PixiBubble extends Container {
     const textureStore = useTextureStore()
 
     this.addChild(this.bubbleGraphic)
-    this.changeTexture(textureStore.bubbleTexture as Texture)
+
+    // TODO: cleaner would be to have subclasses for different types of rows
+    if (this.row instanceof AggregateRow) {
+      this.changeTexture(textureStore.bubbleTextureBordered as Texture)
+    } else {
+      this.changeTexture(textureStore.bubbleTexture as Texture)
+    }
     this.updateTint(this.row.getColor())
     this.updateOpacity(0.5)
     this.updatePositionAndVisibility(false)

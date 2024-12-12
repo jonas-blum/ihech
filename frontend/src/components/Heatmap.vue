@@ -26,6 +26,7 @@ import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
 import ColorMap from '@/components/ColorMap.vue'
 import Search from '@/components/Search.vue'
 import ColumnContextMenu from '@/components/ColumnContextMenu.vue'
+import RowContextMenu from '@/components/RowContextMenu.vue'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
 
 const { x: mouseX, y: mouseY } = useMouse()
@@ -51,9 +52,8 @@ const heatmapCanvas = ref<HTMLCanvasElement | null>(null)
 const pixiHeatmapInitialized = ref(false)
 
 // this mechanism is needed to prevent interaction on the canvas elements below menus or tooltips
-const mouseOverMenuOrTooltip = ref(false)
 watch(
-  () => mouseOverMenuOrTooltip.value,
+  () => mainStore.mouseOverMenuOrTooltip,
   (value) => {
     // disable interaction on the whole canvas if hovering over a menu or tooltip
     if (pixiHeatmapApp) {
@@ -562,25 +562,25 @@ onMounted(async () => {
       </button>
       <Search
         class="custom-shadow"
-        @mouseenter="mouseOverMenuOrTooltip = true"
-        @mouseleave="mouseOverMenuOrTooltip = false"
+        @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+        @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
       ></Search>
       <div class="flex w-full gap-4">
         <RowSorterSettings
           class="w-full custom-shadow"
-          @mouseenter="mouseOverMenuOrTooltip = true"
-          @mouseleave="mouseOverMenuOrTooltip = false"
+          @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+          @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
         />
         <ColumnSorterSettings
           class="w-full custom-shadow"
-          @mouseenter="mouseOverMenuOrTooltip = true"
-          @mouseleave="mouseOverMenuOrTooltip = false"
+          @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+          @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
         />
       </div>
       <!-- <ColorMap
       class="custom-shadow"
-      @mouseenter="mouseOverMenuOrTooltip = true"
-      @mouseleave="mouseOverMenuOrTooltip = false"
+      @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+      @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
       /> -->
     </div>
     <ColorMap
@@ -590,8 +590,8 @@ onMounted(async () => {
         left: `${heatmapLayoutStore.matrixTileFrame.x + heatmapLayoutStore.matrixTileFrame.width}px`,
         width: `${heatmapLayoutStore.rowLabelWidth}px`,
       }"
-      @mouseenter="mouseOverMenuOrTooltip = true"
-      @mouseleave="mouseOverMenuOrTooltip = false"
+      @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+      @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
     />
   </div>
 
@@ -600,8 +600,8 @@ onMounted(async () => {
     class="absolute p-[2px] border-[1px] border-black bg-white shadow-md max-w-[400px]"
     :style="tooltipStyle"
     v-show="mainStore.hoveredPixiHeatmapCell"
-    @mouseenter="mouseOverMenuOrTooltip = true"
-    @mouseleave="mouseOverMenuOrTooltip = false"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
   >
   <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet1 }}</span>
     <span class="font-bold mx-[3px]">{{ mainStore.highlightedRow?.getName() }}</span>
@@ -620,18 +620,25 @@ onMounted(async () => {
     class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
     :style="tooltipStyle"
     v-show="mainStore.hoveredPixiColumnLabel"
-    @mouseenter="mouseOverMenuOrTooltip = true"
-    @mouseleave="mouseOverMenuOrTooltip = false"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
   >
     <span>{{ mainStore.highlightedColumn?.getName() }}</span>
   </div>
 
-  <!-- right-click menu -->
+  <!-- column right-click menu -->
   <ColumnContextMenu
     class="border-[1px] border-black bg-white shadow-md"
-    @mouseenter="mouseOverMenuOrTooltip = true"
-    @mouseleave="mouseOverMenuOrTooltip = false"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
   ></ColumnContextMenu>
+
+  <!-- column right-click menu -->
+  <RowContextMenu
+    class="border-[1px] border-black bg-white shadow-md"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
+  ></RowContextMenu>
 </template>
 
 <style scoped lang="scss"></style>

@@ -55,10 +55,12 @@ export const useMainStore = defineStore('mainStore', {
     hoveredPixiColumnLabel: null as PixiColumnLabel | null,
     hoveredPixiBubble: null as PixiBubble | null,
     selectedPixiColumnLabel: null as PixiColumnLabel | null,
+    selectedPixiRowLabel: null as PixiRowLabel | null,
 
     colorMap: new ColorMap(),
 
     searchResultBoxOpen: false as boolean,
+    mouseOverMenuOrTooltip: false as boolean,
 
     heatmap: {
       attributeDissimilarities: [] as number[],
@@ -791,11 +793,11 @@ export const useMainStore = defineStore('mainStore', {
     },
 
     rowLabelRightClickEvent(pixiRowLabel: PixiRowLabel) {
-      const row = pixiRowLabel.row
-      console.log('rowLabelRightClickEvent', row)
-      if (row instanceof AggregateRow) {
-        this.itemTree?.expandAllRows(row)
-      }
+      console.log('right clicked the label of', pixiRowLabel.row)
+      this.selectedPixiRowLabel = pixiRowLabel
+      // if (row instanceof AggregateRow) {
+      //   this.itemTree?.expandAllRows(row)
+      // }
     },
 
     columnLabelClickEvent(column: Column) {

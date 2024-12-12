@@ -35,6 +35,11 @@ const closeMenus = () => {
     mainStore.selectedPixiColumnLabel = null
   }
 
+  if (mainStore.selectedPixiRowLabel) {
+    // this will close the row context menu
+    mainStore.selectedPixiRowLabel = null
+  }
+
   if (mainStore.searchResultBoxOpen) {
     // this will close the search result box
     mainStore.searchResultBoxOpen = false

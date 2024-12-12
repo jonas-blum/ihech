@@ -56,6 +56,7 @@ export const useMainStore = defineStore('mainStore', {
     hoveredPixiBubble: null as PixiBubble | null,
     selectedPixiColumnLabel: null as PixiColumnLabel | null,
     selectedPixiRowLabel: null as PixiRowLabel | null,
+    selectedPixiBubble: null as PixiBubble | null,
 
     colorMap: new ColorMap(),
 
@@ -827,10 +828,19 @@ export const useMainStore = defineStore('mainStore', {
 
     bubbleRightClickEvent(bubble: PixiBubble) {
       console.log('bubbleRightClickEvent', bubble)
-      const row = bubble.row
-      if (row instanceof AggregateRow) {
-        this.itemTree?.expandAllRows(row)
-      }
+      this.selectedPixiBubble = bubble
+      // if (row instanceof AggregateRow) {
+      //   this.itemTree?.expandAllRows(row)
+      // }
     },
+
+    closeMenus() {
+      this.selectedPixiColumnLabel = null
+      this.selectedPixiRowLabel = null
+      this.selectedPixiBubble = null
+      this.searchResultBoxOpen = false
+
+      this.mouseOverMenuOrTooltip = false
+    }
   },
 })

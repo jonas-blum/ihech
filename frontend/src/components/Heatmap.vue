@@ -25,8 +25,8 @@ import RowSorterSettings from '@/components/RowSorterSettings.vue'
 import ColumnSorterSettings from '@/components/ColumnSorterSettings.vue'
 import ColorMap from '@/components/ColorMap.vue'
 import Search from '@/components/Search.vue'
-import ColumnContextMenu from '@/components/ColumnContextMenu.vue'
-import RowContextMenu from '@/components/RowContextMenu.vue'
+import ContextMenuColumnLabel from '@/components/ContextMenuColumnLabel.vue'
+import ContextMenuRowLabel from '@/components/ContextMenuRowLabel.vue'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
 
 const { x: mouseX, y: mouseY } = useMouse()
@@ -627,18 +627,18 @@ onMounted(async () => {
   </div>
 
   <!-- column right-click menu -->
-  <ColumnContextMenu
+  <ContextMenuColumnLabel
     class="border-[1px] border-black bg-white shadow-md"
     @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
     @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-  ></ColumnContextMenu>
+  ></ContextMenuColumnLabel>
 
-  <!-- column right-click menu -->
-  <RowContextMenu
+  <!-- row right-click menu -->
+  <ContextMenuRowLabel
     class="border-[1px] border-black bg-white shadow-md"
     @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
     @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-  ></RowContextMenu>
+  ></ContextMenuRowLabel>
 </template>
 
 <style scoped lang="scss"></style>

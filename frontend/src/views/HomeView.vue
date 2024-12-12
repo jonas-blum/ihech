@@ -19,32 +19,16 @@ function reloadHeatmap() {
 
 // global click event listener to close all kinds of menus
 document.addEventListener('click', (event) => {
-  closeMenus()
+  mainStore.closeMenus()
 })
 
 // global keydown event listener to close all kinds of menus when ESC is pressed
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
-    closeMenus()
+    mainStore.closeMenus()
   }
 })
 
-const closeMenus = () => {
-  if (mainStore.selectedPixiColumnLabel) {
-    // this will close the column context menu
-    mainStore.selectedPixiColumnLabel = null
-  }
-
-  if (mainStore.selectedPixiRowLabel) {
-    // this will close the row context menu
-    mainStore.selectedPixiRowLabel = null
-  }
-
-  if (mainStore.searchResultBoxOpen) {
-    // this will close the search result box
-    mainStore.searchResultBoxOpen = false
-  }
-}
 </script>
 
 <template>

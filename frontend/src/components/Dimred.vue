@@ -11,6 +11,8 @@ import { PixiDimredApp } from '@/pixiComponents/PixiDimredApp'
 import { Row } from '@/classes/Row'
 import { PixiBubble } from '@/pixiComponents/PixiBubble'
 
+
+import ContextMenuBubble from '@components/ContextMenuBubble.vue'
 import DimredAlgoSelection from '@components/DimredAlgoSelection.vue'
 
 const mainStore = useMainStore()
@@ -33,6 +35,18 @@ watch([mouseX, mouseY], ([x, y]) => {
 
 let pixiDimredApp: PixiDimredApp | null = null
 const pixiDimredInitialized = ref(false)
+
+// this mechanism is needed to prevent interaction on the canvas elements below menus or tooltips
+watch(
+  () => mainStore.mouseOverMenuOrTooltip,
+  (value) => {
+    // disable interaction on the whole canvas if hovering over a menu or tooltip
+    if (pixiDimredApp) {
+      pixiDimredApp.stage.eventMode = value ? 'none' : 'auto'
+    }
+  },
+)
+
 
 // watch for changes is highlightedRow
 // NOTE: I guess having watcher in the Heatmap and Dimred components is not the most efficient way, but for seperation of concerns it is justifiable
@@ -264,6 +278,13 @@ onMounted(async () => {
       {{ mainStore.hoveredPixiBubble?.row.getName() }}
     </span>
   </div>
+
+    <!-- bubble right-click menu -->
+    <ContextMenuBubble
+    class="border-[1px] border-black bg-white shadow-md"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
+  ></ContextMenuBubble>
 </template>
 
 <style scoped></style>

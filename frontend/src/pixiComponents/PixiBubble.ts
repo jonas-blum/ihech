@@ -1,15 +1,16 @@
-import { Container, Texture, Graphics, Sprite, Point } from 'pixi.js'
+import { Container, Texture, Graphics, Sprite, Point, Text } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
-import { Row, AggregateRow } from '@/classes/Row'
+import { Row, AggregateRow, ItemRow } from '@/classes/Row'
 import { PixiHeatmapCell } from '@/pixiComponents/PixiHeatmapCell'
 import { PixiRowLabel } from '@/pixiComponents/PixiRowLabel'
+import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 import { gsap } from 'gsap'
 import { useTextureStore } from '@/stores/textureStore'
 
-export class PixiBubble extends Container {
+export class PixiBubble extends PixiContainer {
   public row: Row // reference to data structure Row
   public bubbleGraphic: Sprite = new Sprite()
 
@@ -18,21 +19,14 @@ export class PixiBubble extends Container {
     this.row = row
 
     const mainStore = useMainStore()
-    const textureStore = useTextureStore()
 
     this.addChild(this.bubbleGraphic)
 
-    // TODO: cleaner would be to have subclasses for different types of rows
-    if (this.row instanceof AggregateRow) {
-      this.changeTexture(textureStore.bubbleTextureBordered as Texture)
-    } else {
-      this.changeTexture(textureStore.bubbleTexture as Texture)
-    }
     this.updateTint(this.row.getColor())
     this.updateOpacity(0.5)
     this.updatePositionAndVisibility(false)
     this.updateSize()
-    
+
     this.eventMode = 'static'
     this.cursor = 'pointer'
 
@@ -68,7 +62,7 @@ export class PixiBubble extends Container {
 
   updatePositionAndVisibility(animate: boolean = true) {
     const dimredLayoutStore = useDimredLayoutStore()
-  
+
     const isRowSticky = useMainStore().itemTree?.isRowSticky(this.row)
 
     // if the position is -1, we hide the bubble
@@ -125,7 +119,6 @@ export class PixiBubble extends Container {
     // if neiter the position nor the oldPosition is -1, we do not need to change the position
 
     this.updateVisibility()
-
   }
 
   updateVisibility(delay: number = 0) {
@@ -197,4 +190,38 @@ export class PixiBubble extends Container {
     this.filters = highlighted ? [new GlowFilter()] : []
     this.updateOpacity(highlighted ? 1 : 0.5)
   }
+}
+
+export class PixiAggregateBubble extends PixiBubble {
+  public text: Text
+
+  constructor(row: AggregateRow) {
+    super(row)
+    this.text = new Text({
+      text: this.row.totalChildrenCount.toString(),
+      style: {
+        fill: this.row.getColor(),
+        fontSize: 10,
+        fontFamily: 'Arial',
+      }
+    })
+    this.text.x = -this.text.width / 2
+    this.text.y = -this.text.height / 2
+
+    this.addChild(this.text)
+
+
+    this.changeTexture(useTextureStore().ringTexture as Texture)
+
+  }
+
+}
+
+export class PixiItemBubble extends PixiBubble {
+  constructor(row: ItemRow) {
+    super(row)
+
+    this.changeTexture(useTextureStore().bubbleTexture as Texture)
+  }
+
 }

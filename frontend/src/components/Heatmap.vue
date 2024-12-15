@@ -539,43 +539,27 @@ onMounted(async () => {
     <canvas class="w-full h-full" ref="heatmapCanvas" @contextmenu.prevent></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
 
-    <div
-      class="absolute z-10 flex flex-col justify-end gap-4 bg-white"
-      :style="{
-        top: `${heatmapLayoutStore.tileMargin}px`,
-        left: `${heatmapLayoutStore.tileMargin}px`,
-        width: `${heatmapLayoutStore.rowLabelWidth}px`,
-        height: `${heatmapLayoutStore.columnLabelHeight}px`,
-      }"
-    >
-      <button
-        @click="reloadHeatmap()"
-        class="btn btn-sm btn-block text-sm rounded-none custom-shadow"
-        :class="{
-          'btn-ghost': !mainStore.isOutOfSync,
-          'btn-warning': mainStore.isOutOfSync,
-        }"
-      >
+    <div class="absolute z-10 flex flex-col justify-end gap-4 bg-white" :style="{
+      top: `${heatmapLayoutStore.tileMargin}px`,
+      left: `${heatmapLayoutStore.tileMargin}px`,
+      width: `${heatmapLayoutStore.rowLabelWidth}px`,
+      height: `${heatmapLayoutStore.columnLabelHeight}px`,
+    }">
+      <button @click="reloadHeatmap()" class="btn btn-sm btn-block text-sm rounded-none custom-shadow" :class="{
+        'btn-ghost': !mainStore.isOutOfSync,
+        'btn-warning': mainStore.isOutOfSync,
+      }">
         Update
         <span v-if="mainStore.isOutOfSync">(unsaved changes!)</span>
         <span v-if="mainStore.isLoading" class="loading loading-spinner"></span>
       </button>
-      <Search
-        class="custom-shadow"
-        @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-        @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-      ></Search>
+      <Search class="custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+        @mouseleave="mainStore.mouseOverMenuOrTooltip = false"></Search>
       <div class="flex w-full gap-4">
-        <RowSorterSettings
-          class="w-full custom-shadow"
-          @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-          @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-        />
-        <ColumnSorterSettings
-          class="w-full custom-shadow"
-          @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-          @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-        />
+        <RowSorterSettings class="w-full custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+          @mouseleave="mainStore.mouseOverMenuOrTooltip = false" />
+        <ColumnSorterSettings class="w-full custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+          @mouseleave="mainStore.mouseOverMenuOrTooltip = false" />
       </div>
       <!-- <ColorMap
       class="custom-shadow"
@@ -583,62 +567,47 @@ onMounted(async () => {
       @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
       /> -->
     </div>
-    <ColorMap
-      class="absolute z-10 -translate-x-[100%] -translate-y-[100%] custom-shadow"
-      :style="{
-        top: `${heatmapLayoutStore.matrixTileFrame.y + heatmapLayoutStore.matrixTileFrame.height}px`,
-        left: `${heatmapLayoutStore.matrixTileFrame.x + heatmapLayoutStore.matrixTileFrame.width}px`,
-        width: `${heatmapLayoutStore.rowLabelWidth}px`,
-      }"
-      @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-      @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-    />
+    <ColorMap class="absolute z-10 -translate-x-[100%] -translate-y-[100%] custom-shadow" :style="{
+      top: `${heatmapLayoutStore.matrixTileFrame.y + heatmapLayoutStore.matrixTileFrame.height}px`,
+      left: `${heatmapLayoutStore.matrixTileFrame.x + heatmapLayoutStore.matrixTileFrame.width}px`,
+      width: `${heatmapLayoutStore.rowLabelWidth}px`,
+    }" @mouseenter="mainStore.mouseOverMenuOrTooltip = true" @mouseleave="mainStore.mouseOverMenuOrTooltip = false" />
   </div>
 
   <!-- Heatmap cell Tooltip -->
-  <div
-    class="absolute p-[2px] border-[1px] border-black bg-white shadow-md max-w-[400px]"
-    :style="tooltipStyle"
-    v-show="mainStore.hoveredPixiHeatmapCell"
-    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-  >
-  <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet1 }}</span>
+  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md max-w-[400px]" :style="tooltipStyle"
+    v-show="mainStore.hoveredPixiHeatmapCell" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+    @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
+    <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet1 }}</span>
     <span class="font-bold mx-[3px]">{{ mainStore.highlightedRow?.getName() }}</span>
-    <span class="mx-[3px]" v-if="(mainStore.highlightedRow instanceof ItemRow)">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet2.single }}</span>
+    <span class="mx-[3px]" v-if="(mainStore.highlightedRow instanceof ItemRow)">{{
+      mainStore.getActiveDataTable?.cellHoverTextSnippet2.single }}</span>
     <span class="mx-[3px]" v-else>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet2.plural }}</span>
     <span class="font-bold mx-[3px]">
       {{ mainStore.hoveredPixiHeatmapCell?.value }}
     </span>
-    <span class="mx-[3px]" v-if="(mainStore.highlightedColumn instanceof AttributeColumn)">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3.single }}</span>
+    <span class="mx-[3px]" v-if="(mainStore.highlightedColumn instanceof AttributeColumn)">{{
+      mainStore.getActiveDataTable?.cellHoverTextSnippet3.single }}</span>
     <span class="mx-[3px]" v-else>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3.plural }}</span>
     <span class="font-bold mx-[3px]">{{ mainStore.highlightedColumn?.getName() }}</span>
   </div>
 
   <!-- Attribute Tooltip -->
-  <div
-    class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
-    :style="tooltipStyle"
-    v-show="mainStore.hoveredPixiColumnLabel"
-    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-  >
+  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md" :style="tooltipStyle"
+    v-show="mainStore.hoveredPixiColumnLabel" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+    @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
     <span>{{ mainStore.highlightedColumn?.getName() }}</span>
   </div>
 
   <!-- column right-click menu -->
-  <ContextMenuColumnLabel
-    class="border-[1px] border-black bg-white shadow-md"
-    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-  ></ContextMenuColumnLabel>
+  <ContextMenuColumnLabel class="border-[1px] border-black bg-white shadow-md"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true" @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
+  </ContextMenuColumnLabel>
 
   <!-- row right-click menu -->
-  <ContextMenuRowLabel
-    class="border-[1px] border-black bg-white shadow-md"
-    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-  ></ContextMenuRowLabel>
+  <ContextMenuRowLabel class="border-[1px] border-black bg-white shadow-md"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true" @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
+  </ContextMenuRowLabel>
 </template>
 
 <style scoped lang="scss"></style>

@@ -68,7 +68,7 @@ export class PixiDimredApp extends Application {
     const bubbleSize = dimredLayoutStore.bubbleSize
 
     // bubble texture no border
-    const bubbleGraphic = new Graphics
+    const bubbleGraphic = new Graphics()
     bubbleGraphic.circle(0, 0, bubbleSize).fill(0xffffff)
     textureStore.bubbleTexture = this.renderer.generateTexture({
       target: bubbleGraphic,
@@ -77,7 +77,7 @@ export class PixiDimredApp extends Application {
     })
 
     // bubble texture with border
-    const bubbleGraphicBordered = new Graphics
+    const bubbleGraphicBordered = new Graphics()
     const strokeWidth = 0.1
     bubbleGraphicBordered.circle(0, 0, bubbleSize).fill(0xffffff).stroke({width: strokeWidth, color: 0x000000})
     textureStore.bubbleTextureBordered = this.renderer.generateTexture({
@@ -85,6 +85,18 @@ export class PixiDimredApp extends Application {
       resolution: 8,
       frame: new Rectangle(-bubbleSize-strokeWidth, -bubbleSize-strokeWidth, bubbleSize * 2 + 1, bubbleSize * 2 + 1),
     })
+
+    // ring texture
+    const ringGraphic = new Graphics()
+    const ringSize = bubbleSize
+    const ringThickness = 0.5
+    ringGraphic.circle(0, 0, ringSize).stroke({width: ringThickness, color: 0xffffff})
+    textureStore.ringTexture = this.renderer.generateTexture({
+      target: ringGraphic,
+      resolution: 8,
+      frame: new Rectangle(-ringSize-ringThickness, -ringSize-ringThickness, ringSize * 2 + 2*ringThickness, ringSize * 2 + 2*ringThickness),
+    })
+
 
     // sticky bubble texture
     const starScaleFactor = 2

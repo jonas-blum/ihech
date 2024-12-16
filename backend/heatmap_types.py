@@ -65,7 +65,7 @@ class ItemNameAndData:
     index: Union[int, None]
     itemName: str
     isOpen: bool
-    data: List[float]
+    data: np.ndarray
     amountOfDataPoints: int
     dimReductionX: float
     dimReductionY: float
@@ -76,7 +76,7 @@ class ItemNameAndData:
         index: Union[int, None],
         itemName: str,
         isOpen: bool,
-        data: List[float],
+        data: np.ndarray,
         amountOfDataPoints: int,
         dimReductionX: float,
         dimReductionY: float,
@@ -85,7 +85,7 @@ class ItemNameAndData:
         self.index: Union[int, None] = index
         self.itemName: str = itemName
         self.isOpen: bool = isOpen
-        self.data: List[float] = data
+        self.data: np.ndarray = data
         self.amountOfDataPoints: int = amountOfDataPoints
         self.dimReductionX: float = dimReductionX
         self.dimReductionY: float = dimReductionY
@@ -107,7 +107,7 @@ def custom_encoder(obj):
             "index": obj.index,
             "itemName": obj.itemName,
             "isOpen": obj.isOpen,
-            "data": obj.data,
+            "data": obj.data.tolist(),
             "amountOfDataPoints": obj.amountOfDataPoints,
             "dimReductionX": obj.dimReductionX,
             "dimReductionY": obj.dimReductionY,

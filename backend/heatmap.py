@@ -1,6 +1,8 @@
 from calculate_attribute_std import calculate_attribute_std
 from numba.core.errors import NumbaDeprecationWarning
 import warnings
+from line_profiler import LineProfiler
+import atexit
 
 
 warnings.filterwarnings(
@@ -23,6 +25,7 @@ from heatmap_types import HeatmapJSON, HeatmapSettings
 from clustering_functions import (
     cluster_items_recursively,
     cluster_attributes_recursively,
+    append_all_average_items_by_attribute_indexes,
 )
 
 
@@ -308,6 +311,7 @@ def create_heatmap(
     )
     logger.info("Starting clustering attributes...")
     start_clustering_attributes = time.perf_counter()
+    list_of_indexes = []
 
     hierarchical_attributes = cluster_attributes_recursively(
         rotated_raw_data_df,
@@ -320,7 +324,15 @@ def create_heatmap(
         settings.hierarchicalColumnsMetadataRowIndexes,
         0,
         settings.selectedAttributesColumnNames,
+        list_of_indexes,
+        len(item_names_and_data[0].data),
     )
+
+    append_all_average_items_by_attribute_indexes(
+        list_of_indexes,
+        item_names_and_data,
+    )
+
     heatmap_json.hierarchicalAttributes = hierarchical_attributes
     logger.info(
         f"Clustering attributes done: {round(time.perf_counter() - start_clustering_attributes, 2)}"

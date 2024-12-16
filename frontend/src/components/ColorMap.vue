@@ -102,6 +102,10 @@ const onCreateBreakpoint = () => {
         <input type="color" class="w-8 h-[1rem]" v-model="templateBreakpoint.color" @click.stop />
         <button @click.stop="onCreateBreakpoint" class="btn btn-xs">Create</button>
       </div>
+      <div class="flex gap-2 justify-between mt-2">
+        <button @click="mainStore.useDivergentColorMap" class="btn btn-xs flex-1">Divergent</button>
+        <button @click="mainStore.useUniformColorMap" class="btn btn-xs flex-1">Uniform</button>
+      </div>
 
     </div>
   </details>

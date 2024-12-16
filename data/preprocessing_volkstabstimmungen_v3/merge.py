@@ -7,7 +7,7 @@ sprachgebiete = pd.read_csv('sprachgebiete.csv')
 voting_results = pd.read_csv('voting_results.csv')
 
 # the metadata columns that can be used to semantically aggregate items
-item_metadata_columns = ['Gemeinde', 'Bezirk', 'Kanton', 'Sprachgebiet']
+item_metadata_columns = ['Gemeinde', 'Sprachgebiet', 'Kanton', 'Bezirk']
 
 # the metadata columns that can be used to semantically aggregate columns
 column_metadata_rows = ['Rechtsform', 'Politikbereich', 'Departement', 'Bundesrat', 'Parlament', 'Nationalrat', 'Ständerat']
@@ -46,7 +46,7 @@ for i, gemeinde in sprachgebiete.iterrows():
         continue
     voting_result = voting_result.iloc[0]
 
-    row = [voting_result['gemeinde_name'], voting_result['bezirk_name'], voting_result['kanton_name'], sprachgebiet, '']
+    row = [voting_result['gemeinde_name'], sprachgebiet, voting_result['kanton_name'], voting_result['bezirk_name'], '']
     
     # to fill the data matrix we need to loop over all votings
     yes_percentages = pivot_table.loc[geo_id].reindex(swissvotes['vorlage_id']).fillna('')

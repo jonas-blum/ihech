@@ -45,7 +45,8 @@
 
 ## Merge datasets
 
-1. Run the `merge.py` script (NOTE: super inefficient code, so it may take a while..)
+1. Run the `merge.py` script --> will produce the final `Voting-Data.json` file
+2. Copy the json file to the `frontend > public` folder to make it available in the tool
 
 
 - `vorlage_id` can be used as a merge key

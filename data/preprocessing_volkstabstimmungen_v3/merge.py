@@ -87,13 +87,13 @@ df.to_csv('Voting-Data-NEW.csv', index=False, header=False)
 
 # create as json file
 dic = {
-    "datasetName": "NEW Voting Data From Switzerland",
+    "datasetName": "Voting Data From Switzerland",
     "descriptionText": "You are exploring the voting results of 'popular votes' (Volksabstimmungen) of Switzerland.",
     "itemNameSingular": "municipality",
     "itemNamePlural": "municipalities",
     "attributeNameSingular": "vote",
     "attributeNamePlural": "votes",
-    "cellHoverTextSnippet1": "The residents of",
+    "cellHoverTextSnippet1": "Municipalities of",
     "cellHoverTextSnippet2": {
         "single": "have voted",
         "plural": "have on average voted"

@@ -1,9 +1,11 @@
 #!/bin/bash
+set -e
+
 cd /home/pi/ihech
 
-git fetch
-LOCAL=$(git rev-parse HEAD)
-REMOTE=$(git rev-parse @{u})
+sudo -u pi -E git fetch
+LOCAL=$(sudo -u pi -E git rev-parse HEAD)
+REMOTE=$(sudo -u pi -E git rev-parse @{u})
 
 BACKEND_IMAGE="jonasblum/ihech-backend2:latest"
 FRONTEND_IMAGE="jonasblum/ihech-frontend2:latest"
@@ -15,7 +17,7 @@ export VITE_API_URL=https://backend2-ihech.jonas-blum.ch
 
 if [ "$LOCAL" != "$REMOTE" ]; then
     echo "Changes detected, updating and restarting the container..."
-    git reset --hard origin/main
+    sudo -u pi -E git reset --hard origin/main
 
     docker build -t $BACKEND_IMAGE ./backend
     docker push $BACKEND_IMAGE

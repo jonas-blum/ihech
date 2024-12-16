@@ -30,7 +30,7 @@ export class PixiHeatmapApp extends Application {
       height: heatmapLayoutStore.canvasHeight,
       backgroundColor: heatmapLayoutStore.heatmapCanvasBackgroundColor,
       antialias: true,
-      resolution: 1,
+      resolution: 2,
       // autoDensity: true, // not sure what this does
     })
 
@@ -43,6 +43,34 @@ export class PixiHeatmapApp extends Application {
 
     this.verticalScrollbar.update()
     this.horizontalScrollbar.update()
+
+    // add scroll event listener
+    this.matrixTile.eventMode = 'static'
+    this.matrixTile.on('wheel', (e: WheelEvent) => {
+      const heatmapLayoutStore = useHeatmapLayoutStore()
+      if (e.deltaY !== 0) {
+        heatmapLayoutStore.setVerticalScrollPosition(heatmapLayoutStore.verticalScrollPosition + e.deltaY)
+      }
+      if (e.deltaX !== 0) {
+        heatmapLayoutStore.setHorizontalScrollPosition(heatmapLayoutStore.horizontalScrollPosition + e.deltaX)
+      }
+    })
+
+    this.rowLabelTile.eventMode = 'static'
+    this.rowLabelTile.on('wheel', (e: WheelEvent) => {
+      const heatmapLayoutStore = useHeatmapLayoutStore()
+      if (e.deltaY !== 0) {
+        heatmapLayoutStore.setVerticalScrollPosition(heatmapLayoutStore.verticalScrollPosition + e.deltaY)
+      }
+    })
+
+    this.columnLabelTile.eventMode = 'static'
+    this.columnLabelTile.on('wheel', (e: WheelEvent) => {
+      const heatmapLayoutStore = useHeatmapLayoutStore()
+      if (e.deltaX !== 0) {
+        heatmapLayoutStore.setHorizontalScrollPosition(heatmapLayoutStore.horizontalScrollPosition + e.deltaX)
+      }
+    })
   }
 
   activateLoadingState() {
@@ -94,8 +122,8 @@ export class PixiHeatmapApp extends Application {
     const circleGraphic = new Graphics()
     circleGraphic.circle(0, 0, 5).fill(0xffffff) //.stroke({width: 1, color: 0x000000})
     textureStore.circleTexture = this.renderer.generateTexture(circleGraphic)
-  
-      // star texture
+
+    // star texture
     const starGraphic = new Graphics()
     starGraphic.star(0, 0, 5, 6).fill(0xffffff)
     textureStore.starTexture = this.renderer.generateTexture({

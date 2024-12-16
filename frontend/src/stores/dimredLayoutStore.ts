@@ -12,7 +12,7 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     tileMargin: 20, // margin between "layout tiles"
 
     animationDuration: 0.3, // duration of animations in seconds
-    showParentBubbles: true, // whether to show the parent bubbles in the dimred
+    showParentBubbles: false, // whether to show the parent bubbles in the dimred
 
     dimredCanvasBackgroundColor: 0xffffff, // background color of the heatmap
     basicBubbleColor: 0x654321, // basic color of the bubbles
@@ -28,7 +28,7 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     },
     // because the dimred points need to be quadratic, we take the minimum of the width and height
     dimredSize(): number {
-      return Math.min(this.canvasInnerWidth, this.canvasInnerHeight) - this.bubbleSizeMaximal
+      return Math.min(this.canvasInnerWidth, this.canvasInnerHeight) - 2*this.bubbleSizeMaximal
     },
     // if the canvasWidth > canvasHeight, we need to center the dimred horizontally
     dimredXPadding(): number {

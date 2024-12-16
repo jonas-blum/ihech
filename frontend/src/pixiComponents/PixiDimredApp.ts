@@ -10,7 +10,7 @@ import { useTextureStore } from '@/stores/textureStore'
 
 export class PixiDimredApp extends Application {
   public bubbleContainer: PixiContainer = new PixiContainer() // PixiBubble[] as children
-  public dimredTile: DimredTile = new DimredTile() 
+  public dimredTile: DimredTile = new DimredTile()
 
   constructor(canvasElement: HTMLCanvasElement) {
     super()
@@ -68,7 +68,7 @@ export class PixiDimredApp extends Application {
     const bubbleSize = dimredLayoutStore.bubbleSize
 
     // bubble texture no border
-    const bubbleGraphic = new Graphics
+    const bubbleGraphic = new Graphics()
     bubbleGraphic.circle(0, 0, bubbleSize).fill(0xffffff)
     textureStore.bubbleTexture = this.renderer.generateTexture({
       target: bubbleGraphic,
@@ -77,14 +77,26 @@ export class PixiDimredApp extends Application {
     })
 
     // bubble texture with border
-    const bubbleGraphicBordered = new Graphics
+    const bubbleGraphicBordered = new Graphics()
     const strokeWidth = 0.1
-    bubbleGraphicBordered.circle(0, 0, bubbleSize).fill(0xffffff).stroke({width: strokeWidth, color: 0x000000})
+    bubbleGraphicBordered.circle(0, 0, bubbleSize).fill(0xffffff).stroke({ width: strokeWidth, color: 0x000000 })
     textureStore.bubbleTextureBordered = this.renderer.generateTexture({
       target: bubbleGraphicBordered,
       resolution: 8,
-      frame: new Rectangle(-bubbleSize-strokeWidth, -bubbleSize-strokeWidth, bubbleSize * 2 + 1, bubbleSize * 2 + 1),
+      frame: new Rectangle(-bubbleSize - strokeWidth, -bubbleSize - strokeWidth, bubbleSize * 2 + 1, bubbleSize * 2 + 1),
     })
+
+    // ring texture
+    const ringGraphic = new Graphics()
+    const ringSize = bubbleSize
+    const ringThickness = 0.5
+    ringGraphic.circle(0, 0, ringSize).stroke({ width: ringThickness, color: 0xffffff })
+    textureStore.ringTexture = this.renderer.generateTexture({
+      target: ringGraphic,
+      resolution: 8,
+      frame: new Rectangle(-ringSize - ringThickness, -ringSize - ringThickness, ringSize * 2 + 2 * ringThickness, ringSize * 2 + 2 * ringThickness),
+    })
+
 
     // sticky bubble texture
     const starScaleFactor = 2
@@ -97,4 +109,33 @@ export class PixiDimredApp extends Application {
       resolution: 16, // Optional: Keep this if you want higher resolution
     })
   }
+
+  testScaling() {
+    // setting the pivot to be the center of the bubble container
+    this.bubbleContainer.pivot.set(this.bubbleContainer.width / 2, this.bubbleContainer.height / 2)
+    console.log(`setting the pivot to ${this.bubbleContainer.pivot.x}, ${this.bubbleContainer.pivot.y}`)
+
+    const currentScale = this.bubbleContainer.scale.x
+    this.bubbleContainer.scale.set(currentScale + 0.1)
+    console.log(`setting the scale from ${currentScale} to ${this.bubbleContainer.scale.x}`)
+  }
+
+  // NOTE: here I tried to dynamically scale to reduce white space in the dimred. I gave up.
+  // scaleToBubbleBoundingBox() {
+  //   const { minX, minY, maxX, maxY } = this.bubbleContainer.getBounds()
+  //   const spanX = maxX - minX // how much space the bubbles take up in x direction
+  //   const spanY = maxY - minY // how much space the bubbles take up in y direction
+  //   console.log({ minX, minY, maxX, maxY, spanX, spanY })
+
+  //   const dimredLayoutStore = useDimredLayoutStore()
+
+  //   // "zoom-in" by scaling the bubble container
+  //   const scaleFactor = dimredLayoutStore.dimredSize / Math.max(spanX, spanY)
+  //   console.log({ scaleFactor })
+  //   this.bubbleContainer.scale.set(scaleFactor)
+
+  //   // translate the bubble container to the center
+  //   this.bubbleContainer.x = dimredLayoutStore.dimredXPadding - minX * scaleFactor
+  //   this.bubbleContainer.y = dimredLayoutStore.dimredYPadding - minY * scaleFactor
+  // }
 }

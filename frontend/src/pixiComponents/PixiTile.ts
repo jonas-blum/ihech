@@ -105,12 +105,12 @@ export class MatrixTile extends PixiTile {
       heatmapLayoutStore.requiredHeightOfStickyRows - heatmapLayoutStore.verticalScrollPosition
 
     // TODO: not sure about the performance side effects of this ...
-    this.rowsContainer.updateMask(
-      0,
-      heatmapLayoutStore.verticalScrollPosition,
-      40000,
-      heatmapLayoutStore.matrixTileFrame.height,
-    )
+    // this.rowsContainer.updateMask(
+    //   0,
+    //   heatmapLayoutStore.verticalScrollPosition,
+    //   40000,
+    //   heatmapLayoutStore.matrixTileFrame.height,
+    // )
   }
 }
 

@@ -13,6 +13,7 @@ export const useTextureStore = defineStore('textureStore', {
     // textures from Dimred
     bubbleTexture: new Texture(),
     bubbleTextureBordered: new Texture(),
+    ringTexture: new Texture(),
     stickyBubbleTexture: new Texture(),
   }),
   getters: {},

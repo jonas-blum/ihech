@@ -8,8 +8,8 @@ import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 import { useTextureStore } from '@/stores/textureStore'
 
 import { PixiDimredApp } from '@/pixiComponents/PixiDimredApp'
-import { Row } from '@/classes/Row'
-import { PixiBubble } from '@/pixiComponents/PixiBubble'
+import { Row, ItemRow, AggregateRow } from '@/classes/Row'
+import { PixiBubble, PixiItemBubble, PixiAggregateBubble } from '@/pixiComponents/PixiBubble'
 
 
 import ContextMenuBubble from '@components/ContextMenuBubble.vue'
@@ -184,12 +184,19 @@ function update() {
     }
 
     for (let row of rows) {
-      let pixiBubble = new PixiBubble(
-        row as Row,
-      ) // create PixiBubble with reference to the Row
-      row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
-      pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp
+      let pixiBubble: PixiBubble | null = null
+      if (row instanceof ItemRow) {
+        pixiBubble = new PixiItemBubble(row)
+      } else if (row instanceof AggregateRow) {
+        pixiBubble = new PixiAggregateBubble(row)
+      }
+
+      if (pixiBubble) {
+        row.pixiBubble = pixiBubble // set the reference to the PixiBubble in the Row
+        pixiDimredApp.addBubble(pixiBubble) // adds the PixiBubble to the PixiDimredApp
+      }
     }
+
     console.timeEnd('initPixiDimredComponents')
 
     pixiDimredInitialized.value = true
@@ -239,37 +246,24 @@ onMounted(async () => {
 
 <template>
   <div class="w-full h-full relative">
-    <!-- might use later: this is the equivalent border shadow of the Pixi.DropShadowFilter -->
+
     <canvas class="w-full h-full" ref="dimredCanvas" @contextmenu.prevent></canvas>
 
-    <DimredAlgoSelection
-      class="absolute"
-      :style="{
-        top: `${dimredLayoutStore.tileMargin}px`,
-        left: `${dimredLayoutStore.tileMargin}px`,
-      }"
-    />
-    <div
-      class="absolute"
-      :style="{
-        top: `${dimredLayoutStore.tileMargin}px`,
-        right: `${dimredLayoutStore.tileMargin}px`,
-      }"
-    >
+    <DimredAlgoSelection class="absolute" :style="{
+      top: `${dimredLayoutStore.tileMargin}px`,
+      left: `${dimredLayoutStore.tileMargin}px`,
+    }" />
+    <div class="absolute" :style="{
+      top: `${dimredLayoutStore.tileMargin}px`,
+      right: `${dimredLayoutStore.tileMargin}px`,
+    }">
       <span class="text-xs mr-1">Show Parent Bubbles?</span>
-      <input
-        v-model="dimredLayoutStore.showParentBubbles"
-        type="checkbox"
-        class="toggle toggle-xs translate-y-[4px]"
-      />
+      <input v-model="dimredLayoutStore.showParentBubbles" type="checkbox" class="toggle toggle-xs translate-y-[4px]" />
     </div>
   </div>
   <!-- Tooltip -->
-  <div
-    class="absolute p-[2px] border-[1px] border-black bg-white shadow-md"
-    :style="tooltipStyle"
-    v-show="mainStore.hoveredPixiBubble"
-  >
+  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md" :style="tooltipStyle"
+    v-show="mainStore.hoveredPixiBubble">
     <!-- <span>{{ mainStore.highlightedRow?.name }}</span
       ><br />
       <span>{{ mainStore.highlightedColumn?.name }}</span
@@ -279,12 +273,10 @@ onMounted(async () => {
     </span>
   </div>
 
-    <!-- bubble right-click menu -->
-    <ContextMenuBubble
-    class="border-[1px] border-black bg-white shadow-md"
-    @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-    @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-  ></ContextMenuBubble>
+  <!-- bubble right-click menu -->
+  <ContextMenuBubble class="border-[1px] border-black bg-white shadow-md"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true" @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
+  </ContextMenuBubble>
 </template>
 
 <style scoped></style>

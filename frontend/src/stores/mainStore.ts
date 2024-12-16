@@ -329,7 +329,7 @@ export const useMainStore = defineStore('mainStore', {
         const criterionB = new ColumnSorterCriterionByName()
         const criterionC = new ColumnSorterCriterionByStandardDeviation()
 
-        const columnSorter = new ColumnSorter([criterionA, criterionB, criterionC])
+        const columnSorter = new ColumnSorter([criterionC, criterionB, criterionA])
 
         // initialize itemTree with the data received from the backend, starting at the root
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]
@@ -352,19 +352,9 @@ export const useMainStore = defineStore('mainStore', {
         this.attributeTree.calculateMaxDepth()
         console.log('AttributeTree:', this.attributeTree)
 
-        // divergent color map
-        const b1 = new Breakpoint(0, 0xff0000)
-        const b2 = new Breakpoint(50, 0xffffff)
-        const b3 = new Breakpoint(100, 0x0000ff)
-        this.colorMap.addBreakpoint(b1)
-        this.colorMap.addBreakpoint(b2)
-        this.colorMap.addBreakpoint(b3)
-
-        // uniform color map
-        // const b1 = new Breakpoint(0, 0xffffff)
-        // const b2 = new Breakpoint(100, 0x000000)
-        // this.colorMap.addBreakpoint(b1)
-        // this.colorMap.addBreakpoint(b2)
+        // set color map
+        // this.useDivergentColorMap()
+        this.useUniformColorMap()
 
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
@@ -381,6 +371,24 @@ export const useMainStore = defineStore('mainStore', {
           this.fetchData()
         }
       }
+    },
+
+    useDivergentColorMap() {
+      this.colorMap.clearBreakpoints()
+      const b1 = new Breakpoint(0, 0xff0000)
+      const b2 = new Breakpoint(50, 0xffffff)
+      const b3 = new Breakpoint(100, 0x0000ff)
+      this.colorMap.addBreakpoint(b1)
+      this.colorMap.addBreakpoint(b2)
+      this.colorMap.addBreakpoint(b3)
+    },
+
+    useUniformColorMap() {
+      this.colorMap.clearBreakpoints()
+      const b1 = new Breakpoint(0, 0xffffff)
+      const b2 = new Breakpoint(100, 0x000000)
+      this.colorMap.addBreakpoint(b1)
+      this.colorMap.addBreakpoint(b2)
     },
 
     setTimer(timer: number) {

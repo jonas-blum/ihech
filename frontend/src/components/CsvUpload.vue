@@ -239,7 +239,8 @@ async function fetchJsonFileByFileName(fileName: string, fetchData: boolean) {
 onMounted(async () => {
   if (mainStore.getAllDatasetNames.length === 0) {
     await fetchJsonFileByFileName('Age-Groups.json', false)
-    await fetchJsonFileByFileName('Voting-Data.json', false)
+    // await fetchJsonFileByFileName('Voting-Data.json', false)
+    await fetchJsonFileByFileName('Voting-Data-NEW.json', false)
     await mainStore.fetchData()
   }
 })

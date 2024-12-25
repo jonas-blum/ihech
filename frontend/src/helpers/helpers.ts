@@ -191,6 +191,9 @@ export interface HeatmapSettings {
   dimReductionAlgo: DimReductionAlgoEnum
   clusterAfterDimRed: boolean
 
+  itemAggregateMethod: string
+  attributeAggregateMethod: string
+
   scaling: ScalingEnum
 }
 
@@ -251,7 +254,12 @@ export interface JsonDataTableProfile extends UploadedJsonData {
   dimReductionAlgo: DimReductionAlgoEnum
   clusterAfterDimRed: boolean
 
+  itemAggregateMethod: string
+  attributeAggregateMethod: string
+
   scaling: ScalingEnum
+
+  defaultSettings: Record<string, any>
 }
 
 export function findRowByIndex(row: ItemNameAndData, index: number): ItemNameAndData | null {

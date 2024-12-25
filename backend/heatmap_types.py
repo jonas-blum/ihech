@@ -203,6 +203,9 @@ class HeatmapSettings:
     attributesClusterSize: int
     dimReductionAlgo: DimReductionAlgoType
     clusterAfterDimRed: bool
+    
+    itemAggregateMethod: str # 'mean' or 'sum'
+    attributeAggregateMethod: str # 'mean' or 'sum'
 
     scaling: ScalingType
 
@@ -235,5 +238,8 @@ class HeatmapSettings:
         self.attributesClusterSize = dict["attributesClusterSize"]
         self.dimReductionAlgo = dict["dimReductionAlgo"]
         self.clusterAfterDimRed = dict["clusterAfterDimRed"]
+        
+        self.itemAggregateMethod = dict["itemAggregateMethod"]
+        self.attributeAggregateMethod = dict["attributeAggregateMethod"]
 
         self.scaling = dict["scaling"]

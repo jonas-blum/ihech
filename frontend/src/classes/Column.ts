@@ -133,9 +133,11 @@ export class AggregateColumn extends Column {
   getName(): string {
     // if the backend provided a name, use it because its a semantic cluster
     if (this.name) {
-      return `${this.name} (${this.selectedChildrenCount} / ${this.childrenCount})`
+      // return `${this.name} (${this.selectedChildrenCount} / ${this.childrenCount})`
+      return `${this.name}`
     } else {
-      return `${this.childrenCount} ${useMainStore().getActiveDataTable?.attributeNamePlural} (${this.selectedChildrenCount} / ${this.childrenCount})`
+      // return `${this.childrenCount} ${useMainStore().getActiveDataTable?.attributeNamePlural} (${this.selectedChildrenCount} / ${this.childrenCount})`
+      return `${this.childrenCount} ${useMainStore().getActiveDataTable?.attributeNamePlural}`
     }
   }
 

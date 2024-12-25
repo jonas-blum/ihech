@@ -294,6 +294,7 @@ def create_heatmap(
         dim_red_df,
         settings.itemsClusterSize,
         settings.clusterItemsByCollections,
+        settings.itemAggregateMethod,
         settings.hierarchicalRowsMetadataColumnNames,
         level=0,
     )
@@ -317,6 +318,7 @@ def create_heatmap(
         item_names_and_data,
         settings.attributesClusterSize,
         settings.clusterAttributesByCollections,
+        settings.attributeAggregateMethod,
         settings.hierarchicalColumnsMetadataRowIndexes,
         0,
         settings.selectedAttributesColumnNames,

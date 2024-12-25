@@ -7,21 +7,18 @@ lib/
 lib64
 pyvenv.cfg
 etc/
-
-# exclude editions folder content
-editions/*
-
 backend/projectenv
-
-
 .env
 .pyc
-
-**/*.log
 **/.DS_Store
+**/*.log
+
+# exclude data stuff (which is too big for git)
+editions/*
 **/original_data_by_municipality.csv
-
-
+data/preprocessing_chess/data/*
+data/preprocessing_chess/all_games.pgn
+data/preprocessing_chess/games_with_openings.csv
 
 # exclude flask stuff
 __pycache__

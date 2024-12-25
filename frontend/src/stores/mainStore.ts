@@ -218,6 +218,39 @@ export const useMainStore = defineStore('mainStore', {
     },
     setActiveDataTable(dataTable: JsonDataTableProfile) {
       this.activeDataTable = dataTable
+      console.log('💥 mainStore.setActiveDataTable', this.activeDataTable)
+
+      
+      // load the default settings
+      const defaultSettings = dataTable.defaultSettings
+      this.setClusterItemsByCollections(defaultSettings.clusterItemsByCollections)
+      this.setClusterAttributesByCollections(defaultSettings.clusterAttributesByCollections)
+      this.setItemsClusterSize(defaultSettings.itemsClusterSize)
+      this.setAttributesClusterSize(defaultSettings.attributesClusterSize)
+      this.setDimReductionAlgo(defaultSettings.dimReductionAlgo)
+      this.setClusterAfterDimRed(defaultSettings.clusterAfterDimRed)
+      this.setItemAggregateMethod(defaultSettings.itemAggregateMethod)
+      this.setAttributeAggregateMethod(defaultSettings.attributeAggregateMethod)
+      
+      // set the default semantic aggregations
+      this.getHierarchicalRowsMetadataColumnNames.forEach((column) => {
+        if (defaultSettings.groupItemsBy.includes(column.label)) {
+          column.selected = true
+        }
+      })
+      this.getHierarchicalColumnsMetadataRowIndexes.forEach((column) => {
+        if (defaultSettings.groupAttributesBy.includes(column.label)) {
+          column.selected = true
+        }
+      })
+
+
+      // set the default color map breakpoints
+      this.colorMap.clearBreakpoints()
+      for (const [value, color] of Object.entries(defaultSettings.colorMapBreakpoints as Record<string, number | string>)) {
+        console.log('value:', value, 'color:', color)
+        this.colorMap.addBreakpoint(new Breakpoint(Number(value), color))
+      }
     },
     setJsonUploadOpen(open: boolean) {
       nextTick(() => {
@@ -316,6 +349,7 @@ export const useMainStore = defineStore('mainStore', {
 
         this.heatmap = receivedHeatmap
         console.log('Received heatmap:', this.heatmap)
+        console.log('this.activeDataTable:', this.activeDataTable)
 
         // initialize rowSorter
         // TODO: I should probably store the rowSorter in the store, otherwise the settings are reset when the heatmap is refetched..
@@ -328,8 +362,7 @@ export const useMainStore = defineStore('mainStore', {
         const criterionA = new ColumnSorterCriterionByOriginalAttributeOrder()
         const criterionB = new ColumnSorterCriterionByName()
         const criterionC = new ColumnSorterCriterionByStandardDeviation()
-
-        const columnSorter = new ColumnSorter([criterionC, criterionB, criterionA])
+        const columnSorter = new ColumnSorter([criterionA, criterionB, criterionC])
 
         // initialize itemTree with the data received from the backend, starting at the root
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]
@@ -352,10 +385,6 @@ export const useMainStore = defineStore('mainStore', {
         this.attributeTree.calculateMaxDepth()
         console.log('AttributeTree:', this.attributeTree)
 
-        // set color map
-        // this.useDivergentColorMap()
-        this.useUniformColorMap()
-
         console.log('Done fetching heatmap in', new Date().getTime() - startTime, 'ms.')
         this.setIsOutOfSync(false)
         nextTick(() => {
@@ -373,23 +402,23 @@ export const useMainStore = defineStore('mainStore', {
       }
     },
 
-    useDivergentColorMap() {
-      this.colorMap.clearBreakpoints()
-      const b1 = new Breakpoint(0, 0xff0000)
-      const b2 = new Breakpoint(50, 0xffffff)
-      const b3 = new Breakpoint(100, 0x0000ff)
-      this.colorMap.addBreakpoint(b1)
-      this.colorMap.addBreakpoint(b2)
-      this.colorMap.addBreakpoint(b3)
-    },
+    // useDivergentColorMap() {
+    //   this.colorMap.clearBreakpoints()
+    //   const b1 = new Breakpoint(0, 0xff0000)
+    //   const b2 = new Breakpoint(50, 0xffffff)
+    //   const b3 = new Breakpoint(100, 0x0000ff)
+    //   this.colorMap.addBreakpoint(b1)
+    //   this.colorMap.addBreakpoint(b2)
+    //   this.colorMap.addBreakpoint(b3)
+    // },
 
-    useUniformColorMap() {
-      this.colorMap.clearBreakpoints()
-      const b1 = new Breakpoint(0, 0xffffff)
-      const b2 = new Breakpoint(100, 0x000000)
-      this.colorMap.addBreakpoint(b1)
-      this.colorMap.addBreakpoint(b2)
-    },
+    // useUniformColorMap() {
+    //   this.colorMap.clearBreakpoints()
+    //   const b1 = new Breakpoint(0, 0xffffff)
+    //   const b2 = new Breakpoint(100, 0x000000)
+    //   this.colorMap.addBreakpoint(b1)
+    //   this.colorMap.addBreakpoint(b2)
+    // },
 
     setTimer(timer: number) {
       this.timer = timer
@@ -472,6 +501,20 @@ export const useMainStore = defineStore('mainStore', {
       }
       this.activeDataTable.clusterAfterDimRed = clusterAfterDim
     },
+    setItemAggregateMethod(itemAggregateMethod: string) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.itemAggregateMethod = itemAggregateMethod
+    },
+    setAttributeAggregateMethod(attributeAggregateMethod: string) {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return
+      }
+      this.activeDataTable.attributeAggregateMethod = attributeAggregateMethod
+    },
 
     getCurrentHeatmapSettings(): HeatmapSettings {
       if (!this.activeDataTable) {
@@ -514,6 +557,9 @@ export const useMainStore = defineStore('mainStore', {
         attributesClusterSize: this.activeDataTable.attributesClusterSize,
         dimReductionAlgo: this.activeDataTable.dimReductionAlgo,
         clusterAfterDimRed: this.activeDataTable.clusterAfterDimRed,
+
+        itemAggregateMethod: this.activeDataTable.itemAggregateMethod,
+        attributeAggregateMethod: this.activeDataTable.attributeAggregateMethod,
 
         scaling: this.activeDataTable.scaling,
       }

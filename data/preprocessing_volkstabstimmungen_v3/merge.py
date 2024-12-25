@@ -69,7 +69,7 @@ for i, gemeinde in sprachgebiete.iterrows():
 dataframe = [first_row] + metadata_rows + [empty_row] + data_rows
 df = pd.DataFrame(dataframe, index=None, columns=None)
 
-# task: get the indexes of all columns that contain only empty strings
+# get the indexes of all columns that contain only empty strings
 raw_data_df = df.iloc[len(column_metadata_rows)+1:, len(item_metadata_columns)+1:]
 empty_columns = raw_data_df.columns[(raw_data_df == '').all()]
 # drop all these columns (in the original dataframe and in the raw_data_df)
@@ -102,15 +102,33 @@ dic = {
         "single": "% Yes on",
         "plural": "% Yes on this group of"
     },
-
-    "defaultMinValue": 0.0,
-    "defaultMaxValue": 100.0,
-    "defaultColorBreakpoints": "",
+    "defaultSettings": {
+        "clusterItemsByCollections": True,
+        "clusterAttributesByCollections": True,
+        "itemsClusterSize": 6,
+        "attributesClusterSize": -1,
+        "dimReductionAlgo": "PCA",
+        "clusterAfterDimRed": False,
+        "itemAggregateMethod": "mean",
+        "attributeAggregateMethod": "mean",
+        "colorMapBreakpoints": {
+            "0": "#ff0000",
+            "50": "#ffffff",
+            "100": "#0000ff"
+        },
+        "groupAttributesBy": ["Rechtsform"],
+        "groupItemsBy": ["Sprachgebiet", "Kanton"],
+    },
     "csvFile": df.to_csv(index=False, header=False),
 }
 
 with open ("Voting-Data-NEW.json", "w") as f:
     f.write(json.dumps(dic, indent=4, ))
+    
+# also write it to the frontend/public folder
+with open ("../../frontend/public/Voting-Data-NEW.json", "w") as f:
+    f.write(json.dumps(dic, indent=4, ))
+
 
 
 

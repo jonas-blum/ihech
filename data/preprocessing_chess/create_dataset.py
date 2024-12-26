@@ -13,7 +13,7 @@ unique_openings = games_with_openings[['opening_eco_book', 'opening_family', 'op
 print(f'There are {len(unique_openings)} unique openings.')
 print(unique_openings.head())
 
-MINIMUM_GAMES_REQUIRED = 1000
+MINIMUM_GAMES_REQUIRED = 100
 
 # get all unique players for white and black
 unique_white_players = games_with_openings['white'].unique()
@@ -110,7 +110,7 @@ dic = {
         "itemAggregateMethod": "mean",
         "attributeAggregateMethod": "sum",
         "colorMapBreakpoints": {
-            "0": "#eeeeee",
+            "0.01": "#eeeeee",
             "100": "#000000"
         },
         "colorMapZeroColor": "#ffffff",

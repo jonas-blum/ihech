@@ -1,10 +1,24 @@
 export class ColorMap {
   breakpoints: Breakpoint[] = []
+  zeroColor: number | null = null
+  isLogarithmic: boolean = false
 
-  constructor(breakpoints: Breakpoint[] = []) {
+  constructor(breakpoints: Breakpoint[] = [], zeroColor: number | string | null = null, isLogarithmic: boolean = false) {
+    this.isLogarithmic = isLogarithmic
     for (const breakpoint of breakpoints) {
       this.addBreakpoint(breakpoint)
     }
+    if (zeroColor !== null) {
+      if (typeof zeroColor === 'string') {
+        this.zeroColor = parseInt(zeroColor.replace('#', ''), 16)
+      } else {
+        this.zeroColor = zeroColor
+      }
+    }
+  }
+
+  setLogarithmic(isLogarithmic: boolean) {
+    this.isLogarithmic = isLogarithmic
   }
 
   // interpolates the color based on the next lower and next higher breakpoint
@@ -13,9 +27,18 @@ export class ColorMap {
       return 0
     }
 
+    // Check for zero value if zeroColor is set
+    if (this.zeroColor !== null && value === 0) {
+      return this.zeroColor
+    }
+
+    // Transform value if logarithmic scale is enabled
+    const transformedValue = this.isLogarithmic ? Math.log10(Math.max(value, Number.EPSILON)) : value
+
     // check for edge case when value is exactly the value of a breakpoint
     for (let i = 0; i < this.breakpoints.length; i++) {
-      if (this.breakpoints[i].value === value) {
+      const breakpointValue = this.isLogarithmic ? Math.log10(Math.max(this.breakpoints[i].value, Number.EPSILON)) : this.breakpoints[i].value
+      if (breakpointValue === transformedValue) {
         return this.breakpoints[i].color
       }
     }
@@ -24,10 +47,11 @@ export class ColorMap {
     let lowerBreakpoint: Breakpoint | null = null
     let higherBreakpoint: Breakpoint | null = null
     for (let i = 0; i < this.breakpoints.length; i++) {
-      if (this.breakpoints[i].value <= value) {
+      const breakpointValue = this.isLogarithmic ? Math.log10(Math.max(this.breakpoints[i].value, Number.EPSILON)) : this.breakpoints[i].value
+      if (breakpointValue <= transformedValue) {
         lowerBreakpoint = this.breakpoints[i]
       }
-      if (this.breakpoints[i].value >= value) {
+      if (breakpointValue >= transformedValue) {
         higherBreakpoint = this.breakpoints[i]
         break
       }
@@ -43,14 +67,29 @@ export class ColorMap {
       return this.breakpoints[0].color
     }
 
-    // interpolate the color
+    // interpolate the color using transformed values if logarithmic
+    const lowerValue = this.isLogarithmic ? Math.log10(Math.max(lowerBreakpoint.value, Number.EPSILON)) : lowerBreakpoint.value
+    const higherValue = this.isLogarithmic ? Math.log10(Math.max(higherBreakpoint.value, Number.EPSILON)) : higherBreakpoint.value
+
     return ColorMap.interpolateColor(
       lowerBreakpoint.color,
       higherBreakpoint.color,
-      value,
-      lowerBreakpoint.value,
-      higherBreakpoint.value,
+      transformedValue,
+      lowerValue,
+      higherValue,
     )
+  }
+
+  setZeroColor(color: number | string | null) {
+    if (color === null) {
+      this.zeroColor = null
+      return
+    }
+    if (typeof color === 'string') {
+      this.zeroColor = parseInt(color.replace('#', ''), 16)
+    } else {
+      this.zeroColor = color
+    }
   }
 
   addBreakpoint(breakpoint: Breakpoint) {

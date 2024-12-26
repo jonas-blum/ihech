@@ -116,6 +116,8 @@ dic = {
             "50": "#ffffff",
             "100": "#0000ff"
         },
+        "colorMapZeroColor": "#ff0000",
+        "colorMapLogarithmic": False,
         "groupAttributesBy": ["Rechtsform"],
         "groupItemsBy": ["Sprachgebiet", "Kanton"],
     },

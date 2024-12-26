@@ -1,4 +1,4 @@
-import { Container, Text, Graphics, Sprite, type Attribute } from 'pixi.js'
+import { Container, Text, Graphics, Sprite, Rectangle } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
 import { AggregateColumn, AttributeColumn, Column } from '@/classes/Column'
@@ -24,6 +24,8 @@ export class PixiColumnLabel extends PixiContainer {
       .stroke({ width: 1, color: heatmapLayoutStore.labelBackgroundColor })
     separatorLine.x = heatmapLayoutStore.columnWidth - 1
     this.addChild(separatorLine)
+
+    this.hitArea = new Rectangle(0, 0, heatmapLayoutStore.columnWidth, heatmapLayoutStore.columnLabelHeight)
 
     // create the text for the column label
     this.text = new Text({

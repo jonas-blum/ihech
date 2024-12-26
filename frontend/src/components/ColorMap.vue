@@ -53,59 +53,44 @@ const onCreateBreakpoint = () => {
     </summary>
 
     <!-- Dropdown content -->
-    <div
-      class="collapse-content rounded-sm w-full p-2 text-sm bg-white"
-    >
-      <div
-        v-for="(breakpoint, index) in mainStore.colorMap.breakpoints"
-        :key="index"
-        class="flex gap-2 items-center justify-between mb-2"
-      >
-        <input
-          type="number"
-          class="input input-bordered input-xs w-16"
-          :value="breakpoint.value"
-          @click.stop
-          @input="
-            (payload: Event) =>
-              breakpoint.setValue(parseInt((payload.target as HTMLInputElement).value))
-          "
-        />
-        <input
-          type="color"
-          class="w-8 h-[1rem]"
-          :value="`#${breakpoint.color.toString(16).padStart(6, '0')}`"
-          @click.stop
-          @input="
-            (payload: Event) =>
-              breakpoint.setColor(parseInt((payload.target as HTMLInputElement).value.slice(1), 16))
-          "
-        />
+    <div class="collapse-content rounded-sm w-full p-2 text-sm bg-white">
+      <div class="flex gap-2 items-center justify-between mb-2">
+        <span>use Log Scaling:</span>
+        <input type="checkbox" class="w-4 h-4" :checked="mainStore.colorMap.isLogarithmic"
+          @click.stop @change="(e) => mainStore.colorMap.setLogarithmic((e.target as HTMLInputElement).checked)" />
+      </div>
+      <div class="flex gap-2 items-center justify-between mb-2">
+        <span>Zero Color:</span>
+        <input type="color" class="w-8 h-[1rem]"
+          :value="`#${(mainStore.colorMap.zeroColor ?? 0).toString(16).padStart(6, '0')}`" @click.stop
+          @input="(payload: Event) => mainStore.colorMap.setZeroColor(parseInt((payload.target as HTMLInputElement).value.slice(1), 16))" />
+      </div>
+      <div v-for="(breakpoint, index) in mainStore.colorMap.breakpoints" :key="index"
+        class="flex gap-2 items-center justify-between mb-2">
+        <input type="number" class="input input-bordered input-xs w-16" :value="breakpoint.value" @click.stop @input="(payload: Event) =>
+          breakpoint.setValue(parseFloat((payload.target as HTMLInputElement).value))
+          " />
+        <input type="color" class="w-8 h-[1rem]" :value="`#${breakpoint.color.toString(16).padStart(6, '0')}`"
+          @click.stop @input="(payload: Event) =>
+            breakpoint.setColor(parseInt((payload.target as HTMLInputElement).value.slice(1), 16))
+            " />
         <button @click.stop="mainStore.colorMap.removeBreakpoint(breakpoint)" class="btn btn-xs">
           Remove
         </button>
       </div>
-      <button
-        v-if="!breakpointFormOpen"
-        @click.stop="toggleBreakpointForm"
-        class="btn btn-xs btn-block"
-      >
+      <button v-if="!breakpointFormOpen" @click.stop="toggleBreakpointForm" class="btn btn-xs btn-block">
         New Breakpoint
       </button>
       <div v-else class="flex gap-2 items-center justify-between mb-2">
-        <input
-          type="number"
-          class="input input-bordered input-xs w-16"
-          v-model="templateBreakpoint.value"
-          @click.stop
-        />
+        <input type="number" class="input input-bordered input-xs w-16" v-model="templateBreakpoint.value"
+          @click.stop />
         <input type="color" class="w-8 h-[1rem]" v-model="templateBreakpoint.color" @click.stop />
         <button @click.stop="onCreateBreakpoint" class="btn btn-xs">Create</button>
       </div>
-      <div class="flex gap-2 justify-between mt-2">
+      <!-- <div class="flex gap-2 justify-between mt-2">
         <button @click="mainStore.useDivergentColorMap" class="btn btn-xs flex-1">Divergent</button>
         <button @click="mainStore.useUniformColorMap" class="btn btn-xs flex-1">Uniform</button>
-      </div>
+      </div> -->
 
     </div>
   </details>
@@ -124,5 +109,4 @@ const onCreateBreakpoint = () => {
 //   position: absolute;
 //   top: 100%; /* Align dropdown to appear below */
 //   left: 0;
-// }
-</style>
+// }</style>

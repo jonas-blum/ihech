@@ -244,13 +244,14 @@ export const useMainStore = defineStore('mainStore', {
         }
       })
 
-
       // set the default color map breakpoints
       this.colorMap.clearBreakpoints()
       for (const [value, color] of Object.entries(defaultSettings.colorMapBreakpoints as Record<string, number | string>)) {
         console.log('value:', value, 'color:', color)
         this.colorMap.addBreakpoint(new Breakpoint(Number(value), color))
       }
+      this.colorMap.setZeroColor(defaultSettings.colorMapZeroColor)
+      this.colorMap.setLogarithmic(defaultSettings.colorMapLogarithmic)
     },
     setJsonUploadOpen(open: boolean) {
       nextTick(() => {

@@ -110,9 +110,11 @@ dic = {
         "itemAggregateMethod": "mean",
         "attributeAggregateMethod": "sum",
         "colorMapBreakpoints": {
-            "0": "#dddddd",
+            "0": "#eeeeee",
             "100": "#000000"
         },
+        "colorMapZeroColor": "#ffffff",
+        "colorMapLogarithmic": True,
         "groupAttributesBy": ["ECO Category", "Opening Family"],
         "groupItemsBy": [],
     },

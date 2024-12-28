@@ -1,37 +1,42 @@
 import pandas as pd
 import json
 
+def bin_birthyears(birthyear):
+    # in bins of 25 years, starting from 1900 to 2000
+    if birthyear <= 1900:
+        return '1900 and before'
+    elif birthyear <= 1925:
+        return '1901-1925'
+    elif birthyear <= 1950:
+        return '1926-1950'
+    elif birthyear <= 1975:
+        return '1951-1975'
+    else:
+        return '1976 and later'
+
 # read in the games_with_openings.csv as a pandas dataframe
 games_with_openings = pd.read_csv('games_with_openings.csv')
 
+# read in the players_gpt_enriched.csv as a pandas dataframe
+players_df = pd.read_csv('players_gpt_enriched.csv')
+
+# filter players for which the 'nationality' or 'birthyear' is not available
+players_df = players_df[players_df['nationality'].notnull() & players_df['birthyear'].notnull()]
+print(f'There are {len(players_df)} players with a nationality and birthyear.')
+
+
 # combine the unique opening family, variation, and subvariation into a single column of the following format: 'family: variation, subvariation'
 games_with_openings['opening'] = games_with_openings['opening_family'] + ':' + games_with_openings['opening_variation'] + ',' + games_with_openings['opening_subvariation']
-print(games_with_openings['opening'].head())
+# print(games_with_openings['opening'].head())
 
 # all unique combinations of opening family, variation, and subvariation
 unique_openings = games_with_openings[['opening_eco_book', 'opening_family', 'opening_variation', 'opening_subvariation', 'opening']].drop_duplicates()
 print(f'There are {len(unique_openings)} unique openings.')
-print(unique_openings.head())
-
-MINIMUM_GAMES_REQUIRED = 100
-
-# get all unique players for white
-unique_white_players = games_with_openings['white'].unique()
-print(f'There are {len(unique_white_players)} players that have played both as white')
-
-# for each individual player, get the number of games played as white
-games_as_white = games_with_openings['white'].value_counts()
-
-# filter out players that have played less than MINIMUM_GAMES_REQUIRED games
-games_as_white = games_as_white[games_as_white >= MINIMUM_GAMES_REQUIRED]
-
-# sort by the number of games played as white
-games_as_white = games_as_white.sort_values(ascending=False)
-print(games_as_white.describe())
+# print(unique_openings.head())
 
 ########################################################################################
 
-item_metadata_columns = ['Name'] # we currently have no semantic metadata; could be a problem for the frontend
+item_metadata_columns = ['Name', 'Nationality', 'Birthyear']
 column_metadata_rows = ['ECO Category', 'Opening Family', 'Opening Variation']
 
 # build the first row
@@ -53,27 +58,29 @@ empty_row = ['']*(len(item_metadata_columns)+1+len(unique_openings))
 data_rows = []
 openings_dict = {opening: idx for idx, opening in enumerate(unique_openings['opening'])}
 
-# create a dictionary to store the number of games played by each player for each opening
-player_opening_games = {player: [0] * len(unique_openings) for player in games_as_white.index}
+# create a dictionary to store the number of games played for each player in players_df
+player_opening_games = {player: [0] * len(unique_openings) for player in players_df.player}
 
 # iterate over the games and populate the dictionary
 for _, game in games_with_openings.iterrows():
-    if game['white'] in player_opening_games:
-        player_opening_games[game['white']][openings_dict[game['opening']]] += 1
-    if game['black'] in player_opening_games:
-        player_opening_games[game['black']][openings_dict[game['opening']]] += 1
+    white_player = game['white']
+    black_player = game['black']
+    opening = game['opening']
+    if white_player in player_opening_games:
+        player_opening_games[white_player][openings_dict[opening]] += 1
 
 # convert the dictionary to data rows with percentages
-for player, games_played in player_opening_games.items():
+for _, player_row in players_df.iterrows():
+    player = player_row['player']
+    games_played = player_opening_games[player]
     total_games = sum(games_played)
     games_played_percentage = [round((count / total_games) * 100, 2) if total_games > 0 else 0 for count in games_played]
-    row = [player, ''] + games_played_percentage
+    row = [player, player_row['nationality'], bin_birthyears(player_row['birthyear']), ''] + games_played_percentage
     data_rows.append(row)
     
 # combine all parts into the final dataframe
 dataframe = [first_row] + metadata_rows + [empty_row] + data_rows
 df = pd.DataFrame(dataframe, index=None, columns=None)
-
 # save as csv
 df.to_csv('Chess-Data-White.csv', index=False, header=False)
 
@@ -121,6 +128,4 @@ with open ("Chess-Data-White.json", "w") as f:
 # also write it to the frontend/public folder
 with open ("../../frontend/public/Chess-Data-White.json", "w") as f:
     f.write(json.dumps(dic, indent=4, ))
-
-
 

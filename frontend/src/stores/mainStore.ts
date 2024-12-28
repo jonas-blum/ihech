@@ -236,11 +236,15 @@ export const useMainStore = defineStore('mainStore', {
       this.getHierarchicalRowsMetadataColumnNames.forEach((column) => {
         if (defaultSettings.groupItemsBy.includes(column.label)) {
           column.selected = true
+        } else {
+          column.selected = false
         }
       })
       this.getHierarchicalColumnsMetadataRowIndexes.forEach((column) => {
         if (defaultSettings.groupAttributesBy.includes(column.label)) {
           column.selected = true
+        } else {
+          column.selected = false
         }
       })
 

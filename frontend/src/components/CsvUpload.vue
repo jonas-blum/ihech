@@ -244,9 +244,9 @@ onMounted(async () => {
     // await fetchJsonFileByFileName('Age-Groups.json', false)
     // await fetchJsonFileByFileName('Voting-Data.json', false)
     await fetchJsonFileByFileName('Voting-Data-NEW.json', false)
-    await fetchJsonFileByFileName('Chess-Data.json', false)
-    await fetchJsonFileByFileName('Chess-Data-White.json', false)
-    await fetchJsonFileByFileName('Chess-Data-Black.json', false)
+    // await fetchJsonFileByFileName('Chess-Data.json', false)
+    // await fetchJsonFileByFileName('Chess-Data-White.json', false)
+    // await fetchJsonFileByFileName('Chess-Data-Black.json', false)
     await mainStore.fetchData()
   }
 })

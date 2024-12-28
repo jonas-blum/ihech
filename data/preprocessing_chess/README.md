@@ -13,32 +13,24 @@ We use a curated chess openings database: [Chess Openings](https://github.com/li
 
 ## Chess Games
 1. Download the [40H](http://www.nk-qy.info/40h/) Grandmaster game collection of 760435 games and put the pgn files (except `cc-tcec.pgn`) in the data folder.
-2. Run `merge_pgn_-_files.py` --> will create file called `all_games.png`
+2. Run `merge_pgn_files.py` --> will create file called `all_games.png`
 3. Run `enrich_with_openings.py` --> will create csv called `games_with_openings.csv`:
 
-| white               | black                  | result   | opening_eco | opening_family  | opening_variation       | opening_subvariation   |
-|---------------------|------------------------|----------|-------------|-----------------|-------------------------|------------------------|
-| Bulcourf, Carlos    | Olivera, Horacio       | 1-0      | A00         | Polish Opening  | King's Indian Variation |                        |
-| Caro, Alberto N.    | Zorigt, D.             | 0-1      | A00         | Polish Opening  | King's Indian Variation | Sokolsky Attack        |
-| Chemin, Vitorio     | Silva Nazzari, Roberto | 1-0      | A00         | Polish Opening  |                         |                        |
-| Damjanovic, Mato    | Bertok, Mario          | 1/2-1/2  | A00         | Polish Opening  | King's Indian Variation | Schiffler Attack       |
+| white | black | result | opening_eco_book | opening_eco | opening_family | opening_variation | opening_subvariation |
+|-------|-------|--------|------------------|-------------|----------------|-------------------|---------------------|
+| Maciejewski, Andrzej | Doda, Zbigniew | 0-1 | A | A00 | Clemenz Opening | Others | Others |
+| Ban, Jeno | Dely, Peter | 1-0 | A | A00 | Anderssen's Opening | Others | Others |
+| Bloch, Nigel | Stean, Michael F. | 1-0 | A | A00 | Anderssen's Opening | Others | Others |
 
+4. Run `players.py` --> will create `players.csv` with the unique chess players
+5. Use LLM to enrich the players.csv with nationality and birthyear and save as `players_gpt_enriched` (there is no script for that, needs to be done manually. not all the data may be 100% accurate due to LLM halllucination; currently done for 500 players with most games)
 
-- get set of all unique players
-- for every player: 
-    - filter their games (optionally by white or black)
-    - get the total amount of games played per opening
-    - compute the relative play percentage per opening
+| Player | Games as White | Games as Black | Total Games | Nationality | Birth Year |
+|--------|---------------|----------------|-------------|-------------|------------|
+| Korchnoi, Viktor | 1,923 | 1,853 | 3,776 | Switzerland | 1931 |
+| Timman, Jan H. | 1,486 | 1,436 | 2,922 | Netherlands | 1951 |
+| Beliavsky, Alexander G. | 1,450 | 1,384 | 2,834 | Slovenia | 1953 |
+| Shirov, Alexei | 1,438 | 1,356 | 2,794 | Latvia | 1972 |
 
+6. Run `create_dataset_white.py` and `create_dataset_black.py` --> will create the final datasets
 
-
-
-
-
-
-
-
-## NOTES
-differentiate between games with white and games with black? lets not differentiate for now. later I can create two separate datasets for white and black.
-
-player_white, player_black, eco, opening_family, variation, subvariation, result

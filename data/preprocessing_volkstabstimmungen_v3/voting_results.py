@@ -72,6 +72,7 @@ for file_name in files:
                     gemeinde_name = gemeinde['geoLevelname']
                     gemeinde_geoId = gemeinde['geoLevelnummer']
                     gemeinde_yesPercentage = gemeinde['resultat']['jaStimmenInProzent']
+                    gemeinde_votePercentage = gemeinde['resultat']['stimmbeteiligungInProzent']
                     
                     if isinstance(gemeinde_yesPercentage, float):
                         float_count += 1
@@ -101,6 +102,7 @@ for file_name in files:
                         # 'gemeinde_eligibleVoters': gemeinde_eligibleVoters,
                         # 'gemeinde_receivedVotes': gemeinde_receivedVotes,
                         # 'gemeinde_validVotes': gemeinde_validVotes
+                        'gemeinde_votePercentage': gemeinde_votePercentage
                     })
                     
 print(f'float_count: {float_count}')

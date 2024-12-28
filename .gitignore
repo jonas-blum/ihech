@@ -16,6 +16,7 @@ backend/projectenv
 # exclude data stuff (which is too big for git)
 editions/*
 **/original_data_by_municipality.csv
+data/preprocessing_volkstabstimmungen_v3/voting_results/*
 data/preprocessing_chess/data/*
 data/preprocessing_chess/all_games.pgn
 data/preprocessing_chess/games_with_openings.csv

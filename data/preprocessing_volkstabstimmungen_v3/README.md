@@ -45,7 +45,7 @@
 
 ## Merge datasets
 
-1. Run the `merge.py` script --> will produce the final `Voting-Data.json` file
+1. Run the `create_dataset_[votePercentage/yesPercentage].py` script --> will produce the final `Voting-Data.json` file
 2. Copy the json file to the `frontend > public` folder to make it available in the tool
 
 

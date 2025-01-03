@@ -1,0 +1,590 @@
+tag,module,description
+c,analysis,(character) represents a character.
+cl,analysis,(clause) represents a grammatical clause.
+interp,analysis,(interpretation) summarizes a specific interpretative annotation which can be linked to a span of text.
+interpGrp,analysis,(interpretation group) collects together a set of related interpretations which share responsibility or type.
+m,analysis,(morpheme) represents a grammatical morpheme.
+pc,analysis,(punctuation character) contains a character or string of characters regarded as constituting a single punctuation mark.
+phr,analysis,(phrase) represents a grammatical phrase.
+s,analysis,(s-unit) contains a sentence-like division of a text.
+span,analysis,associates an interpretative annotation directly with a span of text.
+spanGrp,analysis,(span group) collects together span tags.
+w,analysis,(word) represents a grammatical (not necessarily orthographic) word.
+certainty,certainty,indicates the degree of certainty associated with some aspect of the text markup.
+precision,certainty,indicates the numerical accuracy or precision associated with some aspect of the text markup.
+respons,certainty,(responsibility) identifies the individual(s) responsible for some aspect of the content or markup of particular element(s).
+post,cmc,"a written (or spoken) contribution to a CMC interaction which has been composed (or recorded) by its author in its entirety before being transmitted over a network (e.g., the internet) and made available on the monitor or screen of the other parties en bloc."
+abbr,core,(abbreviation) contains an abbreviation of any sort.
+add,core,"(addition) contains letters, words, or phrases inserted in the source text by an author, scribe, or a previous annotator or corrector."
+addrLine,core,(address line) contains one line of a postal address.
+address,core,"(address) contains a postal address, for example of a publisher, an organization, or an individual."
+analytic,core,(analytic level) contains bibliographic elements describing an item (e.g. an article or poem) published within a monograph or journal and not as an independent publication.
+author,core,"(author) in a bibliographic reference, contains the name(s) of an author, personal or corporate, of a work; for example in the same form as that provided by a recognized bibliographic name authority."
+bibl,core,(bibliographic citation) contains a loosely-structured bibliographic citation of which the sub-components may or may not be explicitly tagged.
+biblScope,core,"(scope of bibliographic reference) defines the scope of a bibliographic reference, for example as a list of page numbers, or a named subdivision of a larger work."
+biblStruct,core,"(structured bibliographic citation) contains a structured bibliographic citation, in which only bibliographic sub-elements appear and in a specified order."
+binaryObject,core,"provides encoded binary data representing an inline graphic, audio, video or other object."
+cb,core,(column beginning) marks the beginning of a new column of a text on a multi-column page.
+choice,core,(choice) groups a number of alternative encodings for the same point in a text.
+cit,core,"(cited quotation) contains a quotation from some other document, together with a bibliographic reference to its source. In a dictionary it may contain an example text with at least one occurrence of the word form, used in the sense being described, or a translation of the headword, or an example."
+citedRange,core,"(cited range) defines the range of cited content, often represented by pages or other units"
+corr,core,(correction) contains the correct form of a passage apparently erroneous in the copy text.
+date,core,(date) contains a date in any format.
+del,core,"(deletion) contains a letter, word, or passage deleted, marked as deleted, or otherwise indicated as superfluous or spurious in the copy text by an author, scribe, or a previous annotator or corrector."
+desc,core,"(description) contains a short description of the purpose, function, or use of its parent element, or when the parent is a documentation element, describes or defines the object being documented."
+distinct,core,"identifies any word or phrase which is regarded as linguistically distinct, for example as archaic, technical, dialectal, non-preferred, etc., or as forming part of a sublanguage."
+divGen,core,(automatically generated text division) indicates the location at which a textual division generated automatically by a text-processing application is to appear.
+editor,core,"contains a secondary statement of responsibility for a bibliographic item, for example the name of an individual, institution or organization, (or of several such) acting as editor, compiler, translator, etc."
+ellipsis,core,"(deliberately marked omission) indicates a purposeful marking in the source document signalling that content has been omitted, and may also supply or describe the omitted content."
+email,core,(electronic mail address) contains an email address identifying a location to which email messages can be delivered.
+emph,core,(emphasized) marks words or phrases which are stressed or emphasized for linguistic or rhetorical effect.
+expan,core,(expansion) contains the expansion of an abbreviation.
+foreign,core,(foreign) identifies a word or phrase as belonging to some language other than that of the surrounding text.
+gap,core,"(gap) indicates a point where material has been omitted in a transcription, whether for editorial reasons described in the TEI header, as part of sampling practice, or because the material is illegible, invisible, or inaudible."
+gb,core,(gathering beginning) marks the beginning of a new gathering or quire in a transcribed codex.
+gloss,core,(gloss) identifies a phrase or word used to provide a gloss or definition for some other word or phrase.
+graphic,core,"(graphic) indicates the location of a graphic or illustration, either forming part of a text, or providing an image of it."
+head,core,"(heading) contains any type of heading, for example the title of a section, or the heading of a list, glossary, manuscript description, etc."
+headItem,core,(heading for list items) contains the heading for the item or gloss column in a glossary list or similar structured list.
+headLabel,core,(heading for list labels) contains the heading for the label or term column in a glossary list or similar structured list.
+hi,core,"(highlighted) marks a word or phrase as graphically distinct from the surrounding text, for reasons concerning which no claim is made."
+imprint,core,groups information relating to the publication or distribution of a bibliographic item.
+index,core,(index entry) marks a location to be indexed for whatever purpose.
+item,core,(item) contains one component of a list.
+l,core,"(verse line) contains a single, possibly incomplete, line of verse."
+label,core,"(label) contains any label or heading used to identify part of a text, typically but not exclusively in a list or glossary."
+lb,core,(line beginning) marks the beginning of a new (typographic) line in some edition or version of a text.
+lg,core,"(line group) contains one or more verse lines functioning as a formal unit, e.g. a stanza, refrain, verse paragraph, etc."
+list,core,(list) contains any sequence of items organized as a list.
+listBibl,core,(citation list) contains a list of bibliographic citations of any kind.
+measure,core,"(measure) contains a word or phrase referring to some quantity of an object or commodity, usually comprising a number, a unit, and a commodity name."
+measureGrp,core,"(measure group) contains a group of dimensional specifications which relate to the same object, for example the height and width of a manuscript page."
+media,core,indicates the location of any form of external media such as an audio or video clip etc.
+meeting,core,"contains the formalized descriptive title for a meeting or conference, for use in a bibliographic description for an item derived from such a meeting, or as a heading or preamble to publications emanating from it."
+mentioned,core,"marks words or phrases mentioned, not used."
+milestone,core,"(milestone) marks a boundary point separating any kind of section of a text, typically but not necessarily indicating a point at which some part of a standard reference system changes, where the change is not represented by a structural element."
+monogr,core,(monographic level) contains bibliographic elements describing an item (e.g. a book or journal) published as an independent item (i.e. as a separate physical object).
+name,core,"(name, proper noun) contains a proper noun or noun phrase."
+note,core,(note) contains a note or annotation.
+noteGrp,core,(note group) contains a group of notes
+num,core,"(number) contains a number, written in any form."
+orig,core,"(original form) contains a reading which is marked as following the original, rather than being normalized or corrected."
+p,core,(paragraph) marks paragraphs in prose.
+pb,core,(page beginning) marks the beginning of a new page in a paginated document.
+postBox,core,(postal box or post office box) contains a number or other identifier for some postal delivery point other than a street address.
+postCode,core,(postal code) contains a numerical or alphanumeric code used as part of a postal address to simplify sorting or delivery of mail.
+ptr,core,(pointer) defines a pointer to another location.
+pubPlace,core,(publication place) contains the name of the place where a bibliographic item was published.
+publisher,core,(publisher) provides the name of the organization responsible for the publication or distribution of a bibliographic item.
+q,core,"(quoted) contains material which is distinguished from the surrounding text using quotation marks or a similar method, for any one of a variety of reasons including, but not limited to: direct speech or thought, technical terms or jargon, authorial distance, quotations from elsewhere, and passages that are mentioned but not used."
+quote,core,(quotation) contains a phrase or passage attributed by the narrator or author to some agency external to the text.
+rb,core,(ruby base) contains the base text annotated by a ruby gloss.
+ref,core,"(reference) defines a reference to another location, possibly modified by additional text or comment."
+reg,core,(regularization) contains a reading which has been regularized or normalized in some sense.
+relatedItem,core,"contains or references some other bibliographic item which is related to the present one in some specified manner, for example as a constituent or alternative version of it."
+resp,core,"(responsibility) contains a phrase describing the nature of a person's intellectual responsibility, or an organization's role in the production or distribution of a work."
+respStmt,core,"(statement of responsibility) supplies a statement of responsibility for the intellectual content of a text, edition, recording, or series, where the specialized elements for authors, editors, etc. do not suffice or do not apply. May also be used to encode information about individuals or organizations which have played a role in the production or distribution of a bibliographic work."
+rs,core,(referencing string) contains a general purpose name or referring string.
+rt,core,"(ruby text) contains a ruby text, an annotation closely associated with a passage of the main text."
+ruby,core,(ruby container) contains a passage of base text along with its associated ruby gloss(es).
+said,core,"(speech or thought) indicates passages thought or spoken aloud, whether explicitly indicated in the source or not, whether directly or indirectly reported, whether by real people or fictional characters."
+series,core,(series information) contains information about the series in which a book or other bibliographic item has appeared.
+sic,core,(Latin for thus or so) contains text reproduced although apparently incorrect or inaccurate.
+soCalled,core,"(so called) contains a word or phrase for which the author or narrator indicates a disclaiming of responsibility, for example by the use of scare quotes or italics."
+sp,core,"(speech) contains an individual speech in a performance text, or a passage presented as such in a prose or verse text."
+speaker,core,"contains a specialized form of heading or label, giving the name of one or more speakers in a dramatic text or fragment."
+stage,core,(stage direction) contains any kind of stage direction within a dramatic text or fragment.
+street,core,contains a full street address including any name or number identifying a building as well as the name of the street or route on which it is located.
+teiCorpus,core,"(TEI corpus) contains the whole of a TEI encoded corpus, comprising a single corpus header and one or more TEI elements, each containing a single text header and a text."
+term,core,"(term) contains a single-word, multi-word, or symbolic designation which is regarded as a technical term."
+textLang,core,"(text language) describes the languages and writing systems identified within the bibliographic work being described, rather than its description."
+time,core,(time) contains a phrase defining a time of day in any format.
+title,core,(title) contains a title for any kind of work.
+unclear,core,"(unclear) contains a word, phrase, or passage which cannot be transcribed with certainty because it is illegible or inaudible in the source."
+unit,core,"contains a symbol, a word or a phrase referring to a unit of measurement in any kind of formal or informal system."
+activity,corpus,"(activity) contains a brief informal description of what a participant in a language interaction is doing other than speaking, if anything."
+channel,corpus,"(primary channel) describes the medium or channel by which a text is delivered or experienced. For a written text, this might be print, manuscript, email, etc.; for a spoken one, radio, telephone, face-to-face, etc."
+constitution,corpus,"(constitution) describes the internal composition of a text or text sample, for example as fragmentary, complete, etc."
+derivation,corpus,(derivation) describes the nature and extent of originality of this text.
+domain,corpus,"(domain of use) describes the most important social context in which the text was realized or for which it is intended, for example private vs. public, education, religion, etc."
+factuality,corpus,"(factuality) describes the extent to which the text may be regarded as imaginative or non-imaginative, that is, as describing a fictional or a non-fictional world."
+interaction,corpus,"(interaction) describes the extent, cardinality and nature of any interaction among those producing and experiencing the text, for example in the form of response or interjection, commentary, etc."
+locale,corpus,"contains a brief informal description of the kind of place concerned, for example: a room, a restaurant, a park bench, etc."
+particDesc,corpus,"(participation description) describes the identifiable speakers, voices, or other participants in any kind of text or other persons named or otherwise referred to in a text, edition, or metadata."
+preparedness,corpus,(preparedness) describes the extent to which a text may be regarded as prepared or spontaneous.
+purpose,corpus,characterizes a single purpose or communicative function of the text.
+setting,corpus,describes one particular setting in which a language interaction takes place.
+settingDesc,corpus,"(setting description) describes the setting or settings within which a language interaction takes place, or other places otherwise referred to in a text, edition, or metadata."
+textDesc,corpus,(text description) provides a description of a text in terms of its situational parameters.
+case,dictionaries,(case) contains grammatical case information given by a dictionary for a given form.
+colloc,dictionaries,(collocate) contains any sequence of words that co-occur with the headword with significant frequency.
+def,dictionaries,(definition) contains definition text in a dictionary entry.
+dictScrap,dictionaries,(dictionary scrap) encloses a part of a dictionary entry in which other phrase-level dictionary elements are freely combined.
+entry,dictionaries,"(entry) contains a single structured entry in any kind of lexical resource, such as a dictionary or lexicon."
+entryFree,dictionaries,"(unstructured entry) contains a single unstructured entry in any kind of lexical resource, such as a dictionary or lexicon."
+etym,dictionaries,(etymology) encloses the etymological information in a dictionary entry.
+form,dictionaries,(form information group) groups all the information on the written and spoken forms of one headword.
+gen,dictionaries,"(gender) identifies the morphological gender of a lexical item, as given in the dictionary."
+gram,dictionaries,"(grammatical information) within an entry in a dictionary or a terminological data file, contains grammatical information relating to a term, word, or form."
+gramGrp,dictionaries,"(grammatical information group) groups morpho-syntactic information about a lexical item, e.g. pos, gen, number, case, or iType (inflectional class)."
+hom,dictionaries,(homograph) groups information relating to one homograph within an entry.
+hyph,dictionaries,"(hyphenation) contains a hyphenated form of a dictionary headword, or hyphenation information in some other form."
+iType,dictionaries,(inflectional class) indicates the inflectional class associated with a lexical item.
+lang,dictionaries,(language name) contains the name of a language mentioned in etymological or other linguistic discussion.
+lbl,dictionaries,"(label) contains a label for a form, example, translation, or other piece of information, e.g. abbreviation for, contraction of, literally, approximately, synonyms:, etc."
+mood,dictionaries,"(mood) contains information about the grammatical mood of verbs (e.g. indicative, subjunctive, imperative)."
+number,dictionaries,"(number) indicates grammatical number associated with a form, as given in a dictionary."
+oRef,dictionaries,"(orthographic-form reference) in a dictionary example, indicates a reference to the orthographic form(s) of the headword."
+orth,dictionaries,(orthographic form) gives the orthographic form of a dictionary headword.
+pRef,dictionaries,"(pronunciation reference) in a dictionary example, indicates a reference to the pronunciation(s) of the headword."
+per,dictionaries,"(person) contains an indication of the grammatical person (1st, 2nd, 3rd, etc.) associated with a given inflected form in a dictionary."
+pos,dictionaries,"(part of speech) indicates the part of speech assigned to a dictionary headword such as noun, verb, or adjective."
+pron,dictionaries,(pronunciation) contains the pronunciation(s) of the word.
+re,dictionaries,"(related entry) contains a dictionary entry for a lexical item related to the headword, such as a compound phrase or derived form, embedded inside a larger entry."
+sense,dictionaries,"groups together all information relating to one word sense in a dictionary entry, for example definitions, examples, and translation equivalents."
+stress,dictionaries,"(stress) contains the stress pattern for a dictionary headword, if given separately."
+subc,dictionaries,"(subcategorization) contains subcategorization information (transitive/intransitive, countable/non-countable, etc.)"
+superEntry,dictionaries,"(super entry) groups a sequence of entries within any kind of lexical resource, such as a dictionary or lexicon which function as a single unit, for example a set of homographs."
+syll,dictionaries,(syllabification) contains the syllabification of the headword.
+tns,dictionaries,(tense) indicates the grammatical tense associated with a given inflected form in a dictionary.
+usg,dictionaries,(usage) contains usage information in a dictionary entry.
+xr,dictionaries,"(cross-reference phrase) contains a phrase, sentence, or icon referring the reader to some other location in this or another text."
+actor,drama,contains the name of an actor appearing within a cast list.
+camera,drama,(camera) describes a particular camera angle or viewpoint in a screen play.
+caption,drama,(caption) contains the text of a caption or other text displayed as part of a film script or screenplay.
+castGroup,drama,(cast list grouping) groups one or more individual castItem elements within a cast list.
+castItem,drama,"(cast list item) contains a single entry within a cast list, describing either a single role or a list of non-speaking roles."
+castList,drama,(cast list) contains a single cast list or dramatis personae.
+epilogue,drama,"(epilogue) contains the epilogue to a drama, typically spoken by an actor out of character, possibly in association with a particular performance or venue."
+move,drama,(movement) marks the actual movement of one or more characters.
+performance,drama,(performance) contains a section of front or back matter describing how a dramatic piece is to be performed in general or how it was performed on some specific occasion.
+prologue,drama,"(prologue) contains the prologue to a drama, typically spoken by an actor out of character, possibly in association with a particular performance or venue."
+role,drama,"(role) contains the name of a dramatic role, as given in a cast list."
+roleDesc,drama,(role description) describes a character's role in a drama.
+set,drama,"(setting) contains a description of the setting, time, locale, appearance, etc., of the action of a play, typically found in the front matter of a printed performance text (not a stage direction)."
+sound,drama,(sound) describes a sound effect or musical sequence specified within a screen play or radio script.
+spGrp,drama,(speech group) contains a group of speeches or songs in a performance text presented in a source as constituting a single unit or ‘number’.
+tech,drama,(technical stage direction) describes a special-purpose stage direction that is not meant for the actors.
+view,drama,"(view) describes the visual context of some part of a screen play in terms of what the spectator sees, generally independent of any dialogue."
+cell,figures,(cell) contains one cell of a table.
+figDesc,figures,"(description of figure) contains a brief prose description of the appearance or content of a graphic figure, for use when documenting an image without displaying it."
+figure,figures,"(figure) groups elements representing or containing graphic information such as an illustration, formula, or figure."
+formula,figures,(formula) contains a mathematical or other formula.
+notatedMusic,figures,encodes the presence of music notation in a text
+row,figures,(row) contains one row of a table.
+table,figures,"(table) contains text displayed in tabular form, in rows and columns."
+char,gaiji,(character) provides descriptive information about a character.
+charDecl,gaiji,(character declarations) provides information about nonstandard characters and glyphs.
+g,gaiji,"(character or glyph) represents a glyph, or a non-standard character."
+glyph,gaiji,(character glyph) provides descriptive information about a character glyph.
+localProp,gaiji,(locally defined property) provides a locally defined character (or glyph) property.
+mapping,gaiji,"(character mapping) contains one or more characters which are related to the parent character or glyph in some respect, as specified by the type attribute."
+unicodeProp,gaiji,(unicode property) provides a Unicode property for a character (or glyph).
+unihanProp,gaiji,(unihan property) holds the name and value of a normative or informative Unihan character (or glyph) property as part of its attributes.
+abstract,header,contains a summary or formal abstract prefixed to an existing source document by the encoder.
+appInfo,header,(application information) records information about an application which has edited the TEI file.
+application,header,provides information about an application which has acted upon the document.
+authority,header,"(release authority) supplies the name of a person or other agency responsible for making a work available, other than a publisher or distributor."
+availability,header,"(availability) supplies information about the availability of a text, for example any restrictions on its use or distribution, its copyright status, any licence applying to it, etc."
+biblFull,header,"(fully-structured bibliographic citation) contains a fully-structured bibliographic citation, in which all components of the TEI file description are present."
+cRefPattern,header,(canonical reference pattern) specifies an expression and replacement pattern for transforming a canonical reference into a URI.
+calendar,header,(calendar) describes a calendar or dating system used in a dating formula in the text.
+calendarDesc,header,(calendar description) contains a description of the calendar system used in any dating expression found in the text.
+catDesc,header,"(category description) describes some category within a taxonomy or text typology, either in the form of a brief prose description or in terms of the situational parameters used by the TEI formal textDesc."
+catRef,header,(category reference) specifies one or more defined categories within some taxonomy or text typology.
+category,header,"(category) contains an individual descriptive category, possibly nested within a superordinate category, within a user-defined taxonomy."
+change,header,"(change) documents a change or set of changes made during the production of a source document, or during the revision of an electronic file."
+citeData,header,(citation data) specifies how information may be extracted from citation structures.
+citeStructure,header,(citation structure) declares a structure and method for citing the current document.
+classCode,header,(classification code) contains the classification code used for this text in some standard classification system.
+classDecl,header,(classification declarations) contains one or more taxonomies defining any classificatory codes used elsewhere in the text.
+conversion,header,defines how to calculate one unit of measure in terms of another.
+correction,header,(correction principles) states how and under what circumstances corrections have been made in the text.
+correspAction,header,"(correspondence action) contains a structured description of the place, the name of a person/organization and the date related to the sending/receiving of a message or any other action related to the correspondence."
+correspContext,header,(correspondence context) provides references to preceding or following correspondence related to this piece of correspondence.
+correspDesc,header,(correspondence description) contains a description of the actions related to one act of correspondence.
+creation,header,(creation) contains information about the creation of a text.
+distributor,header,(distributor) supplies the name of a person or other agency responsible for the distribution of a text.
+edition,header,(edition) describes the particularities of one edition of a text.
+editionStmt,header,(edition statement) groups information relating to one edition of a text.
+editorialDecl,header,(editorial practice declaration) provides details of editorial principles and practices applied during the encoding of a text.
+encodingDesc,header,(encoding description) documents the relationship between an electronic text and the source or sources from which it was derived.
+extent,header,"(extent) describes the approximate size of a text stored on some carrier medium or of some other object, digital or non-digital, specified in any convenient units."
+fileDesc,header,(file description) contains a full bibliographic description of an electronic file.
+funder,header,"(funding body) specifies the name of an individual, institution, or organization responsible for the funding of a project or text."
+geoDecl,header,(geographic coordinates declaration) documents the notation and the datum used for geographic coordinates expressed as content of the geo element elsewhere within the document.
+handNote,header,(note on hand) describes a particular style or hand distinguished within a manuscript.
+hyphenation,header,(hyphenation) summarizes the way in which hyphenation in a source text has been treated in an encoded version of it.
+idno,header,"(identifier) supplies any form of identifier used to identify some object, such as a bibliographic item, a person, a title, an organization, etc. in a standardized way."
+interpretation,header,(interpretation) describes the scope of any analytic or interpretive information added to the text in addition to the transcription.
+keywords,header,(keywords) contains a list of keywords or phrases identifying the topic or nature of a text.
+langUsage,header,"(language usage) describes the languages, sublanguages, registers, dialects, etc. represented within a text."
+language,header,(language) characterizes a single language or sublanguage used within a text.
+licence,header,contains information about a licence or other legal agreement applicable to the text.
+listChange,header,groups a number of change descriptions associated with either the creation of a source text or the revision of an encoded text.
+listPrefixDef,header,"(list of prefix definitions) contains a list of definitions of prefixing schemes used in teidata.pointer values, showing how abbreviated URIs using each scheme may be expanded into full URIs."
+namespace,header,(namespace) supplies the formal name of the namespace to which the elements documented by its children belong.
+normalization,header,(normalization) indicates the extent of normalization or regularization of the original source carried out in converting it to electronic form.
+notesStmt,header,(notes statement) collects together any notes providing information about a text additional to that recorded in other parts of the bibliographic description.
+prefixDef,header,"(prefix definition) defines a prefixing scheme used in teidata.pointer values, showing how abbreviated URIs using the scheme may be expanded into full URIs."
+principal,header,(principal researcher) supplies the name of the principal researcher responsible for the creation of an electronic text.
+profileDesc,header,"(text-profile description) provides a detailed description of non-bibliographic aspects of a text, specifically the languages and sublanguages used, the situation in which it was produced, the participants and their setting."
+projectDesc,header,"(project description) describes in detail the aim or purpose for which an electronic file was encoded, together with any other relevant information concerning the process by which it was assembled or collected."
+publicationStmt,header,(publication statement) groups information concerning the publication or distribution of an electronic or other text.
+punctuation,header,specifies editorial practice adopted with respect to punctuation marks in the original.
+quotation,header,(quotation) specifies editorial practice adopted with respect to quotation marks in the original.
+refState,header,(reference state) specifies one component of a canonical reference defined by the milestone method.
+refsDecl,header,(references declaration) specifies how canonical references are constructed for this text.
+rendition,header,(rendition) supplies information about the rendition or appearance of one or more elements in the source text.
+revisionDesc,header,(revision description) summarizes the revision history for a file.
+samplingDecl,header,"(sampling declaration) contains a prose description of the rationale and methods used in selecting texts, or parts of a text, for inclusion in the resource."
+schemaRef,header,(schema reference) describes or points to a related customization or schema file
+scriptNote,header,describes a particular script distinguished within the description of a manuscript or similar resource.
+segmentation,header,"(segmentation) describes the principles according to which the text has been segmented, for example into sentences, tone-units, graphemic strata, etc."
+seriesStmt,header,"(series statement) groups information about the series, if any, to which a publication belongs."
+sourceDesc,header,"(source description) describes the source(s) from which an electronic text was derived or generated, typically a bibliographic description in the case of a digitized text, or a phrase such as ‘born digital’ for a text which has no previous existence."
+sponsor,header,(sponsor) specifies the name of a sponsoring organization or institution.
+stdVals,header,(standard values) specifies the format used when standardized date or number values are supplied.
+styleDefDecl,header,(style definition language declaration) specifies the name of the formal language in which style or renditional information is supplied elsewhere in the document. The specific version of the scheme may also be supplied.
+tagUsage,header,(element usage) documents the usage of a specific element within a specified document.
+tagsDecl,header,(tagging declaration) provides detailed information about the tagging applied to a document.
+taxonomy,header,"(taxonomy) defines a typology either implicitly, by means of a bibliographic citation, or explicitly by a structured taxonomy."
+teiHeader,header,(TEI header) supplies descriptive and declarative metadata associated with a digital resource or set of resources.
+textClass,header,"(text classification) groups information which describes the nature or topic of a text in terms of a standard classification scheme, thesaurus, etc."
+titleStmt,header,(title statement) groups information about the title of a work and those responsible for its content.
+unitDecl,header,(unit declarations) provides information about units of measurement that are not members of the International System of Units.
+unitDef,header,(unit definition) contains descriptive information related to a specific unit of measurement.
+xenoData,header,(non-TEI metadata) provides a container element into which metadata in non-TEI formats may be placed.
+bicond,iso-fs,"(bi-conditional feature-structure constraint) defines a biconditional feature-structure constraint; both consequent and antecedent are specified as feature structures or groups of feature structures; the constraint is satisfied if both subsume a given feature structure, or if both do not."
+binary,iso-fs,(binary value) represents the value part of a feature-value specification which can contain either of exactly two possible values.
+cond,iso-fs,"(conditional feature-structure constraint) defines a conditional feature-structure constraint; the consequent and the antecedent are specified as feature structures or feature-structure collections; the constraint is satisfied if both the antecedent and the consequent subsume a given feature structure, or if the antecedent does not."
+default,iso-fs,(default feature value) represents the value part of a feature-value specification which contains a defaulted value.
+f,iso-fs,"(feature) represents a feature value specification, that is, the association of a name with a value of any of several different types."
+fDecl,iso-fs,"(feature declaration) declares a single feature, specifying its name, organization, range of allowed values, and optionally its default value."
+fDescr,iso-fs,(feature description (in FSD)) describes in prose what is represented by the feature being declared and its values.
+fLib,iso-fs,(feature library) assembles a library of f (feature) elements.
+fs,iso-fs,"(feature structure) represents a feature structure, that is, a collection of feature-value pairs organized as a structural unit."
+fsConstraints,iso-fs,(feature-structure constraints) specifies constraints on the content of valid feature structures.
+fsDecl,iso-fs,(feature structure declaration) declares one type of feature structure.
+fsDescr,iso-fs,(feature system description (in FSD)) describes in prose what is represented by the type of feature structure declared in the enclosing fsDecl.
+fsdDecl,iso-fs,(feature system declaration) provides a feature system declaration comprising one or more feature structure declarations or feature structure declaration links.
+fsdLink,iso-fs,(feature structure declaration link) associates the name of a typed feature structure with a feature structure declaration for it.
+fvLib,iso-fs,(feature-value library) assembles a library of reusable feature value elements (including complete feature structures).
+if,iso-fs,"defines a conditional default value for a feature; the condition is specified as a feature structure, and is met if it subsumes the feature structure in the text for which a default value is sought."
+iff,iso-fs,(if and only if) separates the condition from the consequence in a bicond element.
+numeric,iso-fs,(numeric value) represents the value part of a feature-value specification which contains a numeric value or range.
+string,iso-fs,(string value) represents the value part of a feature-value specification which contains a string.
+symbol,iso-fs,(symbolic value) represents the value part of a feature-value specification which contains one of a finite list of symbols.
+then,iso-fs,"separates the condition from the default in an if, or the antecedent and the consequent in a cond element."
+vAlt,iso-fs,"(value alternation) represents the value part of a feature-value specification which contains a set of values, only one of which can be valid."
+vColl,iso-fs,"(collection of values) represents the value part of a feature-value specification which contains multiple values organized as a set, bag, or list."
+vDefault,iso-fs,"(value default) declares the default value to be supplied when a feature structure does not contain an instance of f for this name; if unconditional, it is specified as one (or, depending on the value of the org attribute of the enclosing fDecl) more fs elements or primitive values; if conditional, it is specified as one or more if elements; if no default is specified, or no condition matches, the value none is assumed."
+vLabel,iso-fs,(value label) represents the value part of a feature-value specification which appears at more than one point in a feature structure.
+vMerge,iso-fs,"(merged collection of values) represents a feature value which is the result of merging together the feature values contained by its children, using the organization specified by the org attribute."
+vNot,iso-fs,(value negation) represents a feature value which is the negation of its content.
+vRange,iso-fs,"(value range) defines the range of allowed values for a feature, in the form of an fs, vAlt, or primitive value; for the value of an f to be valid, it must be subsumed by the specified range; if the f contains multiple values (as sanctioned by the org attribute), then each value must be subsumed by the vRange."
+ab,linking,"(anonymous block) contains any component-level unit of text, acting as a container for phrase or inter level elements analogous to, but without the same constraints as, a paragraph."
+alt,linking,(alternation) identifies an alternation or a set of choices among elements or passages.
+altGrp,linking,(alternation group) groups a collection of alt elements and possibly pointers.
+anchor,linking,"(anchor point) attaches an identifier to a point within a text, whether or not it corresponds with a textual element."
+annotation,linking,represents an annotation following the Web Annotation Data Model.
+join,linking,"(join) identifies a possibly fragmented segment of text, by pointing at the possibly discontiguous elements which compose it."
+joinGrp,linking,(join group) groups a collection of join elements and possibly pointers.
+link,linking,"(link) defines an association or hypertextual link among elements or passages, of some type not more precisely specifiable by other elements."
+linkGrp,linking,(link group) defines a collection of associations or hypertextual links.
+listAnnotation,linking,"contains a list of annotations, typically encoded as annotation, annotationBlock, or note, possibly organized with nested listAnnotation elements."
+seg,linking,(arbitrary segment) represents any segmentation of text below the ‘chunk’ level.
+standOff,linking,"Functions as a container element for linked data, contextual information, and stand-off annotations embedded in a TEI document."
+timeline,linking,(timeline) provides a set of ordered points in time which can be linked to elements of a spoken text to create a temporal alignment of that text.
+when,linking,"indicates a point in time either relative to other elements in the same timeline tag, or absolutely."
+accMat,msdescription,"(accompanying material) contains details of any significant additional material which may be closely associated with the manuscript or object being described, such as non-contemporaneous documents or fragments bound in with it at some earlier historical period."
+acquisition,msdescription,(acquisition) contains any descriptive or other information concerning the process by which a manuscript or manuscript part or other object entered the holding institution.
+additional,msdescription,"(additional) groups additional information, combining bibliographic information about a manuscript or other object, or surrogate copies of it, with curatorial or administrative information."
+additions,msdescription,"(additions) contains a description of any significant additions found within a manuscript or other object, such as marginalia or other annotations."
+adminInfo,msdescription,"(administrative information) contains information about the present custody and availability of the manuscript or other object, and also about the record description itself."
+altIdentifier,msdescription,"(alternative identifier) contains an alternative or former structured identifier used for a manuscript or other object, such as a former catalogue number."
+binding,msdescription,"(binding) contains a description of one binding, i.e. type of covering, boards, etc. applied to a manuscript or other object."
+bindingDesc,msdescription,"(binding description) describes the present and former bindings of a manuscript or other object, either as a series of paragraphs or as a series of distinct binding elements, one for each binding of the manuscript."
+catchwords,msdescription,"(catchwords) describes the system used to ensure correct ordering of the quires or similar making up a codex, incunable, or other object typically by means of annotations at the foot of the page."
+collation,msdescription,"(collation) contains a description of how the leaves, bifolia, or similar objects are physically arranged."
+collection,msdescription,"(collection) contains the name of a collection of manuscripts or other objects, not necessarily located within a single repository."
+colophon,msdescription,"(colophon) contains the colophon of an item: that is, a statement providing information regarding the date, place, agency, or reason for production of the manuscript or other object."
+condition,msdescription,(condition) contains a description of the physical condition of the manuscript or object.
+custEvent,msdescription,(custodial event) describes a single event during the custodial history of a manuscript or other object.
+custodialHist,msdescription,"(custodial history) contains a description of a manuscript or other object's custodial history, either as running prose or as a series of dated custodial events."
+decoDesc,msdescription,"(decoration description) contains a description of the decoration of a manuscript or other object, either as in paragraphs, or as one or more decoNote elements."
+decoNote,msdescription,"(note on decoration) contains a note describing either a decorative component of a manuscript or other object, or a fairly homogenous class of such components."
+depth,msdescription,"(depth) contains a measurement from the front to the back of an object, perpendicular to the measurement given by the width element."
+dim,msdescription,contains any single measurement forming part of a dimensional specification of some sort.
+dimensions,msdescription,(dimensions) contains a dimensional specification.
+explicit,msdescription,"(explicit) contains the explicit of a item, that is, the closing words of the text proper, exclusive of any rubric or colophon which might follow it."
+filiation,msdescription,"(filiation) contains information concerning the manuscript or other object's filiation, i.e. its relationship to other surviving manuscripts or other objects of the same text or contents, its protographs, antigraphs and apographs."
+finalRubric,msdescription,"(final rubric) contains the string of words that denotes the end of a text division, often with an assertion as to its author and title, usually set off from the text itself by red ink, by a different size or type of script, or by some other such visual device."
+foliation,msdescription,(foliation) describes the numbering system or systems used to count the leaves or pages in a codex or similar object.
+handDesc,msdescription,(description of hands) contains a description of all the different hands used in a manuscript or other object.
+height,msdescription,(height) contains a measurement measured along the axis at a right angle to the bottom of the object.
+heraldry,msdescription,"(heraldry) contains a heraldic formula or phrase, typically found as part of a blazon, coat of arms, etc."
+history,msdescription,"(history) groups elements describing the full history of a manuscript, manuscript part, or other object."
+incipit,msdescription,"contains the incipit of a manuscript or similar object item, that is the opening words of the text proper, exclusive of any rubric which might precede it, of sufficient length to identify the work uniquely; such incipits were, in former times, frequently used a means of reference to a work, in place of a title."
+institution,msdescription,"(institution) contains the name of an organization such as a university or library, with which a manuscript or other object is identified, generally its holding institution."
+layout,msdescription,"(layout) describes how text is laid out on the page or surface of the object, including information about any ruling, pricking, or other evidence of page-preparation techniques."
+layoutDesc,msdescription,(layout description) collects the set of layout descriptions applicable to a manuscript or other object.
+locus,msdescription,"(locus) defines a location within a manuscript, manuscript part, or other object typically as a (possibly discontinuous) sequence of folio references."
+locusGrp,msdescription,"(locus group) groups a number of locations which together form a distinct but discontinuous item within a manuscript, manuscript part, or other object."
+material,msdescription,(material) contains a word or phrase describing the material of which the object being described is composed.
+msContents,msdescription,"(manuscript contents) describes the intellectual content of a manuscript, manuscript part, or other object either as a series of paragraphs or as a series of structured manuscript items."
+msDesc,msdescription,(manuscript description) contains a description of a single identifiable manuscript or other text-bearing object such as an early printed book.
+msFrag,msdescription,"(manuscript fragment) contains information about a fragment described in relation to a prior context, typically as a description of a virtual reconstruction of a manuscript or other object whose fragments were catalogued separately"
+msIdentifier,msdescription,(manuscript identifier) contains the information required to identify the manuscript or similar object being described.
+msItem,msdescription,"(manuscript item) describes an individual work or item within the intellectual content of a manuscript, manuscript part, or other object."
+msItemStruct,msdescription,"(structured manuscript item) contains a structured description for an individual work or item within the intellectual content of a manuscript, manuscript part, or other object."
+msName,msdescription,"(alternative name) contains any form of unstructured alternative name used for a manuscript or other object, such as an ‘ocellus nominum’, or nickname."
+msPart,msdescription,"(manuscript part) contains information about an originally distinct manuscript or part of a manuscript, which is now part of a composite manuscript."
+musicNotation,msdescription,(music notation) contains description of type of musical notation.
+objectDesc,msdescription,(object description) contains a description of the physical components making up the object which is being described.
+objectType,msdescription,(object type) contains a word or phrase describing the type of object being referred to.
+origDate,msdescription,"(origin date) contains any form of date, used to identify the date of origin for a manuscript, manuscript part, or other object."
+origPlace,msdescription,"(origin place) contains any form of place name, used to identify the place of origin for a manuscript, manuscript part, or other object."
+origin,msdescription,"(origin) contains any descriptive or other information concerning the origin of a manuscript, manuscript part, or other object."
+physDesc,msdescription,"(physical description) contains a full physical description of a manuscript, manuscript part, or other object optionally subdivided using more specialized elements from the model.physDescPart class."
+provenance,msdescription,"(provenance) contains any descriptive or other information concerning a single identifiable episode during the history of a manuscript, manuscript part, or other object after its creation but before its acquisition."
+recordHist,msdescription,(recorded history) provides information about the source and revision status of the parent manuscript or object description itself.
+repository,msdescription,"(repository) contains the name of a repository within which manuscripts or other objects are stored, possibly forming part of an institution."
+rubric,msdescription,"(rubric) contains the text of any rubric or heading attached to a particular manuscript item, that is, a string of words through which a manuscript or other object signals the beginning of a text division, often with an assertion as to its author and title, which is in some way set off from the text itself, typically in red ink, or by use of different size or type of script, or some other such visual device."
+scriptDesc,msdescription,(script description) contains a description of the scripts used in a manuscript or other object.
+seal,msdescription,(seal) contains a description of one seal or similar applied to the object described
+sealDesc,msdescription,"(seal description) describes the seals or similar items related to the object described, either as a series of paragraphs or as a series of seal elements."
+secFol,msdescription,(second folio) marks the word or words taken from a fixed point in a codex (typically the beginning of the second leaf) in order to provide a unique identifier for it.
+signatures,msdescription,(signatures) contains discussion of the leaf or quire signatures found within a codex or similar object.
+source,msdescription,(source) describes the original source for the information contained with a manuscript or object description.
+stamp,msdescription,(stamp) contains a word or phrase describing a stamp or similar device.
+summary,msdescription,"contains an overview of the available information concerning some aspect of an item or object (for example, its intellectual content, history, layout, typography etc.) as a complement or alternative to the more detailed information carried by more specific elements."
+support,msdescription,(support) contains a description of the materials etc. which make up the physical support for the written part of a manuscript or other object.
+supportDesc,msdescription,(support description) groups elements describing the physical support for the written part of a manuscript or other object.
+surrogates,msdescription,(surrogates) contains information about any representations of the manuscript or other object being described which may exist in the holding institution or elsewhere.
+typeDesc,msdescription,(typeface description) contains a description of the typefaces or other aspects of the printing of an incunable or other printed source.
+typeNote,msdescription,(typographic note) describes a particular font or other significant typographic feature distinguished within the description of a printed resource.
+watermark,msdescription,(watermark) contains a word or phrase describing a watermark or similar device.
+width,msdescription,"(width) contains a measurement of an object along the axis parallel to its bottom, e.g. perpendicular to the spine of a book or codex."
+addName,namesdates,"(additional name) contains an additional name component, such as a nickname, epithet, or alias, or any other descriptive phrase used within a personal name."
+affiliation,namesdates,"(affiliation) contains an informal description of a person's present or past affiliation with some organization, for example an employer or sponsor."
+age,namesdates,(age) specifies the age of a person.
+birth,namesdates,"(birth) contains information about a person's birth, such as its date and place."
+bloc,namesdates,(bloc) contains the name of a geo-political unit consisting of two or more nation states or countries.
+climate,namesdates,(climate) contains information about the physical climate of a place.
+country,namesdates,"(country) contains the name of a geo-political unit, such as a nation, country, colony, or commonwealth, larger than or administratively superior to a region and smaller than a bloc."
+death,namesdates,"(death) contains information about a person's death, such as its date and place."
+district,namesdates,"(district) contains the name of any kind of subdivision of a settlement, such as a parish, ward, or other administrative or geographic unit."
+education,namesdates,(education) contains a description of the educational experience of a person.
+event,namesdates,(event) contains data relating to anything of significance that happens in time.
+eventName,namesdates,(name of an event) contains a proper noun or noun phrase used to refer to an event.
+faith,namesdates,"(faith) specifies the faith, religion, or belief set of a person."
+floruit,namesdates,(floruit) contains information about a person's period of activity.
+forename,namesdates,"(forename) contains a forename, given or baptismal name."
+genName,namesdates,(generational name component) contains a name component used to distinguish otherwise similar names on the basis of the relative ages or generations of the persons named.
+gender,namesdates,"(gender) specifies the gender identity of a person, persona, or character."
+geo,namesdates,"(geographical coordinates) contains any expression of a set of geographic coordinates, representing a point, line, or area on the surface of the earth in some notation."
+geogFeat,namesdates,"(geographical feature name) contains a common noun identifying some geographical feature contained within a geographic name, such as valley, mount, etc."
+geogName,namesdates,(geographical name) identifies a name associated with some geographical feature such as Windrush Valley or Mount Sinai.
+langKnowledge,namesdates,"(language knowledge) summarizes the state of a person's linguistic knowledge, either as prose or by a list of langKnown elements."
+langKnown,namesdates,"(language known) summarizes the state of a person's linguistic competence, i.e., knowledge of a single language."
+listEvent,namesdates,"(list of events) contains a list of descriptions, each of which provides information about an identifiable event."
+listNym,namesdates,"(list of canonical names) contains a list of nyms, that is, standardized names for any thing."
+listObject,namesdates,"(list of objects) contains a list of descriptions, each of which provides information about an identifiable physical object."
+listOrg,namesdates,"(list of organizations) contains a list of elements, each of which provides information about an identifiable organization."
+listPerson,namesdates,"(list of persons) contains a list of descriptions, each of which provides information about an identifiable person or a group of people, for example the participants in a language interaction, or the people referred to in a historical source."
+listPlace,namesdates,"(list of places) contains a list of places, optionally followed by a list of relationships (other than containment) defined amongst them."
+listRelation,namesdates,"provides information about relationships identified amongst people, places, and organizations, either informally as prose or as formally expressed relation links."
+location,namesdates,"(location) defines the location of a place as a set of geographical coordinates, in terms of other named geo-political entities, or as an address."
+nameLink,namesdates,"(name link) contains a connecting phrase or link used within a name but not regarded as part of it, such as van der or of."
+nationality,namesdates,(nationality) contains an informal description of a person's present or past nationality or citizenship.
+nym,namesdates,(canonical name) contains the definition for a canonical name or name component of any kind.
+object,namesdates,contains a description of a single identifiable physical object.
+objectIdentifier,namesdates,(object identifier) groups one or more identifiers or pieces of locating information concerning a single object.
+objectName,namesdates,(name of an object) contains a proper noun or noun phrase used to refer to an object.
+occupation,namesdates,"(occupation) contains an informal description of a person's trade, profession or occupation."
+offset,namesdates,"(offset) marks that part of a relative temporal or spatial expression which indicates the direction of the offset between the two place names, dates, or times involved in the expression."
+org,namesdates,"(organization) provides information about an identifiable organization such as a business, a tribe, or any other grouping of people."
+orgName,namesdates,(organization name) contains an organizational name.
+persName,namesdates,"(personal name) contains a proper noun or proper-noun phrase referring to a person, possibly including one or more of the person's forenames, surnames, honorifics, added names, etc."
+persPronouns,namesdates,"(personal pronouns) indicates the personal pronouns used, or assumed to be used, by the individual being described."
+person,namesdates,"(person) provides information about an identifiable individual, for example a participant in a language interaction, or a person referred to in a historical source."
+personGrp,namesdates,(personal group) describes a group of individuals treated as a single person for analytic purposes.
+persona,namesdates,"provides information about one of the personalities identified for a given individual, where an individual has multiple personalities."
+place,namesdates,(place) contains data about a geographic location
+placeName,namesdates,(place name) contains an absolute or relative place name.
+population,namesdates,(population) contains information about the population of a place.
+region,namesdates,"(region) contains the name of an administrative unit such as a state, province, or county, larger than a settlement, but smaller than a country."
+relation,namesdates,"(relationship) describes any kind of relationship or linkage amongst a specified group of places, events, persons, objects or other items."
+residence,namesdates,(residence) describes a person's present or past places of residence.
+roleName,namesdates,"(role name) contains a name component which indicates that the referent has a particular role or position in society, such as an official title or rank."
+settlement,namesdates,"(settlement) contains the name of a settlement such as a city, town, or village identified as a single geo-political or administrative unit."
+sex,namesdates,(sex) specifies the sex of an organism.
+socecStatus,namesdates,(socio-economic status) contains an informal description of a person's perceived social or economic status.
+state,namesdates,"(state) contains a description of some status or quality attributed to a person, place, or organization often at some specific time or for a specific date range."
+surname,namesdates,"(surname) contains a family (inherited) name, as opposed to a given, baptismal, or nick name."
+terrain,namesdates,(terrain) contains information about the physical terrain of a place.
+trait,namesdates,"(trait) contains a description of some status or quality attributed to a person, place, or organization typically, but not necessarily, independent of the volition or action of the holder and usually not at some specific time or for a specific date range."
+arc,nets,"(arc) encodes an arc, the connection from one node to another in a graph."
+eLeaf,nets,"(leaf or terminal node of an embedding tree) provides explicitly for a leaf of an embedding tree, which may also be encoded with the eTree element."
+eTree,nets,(embedding tree) provides an alternative to the tree element for representing ordered rooted tree structures.
+forest,nets,(forest) provides for groups of rooted trees.
+graph,nets,"(graph) encodes a graph, which is a collection of nodes, and arcs which connect the nodes."
+iNode,nets,(intermediate (or internal) node) represents an intermediate (or internal) node of a tree.
+leaf,nets,(leaf) encodes the leaves (terminal nodes) of a tree.
+listForest,nets,provides for lists of forests.
+node,nets,"(node) encodes a node, a possibly labeled point in a graph."
+root,nets,(root node) represents the root node of a tree.
+tree,nets,"(tree) encodes a tree, which is made up of a root, internal nodes, leaves, and arcs from root to leaves."
+triangle,nets,"(underspecified embedding tree, so called because of its characteristic shape when drawn) provides for an underspecified eTree, that is, an eTree with information left out."
+annotationBlock,spoken,"groups together various annotations, e.g. for parallel interpretations of a spoken segment."
+broadcast,spoken,(broadcast) describes a broadcast used as the source of a spoken text.
+equipment,spoken,(equipment) provides technical details of the equipment and media used for an audio or video recording used as the source for a spoken text.
+incident,spoken,"(incident) marks any phenomenon or occurrence, not necessarily vocalized or communicative, for example incidental noises or other events affecting communication."
+kinesic,spoken,"(kinesic) marks any communicative phenomenon, not necessarily vocalized, for example a gesture, frown, etc."
+pause,spoken,(pause) marks a pause either between or within utterances.
+recording,spoken,"(recording event) provides details of an audio or video recording event used as the source of a spoken text, either directly or from a public broadcast."
+recordingStmt,spoken,(recording statement) describes a set of recordings used as the basis for transcription of a spoken text.
+scriptStmt,spoken,(script statement) contains a citation giving details of the script used for a spoken text.
+shift,spoken,(shift) marks the point at which some paralinguistic feature of a series of utterances by any one speaker changes.
+transcriptionDesc,spoken,"(transcription description) describes the set of transcription conventions used, particularly for spoken material."
+u,spoken,(utterance) contains a stretch of speech usually preceded and followed by silence or by a change of speaker.
+vocal,spoken,"(vocal) marks any vocalized but not necessarily lexical phenomenon, for example voiced pauses, non-lexical backchannels, etc."
+writing,spoken,(writing) contains a passage of written text revealed to participants in the course of a spoken text.
+altIdent,tagdocs,"(alternate identifier) supplies the recommended XML name for an element, class, attribute, etc. in some language."
+alternate,tagdocs,indicates that the constructs referenced by its children form an alternation
+anyElement,tagdocs,indicates the presence of any elements in a content model
+att,tagdocs,(attribute) contains the name of an attribute appearing within running text.
+attDef,tagdocs,(attribute definition) contains the definition of a single attribute.
+attList,tagdocs,"(attribute list) contains documentation for all the attributes associated with this element, as a series of attDef elements."
+attRef,tagdocs,(attribute pointer) points to the definition of an attribute or group of attributes.
+classRef,tagdocs,points to the specification for an attribute or model class which is to be included in a schema
+classSpec,tagdocs,"(class specification) contains reference information for a TEI element class; that is a group of elements which appear together in content models, or which share some common attribute, or both."
+classes,tagdocs,(classes) specifies all the classes of which the documented element or class is a member or subclass.
+code,tagdocs,contains literal code from some formal language such as a programming language.
+constraint,tagdocs,(constraint rules) the formal rules of a constraint
+constraintSpec,tagdocs,"(constraint on schema) contains a formal constraint, typically expressed in a rule-based schema language, to which a construct must conform in order to be considered valid"
+content,tagdocs,(content model) contains a declaration of the intended content model for the element (or other construct) being specified.
+dataFacet,tagdocs,"Restricts the value of the strings used to represent values of a datatype, according to XML Schema Part 2: Datatypes Second Edition."
+dataRef,tagdocs,"identifies the datatype of an attribute value, either by referencing an item in an externally defined datatype library, or by pointing to a TEI-defined data specification"
+dataSpec,tagdocs,(datatype specification) documents a datatype.
+datatype,tagdocs,"(datatype) specifies the declared value for an attribute, by referring to any datatype defined by the chosen schema language."
+defaultVal,tagdocs,(default value) specifies the default declared value for an attribute.
+eg,tagdocs,(example) contains any kind of illustrative example.
+egXML,tagdocs,"(example of XML) a single XML fragment demonstrating the use of some XML, such as elements, attributes, or processing instructions, etc., in which the egXML element functions as the root element."
+elementRef,tagdocs,points to the specification for some element which is to be included in a schema
+elementSpec,tagdocs,"(element specification) documents the structure, content, and purpose of a single element type."
+empty,tagdocs,indicates the presence of an empty node within a content model
+equiv,tagdocs,"(equivalent) specifies a component which is considered equivalent to the parent element, either by co-reference, or by external link."
+exemplum,tagdocs,(exemplum) groups an example demonstrating the use of an element along with optional paragraphs of commentary.
+gi,tagdocs,(element name) contains the name (generic identifier) of an element.
+ident,tagdocs,"(identifier) contains an identifier or name for an object of some kind in a formal language. ident is used for tokens such as variable names, class names, type names, function names etc. in formal programming languages."
+listRef,tagdocs,(list of references) supplies a list of significant references in the current document or elsewhere
+macroRef,tagdocs,points to the specification for some pattern which is to be included in a schema
+macroSpec,tagdocs,(macro specification) documents the function and implementation of a pattern.
+memberOf,tagdocs,specifies class membership of the documented element or class.
+model,tagdocs,describes the processing intended for a specified element.
+modelGrp,tagdocs,(model group) any grouping of model or modelSequence elements with a common output method
+modelSequence,tagdocs,any sequence of model or modelSequence elements which is to be processed as a single set of actions
+moduleRef,tagdocs,(module reference) references a module which is to be incorporated into a schema.
+moduleSpec,tagdocs,"(module specification) documents the structure, content, and purpose of a single module, i.e. a named and externally visible group of declarations."
+outputRendition,tagdocs,describes the rendering or appearance intended for all occurrences of an element in a specified context for a specified type of output
+param,tagdocs,provides a parameter for a model behaviour by supplying its name and an XPath expression identifying the location of its content.
+paramList,tagdocs,list of parameter specification
+paramSpec,tagdocs,supplies specification for one parameter of a model behaviour
+remarks,tagdocs,"(remarks) contains any commentary or discussion about the usage of an element, attribute, class, or entity not otherwise documented within the containing element."
+schemaSpec,tagdocs,(schema specification) generates a TEI-conformant schema and documentation for it.
+sequence,tagdocs,indicates that the constructs referenced by its children form a sequence
+specDesc,tagdocs,"(specification description) indicates that a description of the specified element, class, or macro should be included at this point within a document."
+specGrp,tagdocs,(specification group) contains any convenient grouping of specifications for use within the current module.
+specGrpRef,tagdocs,(reference to a specification group) indicates that the declarations contained by the specGrp referenced should be inserted at this point.
+specList,tagdocs,(specification list) marks where a list of descriptions is to be inserted into the prose documentation.
+tag,tagdocs,"(tag) contains text of a complete start- or end-tag, possibly including attribute specifications, but excluding the opening and closing markup delimiter characters."
+textNode,tagdocs,indicates the presence of a text node in a content model
+val,tagdocs,(value) contains a single attribute value.
+valDesc,tagdocs,"(value description) specifies any semantic or syntactic constraint on the value that an attribute may take, additional to the information carried by the datatype element."
+valItem,tagdocs,documents a single value in a predefined list of values.
+valList,tagdocs,(value list) contains one or more valItem elements defining possible values.
+app,textcrit,"(apparatus entry) contains one entry in a critical apparatus, with an optional lemma and usually one or more readings or notes on the relevant passage."
+lacunaEnd,textcrit,(lacuna end) indicates the end of a lacuna in a mostly complete textual witness.
+lacunaStart,textcrit,(lacuna start) indicates the beginning of a lacuna in the text of a mostly complete textual witness.
+lem,textcrit,"(lemma) contains the lemma, or base text, of a textual variation."
+listApp,textcrit,(list of apparatus entries) contains a list of apparatus entries.
+listWit,textcrit,"(witness list) lists definitions for all the witnesses referred to by a critical apparatus, optionally grouped hierarchically."
+rdg,textcrit,(reading) contains a single reading within a textual variation.
+rdgGrp,textcrit,"(reading group) within a textual variation, groups two or more readings perceived to have a genetic relationship or other affinity."
+variantEncoding,textcrit,(variant encoding) declares the method used to encode text-critical variants.
+wit,textcrit,"(wit) contains a list of one or more sigla of witnesses attesting a given reading, in a textual variation."
+witDetail,textcrit,"(witness detail) gives further information about a particular witness, or witnesses, to a particular reading."
+witEnd,textcrit,"(fragmented witness end) indicates the end, or suspension, of the text of a fragmentary witness."
+witStart,textcrit,"(fragmented witness start) indicates the beginning, or resumption, of the text of a fragmentary witness."
+witness,textcrit,"(witness) contains either a description of a single witness referred to within the critical apparatus, or a list of witnesses which is to be referred to by a single sigil."
+TEI,textstructure,"(TEI document) contains a single TEI-conformant document, combining a single TEI header with one or more members of the model.resource class. Multiple TEI elements may be combined within a TEI (or teiCorpus) element."
+argument,textstructure,(argument) contains a formal list or prose description of the topics addressed by a subdivision of a text.
+back,textstructure,"(back matter) contains any appendixes, etc. following the main part of a text."
+body,textstructure,"(text body) contains the whole body of a single unitary text, excluding any front or back matter."
+byline,textstructure,(byline) contains the primary statement of responsibility given for a work on its title page or at the head or end of the work.
+closer,textstructure,"(closer) groups together salutations, datelines, and similar phrases appearing as a final group at the end of a division, especially of a letter."
+dateline,textstructure,"(dateline) contains a brief description of the place, date, time, etc. of production of a letter, newspaper story, or other work, prefixed or suffixed to it as a kind of heading or trailer."
+div,textstructure,"(text division) contains a subdivision of the front, body, or back of a text."
+div1,textstructure,"(level-1 text division) contains a first-level subdivision of the front, body, or back of a text."
+div2,textstructure,"(level-2 text division) contains a second-level subdivision of the front, body, or back of a text."
+div3,textstructure,"(level-3 text division) contains a third-level subdivision of the front, body, or back of a text."
+div4,textstructure,"(level-4 text division) contains a fourth-level subdivision of the front, body, or back of a text."
+div5,textstructure,"(level-5 text division) contains a fifth-level subdivision of the front, body, or back of a text."
+div6,textstructure,"(level-6 text division) contains a sixth-level subdivision of the front, body, or back of a text."
+div7,textstructure,"(level-7 text division) contains the smallest possible subdivision of the front, body or back of a text, larger than a paragraph."
+docAuthor,textstructure,"(document author) contains the name of the author of the document, as given on the title page (often but not always contained in a byline)."
+docDate,textstructure,"(document date) contains the date of a document, as given on a title page or in a dateline."
+docEdition,textstructure,(document edition) contains an edition statement as presented on a title page of a document.
+docImprint,textstructure,"(document imprint) contains the imprint statement (place and date of publication, publisher name), as given (usually) at the foot of a title page."
+docTitle,textstructure,"(document title) contains the title of a document, including all its constituents, as given on a title page."
+epigraph,textstructure,"(epigraph) contains a quotation, anonymous or attributed, appearing at the start or end of a section or on a title page."
+floatingText,textstructure,"(floating text) contains a single text of any kind, whether unitary or composite, which interrupts the text containing it at any point and after which the surrounding text resumes."
+front,textstructure,"(front matter) contains any prefatory matter (headers, abstracts, title page, prefaces, dedications, etc.) found at the start of a document, before the main body."
+group,textstructure,"(group) contains the body of a composite text, grouping together a sequence of distinct texts (or groups of such texts) which are regarded as a unit for some purpose, for example the collected works of an author, a sequence of prose essays, etc."
+imprimatur,textstructure,"(imprimatur) contains a formal statement authorizing the publication of a work, sometimes required to appear on a title page or its verso."
+opener,textstructure,"(opener) groups together dateline, byline, salutation, and similar phrases appearing as a preliminary group at the start of a division, especially of a letter."
+postscript,textstructure,"contains a postscript, e.g. to a letter."
+salute,textstructure,"(salutation) contains a salutation or greeting prefixed to a foreword, dedicatory epistle, or other division of a text, or the salutation in the closing of a letter, preface, etc."
+signed,textstructure,"(signature) contains the closing salutation, etc., appended to a foreword, dedicatory epistle, or other division of a text."
+text,textstructure,"(text) contains a single text of any kind, whether unitary or composite, for example a poem or drama, a collection of essays, a novel, a dictionary, or a corpus sample."
+titlePage,textstructure,"(title page) contains the title page of a text, appearing within the front or back matter."
+titlePart,textstructure,"(title part) contains a subsection or division of the title of a work, as indicated on a title page."
+trailer,textstructure,contains a closing title or footer appearing at the end of a division of a text.
+addSpan,transcr,"(added span of text) marks the beginning of a longer sequence of text added by an author, scribe, annotator or corrector (see also add)."
+am,transcr,(abbreviation marker) contains a sequence of letters or signs present in an abbreviation which are omitted or replaced in the expanded form of the abbreviation.
+damage,transcr,(damage) contains an area of damage to the text witness.
+damageSpan,transcr,(damaged span of text) marks the beginning of a longer sequence of text which is damaged in some way but still legible.
+delSpan,transcr,"(deleted span of text) marks the beginning of a longer sequence of text deleted, marked as deleted, or otherwise signaled as superfluous or spurious by an author, scribe, annotator, or corrector."
+ex,transcr,(editorial expansion) contains a sequence of letters added by an editor or transcriber when expanding an abbreviation.
+facsimile,transcr,contains a representation of some written source in the form of a set of images rather than as transcribed or encoded text.
+fw,transcr,"(forme work) contains a running head (e.g. a header, footer), catchword, or similar material appearing on the current page."
+handNotes,transcr,contains one or more handNote elements documenting the different hands identified within the source texts.
+handShift,transcr,"(handwriting shift) marks the beginning of a sequence of text written in a new hand, or the beginning of a scribal stint."
+line,transcr,contains the transcription of a topographic line in the source document
+listTranspose,transcr,"supplies a list of transpositions, each of which is indicated at some point in a document typically by means of metamarks."
+metamark,transcr,contains or describes any kind of graphic or written signal within a document the function of which is to determine how it should be read rather than forming part of the actual content of the document.
+mod,transcr,represents any kind of modification identified within a single document.
+path,transcr,(path) defines any line passing through two or more points within a surface element.
+redo,transcr,indicates one or more cancelled interventions in a document which have subsequently been marked as reaffirmed or repeated.
+restore,transcr,(restore) indicates restoration of text to an earlier state by cancellation of an editorial or authorial marking or instruction.
+retrace,transcr,"contains a sequence of writing which has been retraced, for example by over-inking, to clarify or fix it."
+secl,transcr,(secluded text) Secluded. Marks text present in the source which the editor believes to be genuine but out of its original place (which is unknown).
+sourceDoc,transcr,contains a transcription or other representation of a single source document potentially forming part of a dossier génétique or collection of sources.
+space,transcr,(space) indicates the location of a significant space in the text.
+subst,transcr,(substitution) groups one or more deletions (or surplus text) with one or more additions when the combination is to be regarded as a single intervention in the text.
+substJoin,transcr,"(substitution join) identifies a series of possibly fragmented additions, deletions, or other revisions on a manuscript that combine to make up a single intervention in the text"
+supplied,transcr,"(supplied) signifies text supplied by the transcriber or editor for any reason; for example because the original cannot be read due to physical damage, or because of an obvious omission by the author or scribe."
+surface,transcr,"defines a written surface as a two-dimensional coordinate space, optionally grouping one or more graphic representations of that space, zones of interest within that space, and, when using an embedded transcription approach, transcriptions of the writing within them."
+surfaceGrp,transcr,"(surface group) defines any kind of useful grouping of written surfaces, for example the recto and verso of a single leaf, which the encoder wishes to treat as a single unit."
+surplus,transcr,(surplus) marks text present in the source which the editor believes to be superfluous or redundant.
+transpose,transcr,describes a single textual transposition as an ordered list of at least two pointers specifying the order in which the elements indicated should be re-combined.
+undo,transcr,indicates one or more marked-up interventions in a document which have subsequently been marked for cancellation.
+zone,transcr,defines any two-dimensional area within a surface element.
+caesura,verse,marks the point at which a metrical line may be divided.
+metDecl,verse,"(metrical notation declaration) documents the notation employed to represent a metrical pattern when this is specified as the value of a met, real, or rhyme attribute on any structural element of a metrical text (e.g. lg, l, or seg)."
+metSym,verse,"(metrical notation symbol) documents the intended significance of a particular character or character sequence within a metrical notation, either explicitly or in terms of other metSym elements in the same metDecl."
+rhyme,verse,marks the rhyming part of a metrical line.
+blackening,custom,
+comment,custom,

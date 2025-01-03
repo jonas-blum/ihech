@@ -210,11 +210,8 @@ export class PixiAggregateBubble extends PixiBubble {
 
     this.addChild(this.text)
 
-
     this.changeTexture(useTextureStore().ringTexture as Texture)
-
   }
-
 }
 
 export class PixiItemBubble extends PixiBubble {
@@ -224,4 +221,72 @@ export class PixiItemBubble extends PixiBubble {
     this.changeTexture(useTextureStore().bubbleTexture as Texture)
   }
 
+  updatePositionAndVisibility(animate: boolean = true) {
+    const dimredLayoutStore = useDimredLayoutStore()
+
+    const isRowSticky = useMainStore().itemTree?.isRowSticky(this.row)
+
+    // if the position is -1, we hide the bubble
+    if (this.row.position === -1 && !isRowSticky) {
+      const startX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
+      const startY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
+      const endX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
+      const endY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
+      gsap.fromTo(
+        this,
+        {
+          x: startX,
+          y: startY,
+        },
+        {
+          x: endX,
+          y: endY,
+          duration: animate ? dimredLayoutStore.animationDuration : 0,
+        },
+      )
+
+      // set visibility to false after the animation
+      setTimeout(
+        () => {
+          this.updateVisibility()
+        },
+        animate ? dimredLayoutStore.animationDuration * 1000 : 0,
+      )
+
+      return
+    }
+
+    // if the oldPosition is -1, we want to animate from the parent row position (if available)
+    if (this.row.oldPosition === -1 && !isRowSticky) {
+      const startX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
+      const startY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
+      const endX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
+      const endY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
+
+      // NOTE: I have no idea why, but for some reason it crashed when updating and an item was sticky.
+      // this catch block is a dirty fix to avoid the crash
+      try {
+        let wtf = this.x
+      } catch (error) {
+        return
+      }
+
+      gsap.fromTo(
+        this,
+        {
+          x: startX,
+          y: startY,
+        },
+        {
+          x: endX,
+          y: endY,
+          duration: animate ? dimredLayoutStore.animationDuration : 0,
+        },
+      )
+    }
+
+    // if neiter the position nor the oldPosition is -1, we do not need to change the position
+
+    this.updateVisibility()
+  }
 }

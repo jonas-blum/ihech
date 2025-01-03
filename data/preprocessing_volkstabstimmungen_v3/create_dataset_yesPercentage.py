@@ -120,6 +120,7 @@ dic = {
         "colorMapLogarithmic": False,
         "groupAttributesBy": ["Rechtsform"],
         "groupItemsBy": ["Sprachgebiet", "Kanton"],
+        "scaling": "STANDARDIZING",
     },
     "csvFile": df.to_csv(index=False, header=False),
 }

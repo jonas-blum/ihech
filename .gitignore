@@ -20,6 +20,8 @@ data/preprocessing_volkstabstimmungen_v3/voting_results/*
 data/preprocessing_chess/data/*
 data/preprocessing_chess/all_games.pgn
 data/preprocessing_chess/games_with_openings.csv
+data/preprocessing_tei/editions/*
+data/preprocessing_tei/_editions/*
 
 # exclude flask stuff
 __pycache__

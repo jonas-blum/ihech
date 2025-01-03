@@ -79,6 +79,8 @@ export function mapScalingEnum(scaling: ScalingEnum): string {
   switch (scaling) {
     case ScalingEnum.NO_SCALING:
       return 'No Scaling'
+    case ScalingEnum.BINARY:
+      return 'Binary'
     case ScalingEnum.STANDARDIZING:
       return 'Standardizing'
   }
@@ -118,6 +120,7 @@ export enum SortOrderAttributes {
 
 export enum ScalingEnum {
   NO_SCALING = 'NO_SCALING',
+  BINARY = 'BINARY',
   STANDARDIZING = 'STANDARDIZING',
 }
 

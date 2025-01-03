@@ -108,6 +108,7 @@ dic = {
         "colorMapLogarithmic": True,
         "groupAttributesBy": ["ECO Category", "Opening Family"],
         "groupItemsBy": [],
+        "scaling": "STANDARDIZING",
     },
     "csvFile": df.to_csv(index=False, header=False),
 }

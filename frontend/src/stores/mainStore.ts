@@ -231,6 +231,7 @@ export const useMainStore = defineStore('mainStore', {
       this.setClusterAfterDimRed(defaultSettings.clusterAfterDimRed)
       this.setItemAggregateMethod(defaultSettings.itemAggregateMethod)
       this.setAttributeAggregateMethod(defaultSettings.attributeAggregateMethod)
+      this.setScaling(defaultSettings.scaling)
       
       // set the default semantic aggregations
       this.getHierarchicalRowsMetadataColumnNames.forEach((column) => {

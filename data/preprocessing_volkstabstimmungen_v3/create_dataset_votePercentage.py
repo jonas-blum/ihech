@@ -119,6 +119,7 @@ dic = {
         "colorMapLogarithmic": False,
         "groupAttributesBy": ["Bereich (1. Level)", "Bereich (2. Level)", "Bereich (3. Level)"],
         "groupItemsBy": ["Sprachgebiet", "Kanton"],
+        "scaling": "STANDARDIZING",
     },
     "csvFile": df.to_csv(index=False, header=False),
 }

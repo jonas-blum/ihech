@@ -37,13 +37,14 @@ def insert_value_in_item_name_and_data_at_index(
 
 
 def append_average_item_by_attribute_indexes(
-    indexes: List[int], item_name_and_data: ItemNameAndData,
+    indexes: List[int],
+    item_name_and_data: ItemNameAndData,
     attribute_aggregate_method: str = "mean",
 ) -> None:
     if item_name_and_data is None:
         return
     data = item_name_and_data.data
-    
+
     # NOTE: initially, we just took the average by default. Later we added the option to sum the values instead.
     # because I was too lazy to refactor, the method & function are still named 'avg'. this is confusing and should be changed.
     if attribute_aggregate_method == "mean":
@@ -60,20 +61,26 @@ def append_average_item_by_attribute_indexes(
         avg_data = float(any(data[i] > 0 for i in indexes))
     else:
         raise ValueError(f"Unknown aggregation method: {attribute_aggregate_method}")
-    
+
     item_name_and_data.data.append(avg_data)
     if item_name_and_data.children is None:
         return
     for child in item_name_and_data.children:
         if child is not None:
-            append_average_item_by_attribute_indexes(indexes, child, attribute_aggregate_method)
+            append_average_item_by_attribute_indexes(
+                indexes, child, attribute_aggregate_method
+            )
 
 
 def append_all_average_items_by_attribute_indexes(
-    indexes: List[int], item_names_and_data: List[ItemNameAndData], attribute_aggregate_method: str
+    indexes: List[int],
+    item_names_and_data: List[ItemNameAndData],
+    attribute_aggregate_method: str,
 ):
     for item_name_and_data in item_names_and_data:
-        append_average_item_by_attribute_indexes(indexes, item_name_and_data, attribute_aggregate_method)
+        append_average_item_by_attribute_indexes(
+            indexes, item_name_and_data, attribute_aggregate_method
+        )
 
 
 def get_current_data_length(item_names_and_data: List[ItemNameAndData]):
@@ -97,7 +104,9 @@ def cluster_attributes_recursively(
     if level == 0:
         indexes = list(range(rotated_scaled_raw_data_df.shape[0]))
         new_attribute_index = get_current_data_length(item_names_and_data)
-        append_all_average_items_by_attribute_indexes(indexes, item_names_and_data, attribute_aggregate_method)
+        append_all_average_items_by_attribute_indexes(
+            indexes, item_names_and_data, attribute_aggregate_method
+        )
         new_attribute_name = f""
 
         children_0 = cluster_attributes_recursively(
@@ -142,7 +151,9 @@ def cluster_attributes_recursively(
             )
             group_data_attribute_index = get_current_data_length(item_names_and_data)
             append_all_average_items_by_attribute_indexes(
-                indexes_of_current_group, item_names_and_data, attribute_aggregate_method
+                indexes_of_current_group,
+                item_names_and_data,
+                attribute_aggregate_method,
             )
             remaining_collection_row_indexes = hierarchical_column_metadata_row_indexes[
                 1:
@@ -377,8 +388,10 @@ def cluster_items_recursively(
 ) -> Union[List[ItemNameAndData], None]:
     # Case: root level
     if level == 0:
-        tag_data_0_aggregated, dim_reduction_0_aggregated = compute_item_aggregated_statistics(
-            raw_data_df, dim_red_df, aggregate_method
+        tag_data_0_aggregated, dim_reduction_0_aggregated = (
+            compute_item_aggregated_statistics(
+                raw_data_df, dim_red_df, aggregate_method
+            )
         )
 
         new_item_name_0 = ""
@@ -429,8 +442,10 @@ def cluster_items_recursively(
             dim_red_group_df = dim_red_df.loc[indexes_of_current_group]
             item_names_group_df = item_names_df.loc[indexes_of_current_group]
 
-            tag_data_aggregated, dim_reduction_aggregated = compute_item_aggregated_statistics(
-                raw_data_group_df, dim_red_group_df, aggregate_method
+            tag_data_aggregated, dim_reduction_aggregated = (
+                compute_item_aggregated_statistics(
+                    raw_data_group_df, dim_red_group_df, aggregate_method
+                )
             )
             new_item_name = str(collection)
 
@@ -438,7 +453,7 @@ def cluster_items_recursively(
                 raw_data_group_df.shape[0] == 1
                 and len(remaining_collection_column_names) == 0
             ):
-                solo_child_name = str(item_names_df.iloc[0, 0])
+                solo_child_name = str(item_names_group_df.iloc[0, 0])
                 solo_child_data = np.round(
                     raw_data_group_df.iloc[0], rounding_precision
                 ).tolist()
@@ -610,8 +625,10 @@ def cluster_items_recursively(
                 new_clustered_item_names_and_data.append(new_item_name_and_data)
                 continue
 
-            tag_data_aggregated, dim_reduction_aggregated = compute_item_aggregated_statistics(
-                raw_data_cluster_df, dim_red_cluster_df, aggregate_method
+            tag_data_aggregated, dim_reduction_aggregated = (
+                compute_item_aggregated_statistics(
+                    raw_data_cluster_df, dim_red_cluster_df, aggregate_method
+                )
             )
 
             new_item_name = ""
@@ -641,11 +658,10 @@ def cluster_items_recursively(
             new_clustered_item_names_and_data.append(new_aggregated_item_name_and_data)
 
         return new_clustered_item_names_and_data
-    
+
+
 def compute_item_aggregated_statistics(
-    raw_data: pd.DataFrame,
-    dim_red_data: pd.DataFrame,
-    method: str = "mean"
+    raw_data: pd.DataFrame, dim_red_data: pd.DataFrame, method: str = "mean"
 ) -> Tuple[List[float], List[float]]:
     """Compute aggregated statistics for raw data and dimension reduction values."""
     if method == "mean":
@@ -662,8 +678,8 @@ def compute_item_aggregated_statistics(
         agg_func = lambda df: (df > 0).any().astype(float)  # Returns 1.0 if any value > 0, else 0.0
     else:
         raise ValueError(f"Unknown aggregation method: {method}")
-    
+
     tag_data = np.round(agg_func(raw_data), rounding_precision).tolist()
     dim_reduction = np.round(agg_func(dim_red_data), rounding_precision).tolist()
-    
+
     return tag_data, dim_reduction

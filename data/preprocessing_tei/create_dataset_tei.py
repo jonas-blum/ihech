@@ -69,11 +69,11 @@ dic = {
         "attributesClusterSize": -1,
         "dimReductionAlgo": "UMAP",
         "clusterAfterDimRed": False,
-        "itemAggregateMethod": "mean",
-        "attributeAggregateMethod": "mean",
+        "itemAggregateMethod": "binary",
+        "attributeAggregateMethod": "binary", 
         "colorMapBreakpoints": {
             "1": "#eeeeee",
-            "1000": "#000000"
+            "100": "#000000"
         },
         "colorMapZeroColor": "#ffffff",
         "colorMapLogarithmic": True,

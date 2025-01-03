@@ -50,6 +50,14 @@ def append_average_item_by_attribute_indexes(
         avg_data = np.round(np.mean([data[i] for i in indexes]), rounding_precision)
     elif attribute_aggregate_method == "sum":
         avg_data = np.round(np.sum([data[i] for i in indexes]), rounding_precision)
+    elif attribute_aggregate_method == "max":
+        avg_data = np.round(np.max([data[i] for i in indexes]), rounding_precision)
+    elif attribute_aggregate_method == "min":
+        avg_data = np.round(np.min([data[i] for i in indexes]), rounding_precision)
+    elif attribute_aggregate_method == "median":
+        avg_data = np.round(np.median([data[i] for i in indexes]), rounding_precision)
+    elif attribute_aggregate_method == "binary":
+        avg_data = float(any(data[i] > 0 for i in indexes))
     else:
         raise ValueError(f"Unknown aggregation method: {attribute_aggregate_method}")
     
@@ -363,7 +371,7 @@ def cluster_items_recursively(
     dim_red_df: pd.DataFrame,
     cluster_size: int,
     cluster_by_collections: bool,
-    aggregate_method: str, # 'mean' or 'sum' currently supported
+    aggregate_method: str, # 'mean' | 'sum' | 'max' | 'min' | 'median'
     hierarchical_rows_metadata_column_names: List[str],
     level: int,
 ) -> Union[List[ItemNameAndData], None]:
@@ -644,6 +652,14 @@ def compute_item_aggregated_statistics(
         agg_func = lambda df: df.mean()
     elif method == "sum":
         agg_func = lambda df: df.sum()
+    elif method == "max":
+        agg_func = lambda df: df.max()
+    elif method == "min":
+        agg_func = lambda df: df.min()
+    elif method == "median":
+        agg_func = lambda df: df.median()
+    elif method == "binary":
+        agg_func = lambda df: (df > 0).any().astype(float)  # Returns 1.0 if any value > 0, else 0.0
     else:
         raise ValueError(f"Unknown aggregation method: {method}")
     

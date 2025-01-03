@@ -8,7 +8,7 @@ documents = pd.read_csv('documents.csv', header=0)
 
 # NOTE: see this github issue for data structure explanation: https://github.com/jonas-blum/ihech/issues/17
 # the metadata columns that can be used to semantically aggregate items
-item_metadata_columns = ['Name', 'Edition']
+item_metadata_columns = ['Document Name', 'Digital Edition']
 
 # the metadata columns that can be used to semantically aggregate columns
 column_metadata_rows = ['Module']
@@ -69,16 +69,16 @@ dic = {
         "attributesClusterSize": -1,
         "dimReductionAlgo": "UMAP",
         "clusterAfterDimRed": False,
-        "itemAggregateMethod": "binary",
+        "itemAggregateMethod": "mean",
         "attributeAggregateMethod": "binary", 
         "colorMapBreakpoints": {
-            "1": "#eeeeee",
-            "100": "#000000"
+            "0.01": "#eeeeee",
+            "1": "#000000"
         },
         "colorMapZeroColor": "#ffffff",
-        "colorMapLogarithmic": True,
+        "colorMapLogarithmic": False,
         "groupAttributesBy": ["Module"],
-        "groupItemsBy": ["Edition"],
+        "groupItemsBy": ["Digital Edition"],
     },
     "csvFile": df.to_csv(index=False, header=False),
 }

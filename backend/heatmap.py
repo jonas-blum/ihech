@@ -95,6 +95,10 @@ def do_scaling(
     if settings.scaling == "NO_SCALING":
         scaled_df = raw_data_df.copy()
         return scaled_df
+    if settings.scaling == "BINARY":
+        scaled_df = raw_data_df.copy()
+        scaled_df[scaled_df != 0] = 1
+        return scaled_df
     elif settings.scaling == "STANDARDIZING":
         scaler = StandardScaler()
         scaled_df = scaler.fit_transform(raw_data_df)
@@ -164,6 +168,7 @@ def create_heatmap(
         settings,
     )
 
+    # TODO: here is the place to binarify the data
     scaled_raw_data_df = do_scaling(selected_columns_raw_data_df, settings)
 
     if settings.clusterItemsBasedOnStickyAttributes:

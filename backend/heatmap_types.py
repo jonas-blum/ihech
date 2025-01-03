@@ -5,6 +5,7 @@ import numpy as np
 
 ScalingType = Literal[
     "NO_SCALING",
+    "BINARY",
     "STANDARDIZING",
 ]
 

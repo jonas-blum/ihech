@@ -79,6 +79,7 @@ dic = {
         "colorMapLogarithmic": False,
         "groupAttributesBy": ["Module"],
         "groupItemsBy": ["Digital Edition"],
+        "scaling": "BINARY",
     },
     "csvFile": df.to_csv(index=False, header=False),
 }

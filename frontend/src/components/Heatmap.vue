@@ -28,6 +28,7 @@ import Search from '@/components/Search.vue'
 import ContextMenuColumnLabel from '@/components/ContextMenuColumnLabel.vue'
 import ContextMenuRowLabel from '@/components/ContextMenuRowLabel.vue'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
+import MiscSettings from './MiscSettings.vue'
 
 const { x: mouseX, y: mouseY } = useMouse()
 
@@ -555,6 +556,8 @@ onMounted(async () => {
       </button>
       <Search class="custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
         @mouseleave="mainStore.mouseOverMenuOrTooltip = false"></Search>
+      <MiscSettings class="w-full custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
+        @mouseleave="mainStore.mouseOverMenuOrTooltip = false" />
       <div class="flex w-full gap-4">
         <RowSorterSettings class="w-full custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
           @mouseleave="mainStore.mouseOverMenuOrTooltip = false" />

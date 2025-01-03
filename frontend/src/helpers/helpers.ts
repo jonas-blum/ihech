@@ -86,6 +86,23 @@ export function mapScalingEnum(scaling: ScalingEnum): string {
   }
 }
 
+export function mapAggregationMethodEnum(aggregationMethod: AggregationMethodEnum): string {
+  switch (aggregationMethod) {
+    case AggregationMethodEnum.MEAN:
+      return 'Mean'
+    case AggregationMethodEnum.MEDIAN:
+      return 'Median'
+    case AggregationMethodEnum.SUM:
+      return 'Sum'
+    case AggregationMethodEnum.MIN:
+      return 'Min'
+    case AggregationMethodEnum.MAX:
+      return 'Max'
+    case AggregationMethodEnum.BINARY:
+      return 'Binary'
+  }
+}
+
 export function mapDimReductionAlgoEnum(dimReductionAlgo: DimReductionAlgoEnum): string {
   switch (dimReductionAlgo) {
     case DimReductionAlgoEnum.PCA:
@@ -122,6 +139,15 @@ export enum ScalingEnum {
   NO_SCALING = 'NO_SCALING',
   BINARY = 'BINARY',
   STANDARDIZING = 'STANDARDIZING',
+}
+
+export enum AggregationMethodEnum {
+  MEAN = 'mean',
+  MEDIAN = 'median',
+  SUM = 'sum',
+  MIN = 'min',
+  MAX = 'max',
+  BINARY = 'binary',
 }
 
 export enum DimReductionAlgoEnum {

@@ -2,11 +2,8 @@
 import { DimReductionAlgoEnum, mapDimReductionAlgoEnum } from '@/helpers/helpers'
 import { ref, computed, watch } from 'vue'
 import { useMainStore } from '@/stores/mainStore'
-import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
-import { Icon } from '@iconify/vue'
 
 const mainStore = useMainStore()
-const heatmapLayoutStore = useHeatmapLayoutStore()
 
 // Get the first algorithm from the enum as the default
 const firstDimReductionAlgo = Object.values(DimReductionAlgoEnum)[0]
@@ -15,10 +12,19 @@ const firstDimReductionAlgo = Object.values(DimReductionAlgoEnum)[0]
 const selectedDimReductionAlgo = ref<DimReductionAlgoEnum>(firstDimReductionAlgo)
 
 async function updateDimReductionAlgo(dimReductionAlgo: DimReductionAlgoEnum) {
-    console.log('updateDimReductionAlgo', dimReductionAlgo)
+  console.log('updateDimReductionAlgo', dimReductionAlgo)
   mainStore.setDimReductionAlgo(dimReductionAlgo)
   mainStore.setIsOutOfSync(true)
 }
+
+// watch for change in this.activeDataTable.dimReductionAlgo
+watch(
+  () => mainStore.activeDataTable?.dimReductionAlgo,
+  (newVal) => {
+    if (newVal) selectedDimReductionAlgo.value = newVal
+  },
+  { immediate: true }
+)
 </script>
 
 <template>

@@ -117,7 +117,7 @@ dic = {
         },
         "colorMapZeroColor": "#ff0000",
         "colorMapLogarithmic": False,
-        "groupAttributesBy": ["Rechtsform"],
+        "groupAttributesBy": ["Bereich (1. Level)", "Bereich (2. Level)", "Bereich (3. Level)"],
         "groupItemsBy": ["Sprachgebiet", "Kanton"],
     },
     "csvFile": df.to_csv(index=False, header=False),

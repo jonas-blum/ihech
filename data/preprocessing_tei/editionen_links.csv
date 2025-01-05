@@ -1,0 +1,168 @@
+'link','name','country institution','origin','period','genre/type','Xml-tei','export?','completed','remark'
+'https://editio.ssrq-online.ch/','Schweizerische Rechtsquellen','Switzerland','Switzerland','Medieval-???','historical sources','yes','unknown',,
+'https://www.hallernet.org/','haller-net/république des lettres','Switzerland',,,'multiple editions',,'unknown',,
+'https://github.com/alhuber1502/TGA/tree/master/texts','Thomas Gray Archive','Great Britain, Germany','Great Britain','Modern','letters, poems','some','via github',,
+'https://github.com/christofs/berardier/blob/master/essai/tei-master','Bérardier de Bataut Archive','Germany','France','Modern','essais','yes','via github',,
+'https://www.ehu.eus/galicano/?t=tei&l=es','Bercerro Galicano de San Millan de la Cogolla','Spain','Spain','Medieval','historical sources','yes','via zip-link',,
+'https://github.com/donaldmastronarde/EuripidesScholia','Scholia (commentaries) of the plays of Euripides','USA','Greece','Ancient','historical sources','yes','via github',,
+'https://github.com/HistoryAtState/frus-history/tree/master/documents','Source data for History of the Foreign Relations Series ','USA','USA','Present','historical sources','yes','via github',,
+'https://github.com/orgs/DiScholEd/repositories','Digital Scholarly Editions','France',,,'multiple editions',,,,
+'http://www.livesandletters.ac.uk/projects/hooke-folio-online','long lost manuscript of Robert Hooke','Great Britain','Great Britain','Medieval-Modern','?','no','unknown','yes',
+'http://www.livesandletters.ac.uk/wd/index.html','workdiaries of Robert Boyle','Great Britain','Great Britain','Medieval-Modern','historical sources','no','unknown','yes',
+'https://english.nsms.ox.ac.uk/Holinshed/toc.php?edition=1577','The Holinshed Project','Great Britain','Great Britain','Medieval','historical sources','no','unknown',,
+'https://isaw.nyu.edu/publications/inscriptions/campa/index.html','Inscriptions of ancient Campa (Viet Nam)','France, USA','Vietnam','Ancient','inscriptions','yes','unknown','no',
+'https://www.ibsen.uio.no/forside.xhtml','Collected writings of Ibsen','Norway, Sweden','Norway','Modern','essais, prose, poems, letters','yes','unknown','no',
+'https://www.marktwainproject.org/','Collected writings of Mark Twain','USA','USA','Modern','letters, prose','not found','unknown',,
+'https://auchinleck.nls.uk/','Auchinleck Manuscript','Great Britain','Great Britain','Medieval','prose, poem','no','unknown','yes',
+'https://github.com/CasebooksProject/casebooks-data/tree/master/cases','Casebooks of S.Forman and R. Napier','Great Britain','Great Britain','Modern','?','yes','via github',,
+'https://itseeweb.cal.bham.ac.uk/iohannes/download.html','Electronic Editions of the Gospel According to John','Great Britain','Middle East','Ancient','historical sources','yes','via zip-link',,
+'https://www.oldbaileyonline.org/about/data#toc3','The Proceeding of the Old Bailey, 1647-1913','Great Britain','Great Britain','Modern','historical sources','yes','via zip-link',,
+'https://github.com/umd-mith/mishnah-data/tree/master/mishnah','Digital Mishnah','USA','Middle East','Ancient','historical sources','yes','via github','no','download via webpage broken'
+'https://github.com/CDRH/data_lewisandclark/tree/main/source/tei','Lewis and Clark Expedition','USA','USA','Modern','historical sources','yes','via github',,'repo contains different type of data: journal entries, commentaries from the editors, image-annotations; we might be only interested in journals'
+'https://vergil.classics.upenn.edu/','Vergil Project. Resources for Students, Teachers and Readers of Vergil','USA','Italy','Ancient','prose, poem','no','unknown',,'couldn’t find anything about tei/xml'
+'https://www.ffzg.unizg.hr/klafil/epidoc-radovi/','Inscriptiones Graecae in Croatia Repertae (IGCR)','Croatia','Croatia','Ancient','historical sources','not found','unknown',,
+'https://zenodo.org/records/13759841','Carl Maria von Weber Gesamtausgabe','Germany','Germany','Modern','letters, diaries','yes','via zenodo',,
+'https://github.com/livingstoneonline/LEAP-TEI/tree/master','Livingstone','USA, Great Britain','Great Britain','Modern','letters, diaries','yes','via github',,
+'https://irt2021.inslib.kcl.ac.uk/en/','Inscriptions of Roman Tripolitania','Great Britain','North Africa','Ancient','inscriptions','yes','each via page, couldn’t find repo or zip',,
+'https://www.benedictus.mgh.de/haupt.htm','Edition der falschen Kapitularien des Benedictus Levita','Germany','Germany','Medieval','prose','no','unknown','no','not finished since 2006'
+'http://publications.thebritishacademy.ac.uk/pubs/dialogus/ockdial.html','William of Ockham: Dialogus','Great Britain','Great Britain','Medieval','prose','no','unknown',,
+'https://github.com/whitmanarchive','The Walt Whitman Archive','USA','USA','Modern','letters, diaries, prose','yes','via github',,
+'https://schenkerdocumentsonline.org/documents/repos/collection.html','Heinrich Schenker Documents Online','Great Britain','Germany','Modern-Present','letters, diaries, prose','not found','unknown',,'downloads are temporally removed for “testing purposes”'
+'https://github.com/Brown-University-Library/iip-texts/tree/master/archival-files','Inscriptions of Israel/Palestine','USA','Middle East','Ancient','inscriptions','yes','via github','no',
+'https://github.com/umd-mith/sga/tree/master/data/tei','kommentierte digitale Edition der Reise- und Sammlungsbeschreibungen Philipp Hainhofers (1578-1647)','Germany','Germany','Modern','letters, diaries, prose','yes','via github',,'Special Tei structure (referencing xml-files from main tei-file)'
+'https://www.dhi.ac.uk/onlinefroissart/','A Digital Edition of the Chronicles of Jean Froissart','Great Britain ','France','Medieval','historical sources','yes','not allowed',,
+'https://www.newtonproject.ox.ac.uk/','Full edition of I. Newton’s writings','Great Britain','Great Britain','Modern','miscellaneous','yes','unknown',,
+'https://en.wikibooks.org/wiki/The_Devonshire_Manuscript','The Devonshire Manuscript','USA, Great Britain','Great Britain','Medieval','historical sources','yes','via zip-link',,'The entire Devonshire Manuscript, its witnesses, notes, and critical apparatus have been marked up in TEI P5'
+'http://www.bvh.univ-tours.fr/index.htm','Les Bibliothèques Virtuelles Humanistes','France',,'Modern','multiple editions','not found','unknown',,
+'https://github.com/kb-dk/SKS_tei/tree/master','Writings of Sören Kierkegaard','Denmark','Denmark','Modern','miscellaneous','yes','via github',,
+'https://helmerichs.us/planctus/','The planctus for William Longsword','USA','Great Britain','Medieval','historical sources','no','via zip-link',,'seems like a private project'
+'https://ndhadeliver.natlib.govt.nz/webarchive/20211217122910/http://nzetc.victoria.ac.nz/tm/scholarly/tei-corpus-golder.html','Writings of William Golder','New Zealand','New Zealand','Modern','miscellaneous','yes','each via page, couldn’t find repo or zip',,
+'https://github.com/desgodets/desgodetsSources/tree/master','Les Cours d’Antoine Desgodets','France','France','Modern','prose','yes','via github','yes','lectures hold at Académie royale d’architecture'
+'https://git.hab.de/goermar/tagebuch-christian-ii-xml','Digitale Edition und Kommentierung der Tagebücher des Fürsten Christian II. von Anhalt-Bernburg (1599-1656)','Germany','Germany','Medieval-Modern','diaries','yes','via gitlab','yes','https://github.com/i-d-e/ride/blob/master/issues/issue16/tagebuecher-christian-ii/tagebuecher-christian-ii.pdf'
+'http://selbstzeugnisse.hab.de/edition/diarium/download','Digitale Edition des Diariums von Herzog August dem Jüngeren”','Germany','Germany','Medieval-Modern','diaries','yes','via link','yes','one large file'
+'https://heidata.uni-heidelberg.de/dataset.xhtml?persistentId=doi:10.11588/data/DVU14P','Kommentierte digitale Edition der Reise- und Sammlungsbeschreibungen Philipp Hainhofers (1578-1647)','Germany','Germany','Medieval-Modern','diaries','yes','via zip-link',,
+'https://libguides.nypl.org/african-american-women-writers-of-the-19th-Century','Schomburg Editions: African American Women Writers of the 19th century','USA','USA','Modern-Present','prose','not found','unknown',,'only pdf link found'
+'https://github.com/faustedition/faust-xml','Historisch-kritische Faustedition','Germany','Germany','Modern','miscellaneous','yes','via github',,
+'https://fontane-nb.dariah.eu/index.html','Theodor Fontanes Notizbücher','Germany','Germany','Modern','diaries','yes','each via page, couldn’t find repo or zip',,
+'https://schopenhauer.uni.wroc.pl/Oraculo-Schopenhauer-Marginalia-1659.xml','Schopenhauer’s Library: Oraculo manual y arte de prudencia','Poland','Germany','Modern','prose','yes','via link',,'Only 1 document'
+'https://github.com/msank/tarsian-tei/tree/master','Tarsian. Digital Edition of an Ancient New Testament Arabic Manuscript','Switzerland',,'Ancient','historical sources','yes','via github',,'3 documents: arabic original and french translation'
+'https://github.com/gbergel/WJC/blob/master/WJC/WJC.xml','Wandering Jew’s Chronicle','Great Britain','Great Britain','Medieval-Modern','historical sources','yes','via github',,'different versions of the same ballad'
+'https://github.com/cambridge-collection/darwin-correspondence-data/tree/main/xml/letters','Darwin Correspondence Project','Great Britain','Great Britain','Modern','letters','yes','via github',,
+'https://darwin-online.org.uk/','The Complete Work of Charles Darwin Online','Great Britain','Great Britain','Modern','miscellaneous','not found','unknown',,
+'https://github.com/papyri/idp.data/tree/master','Papyri.info Data',,,'Ancient','miscellaneous','yes','via github',,
+'https://grammateus.unige.ch/howto-cite','Grammateus','Switzerland',,'Ancient','historical sources','yes','unknown',,'probably accessible via papyri.info'
+'https://damos.hf.uio.no/1','Damos. Database of Mycenaean at Oslo','Norway','Greece','Ancient','inscriptions','no','unknown',,
+'https://edities.kantl.be/streuvels/index.htm','Letters of Stijn Streuvels','Belgium','Belgium','Present','letters','yes','unknown',,
+'https://labs.onb.ac.at/gitlab/digital-editions/sauer-seuffert-public','Briefwechsel Sauer Seuffert','Austria','Austria, Germany','Modern','letters','yes','via gitlab',,
+'https://labs.onb.ac.at/gitlab/digital-editions/okopenko-public','Tagebücher Andreas Okopenko','Austria','Austria','Present','diaries','yes','via gitlab',,
+'https://labs.onb.ac.at/gitlab/digital-editions/musil-public','Musil Online','Austria','Austria','Present','miscellaneous','yes','via gitlab',,
+'https://labs.onb.ac.at/gitlab/digital-editions/blotius-public','Blotius Digital','Austria','Austria','Medieval-Modern','historical sources','yes','via gitlab',,
+'https://github.com/CDRH/data_cody/tree/main/source/tei','William F. Cody Archive','USA','USA','Modern','prose','yes','via github',,
+'https://github.com/OpenGreekAndLatin/athenaeus-dev','Machine-corrected EpiDoc versions of public-domain editions of Athenaeus of Naucratis','Germany',,'Ancient','prose','yes','via github',,'Contains 2 versions of the same text'
+'https://github.com/OpenGreekAndLatin','Multiple Projects with machine-corrected TEI-XML versions of Greek/Latin works and translations',,,'Ancient','miscellaneous','yes','via github',,
+'https://guillelmus.uni-koeln.de/tcrit/tcrit_prologus','Magistri Guillelmi Autissiodorensis Summa de officiis ecclesiasticis','Germany, Italy',,'Medieval','prose','yes','unknown',,
+'https://github.com/telota/edition-humboldt-digital','Alexander von Humboldt Edition','Germany',,'Modern','miscellaneous','yes','via github/zenodo',,
+'https://www.db-thueringen.de/receive/dbt_mods_00056963','DE der Briefe Erdmuthe Benignas von Reuss-Ebersdorf','Germany',,'Modern','letters','yes','via zip-link',,
+'https://github.com/digicademy/sturm-exist-app/tree/master/xml/quellen','Der Sturm. Digitale Edition zur Geschichte der Internationalen Avantgarde','Germany','Germany, Austria','Present','miscellaneous','yes','via github',,
+'http://teitok.clul.ul.pt/postscriptum/index.php?action=downloads','PostScriptum. Ordinary Wrting from Spain and Portugal (16th to 19th Century)','Portugal, Spain','Portugal, Spain','Modern','letters','yes','via zip-link',,
+'https://heidata.uni-heidelberg.de/dataset.xhtml?persistentId=doi:10.11588/data/FNKJ2Y','Der arme Heinrich – digital','Germany, Spain','Germany','Medieval','prose','yes','via zip-link',,
+'https://github.com/arthur-schnitzler/schnitzler-briefe-data/tree/main/data/editions','Briefwechsel Schnitzler Bahr','Austria','Germany, Austria','Modern-Present','letters','yes','via github',,
+'https://www.arthur-schnitzler.de/','Arthur Schnitzler digital','Germany, Great Britain','Germany, Austria','Modern-Present','prose','yes','unknown',,
+'https://deba.unideb.hu/deba/raday/levelvaltasok.php','The Correspondence of the Raday Family','Hungary','Hungary','Modern-Present','letters','no','unknown',,
+'https://deba.unideb.hu/deba/levelezes/index.php','The Correspondence of the Hungarian Authors','Hungary','Hungary','Modern','letters','no','unknown',,
+'https://deba.unideb.hu/deba/berzsenyi/index.php','The Correspondence of Daniel Berzsenyi','Hungary','Hungary','Modern','letters','no','unknown',,
+'https://deba.unideb.hu/deba/gyongyossi/index.php','The Works of Janos Gyöngyössi','Hungary','Hungary','Modern','miscellaneous','no','unknown',,
+'https://deba.unideb.hu/deba/csokonai_muvei/','The Complete Works of Mihaly Csokonai Vitez','Hungary','Hungary','Modern','miscellaneous','no','unknown',,
+'https://deba.unideb.hu/deba/kazinczy_muvei/index.php','The Complete Works of Ferenc Kazinczy','Hungary','Hungary','Modern','miscellaneous','no','unknown',,
+'https://kabbalaheditions.org/index.en.html','Platform for academic editions of kabbalistic texts','Israel, Germany',,'Medieval-Modern','prose','yes','unknown',,'no editions seem to be published yet'
+'https://github.com/iulibdcs/Indiana-Magazine-of-History','The Indiana Magazine of History (IMH)','USA','USA','Present','prose','yes','via github',,
+'https://parzival.unibe.ch/','Parzival Edition','Switzerland','Germany','Medieval','prose','not found','unknown',,'Dominique S. fragen?'
+'https://nietzsche.philhist.unibas.ch','Der späte Nietzsche','Switzerland','Germany, Switzerland','Present','manuscripts','not found','unknown',,'Dominique S. fragen?'
+'https://gossembrot.unibe.ch/gossembrot-db/','Die Bibliothek Sigmund Gossembrots','Switzerland','Germany','Medieval','manuscripts','yes','unknown',,'Dominique S. fragen?'
+'http://diglib.hab.de/edoc/ed000006/index.php','Digitale Edition der Handschrift Cod. Guelf. 64 Weiss.','Germany','Germany','Medieval','manuscripts','not found','unknown',,
+'https://dafyddapgwilym.net/','The Poems of Dafydd ap Gwilym','Great Britain','Great Britain','Medieval','prose','no','unknown',,
+'https://www.confessio.ie/more/downloads#','Saint Patrick’s Confessio','Ireland','Ireland','Ancient ','prose','yes','via link',,
+'http://scrineum.unipv.it/LM/home.html','"Liber Matriculae - Il libro della matricola dei notai di Vercelli"','Italy','Italy','Medieval – Modern','unknown','no','unknown',,'page is down'
+'https://bayle-correspondance.univ-st-etienne.fr','Correspondance de Pierre Bayle','France','France','Modern','letters','not found','unknown',,
+'http://vto2.classics.ox.ac.uk/','Vindolanda Tablets Online II','Great Britain','Great Britain','Ancient','historical sources','no','unknown',,
+'http://vindolanda.csad.ox.ac.uk/index.shtml','Vindolanda Tablets Online','Great Britain','Great Britain','Ancient','historical sources','no','unknown',,
+'https://romaninscriptionsofbritain.org/','Roman Inscription of Britain','Great Britain','Great Britain','Ancient','historical sources','yes','unknown',,
+'https://www.codexsinaiticus.org/en/project/transcription_download.aspx','Codex Sinaiticus','Great Britain, Germany, Greece, USA','Middle East','Ancient','manuscripts','yes','via link',,
+'https://gtr.ukri.org/project/D8559AFF-42B9-458A-833D-0A956C16F3C2#/tabOverview','The Saint-Aubins’ Book of Arses: The Livre de Caricatures tant de bonnes que mauvaises','Great Britain','France','Modern','prose','no','unknown',,'no data found'
+'http://www.catullusonline.org/CatullusOnline/index.php','Catullus Online','Germany','Italy','Ancient','prose','no','unknown',,
+'http://suprasliensis.obdurodon.org/','Codex Suprasliensis','Bulgaria, USA','Bulgaria','Medieval','prose','no','unknown',,
+'https://dlv.org.uk/index.html','The Durham Liber Vitae Project','Great Britain','Great Britain','Medieval','manuscripts','no','unknown',,
+'https://www.beckettarchive.org/getlogin.html','Samuel Beckett Digital Manuscript Project','Great Britain, Belgium','Great Britain','Present','manuscripts','no','unknown',,'70 Euros/ Year for an individual // 400 Euros/Year for an Institution'
+'http://omacl.org/Heimskringla/','Heimskringla Edition','Iceland','Iceland','Medieval','manuscripts','not found','unknown',,'page is down'
+'lost','Partonopeus de Blois','Great Britain','France','Medieval','manuscripts','yes','via zip-link',,'Tei-xml is separated into header and xml-files'
+'https://ota.bodleian.ox.ac.uk/repository/xmlui/handle/20.500.12024/3261','The vision of Piers Plowman: a critical edition of the B-text','Great Britain','Great Britain','Medieval','prose','yes','via zip-link',,
+'https://ota.bodleian.ox.ac.uk/repository/xmlui/handle/20.500.12024/A02453','Castara the third edition. Corrected and augmented','Great Britain','Great Britain','Modern','prose','yes','via zip-link',,
+'https://ota.bodleian.ox.ac.uk/repository/xmlui/handle/20.500.12024/K023576.000','Cursory criticisms on the edition of Shakespeare published by Edmond Malone','Great Britain','Great Britain','Modern','prose','yes','via zip-link',,
+'https://ota.bodleian.ox.ac.uk/repository/xmlui/handle/20.500.12024/7','ECCO Eighteenth Century Collections Online','Great Britain','Great Britain','Modern','multiple editions','yes','via zip-link',,'are those critical editions?'
+'https://ota.bodleian.ox.ac.uk/repository/xmlui/handle/20.500.12024/5','Early English Books Online','Great Britain','Great Britain','Modern','diplomatic transcriptions (as opposed to critical editions) ','yes','via zip-link',,'are those critical editions?'
+'https://ota.bodleian.ox.ac.uk/repository/xmlui/handle/20.500.12024/10','Jonathan Swift Archive','Great Britain','Great Britain','Modern','prose','yes','each via page, couldn’t find repo or zip',,
+'https://ota.bodleian.ox.ac.uk/repository/xmlui/handle/20.500.12024/8','Evans Early American Imprints','Great Britain','USA','Modern','prose','no','each via page, couldn’t find repo or zip',,
+'http://www.finerollshenry3.org.uk','Henry III Fine Rolls Project','Great Britain','Great Britain','Medieval','historical sources','yes','unknown','yes',
+'https://www.intratext.com/','La Famiglia dell’Antiquario','Italy','Italy','Modern','prose','no','unknown','yes','cannot find dedicated page'
+'http://www.e-codices.unifr.ch/de/description/csg/0621/','Die Glossen Ekkeharts im Codex Sangallensis 621','Switzerland','Switzerland','Medieval','manuscripts','not found','unknown',,
+'https://iospe.kcl.ac.uk/corpora/tyras/index.html','Inscriptions of the Northern Black Sea','Great Britain','Ukraine, Russia','Ancient','historical sources','yes','each via page, couldn’t find repo or zip',,'repo link promised'
+'https://github.com/Brown-University-Library/usep-data/tree/master/xml_inscriptions','US Epigraphy Project. Collections of Greek and Latin Inscriptions in the USA','USA','Europe','Ancient','historical sources','yes','via github',,
+'https://entretenida.outofthewings.org/','La entretenida by Miguel Cervantes: A Digital, Annotated Edition and English Translation','Great Britain','Spain','Medieval – Modern','prose','yes','unknown','yes',
+'https://github.com/CopticScriptorium/corpora/tree/master','Coptic Scriptorum','USA','Egypt','Ancient – Medieval','corpora','yes','via github',,'how to treat a corpus?'
+'http://cgrn.ulg.ac.be/','Collection of Greek Ritual Norms','France, Belgium','Greece','Ancient','historical sources','yes','each via page, couldn’t find repo or zip',,
+'https://atticinscriptions.com/about/','Attic Inscriptions Online','Great Britain','Greece','Ancient','historical sources','no','unknown',,
+'http://www.eagle-eagle.it/','Electronic Archive of Greek and Latin Epigraphy','Italy','Italy, Greece','Ancient','inscriptions','not found','unknown',,'seems to be html, but should be epidoc (related to: https://wiki.eagle-network.eu/wiki/index.php/ ?)'
+'https://wiki.digitalclassicist.org/Apparatus_Inscriptions_(Agostinelli)','Appartus Inscriptions (Agostinelli)','Italy','Italy','Ancient','inscriptions','yes','unknown',,'Probably part of: https://www.edb.uniba.it/ (login required to access db)'
+'https://insaph.kcl.ac.uk/iaph2007/inscriptions/xml-repo.html','Inscriptions of Aphrodisias','Great Britain','Greece','Ancient','historical sources','yes','via zip-link',,
+'https://zenodo.org/records/7038093','Titulus Corpus ','France','France','Medieval','historical sources','yes','via zip-link',,'Request access due to image rights'
+'https://classicmayan.org/portal/','Maya Wörterbuch','Germany','Mexico','Ancient – Medieval','historical sources','yes','unknown',,
+'https://telamon.uni-sofia.bg/en/page/project','Ancient Greek Inscriptions from Bulgaria','Bulgaria ','Bulgaria','Ancient','historical sources','yes','via zip-link',,'Download the whole web-program and extract the tei-xml files'
+'http://rosettastone.hieroglyphic-texts.net/tei-xml/','The Rosetta Stone Online','Germany','Egypt','Ancient','historical sources','yes','via link',,'only one text: already an edition?'
+'https://scholarlyeditions.brill.com/sego/','Supplementum Epigraphicum Graecum','USA','Greece','Ancient','historical sources','yes','unknown',,'access costs'
+'http://ppret-inscriptions.huma-num.fr/en/','PPRET Inscriptions. Les Préféts du Prétoire de l’Empire Tardif','France','Europe','Ancient','historical sources','yes','each via page, couldn’t find repo or zip',,
+'https://petrae.huma-num.fr/fr/inscriptions/liste','Petrae. Inscriptions','France','Europe','Ancient','historical sources','yes','each via page, couldn’t find repo or zip',,'only samples are available, not all of them'
+'https://github.com/PerseusDL','Perseus Digital Library','USA','Europe','Ancient','multiple editions','yes','via github',,'texts from ancient greek and latin and their translations'
+'https://pandektis.ekt.gr/pandektis/','Digital Thesaurus of Primary Sources for Greek History and Culture','Greece','Greece','Ancient – Modern','miscellaneous','not found','unknown',,
+'https://github.com/OpenGreekAndLatin','Open Greek and Latin Project of Machine-Corrected XML',,'Greece, Italy','Ancient','multiple editions','yes','via github',,'what are machine-corrected xml-files?'
+'https://wiki.digitalclassicist.org/A_Nastro_Inscriptions_from_Roman_Catacombs','A Nastro Inscription from Roman Catacombs','Italy','Italy','Ancient','inscriptions','yes','unknown','no','Project seems to be dead '
+'https://textalign.net/quran/','Corpus Coranicum Christianum. Collated Editions','Germany','Middle East','Ancient','prose','yes','via dropbox-link',,
+'https://sinai.library.ucla.edu/','Sinai Palimpsests Project','USA','Middle East','Ancient – Medieval','miscellaneous','yes','unknown',,'Login needed to browse images and metadata of palimpsests'
+'https://wiki.digitalclassicist.org/Testi_Minoici_Trascritti_On_Line','Testi Minoici Trascritti On Line','Italy','Greece','Ancient','prose','yes','unknown',,'Project seems to be dead '
+'https://elephantine.smb.museum/search/','Text and Scripts from Elephantine Island in Egypt','Germany','Egypt','Ancient','miscellaneous','yes','each via page, couldn’t find repo or zip',,'maybe the data could be accessible via papyri.info'
+'https://peace.sites.uu.nl/','PEACE – Portal of Epigraphy, Archaeology, Conservation and Education on Jewish Funerary Culture','Netherlands','Europe','Ancient – Modern','inscriptions','not found','unknown',,'seems to be a page that links to resources hosted on other pages'
+'https://wiki.digitalclassicist.org/Parma_Digital_Medical_Library','Parma Digital Medical Library','Italy','Europe','Ancient','prose','not found','unknown',,'Project seems to be dead '
+'https://dasi.cnr.it/','Digital Archive for the Study of Pre-Islamic Arabian Inscriptions','Italy','Arabia','Ancient','multiple editions','not found','unknown',,
+'https://ogham.celt.dias.ie/menu.php?lang=en&menuitem=81','Ogham in 3D','Ireland','Ireland','Ancient – Medieval','inscriptions','yes','via zip-link',,'TEI-Xml contains all the metadata of the 3D-Image'
+'http://mama.csad.ox.ac.uk/project/website.html','Monumenta Asiae Minoris Antiqua XI','Great Britain','Turkey','Ancient','inscriptions','yes','each via page, couldn’t find repo or zip',,'TEI-Xml contains a description of the epigraphy'
+'https://db.mappola.eu/info/data','Mappola. Roman Verse Inscriptions','Germany, Italy','Italy','Ancient','inscriptions','yes','each via page, couldn’t find repo or zip',,
+'https://papyri.uni-koeln.de/magica-levantina/about.html#technical','Magica Levantina','Germany','Europe','Ancient','prose','yes','unknown','no','Project seems to be dead '
+'https://github.com/DFHG-project','Digital Fragmenta Historicorum Graecorum (DFGH) ','Germany','Europe','Ancient','prose','yes','via github',,'“xml files have been automatically generated from data stored in the DFHG database and are encoded in accordance with the CTS/CITE Architecture. The repository contains two kinds of files arranged by DFHG authors:
+
+    EpiDoc xml files that are encoded in accordance with EpiDoc standards and represent the structure of the edition of the FHG.”'
+'https://wiki.digitalclassicist.org/Latium_Vetus','Latium Vetus','Italy','Italy','Ancient','inscriptions','yes','unknown','no','Project seems to be dead '
+'https://latinnow.eu/online-resources-2/databases-and-data/','Latin Now','Great Britain','Europe','Ancient','miscellaneous','yes','unknown','no','umbrella project for multiple projects (like “roman inscriptions of Britain online”)'
+'https://wiki.digitalclassicist.org/Latin_Inscriptions_from_Albania','Latin Inscriptions of Albania','Germany','Albania','Ancient','inscriptions','not found','unknown',,'Project seems to be dead '
+'https://dspace-clarin-it.ilc.cnr.it/repository/xmlui/handle/20.500.11752/OPEN-548','Cretan Institutional Inscriptions','Italy','Greece','Ancient','inscriptions','yes','via curl','yes',
+'https://ircyr2020.inslib.kcl.ac.uk//en/inscriptions/zip/','Inscriptions of Roman Cyrenaica','Great Britain','North Africa','Ancient','inscriptions','yes','via zip-link',,
+'https://inslib.kcl.ac.uk/','Inscriptions of Libya','Great Britain','North Africa','Ancient','inscriptions','yes','unknown','no',
+'https://amsacta.unibo.it/id/eprint/5863/','Inscriptions of Greek Cyrenaica and Greek Verse Inscriptions of Cyrenaica','Italy','North Africa','Ancient','inscriptions','yes','via zip-link',,
+'https://wiki.digitalclassicist.org/Inscriptiones_Graecae_et_Latinae_Bruttiorum_(BILG)','Inscriptiones Graecae et Latinae Bruttiorum (BILG)','Italy','Europe','Ancient','inscriptions','not found','unknown',,'Project seems to be dead '
+'https://staging-rdm.fdr.uni-hamburg.de/records/es4cq-c7p42','Epigraphic Database of ancient Asia Minor','Germany','Turkey','Ancient','inscriptions','yes','via zip-link','no',
+'https://edv.seai.uniroma1.it/en/inscriptions/','Epigraphic Database Vernacular','Italy','Italy','Ancient','inscriptions','yes','each via page, couldn’t find repo or zip',,
+'https://edh.ub.uni-heidelberg.de/data/download','Epigraphic Database Heidelberg','Germany','Europe','Ancient','inscriptions','yes','via zip-link',,
+'https://epigraphy.iliauni.edu.ge/en/','Epigraphic Corpus of Georgia','Georgia','Georgia','Ancient','inscriptions','not found','unknown',,'Page is buggy'
+'epicum.istc.cnr.it','Epigraphs of Castello Ursino Museum','Italy','Italy','Ancient – Medieval','inscriptions','yes','each via page, couldn’t find repo or zip',,
+'http://hisoma.huma-num.fr/exist/apps/EIAD/works/','Early Inscriptions of Andhradesa','France','India','Ancient – Medieval','inscriptions','yes','each via page, couldn’t find repo or zip',,'Not sure how this differs from the DHARMA Project ?'
+'https://github.com/erc-dharma','DHARMA Project. The Domestication of “Hindu” Asceticism and the Religious Making of South and Southeast Asia (2019 – 2025)','France, Germany','India','Ancient – Medieval','multiple editions','yes','via github','no',
+'https://dodonaonline.com/','Dodona Online','Greece','Greece','Ancient','inscriptions','not found','unknown','no',
+'http://www.steinheim-institut.de/cgi-bin/epidat?info=howtoharvest','Datenbank zur jüdischen Grabsteinepigraphik','Germany','Germany','Ancient – Present','inscriptions','yes','each via page, couldn’t find repo or zip',,'repo/zip should exist, but link didn’t work'
+'http://curses.csad.ox.ac.uk/','Curse Tablets of Roman Britain','Great Britain','Great Britain','Ancient – Medieval','inscriptions','not found','unknown',,'page is buggy'
+'http://sicily.classics.ox.ac.uk','Crossreads Sicily','Great Britain','Italy','Ancient – Medieval','inscriptions','yes','each via page, couldn’t find repo or zip','no',
+'http://hisoma.huma-num.fr/exist/apps/pyu/works/','Corpus of Pyu Inscriptions','France','Myanmar','Ancient','inscriptions','yes','each via page, couldn’t find repo or zip',,
+'http://cpi.csad.ox.ac.uk/about/','Corpus of Ptolemaic Inscriptions','Great Britain','Egypt','Ancient','inscriptions','not found','unknown','no',
+'https://wiki.digitalclassicist.org/Corpus_of_Ancient_Label_Inscriptions','Corpus of Ancient Label Inscriptions','Germany',,'Ancient','inscriptions','not found','unknown',,'Project seems to be dead '
+'https://megadigital.bbaw.de/about/text.xql?id=M0001265','Marx Engels Gesamtausgabe Digital','Germany','Germany','Modern – Present','miscellaneous','not found','unknown','no','TEI-Xml files not published yet'
+'https://ancientwisdoms.ac.uk/library/index.html','SAWS Dynamic Library. Sharing Ancient Wisdoms','Great Britain',,'Ancient','multiple editions','not found','unknown',,'page is buggy'
+'https://pmb.acdh.oeaw.ac.at/export/','Personen der Moderne Basis','Austria','Austria','Present','relations, not an edition as such','yes','via zip-link',,'project is rather a entity relation db, not an edition'
+'https://schnitzler-zeitungen.acdh.oeaw.ac.at/','Arthur Schnitzler: Archiv der Zeitungsausschnitte','Austria, Great Britain','Austria','Present','prose','not found','unknown',,'probably only snippets from newspapers but not transkriptions'
+,'Arthur Schnitzler: Tagebuch',,,,,,,,

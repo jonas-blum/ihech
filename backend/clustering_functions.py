@@ -45,8 +45,8 @@ def append_average_item_by_attribute_indexes(
         return
     data = item_name_and_data.data
 
-    # NOTE: initially, we just took the average by default. Later we added the option to sum the values instead.
-    # because I was too lazy to refactor, the method & function are still named 'avg'. this is confusing and should be changed.
+    # NOTE: initially, we just took the average by default. Later we added the option to use other aggregation methods.
+    # the method & function are still named 'avg'. this is confusing and should be changed.
     if attribute_aggregate_method == "mean":
         avg_data = np.round(np.mean([data[i] for i in indexes]), rounding_precision)
     elif attribute_aggregate_method == "sum":
@@ -382,7 +382,7 @@ def cluster_items_recursively(
     dim_red_df: pd.DataFrame,
     cluster_size: int,
     cluster_by_collections: bool,
-    aggregate_method: str, # 'mean' | 'sum' | 'max' | 'min' | 'median'
+    aggregate_method: str, # 'mean' | 'sum' | 'max' | 'min' | 'median' | 'binary'
     hierarchical_rows_metadata_column_names: List[str],
     level: int,
 ) -> Union[List[ItemNameAndData], None]:
@@ -680,6 +680,10 @@ def compute_item_aggregated_statistics(
         raise ValueError(f"Unknown aggregation method: {method}")
 
     tag_data = np.round(agg_func(raw_data), rounding_precision).tolist()
-    dim_reduction = np.round(agg_func(dim_red_data), rounding_precision).tolist()
+    # NOTE: is this desired behavior? aggregating dim red values seems weird ?!
+    # CONCLUSION: taking anything else than 'mean' for dim red values does not make sense!
+    # this problem was only introduced with the new 'aggregate_method' parameter, which allowed to use other aggregation methods than 'mean'.
+    # dim_reduction = np.round(agg_func(dim_red_data), rounding_precision).tolist()
+    dim_reduction = np.round(dim_red_data.mean(), rounding_precision).tolist()
 
     return tag_data, dim_reduction

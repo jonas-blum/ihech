@@ -70,6 +70,7 @@ def filter_attributes_and_items(
     hierarchical_rows_metadata_df = hierarchical_rows_metadata_df.drop(na_row_indexes)
     item_names_df = item_names_df.drop(na_row_indexes)
 
+    # NOTE: this could lead to unexpected results! 
     medians = selected_columns_raw_data_df.median()
     selected_columns_raw_data_df = selected_columns_raw_data_df.fillna(medians)
     medians_all_columns = all_columns_raw_data_df.median()
@@ -167,8 +168,13 @@ def create_heatmap(
         raw_data_df,
         settings,
     )
+    
+    logger.info("item_names_df: " + str(item_names_df.shape))
+    logger.info("hierarchical_rows_metadata_df: " + str(hierarchical_rows_metadata_df.shape))
+    logger.info("hierarchical_columns_metadata_df: " + str(hierarchical_columns_metadata_df.shape))
+    logger.info("selected_columns_raw_data_df: " + str(selected_columns_raw_data_df.shape)) # (1925, 484)
+    logger.info("all_columns_raw_data_df: " + str(all_columns_raw_data_df.shape)) # (1925, 589)
 
-    # TODO: here is the place to binarify the data
     scaled_raw_data_df = do_scaling(selected_columns_raw_data_df, settings)
 
     if settings.clusterItemsBasedOnStickyAttributes:

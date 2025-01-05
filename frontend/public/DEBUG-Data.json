@@ -1,0 +1,41 @@
+{
+    "datasetName": "DEBUG DATASET",
+    "descriptionText": "descriptionText",
+    "itemNameSingular": "item",
+    "itemNamePlural": "items",
+    "attributeNameSingular": "attribute",
+    "attributeNamePlural": "attributes",
+    "cellHoverTextSnippet1": "Items of",
+    "cellHoverTextSnippet2": {
+        "single": "have",
+        "plural": "have aggregatedly"
+    },
+    "cellHoverTextSnippet3": {
+        "single": "",
+        "plural": "in this group of"
+    },
+    "defaultSettings": {
+        "clusterItemsByCollections": true,
+        "clusterAttributesByCollections": true,
+        "itemsClusterSize": 6,
+        "attributesClusterSize": -1,
+        "dimReductionAlgo": "PCA",
+        "clusterAfterDimRed": false,
+        "itemAggregateMethod": "mean",
+        "attributeAggregateMethod": "mean",
+        "colorMapBreakpoints": {
+            "1": "#eeeeee",
+            "100": "#000000"
+        },
+        "colorMapZeroColor": "#ff0000",
+        "colorMapLogarithmic": false,
+        "groupAttributesBy": [
+            "Att_semantic_1"
+        ],
+        "groupItemsBy": [
+            "Item_semantic_1"
+        ],
+        "scaling": "STANDARDIZING"
+    },
+    "csvFile": "Item_name,Item_semantic_1,,Att_1,Att_2,Att_3,Att_4\nAtt_semantic_1,unknown,,group_1,group_1,group_2,group_2\n,,,,,,\nItem_1,group_1,,20,56,59,65\nItem_2,group_1,,73,48,70,22\nItem_3,group_1,,78,45,50,30\nItem_4,group_2,,11,85,10,32\n"
+}

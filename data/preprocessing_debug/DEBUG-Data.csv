@@ -1,0 +1,7 @@
+Item_name,Item_semantic_1,,Att_1,Att_2,Att_3,Att_4
+Att_semantic_1,unknown,,group_1,group_1,group_2,group_2
+,,,,,,
+Item_1,group_1,,20,56,59,65
+Item_2,group_1,,73,48,70,22
+Item_3,group_1,,78,45,50,30
+Item_4,group_2,,11,85,10,32

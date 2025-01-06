@@ -118,24 +118,64 @@ export abstract class Row {
 }
 
 export class ItemRow extends Row {
+  selected: boolean = true // if not selected, the row (item) will be removed after next update
+
   constructor(
     name: string,
     totalChildrenCount: number,
     data: number[],
     dimredPosition: DimredPosition,
+    selected: boolean,
     parent?: Row | null,
   ) {
     super(name, totalChildrenCount, data, dimredPosition, parent)
+    this.selected = selected
   }
 
   hasChildren(): boolean {
     return false
   }
+
+  setSelected(selected: boolean) {
+    this.selected = selected
+
+    if (this.selected) {
+      // recursively increase the selectedChildrenCount of all parents
+      let parent: Row | null = this.parent
+      while (parent !== null) {
+        if (parent instanceof AggregateRow) {
+          parent.selectedChildrenCount++
+          // also update the name of the parent
+          parent.pixiRowLabel?.updateText()
+        }
+        parent = parent.parent
+      }
+    } else {
+      // recursively decrease the selectedChildrenCount of all parents
+      let parent: Row | null = this.parent
+      while (parent !== null) {
+        if (parent instanceof AggregateRow) {
+          parent.selectedChildrenCount--
+          // also update the name of the parent
+          parent.pixiRowLabel?.updateText()
+        }
+        parent = parent.parent
+      }
+    }
+    this.pixiRowLabel?.updateIcon()
+  }
+
+  toggleSelected() {
+    this.setSelected(!this.selected)
+  }
+
 }
 
 export class AggregateRow extends Row {
   isOpen: boolean
   children: Row[] = []
+  childrenCount: number = 0 // number of ItemRow children (not AggregateRow children)
+  selectedChildrenCount: number = 0 // number of selected ItemRow children
 
   constructor(
     name: string,
@@ -150,11 +190,38 @@ export class AggregateRow extends Row {
   }
 
   getName(): string {
+    // TODO
     // if the backend provided a name, use it because its a semantic cluster 
     if (this.name) {
       return this.name
     } else {
       return `${this.totalChildrenCount} ${useMainStore().getActiveDataTable?.itemNamePlural}`
+    }
+  }
+
+  addChildren(children: Row[]) {
+    this.children = children
+    for (const child of children) {
+      if (child instanceof ItemRow) {
+        const increaseSelectedChildrenCount = child.selected
+
+        this.childrenCount++
+        if (increaseSelectedChildrenCount) {
+          this.selectedChildrenCount++
+        }
+
+        // increase the selectedChildrenCount of all parents
+        let parent: Row | null = this.parent
+        while (parent !== null) {
+          if (parent instanceof AggregateRow) {
+            parent.childrenCount++
+            if (increaseSelectedChildrenCount) {
+              parent.selectedChildrenCount++
+            }
+          }
+          parent = parent.parent
+        }
+      }
     }
   }
 
@@ -204,6 +271,26 @@ export class AggregateRow extends Row {
       if (child instanceof AggregateRow) {
         // recursively close all children
         child.close()
+      }
+    })
+  }
+
+  selectChidrenDeep() {
+    this.children.forEach((child) => {
+      if (child instanceof ItemRow && !child.selected) {
+        child.setSelected(true)
+      } else if (child instanceof AggregateRow) {
+        child.selectChidrenDeep()
+      }
+    })
+  }
+
+  unselectChildrenDeep() {
+    this.children.forEach((child) => {
+      if (child instanceof ItemRow && child.selected) {
+        child.setSelected(false)
+      } else if (child instanceof AggregateRow) {
+        child.unselectChildrenDeep()
       }
     })
   }

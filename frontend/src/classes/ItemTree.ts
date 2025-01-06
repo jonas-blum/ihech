@@ -51,7 +51,7 @@ export class ItemTree {
       // Now create children, correctly passing `row` as the parent
       const children = itemNameAndData.children.map((child: any) => this.buildItemTree(child, row))
       // @ts-ignore - we can be sure that row is an AggregateRow here and has a children property
-      row.children = children // Assign children to the row after they've been created
+      row.addChildren(children)
 
       // // Set prevSibling and nextSibling for each child
       // for (let i = 0; i < children.length; i++) {
@@ -68,6 +68,7 @@ export class ItemTree {
         itemNameAndData.amountOfDataPoints,
         itemNameAndData.data,
         { x: itemNameAndData.dimReductionX, y: itemNameAndData.dimReductionY },
+        true, // by default selected is always true. better would be to have the same logic as for attributes
         parent,
       )
     }
@@ -165,8 +166,8 @@ export class ItemTree {
     this.rowsAsArray.forEach((row) => {
       row.setHeatmapVisibility(
         row.position !== -1 &&
-          row.position >= firstVisibleRowIndex &&
-          row.position <= lastVisibleRowIndex,
+        row.position >= firstVisibleRowIndex &&
+        row.position <= lastVisibleRowIndex,
       )
     })
   }
@@ -224,6 +225,11 @@ export class ItemTree {
     }
 
     return rows
+  }
+
+  // get all ItemRows which have the selected property set to true
+  getSelectedItems(): Row[] {
+    return this.rowsAsArray.filter((row) => row instanceof ItemRow && row.selected)
   }
 
   // NOTE: should only be called when the rowSorter changed! for other operations, the updatePositionsAndDepth method should be used

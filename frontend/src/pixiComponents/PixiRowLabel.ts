@@ -1,7 +1,7 @@
 import { Container, Text, Rectangle, Graphics, Sprite } from 'pixi.js'
 import { OutlineFilter, DropShadowFilter, GlowFilter } from 'pixi-filters'
 import { PixiContainer } from '@/pixiComponents/PixiContainer'
-import { AggregateRow, Row } from '@/classes/Row'
+import { AggregateRow, ItemRow, Row } from '@/classes/Row'
 import { useMainStore } from '@/stores/mainStore'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { useTextureStore } from '@/stores/textureStore'
@@ -98,6 +98,10 @@ export class PixiRowLabel extends PixiContainer {
     // needs to be implemented by the subclasses
   }
 
+  updateText() {
+    // needs to be implemented by the subclasses
+  }
+
   updateVisibility() {
     this.visible = this.row.heatmapVisibility
   }
@@ -134,11 +138,18 @@ export class PixiAggregateRowLabel extends PixiRowLabel {
       duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
     })
   }
+
+  updateText(): void {
+    this.text.text = this.row.getName()
+  }
 }
 
 export class PixiItemRowLabel extends PixiRowLabel {
-  constructor(row: Row) {
+  row: ItemRow
+
+  constructor(row: ItemRow) {
     super(row)
+    this.row = row
     this.createIcon()
     this.updateHighlightedDisplay(false)
     this.text.text = row.getName()
@@ -155,6 +166,7 @@ export class PixiItemRowLabel extends PixiRowLabel {
 
   updateIcon(): void {
     this.icon.tint = this.row.getColor()
+    this.icon.visible = this.row.selected
   }
 
   updateHighlightedDisplay(highlighted: boolean): void {
@@ -166,7 +178,7 @@ export class PixiItemRowLabel extends PixiRowLabel {
 
 // NOTE: this extends the PixiItemRowLabel
 export class PixiStickyRowLabel extends PixiItemRowLabel {
-  constructor(row: Row) {
+  constructor(row: ItemRow) {
     super(row)
     this.createIcon()
     this.updateHighlightedDisplay(false)

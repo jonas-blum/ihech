@@ -48,12 +48,28 @@ watch(
     :style="contextMenuStyle"
     @click.stop="mainStore.closeMenus"
   >
-    <ul v-if="!isAggregateRow" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">
+  <ul v-if="!isAggregateRow" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">
       <li>
-        <a @click="mainStore.itemTree?.toggleStickyRow(row)">{{ mainStore.itemTree?.isRowSticky(row) ? 'Unselect' : 'Select' }}</a>
+        <a @click="mainStore.itemTree?.toggleStickyRow(row)">{{ mainStore.itemTree?.isRowSticky(row) ? 'Unpin' : 'Pin' }}</a>
+      </li>
+      <li>
+        <a @click="row?.toggleSelected">{{ row?.selected ? 'Unselect' : 'Select' }}</a>
       </li>
     </ul>
     <ul v-if="isAggregateRow" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">
+      <li>
+        <a
+          v-if="row?.childrenCount === row?.selectedChildrenCount"
+          @click="row?.unselectChildrenDeep"
+        >
+          <!-- All children are selected -->
+          Unselect All ({{ row?.selectedChildrenCount }} / {{ row?.childrenCount }})
+        </a>
+        <a v-else @click="row?.selectChildrenDeep">
+          <!-- Not all children are selected -->
+          Select All ({{ row?.selectedChildrenCount }} / {{ row?.childrenCount }})
+        </a>
+      </li>
       <li>
         <a @click="mainStore.itemTree?.toggleRowExpansion(row)">{{
           row?.isOpen ? 'Close' : 'Expand'

@@ -220,7 +220,7 @@ export const useMainStore = defineStore('mainStore', {
       this.activeDataTable = dataTable
       console.log('💥 mainStore.setActiveDataTable', this.activeDataTable)
 
-      
+
       // load the default settings
       const defaultSettings = dataTable.defaultSettings
       this.setClusterItemsByCollections(defaultSettings.clusterItemsByCollections)
@@ -232,7 +232,7 @@ export const useMainStore = defineStore('mainStore', {
       this.setItemAggregateMethod(defaultSettings.itemAggregateMethod)
       this.setAttributeAggregateMethod(defaultSettings.attributeAggregateMethod)
       this.setScaling(defaultSettings.scaling)
-      
+
       // set the default semantic aggregations
       this.getHierarchicalRowsMetadataColumnNames.forEach((column) => {
         if (defaultSettings.groupItemsBy.includes(column.label)) {
@@ -522,6 +522,32 @@ export const useMainStore = defineStore('mainStore', {
       this.activeDataTable.attributeAggregateMethod = attributeAggregateMethod
     },
 
+    getSelectedItemsRowIndexes(): number[] {
+      if (!this.activeDataTable) {
+        console.error('No active data table')
+        return []
+      }
+
+      // if there is no ItemTree yet, simply return all row indexes
+      if (!this.itemTree || this.itemTree.datasetName !== this.activeDataTable.datasetName) {
+        return this.activeDataTable.allRowIndexes
+      }
+
+      // get selected item names from ItemTree
+      const selectedItemsNames = this.itemTree.getSelectedItems().map(item => item.name)
+      
+      let selectedItemsRowIndexes: number[] = []
+      // loop over dataset and get all the indexes of the selected items
+      this.activeDataTable.df.forEach((row, index) => {
+        let itemName = row[this.activeDataTable!.allColumnNames[0]] // first column is the item name column
+        if (selectedItemsNames.includes(itemName)) {
+          selectedItemsRowIndexes.push(index)
+        }
+      })
+
+      return selectedItemsRowIndexes
+    },
+
     getCurrentHeatmapSettings(): HeatmapSettings {
       if (!this.activeDataTable) {
         console.error('No active data table')
@@ -534,6 +560,7 @@ export const useMainStore = defineStore('mainStore', {
       ) {
         selectedColumnNames = this.attributeTree.getSelectedAttributesColumnNames()
       }
+
       return {
         csvFile: this.activeDataTable.csvFile,
 
@@ -544,7 +571,7 @@ export const useMainStore = defineStore('mainStore', {
           .filter((i) => i.selected)
           .map((i) => i.index),
 
-        selectedItemsRowIndexes: this.activeDataTable.allRowIndexes,
+        selectedItemsRowIndexes: this.getSelectedItemsRowIndexes(),
 
         selectedAttributesColumnNames: selectedColumnNames,
 

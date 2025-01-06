@@ -45,7 +45,7 @@ def filter_attributes_and_items(
         for col in settings.selectedAttributesColumnNames
         if col in raw_data_df.columns
     ]
-
+    
     raw_data_df = raw_data_df.loc[valid_indexes]
     hierarchical_rows_metadata_df = hierarchical_rows_metadata_df.loc[valid_indexes]
     item_names_df = item_names_df.loc[valid_indexes]

@@ -50,7 +50,7 @@ watch(
   >
     <ul v-if="!isAggregateRow" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">
       <li>
-        <a @click="mainStore.itemTree?.toggleStickyRow(row)">{{ mainStore.itemTree?.isRowSticky(row) ? 'Unselect' : 'Select' }}</a>
+        <a @click="mainStore.itemTree?.toggleStickyRow(row)">{{ mainStore.itemTree?.isRowSticky(row) ? 'Unpin' : 'Pin' }}</a>
       </li>
     </ul>
     <ul v-if="isAggregateRow" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">

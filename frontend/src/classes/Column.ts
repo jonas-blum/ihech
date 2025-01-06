@@ -131,6 +131,7 @@ export class AggregateColumn extends Column {
   }
 
   getName(): string {
+    // TODO
     // if the backend provided a name, use it because its a semantic cluster
     if (this.name) {
       // return `${this.name} (${this.selectedChildrenCount} / ${this.childrenCount})`

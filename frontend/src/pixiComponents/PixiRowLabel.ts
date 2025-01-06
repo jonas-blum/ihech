@@ -35,7 +35,7 @@ export class PixiRowLabel extends PixiContainer {
       style: {
         fill: this.row.getColor(),
         // fill: 0x000000,
-        fontSize: 12,
+        fontSize: heatmapLayoutStore.fontSize,
         fontFamily: 'Arial',
       },
     })
@@ -124,8 +124,10 @@ export class PixiAggregateRowLabel extends PixiRowLabel {
 
   createIcon(): void {
     const heatmapLayoutStore = useHeatmapLayoutStore()
+    
     this.icon = new Sprite(useTextureStore().chevronTexture)
     this.icon.anchor.set(0.5)
+
     this.icon.x = this.icon.width / 2
     this.icon.y = heatmapLayoutStore.rowHeight / 2
     this.addChild(this.icon)
@@ -133,9 +135,14 @@ export class PixiAggregateRowLabel extends PixiRowLabel {
   }
 
   updateIcon(animate: boolean = true): void {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    const maxIconSize = useHeatmapLayoutStore().maxIconSize
+    this.icon.width = maxIconSize
+    this.icon.height = maxIconSize
+
     gsap.to(this.icon, {
       rotation: this.row.isOpen ? 0 : -Math.PI / 2,
-      duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
+      duration: animate ? heatmapLayoutStore.animationDuration : 0,
     })
   }
 
@@ -162,9 +169,15 @@ export class PixiItemRowLabel extends PixiRowLabel {
     this.icon.x = this.icon.width / 2
     this.icon.y = heatmapLayoutStore.rowHeight / 2
     this.addChild(this.icon)
+    this.updateIcon()
   }
 
   updateIcon(): void {
+    const heatmapLayoutStore = useHeatmapLayoutStore()
+    const maxIconSize = useHeatmapLayoutStore().maxIconSize
+    this.icon.width = maxIconSize
+    this.icon.height = maxIconSize
+
     this.icon.tint = this.row.getColor()
     this.icon.visible = this.row.selected
   }

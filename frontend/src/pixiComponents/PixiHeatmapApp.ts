@@ -111,12 +111,15 @@ export class PixiHeatmapApp extends Application {
     // chevron texture
     const chevronWidth = 10
     const chevronHeight = 6
+    const textureSize = 10
     const chevronGraphic = new Graphics()
     chevronGraphic
-      .lineTo(chevronWidth / 2, chevronHeight)
-      .lineTo(chevronWidth, 0)
+      .moveTo(0, (textureSize - chevronHeight) / 2)
+      .lineTo(chevronWidth / 2, (textureSize + chevronHeight) / 2)
+      .lineTo(chevronWidth, (textureSize - chevronHeight) / 2)
       .stroke({ width: 1, color: heatmapLayoutStore.chevronColor })
-    textureStore.chevronTexture = this.renderer.generateTexture(chevronGraphic)
+    let textureContainer = new Rectangle(0, 0, textureSize, textureSize)
+    textureStore.chevronTexture = this.renderer.generateTexture({frame: textureContainer, target: chevronGraphic})
 
     // circle texture (used for PixiItemRowLabel)
     const circleGraphic = new Graphics()

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+
 import { onMounted, watch, ref } from 'vue'
 import { useMouse, watchThrottled } from '@vueuse/core'
 
@@ -336,6 +338,22 @@ watch(
   },
 )
 
+function shrinkCells() {
+  heatmapLayoutStore.setRowAndColumnSize(heatmapLayoutStore.rowHeight - 5, heatmapLayoutStore.columnWidth - 5)
+  stopRenderer()
+  setTimeout(() => {
+    startRenderer()
+  }, 1000)
+}
+
+function growCells() {
+  heatmapLayoutStore.setRowAndColumnSize(heatmapLayoutStore.rowHeight + 5, heatmapLayoutStore.columnWidth + 5)
+  stopRenderer()
+  setTimeout(() => {
+    startRenderer()
+  }, 1000)
+}
+
 function clear() {
   console.log('🧹 Heatmap.vue clear')
   const clearStart = performance.now()
@@ -458,21 +476,31 @@ function updateCanvasDimensions() {
   }
 }
 
-function debug() {
-  console.log('🐞', pixiHeatmapApp)
-
+function stopRenderer() {
+  // we are about to fetch new data, so this is a good time to clear the canvas
+  // stop first, because we don't want to update the canvas while it is being cleared
   if (pixiHeatmapApp) {
-    const debugTImer = performance.now()
-    pixiHeatmapApp.activateLoadingState()
+    // stop the auto-renderer (essentially freezes the canvas)
+    pixiHeatmapApp.stop()
+    // activate loading state
+    pixiHeatmapApp?.activateLoadingState()
+    // render once more to display the loading state
+    pixiHeatmapApp?.render()
+
+    // re-generate the textures (in case the size changed)
+    pixiHeatmapApp?.generateTextures()
   }
+
+  // now clear all kinds of PIXI stuff
+  clear()
 }
 
-function debug2() {
-  console.log('🐞', pixiHeatmapApp)
-
+function startRenderer() {
   if (pixiHeatmapApp) {
-    const debugTImer = performance.now()
-    pixiHeatmapApp.deactivateLoadingState()
+    // we have new data, so we need to update the canvas
+    update()
+    pixiHeatmapApp?.start() // start again
+    pixiHeatmapApp?.deactivateLoadingState()
   }
 }
 
@@ -485,24 +513,9 @@ watch(
   () => mainStore.loading,
   (loading) => {
     if (loading === true) {
-      // we are about to fetch new data, so this is a good time to clear the canvas
-      // stop first, because we don't want to update the canvas while it is being cleared
-      if (pixiHeatmapApp) {
-        // stop the auto-renderer (essentially freezes the canvas)
-        pixiHeatmapApp.stop()
-        // activate loading state
-        pixiHeatmapApp?.activateLoadingState()
-        // render once more to display the loading state
-        pixiHeatmapApp?.render()
-      }
-
-      // now clear all kinds of PIXI stuff
-      clear()
+      stopRenderer()
     } else {
-      // we have new data, so we need to update the canvas
-      update()
-      pixiHeatmapApp?.start() // start again
-      pixiHeatmapApp?.deactivateLoadingState()
+      startRenderer()
     }
   },
 )
@@ -533,9 +546,6 @@ onMounted(async () => {
         {{ heatmapLayoutStore.firstVisibleColumnIndex }} /
         {{ heatmapLayoutStore.lastVisibleColumnIndex }}
       </span> -->
-
-    <!-- <button @click="debug" class="absolute z-[1000] btn btn-xs">Debug</button>
-    <button @click="debug2" class="absolute z-[1000] btn btn-xs" style="top: 2rem">Debug2</button> -->
 
     <canvas class="w-full h-full" ref="heatmapCanvas" @contextmenu.prevent></canvas>
     <!-- <button class="btn btn-primary btn-small absolute bottom-0" @click="debug()">Debug</button> -->
@@ -575,6 +585,20 @@ onMounted(async () => {
       left: `${heatmapLayoutStore.matrixTileFrame.x + heatmapLayoutStore.matrixTileFrame.width}px`,
       width: `${heatmapLayoutStore.rowLabelWidth}px`,
     }" @mouseenter="mainStore.mouseOverMenuOrTooltip = true" @mouseleave="mainStore.mouseOverMenuOrTooltip = false" />
+
+    <!-- zoom buttons -->
+    <div class="absolute z-10 -translate-y-[100%] flex gap-2 p-2" :style="{
+      top: `${heatmapLayoutStore.matrixTileFrame.y + heatmapLayoutStore.matrixTileFrame.height}px`,
+      left: `${heatmapLayoutStore.matrixTileFrame.x}px`,
+    }">
+      <button @click="shrinkCells" class="btn btn-xs bg-white rounded-none custom-shadow p-1">
+        <Icon icon="ic:baseline-minus" class="p-0 w-4 h-4 text-opacity-50 cursor-pointer" />
+      </button>
+      <button @click="growCells" class="btn btn-xs bg-white rounded-none custom-shadow p-1">
+        <Icon icon="ic:baseline-plus" class="p-0 w-4 h-4 text-opacity-50 cursor-pointer" />
+      </button>
+    </div>
+
   </div>
 
   <!-- Heatmap cell Tooltip -->

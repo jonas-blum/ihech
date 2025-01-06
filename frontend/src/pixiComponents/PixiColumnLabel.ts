@@ -32,7 +32,7 @@ export class PixiColumnLabel extends PixiContainer {
       text: '', // NOTE: this is set in the subclasses
       style: {
         fill: 0x000000,
-        fontSize: 12,
+        fontSize: heatmapLayoutStore.fontSize,
         fontFamily: 'Arial',
       },
     })
@@ -133,10 +133,17 @@ export class PixiAggregateColumnLabel extends PixiColumnLabel {
   }
 
   updateIcon(animate: boolean = true): void {
+    console.log('updateIcon')
+    
+    const maxIconSize = useHeatmapLayoutStore().maxIconSize
+    this.icon.width = maxIconSize
+    this.icon.height = maxIconSize
+
     gsap.to(this.icon, {
       rotation: this.column.isOpen ? -Math.PI / 2 : 0,
       duration: animate ? useHeatmapLayoutStore().animationDuration : 0,
     })
+    
   }
 
   updateText(): void {
@@ -156,6 +163,10 @@ export class PixiAttributeColumnLabel extends PixiColumnLabel {
   }
 
   updateIcon(animated: boolean = true): void {
+    const maxIconSize = useHeatmapLayoutStore().maxIconSize
+    this.icon.width = maxIconSize
+    this.icon.height = maxIconSize
+
     // dont show the dot if the column is not selected
     this.icon.visible = this.column.selected
   }

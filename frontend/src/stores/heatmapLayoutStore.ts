@@ -10,12 +10,8 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
     columnWidth: 20, // width of a column in the heatmap
     columnLabelHeight: 200, // top margin until the rows start
     columnLabelPaddingBottom: 5, // prevent column labels from touching the cells
-    columnLabelTextPaddingTop: 15, // bottom padding of the column label text compared to the column label background
     rowLabelWidth: 200, // left margin until the columns start
-    rowLabelTextPaddingLeft: 15, // left padding of the row label text compared to the row label background
     rowLabelPaddingRight: 5, // prevent row labels from touching the cells
-    cellPadding: 1, // inset padding of the cells (will create a gap between cells)
-    gapAfterStickyRows: 10, // gap between sticky rows and the rest of the heatmap rows
     rowLabelDepthIndent: 15, // indent for each depth level in the row labels
     columnLabelDepthIndent: 15, // indent for each depth level in the row labels
     heatmapLeftMargin: 5, // prevent the heatmap from touching the left border
@@ -195,6 +191,35 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
         this.availableWidthForColumns
       )
     },
+
+    fontSize(): number {
+      let maxFontSize = 16
+      let computedFontSize = Math.min(this.rowHeight, this.columnWidth) * 0.7
+      return Math.min(maxFontSize, computedFontSize)
+    },
+
+    rowLabelTextPaddingLeft(): number {
+      return this.rowHeight * 1
+    },
+
+    columnLabelTextPaddingTop(): number {
+      return this.columnWidth * 1
+    },
+
+    maxIconSize(): number {
+      return this.fontSize * 0.8
+    },
+
+    // inset padding of the cells (will create a visual gap between cells)
+    cellPadding(): number {
+      let computedCellPadding = this.rowHeight * 0.05
+      return computedCellPadding > 0.05 ? computedCellPadding : 0
+    },
+
+    // gap between sticky rows and the rest of the heatmap rows
+    gapAfterStickyRows(): number {
+      return this.rowHeight * 0.5
+    },
   },
   actions: {
     setVerticalScrollPosition(position: number) {
@@ -209,5 +234,9 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
       const maxPosition = this.requiredWidthOfColumns - this.availableWidthForColumns
       this.horizontalScrollPosition = Math.max(0, Math.min(maxPosition, position))
     },
+    setRowAndColumnSize(rowHeight: number, columnWidth: number) {
+      this.rowHeight = rowHeight
+      this.columnWidth = columnWidth
+    }
   },
 })

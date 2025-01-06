@@ -44,33 +44,26 @@ export class PixiHeatmapApp extends Application {
     this.verticalScrollbar.update()
     this.horizontalScrollbar.update()
 
-    // add scroll event listener
-    this.matrixTile.eventMode = 'static'
-    this.matrixTile.on('wheel', (e: WheelEvent) => {
+    // add scroll event listeners
+    const handleWheel = (e: WheelEvent, allowVertical = true, allowHorizontal = true) => {
       const heatmapLayoutStore = useHeatmapLayoutStore()
-      if (e.deltaY !== 0) {
+
+      if (allowVertical && e.deltaY !== 0) {
         heatmapLayoutStore.setVerticalScrollPosition(heatmapLayoutStore.verticalScrollPosition + e.deltaY)
       }
-      if (e.deltaX !== 0) {
+      if (allowHorizontal && e.deltaX !== 0) {
         heatmapLayoutStore.setHorizontalScrollPosition(heatmapLayoutStore.horizontalScrollPosition + e.deltaX)
       }
-    })
+    }
+
+    this.matrixTile.eventMode = 'static'
+    this.matrixTile.on('wheel', (e) => handleWheel(e, true, true))
 
     this.rowLabelTile.eventMode = 'static'
-    this.rowLabelTile.on('wheel', (e: WheelEvent) => {
-      const heatmapLayoutStore = useHeatmapLayoutStore()
-      if (e.deltaY !== 0) {
-        heatmapLayoutStore.setVerticalScrollPosition(heatmapLayoutStore.verticalScrollPosition + e.deltaY)
-      }
-    })
+    this.rowLabelTile.on('wheel', (e) => handleWheel(e, true, false))
 
     this.columnLabelTile.eventMode = 'static'
-    this.columnLabelTile.on('wheel', (e: WheelEvent) => {
-      const heatmapLayoutStore = useHeatmapLayoutStore()
-      if (e.deltaX !== 0) {
-        heatmapLayoutStore.setHorizontalScrollPosition(heatmapLayoutStore.horizontalScrollPosition + e.deltaX)
-      }
-    })
+    this.columnLabelTile.on('wheel', (e) => handleWheel(e, false, true))
   }
 
   activateLoadingState() {
@@ -111,12 +104,15 @@ export class PixiHeatmapApp extends Application {
     // chevron texture
     const chevronWidth = 10
     const chevronHeight = 6
+    const textureSize = 10
     const chevronGraphic = new Graphics()
     chevronGraphic
-      .lineTo(chevronWidth / 2, chevronHeight)
-      .lineTo(chevronWidth, 0)
+      .moveTo(0, (textureSize - chevronHeight) / 2)
+      .lineTo(chevronWidth / 2, (textureSize + chevronHeight) / 2)
+      .lineTo(chevronWidth, (textureSize - chevronHeight) / 2)
       .stroke({ width: 1, color: heatmapLayoutStore.chevronColor })
-    textureStore.chevronTexture = this.renderer.generateTexture(chevronGraphic)
+    let textureContainer = new Rectangle(0, 0, textureSize, textureSize)
+    textureStore.chevronTexture = this.renderer.generateTexture({ frame: textureContainer, target: chevronGraphic })
 
     // circle texture (used for PixiItemRowLabel)
     const circleGraphic = new Graphics()

@@ -242,10 +242,44 @@ onMounted(async () => {
 
   init()
 })
+
+const containerX = ref(0)
+const containerV = ref(0)
+
+function debug() {
+  let bounds = pixiDimredApp?.bubbleContainer.getBounds()
+  console.log(bounds)
+
+  let width = bounds.maxX - bounds.minX
+  let height = bounds.maxY - bounds.minY
+
+  console.log('width', width)
+  console.log('height', height)
+  console.log(`position: x: ${pixiDimredApp?.bubbleContainer.position.x}, y: ${pixiDimredApp?.bubbleContainer.position.y}`)
+  containerX.value = pixiDimredApp?.bubbleContainer.position.x
+  containerV.value = pixiDimredApp?.bubbleContainer.position.y
+
+}
+
+
+function debug2() {
+  if (pixiDimredApp) {
+    pixiDimredApp.bubbleContainer.position.x = containerX.value
+    pixiDimredApp.bubbleContainer.position.y = containerV.value
+  }
+}
 </script>
 
 <template>
   <div class="w-full h-full relative">
+
+    <div class="absolute z-10 bottom-12 w-[300px] flex gap-2 bg-white p-2 border-[1px] border-black">
+      <button @click="debug" class="btn btn-xs">DEBUG</button>
+      <input type="number" v-model="containerX" class="input input-xs w-16" />
+      <input type="number" v-model="containerV" class="input input-xs w-16" />
+      <button @click="debug2" class="btn btn-xs">Set coords</button>
+      <span>{{ dimredLayoutStore.dimredSize }}</span>
+    </div>
 
     <canvas class="w-full h-full" ref="dimredCanvas" @contextmenu.prevent></canvas>
 

@@ -26,9 +26,9 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     canvasInnerHeight(): number {
       return this.canvasHeight - 2 * this.tileMargin
     },
-    // because the dimred points need to be quadratic, we take the minimum of the width and height
+    // needs to be a square, so we take the smaller of the two dimensions.. and take some padding
     dimredSize(): number {
-      return Math.min(this.canvasInnerWidth, this.canvasInnerHeight) - 2*this.bubbleSizeMaximal
+      return Math.min(this.canvasInnerWidth, this.canvasInnerHeight) - 3*this.bubbleSizeMaximal
     },
     // if the canvasWidth > canvasHeight, we need to center the dimred horizontally
     dimredXPadding(): number {

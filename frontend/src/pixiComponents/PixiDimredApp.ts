@@ -31,13 +31,33 @@ export class PixiDimredApp extends Application {
     this.stage.addChild(this.dimredTile)
 
     this.dimredTile.content.addChild(this.bubbleContainer)
-    // center the dimred, ensure it is quadratic
+    this.bubbleContainer.x = dimredLayoutStore.dimredXPadding
+    this.bubbleContainer.y = dimredLayoutStore.dimredYPadding
     this.bubbleContainer.width = dimredLayoutStore.dimredSize
     this.bubbleContainer.height = dimredLayoutStore.dimredSize
-    this.bubbleContainer.position.set(
-      dimredLayoutStore.dimredXPadding,
-      dimredLayoutStore.dimredYPadding,
-    )
+
+    // AHAH! dimredTile has by default a padding! this is why the bubbleContainer is actually overflowing to the right
+    // its size can not be dimredSize... ?!
+
+    // One problem is that the bubbles are positioned by their top left corner, not their center
+    // this is tricky to correct, because we dont know the size of the bubble container, they are scaled dynamically
+
+    // rectangle with same dimension and position as bubble for debugging
+    // let rectangle = new Graphics()
+    // this.bubbleContainer.addChild(rectangle)
+    // rectangle.rect(
+    //   0, 0,
+    //   dimredLayoutStore.dimredTileFrame.width - 2 * useHeatmapLayoutStore().tilePadding,
+    //   dimredLayoutStore.dimredTileFrame.height - 2 * useHeatmapLayoutStore().tilePadding,
+    // ).stroke({ width: 1, color: 0x000000 })
+    // rectangle.filters = [new OutlineFilter()]
+
+    // custom circle because I cannot control the bubble position, size, scaling and all that shizzle
+    // let circle = new Graphics()
+    // this.bubbleContainer.addChild(circle)
+    // circle.circle(0, 0, 10).stroke({ width: 1, color: 0x000000 })
+    // circle.position.set(0, 0)
+
     // for debugging the bubbleContainer position
     // this.bubbleContainer.addBackground(0x00ffff)
     // this.bubbleContainer.setBackgroundDimensions(
@@ -112,12 +132,12 @@ export class PixiDimredApp extends Application {
 
   testScaling() {
     // setting the pivot to be the center of the bubble container
-    this.bubbleContainer.pivot.set(this.bubbleContainer.width / 2, this.bubbleContainer.height / 2)
-    console.log(`setting the pivot to ${this.bubbleContainer.pivot.x}, ${this.bubbleContainer.pivot.y}`)
+    // this.bubbleContainer.pivot.set(this.bubbleContainer.width / 2, this.bubbleContainer.height / 2)
+    // console.log(`setting the pivot to ${this.bubbleContainer.pivot.x}, ${this.bubbleContainer.pivot.y}`)
 
-    const currentScale = this.bubbleContainer.scale.x
-    this.bubbleContainer.scale.set(currentScale + 0.1)
-    console.log(`setting the scale from ${currentScale} to ${this.bubbleContainer.scale.x}`)
+    // const currentScale = this.bubbleContainer.scale.x
+    // this.bubbleContainer.scale.set(currentScale + 0.1)
+    // console.log(`setting the scale from ${currentScale} to ${this.bubbleContainer.scale.x}`)
   }
 
   // NOTE: here I tried to dynamically scale to reduce white space in the dimred. I gave up.

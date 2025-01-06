@@ -65,12 +65,15 @@ export class PixiBubble extends PixiContainer {
 
     const isRowSticky = useMainStore().itemTree?.isRowSticky(this.row)
 
+    // dimredPosition is between 0 and 1, so we need to multiply it by the size of dimred
+    const parentContainerSize = dimredLayoutStore.dimredSize
+
     // if the position is -1, we hide the bubble
     if (this.row.position === -1 && !isRowSticky) {
-      const startX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
-      const startY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
-      const endX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
-      const endY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
+      const startX = this.row.dimredPosition.x * parentContainerSize
+      const startY = this.row.dimredPosition.y * parentContainerSize
+      const endX = (this.row.parent?.dimredPosition.x ?? 0) * parentContainerSize
+      const endY = (this.row.parent?.dimredPosition.y ?? 0) * parentContainerSize
       gsap.fromTo(
         this,
         {
@@ -97,10 +100,12 @@ export class PixiBubble extends PixiContainer {
 
     // if the oldPosition is -1, we want to animate from the parent row position (if available)
     if (this.row.oldPosition === -1 && !isRowSticky) {
-      const startX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
-      const startY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
-      const endX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
-      const endY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
+      const startX = (this.row.parent?.dimredPosition.x ?? 0) * parentContainerSize
+      const startY = (this.row.parent?.dimredPosition.y ?? 0) * parentContainerSize
+      const endX = this.row.dimredPosition.x * parentContainerSize
+      const endY = this.row.dimredPosition.y * parentContainerSize
+      // const endX = 0 * parentContainerSize
+      // const endY = 0 * parentContainerSize
 
       gsap.fromTo(
         this,
@@ -178,6 +183,7 @@ export class PixiBubble extends PixiContainer {
     // Calculate the scale factor with log-transformed values
     const scaleFactor = 1 + (maxScaleFactor - 1) * (logItemsAmount / logItemsTotal)
 
+    // this.bubbleGraphic.pivot.set(this.bubbleGraphic.width / 2, this.bubbleGraphic.height / 2)
     this.bubbleGraphic.scale = scaleFactor
   }
 
@@ -226,12 +232,14 @@ export class PixiItemBubble extends PixiBubble {
 
     const isRowSticky = useMainStore().itemTree?.isRowSticky(this.row)
 
+    const parentContainerSize = dimredLayoutStore.dimredSize
+
     // if the position is -1, we hide the bubble
     if (this.row.position === -1 && !isRowSticky) {
-      const startX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
-      const startY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
-      const endX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
-      const endY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
+      const startX = this.row.dimredPosition.x * parentContainerSize
+      const startY = this.row.dimredPosition.y * parentContainerSize
+      const endX = (this.row.parent?.dimredPosition.x ?? 0) * parentContainerSize
+      const endY = (this.row.parent?.dimredPosition.y ?? 0) * parentContainerSize
       gsap.fromTo(
         this,
         {
@@ -258,10 +266,10 @@ export class PixiItemBubble extends PixiBubble {
 
     // if the oldPosition is -1, we want to animate from the parent row position (if available)
     if (this.row.oldPosition === -1 && !isRowSticky) {
-      const startX = (this.row.parent?.dimredPosition.x ?? 0) * dimredLayoutStore.dimredSize
-      const startY = (this.row.parent?.dimredPosition.y ?? 0) * dimredLayoutStore.dimredSize
-      const endX = this.row.dimredPosition.x * dimredLayoutStore.dimredSize
-      const endY = this.row.dimredPosition.y * dimredLayoutStore.dimredSize
+      const startX = (this.row.parent?.dimredPosition.x ?? 0) * parentContainerSize
+      const startY = (this.row.parent?.dimredPosition.y ?? 0) * parentContainerSize
+      const endX = this.row.dimredPosition.x * parentContainerSize
+      const endY = this.row.dimredPosition.y * parentContainerSize
 
       // NOTE: I have no idea why, but for some reason it crashed when updating and an item was sticky.
       // this catch block is a dirty fix to avoid the crash

@@ -529,19 +529,22 @@ export const useMainStore = defineStore('mainStore', {
       }
 
       // if there is no ItemTree yet, simply return all row indexes
-      if (!this.itemTree) {
+      if (!this.itemTree || this.itemTree.datasetName !== this.activeDataTable.datasetName) {
         return this.activeDataTable.allRowIndexes
       }
 
-      // otherwise, get the selected items from the ItemTree
-      let selectedItems = this.itemTree.getSelectedItems()
+      // get selected item names from ItemTree
+      const selectedItemsNames = this.itemTree.getSelectedItems().map(item => item.name)
+      
       let selectedItemsRowIndexes: number[] = []
       // loop over dataset and get all the indexes of the selected items
       this.activeDataTable.df.forEach((row, index) => {
-        if (selectedItems?.map((item) => item.name).includes(row['Item_name'])) {
+        let itemName = row[this.activeDataTable!.allColumnNames[0]] // first column is the item name column
+        if (selectedItemsNames.includes(itemName)) {
           selectedItemsRowIndexes.push(index)
         }
       })
+
       return selectedItemsRowIndexes
     },
 

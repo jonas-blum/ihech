@@ -128,6 +128,27 @@ watch(
   },
 )
 
+// watch for change in dimredNeedsToBeScaled counter
+watch(
+  () => dimredLayoutStore.dimredNeedsToBeScaled,
+  (newValue, oldValue) => {
+    if (!pixiDimredApp) {
+      console.warn('pixiDimredApp is not set')
+      return
+    }
+
+    // console.log('🔍 Dimred.vue dimredNeedsToBeScaled changed from', oldValue, 'to', newValue)
+
+    // lets re-scale immediately in case there is no animation ...
+    // pixiDimredApp?.testScaling()
+
+    // ... and re-scale after the animation is finished
+    setTimeout(() => {
+      pixiDimredApp?.testScaling()
+    }, dimredLayoutStore.animationDuration * 1000)
+  },
+)
+
 function clear() {
   console.log('🧹 Dimred.vue clear')
   const clearStart = performance.now()
@@ -242,10 +263,30 @@ onMounted(async () => {
 
   init()
 })
+
+const containerX = ref(0)
+const containerV = ref(0)
+
+function debug() {
+
+}
+
+
+function debug2() {
+  if (pixiDimredApp) {
+    pixiDimredApp.testScaling()
+  }
+}
 </script>
 
 <template>
   <div class="w-full h-full relative">
+
+    <!-- <div class="absolute z-10 bottom-12 w-[300px] flex gap-2 bg-white p-2 border-[1px] border-black">
+      <button @click="debug" class="btn btn-xs">DEBUG</button>
+      <button @click="debug2" class="btn btn-xs">testScaling</button>
+      <span>{{ dimredLayoutStore.dimredSize }}</span>
+    </div> -->
 
     <canvas class="w-full h-full" ref="dimredCanvas" @contextmenu.prevent></canvas>
 

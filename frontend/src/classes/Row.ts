@@ -275,12 +275,12 @@ export class AggregateRow extends Row {
     })
   }
 
-  selectChidrenDeep() {
+  selectChildrenDeep() {
     this.children.forEach((child) => {
       if (child instanceof ItemRow && !child.selected) {
         child.setSelected(true)
       } else if (child instanceof AggregateRow) {
-        child.selectChidrenDeep()
+        child.selectChildrenDeep()
       }
     })
   }

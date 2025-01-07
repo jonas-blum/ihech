@@ -11,6 +11,8 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     tilePadding: 5, // padding of items inside the "layout tiles"
     tileMargin: 20, // margin between "layout tiles"
 
+    dimredNeedsToBeScaled: 0, // counter that is incremented when the dimred needs to be scaled (because rows where expanded or collapsed)
+
     animationDuration: 0.3, // duration of animations in seconds
     showParentBubbles: false, // whether to show the parent bubbles in the dimred
 
@@ -26,9 +28,12 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     canvasInnerHeight(): number {
       return this.canvasHeight - 2 * this.tileMargin
     },
-    // because the dimred points need to be quadratic, we take the minimum of the width and height
+    // needs to be a square, so we take the smaller of the two dimensions.. and take some padding
     dimredSize(): number {
-      return Math.min(this.canvasInnerWidth, this.canvasInnerHeight) - 2*this.bubbleSizeMaximal
+      return Math.min(
+        this.dimredTileFrame.width - this.tilePadding * 2 - this.bubbleSizeMaximal * 2.2, 
+        this.dimredTileFrame.height - this.tilePadding * 2 - this.bubbleSizeMaximal * 2.2
+      )
     },
     // if the canvasWidth > canvasHeight, we need to center the dimred horizontally
     dimredXPadding(): number {

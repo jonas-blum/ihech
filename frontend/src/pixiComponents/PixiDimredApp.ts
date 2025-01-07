@@ -31,19 +31,6 @@ export class PixiDimredApp extends Application {
     this.stage.addChild(this.dimredTile)
 
     this.dimredTile.content.addChild(this.bubbleContainer)
-    // center the dimred, ensure it is quadratic
-    this.bubbleContainer.width = dimredLayoutStore.dimredSize
-    this.bubbleContainer.height = dimredLayoutStore.dimredSize
-    this.bubbleContainer.position.set(
-      dimredLayoutStore.dimredXPadding,
-      dimredLayoutStore.dimredYPadding,
-    )
-    // for debugging the bubbleContainer position
-    // this.bubbleContainer.addBackground(0x00ffff)
-    // this.bubbleContainer.setBackgroundDimensions(
-    //   dimredLayoutStore.dimredSize,
-    //   dimredLayoutStore.dimredSize,
-    // )
   }
 
   clear() {
@@ -111,31 +98,56 @@ export class PixiDimredApp extends Application {
   }
 
   testScaling() {
-    // setting the pivot to be the center of the bubble container
-    this.bubbleContainer.pivot.set(this.bubbleContainer.width / 2, this.bubbleContainer.height / 2)
-    console.log(`setting the pivot to ${this.bubbleContainer.pivot.x}, ${this.bubbleContainer.pivot.y}`)
+    // console.log('🎾 SCALING')
+    const dimredLayoutStore = useDimredLayoutStore()
 
-    const currentScale = this.bubbleContainer.scale.x
-    this.bubbleContainer.scale.set(currentScale + 0.1)
-    console.log(`setting the scale from ${currentScale} to ${this.bubbleContainer.scale.x}`)
+    // reset postion and scale to prevent weird iteration effects
+    this.bubbleContainer.position.set(0, 0)
+    this.bubbleContainer.scale.set(1, 1)
+    // also reset the scale of the individual bubbles
+    this.bubbleContainer.children.forEach((bubble) => {
+      bubble.scale.set(1, 1);
+    });
+
+    // Bounding box of the bubbles
+    const { minX, minY, maxX, maxY } = this.bubbleContainer.getBounds();
+    // console.log({ minX, minY, maxX, maxY });
+    // console.log(`bubbleContainer: ${this.bubbleContainer.x}, ${this.bubbleContainer.y}, ${this.bubbleContainer.width}, ${this.bubbleContainer.height}`);
+
+    // Size of the available space
+    const availableWidth = dimredLayoutStore.dimredSize
+    const availableHeight = dimredLayoutStore.dimredSize
+    const offsetX = dimredLayoutStore.bubbleSizeMaximal * 1.5
+    const offsetY = dimredLayoutStore.bubbleSizeMaximal * 1.5
+
+    // translate the bubbles to fit the available space
+    const scaleFactor = Math.min(availableWidth / (maxX - minX), availableHeight / (maxY - minY));
+    // console.log({scaleFactor});
+    this.bubbleContainer.scale.set(this.bubbleContainer.scale.x * scaleFactor, this.bubbleContainer.scale.y * scaleFactor);
+    // console.log(`bubbleContainer: ${this.bubbleContainer.x}, ${this.bubbleContainer.y}, ${this.bubbleContainer.width}, ${this.bubbleContainer.height}`);
+
+    // apply reverse scaling to the individual bubbles to keep their size
+    this.bubbleContainer.children.forEach((bubble) => {
+      // bubble.pivot.set(bubble.width / 2, bubble.height / 2);
+      bubble.scale.set(bubble.scale.x / scaleFactor, bubble.scale.y / scaleFactor);
+    });
+
+    // translate the container such that the bounds is in the top left corner
+    const bounds2 = this.bubbleContainer.getBounds();
+    // console.log({ bounds2 });
+    this.bubbleContainer.position.set(
+      this.bubbleContainer.x - bounds2.x,
+      this.bubbleContainer.y - bounds2.y,
+    );
+
+    const bounds3 = this.bubbleContainer.getBounds();
+    // console.log({ bounds3 });
+
+    // translate the container to the center and add padding
+    this.bubbleContainer.position.set(
+      this.bubbleContainer.x + (availableWidth - bounds3.width) / 2 + offsetX,
+      this.bubbleContainer.y + (availableHeight - bounds3.height) / 2 + offsetY,
+    );
+
   }
-
-  // NOTE: here I tried to dynamically scale to reduce white space in the dimred. I gave up.
-  // scaleToBubbleBoundingBox() {
-  //   const { minX, minY, maxX, maxY } = this.bubbleContainer.getBounds()
-  //   const spanX = maxX - minX // how much space the bubbles take up in x direction
-  //   const spanY = maxY - minY // how much space the bubbles take up in y direction
-  //   console.log({ minX, minY, maxX, maxY, spanX, spanY })
-
-  //   const dimredLayoutStore = useDimredLayoutStore()
-
-  //   // "zoom-in" by scaling the bubble container
-  //   const scaleFactor = dimredLayoutStore.dimredSize / Math.max(spanX, spanY)
-  //   console.log({ scaleFactor })
-  //   this.bubbleContainer.scale.set(scaleFactor)
-
-  //   // translate the bubble container to the center
-  //   this.bubbleContainer.x = dimredLayoutStore.dimredXPadding - minX * scaleFactor
-  //   this.bubbleContainer.y = dimredLayoutStore.dimredYPadding - minY * scaleFactor
-  // }
 }

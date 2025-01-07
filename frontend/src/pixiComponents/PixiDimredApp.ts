@@ -98,6 +98,7 @@ export class PixiDimredApp extends Application {
   }
 
   testScaling() {
+    // console.log('🎾 SCALING')
     const dimredLayoutStore = useDimredLayoutStore()
 
     // reset postion and scale to prevent weird iteration effects

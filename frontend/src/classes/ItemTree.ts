@@ -8,6 +8,7 @@ import {
   schemeCategory10,
 } from 'd3'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
+import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
 
 export class ItemTree {
   root: AggregateRow
@@ -156,6 +157,9 @@ export class ItemTree {
         pointer = pointer.nextSibling
       }
     }
+
+    // trigger a rescaling of the dimred
+    this.updateDimredNeedsToBeScaled()
   }
 
   // this function might be moved to the heatmapLayoutStore
@@ -170,6 +174,12 @@ export class ItemTree {
         row.position <= lastVisibleRowIndex,
       )
     })
+  }
+
+  // bit hacky solution to trigger rescaling of the dimred
+  updateDimredNeedsToBeScaled() {
+    const dimredLayoutStore = useDimredLayoutStore()
+    dimredLayoutStore.dimredNeedsToBeScaled++
   }
 
   // NOTE: because I need access to all rows in a flat array quite often, maybe I should store them in a flat array for instant access without traversal

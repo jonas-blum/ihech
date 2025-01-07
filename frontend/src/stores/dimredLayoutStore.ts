@@ -11,6 +11,8 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     tilePadding: 5, // padding of items inside the "layout tiles"
     tileMargin: 20, // margin between "layout tiles"
 
+    dimredNeedsToBeScaled: 0, // counter that is incremented when the dimred needs to be scaled (because rows where expanded or collapsed)
+
     animationDuration: 0.3, // duration of animations in seconds
     showParentBubbles: false, // whether to show the parent bubbles in the dimred
 

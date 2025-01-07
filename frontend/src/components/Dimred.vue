@@ -128,6 +128,27 @@ watch(
   },
 )
 
+// watch for change in dimredNeedsToBeScaled counter
+watch(
+  () => dimredLayoutStore.dimredNeedsToBeScaled,
+  (newValue, oldValue) => {
+    if (!pixiDimredApp) {
+      console.warn('pixiDimredApp is not set')
+      return
+    }
+
+    // console.log('🔍 Dimred.vue dimredNeedsToBeScaled changed from', oldValue, 'to', newValue)
+
+    // lets re-scale immediately in case there is no animation ...
+    // pixiDimredApp?.testScaling()
+
+    // ... and re-scale after the animation is finished
+    setTimeout(() => {
+      pixiDimredApp?.testScaling()
+    }, dimredLayoutStore.animationDuration * 1000)
+  },
+)
+
 function clear() {
   console.log('🧹 Dimred.vue clear')
   const clearStart = performance.now()
@@ -247,17 +268,6 @@ const containerX = ref(0)
 const containerV = ref(0)
 
 function debug() {
-  let bounds = pixiDimredApp?.bubbleContainer.getBounds()
-  console.log(bounds)
-
-  let width = bounds.maxX - bounds.minX
-  let height = bounds.maxY - bounds.minY
-
-  console.log('width', width)
-  console.log('height', height)
-  console.log(`position: x: ${pixiDimredApp?.bubbleContainer.position.x}, y: ${pixiDimredApp?.bubbleContainer.position.y}`)
-  containerX.value = pixiDimredApp?.bubbleContainer.position.x
-  containerV.value = pixiDimredApp?.bubbleContainer.position.y
 
 }
 

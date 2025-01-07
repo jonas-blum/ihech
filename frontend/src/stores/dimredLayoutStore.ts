@@ -28,7 +28,10 @@ export const useDimredLayoutStore = defineStore('dimredLayoutStore', {
     },
     // needs to be a square, so we take the smaller of the two dimensions.. and take some padding
     dimredSize(): number {
-      return Math.min(this.canvasInnerWidth, this.canvasInnerHeight) - 3*this.bubbleSizeMaximal
+      return Math.min(
+        this.dimredTileFrame.width - this.tilePadding * 2 - this.bubbleSizeMaximal * 2.2, 
+        this.dimredTileFrame.height - this.tilePadding * 2 - this.bubbleSizeMaximal * 2.2
+      )
     },
     // if the canvasWidth > canvasHeight, we need to center the dimred horizontally
     dimredXPadding(): number {

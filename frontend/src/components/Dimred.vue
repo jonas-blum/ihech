@@ -264,8 +264,7 @@ function debug() {
 
 function debug2() {
   if (pixiDimredApp) {
-    pixiDimredApp.bubbleContainer.position.x = containerX.value
-    pixiDimredApp.bubbleContainer.position.y = containerV.value
+    pixiDimredApp.testScaling()
   }
 }
 </script>
@@ -275,9 +274,9 @@ function debug2() {
 
     <div class="absolute z-10 bottom-12 w-[300px] flex gap-2 bg-white p-2 border-[1px] border-black">
       <button @click="debug" class="btn btn-xs">DEBUG</button>
-      <input type="number" v-model="containerX" class="input input-xs w-16" />
-      <input type="number" v-model="containerV" class="input input-xs w-16" />
-      <button @click="debug2" class="btn btn-xs">Set coords</button>
+      <!-- <input type="number" v-model="containerX" class="input input-xs w-16" />
+      <input type="number" v-model="containerV" class="input input-xs w-16" /> -->
+      <button @click="debug2" class="btn btn-xs">testScaling</button>
       <span>{{ dimredLayoutStore.dimredSize }}</span>
     </div>
 

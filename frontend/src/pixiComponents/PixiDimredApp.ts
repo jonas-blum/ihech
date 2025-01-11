@@ -114,14 +114,12 @@ export class PixiDimredApp extends Application {
     // console.log({ minX, minY, maxX, maxY });
     // console.log(`bubbleContainer: ${this.bubbleContainer.x}, ${this.bubbleContainer.y}, ${this.bubbleContainer.width}, ${this.bubbleContainer.height}`);
 
-    // Size of the available space
-    const availableWidth = dimredLayoutStore.dimredSize
-    const availableHeight = dimredLayoutStore.dimredSize
+    // offsets
     const offsetX = dimredLayoutStore.bubbleSizeMaximal * 1.5
     const offsetY = dimredLayoutStore.bubbleSizeMaximal * 1.5
 
-    // translate the bubbles to fit the available space
-    const scaleFactor = Math.min(availableWidth / (maxX - minX), availableHeight / (maxY - minY));
+    // scale the bubbles to fit the available space
+    const scaleFactor = Math.min(dimredLayoutStore.dimredSize / (maxX - minX), dimredLayoutStore.dimredSize / (maxY - minY));
     // console.log({scaleFactor});
     this.bubbleContainer.scale.set(this.bubbleContainer.scale.x * scaleFactor, this.bubbleContainer.scale.y * scaleFactor);
     // console.log(`bubbleContainer: ${this.bubbleContainer.x}, ${this.bubbleContainer.y}, ${this.bubbleContainer.width}, ${this.bubbleContainer.height}`);
@@ -144,6 +142,8 @@ export class PixiDimredApp extends Application {
     // console.log({ bounds3 });
 
     // translate the container to the center and add padding
+    const availableWidth = dimredLayoutStore.dimredTileFrame.width
+    const availableHeight = dimredLayoutStore.dimredTileFrame.height
     this.bubbleContainer.position.set(
       this.bubbleContainer.x + (availableWidth - bounds3.width) / 2 + offsetX,
       this.bubbleContainer.y + (availableHeight - bounds3.height) / 2 + offsetY,

@@ -93,15 +93,11 @@ dic = {
     "itemNamePlural": "municipalities",
     "attributeNameSingular": "vote",
     "attributeNamePlural": "votes",
-    "cellHoverTextSnippet1": "Municipalities of",
     "cellHoverTextSnippet2": {
-        "single": "participated in",
-        "plural": "participated on average in"
+        "single": "has a participation rate of",
+        "plural": "have a participation rate of"
     },
-    "cellHoverTextSnippet3": {
-        "single": "% of votes",
-        "plural": "% of votes on this group of"
-    },
+    "cellHoverTextSnippet3": "% for",
     "defaultSettings": {
         "clusterItemsByCollections": True,
         "clusterAttributesByCollections": True,

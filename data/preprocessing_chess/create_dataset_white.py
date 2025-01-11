@@ -92,15 +92,11 @@ dic = {
     "itemNamePlural": "players",
     "attributeNameSingular": "opening",
     "attributeNamePlural": "openings",
-    "cellHoverTextSnippet1": "",
     "cellHoverTextSnippet2": {
-        "single": "",
-        "plural": ""
+        "single": "has played",
+        "plural": "have played"
     },
-    "cellHoverTextSnippet3": {
-        "single": "",
-        "plural": ""
-    },
+    "cellHoverTextSnippet3": "% of times",
     "defaultSettings": {
         "clusterItemsByCollections": True,
         "clusterAttributesByCollections": True,
@@ -116,7 +112,7 @@ dic = {
         },
         "colorMapZeroColor": "#ffffff",
         "colorMapLogarithmic": True,
-        "groupAttributesBy": ["ECO Category", "Opening Family"],
+        "groupAttributesBy": ["ECO Category", "Opening Family", "Opening Variation"],
         "groupItemsBy": [],
         "scaling": "STANDARDIZING",
     },

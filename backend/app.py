@@ -79,19 +79,19 @@ def get_heatmap():
         cache_key = hashlib.sha256(settings_str.encode("utf-8")).hexdigest()
 
         # Check if we have a cached response for these settings
-        # if cache_key in heatmap_cache:
-        #     logger.info("Cache hit. Returning cached result.")
-        #     cached_heatmap_json = heatmap_cache[cache_key]
+        if cache_key in heatmap_cache:
+            logger.info("Cache hit. Returning cached result.")
+            cached_heatmap_json = heatmap_cache[cache_key]
 
-        #     def cached_generate():
-        #         for chunk in json.JSONEncoder(default=custom_encoder).iterencode(
-        #             cached_heatmap_json
-        #         ):
-        #             yield chunk
+            def cached_generate():
+                for chunk in json.JSONEncoder(default=custom_encoder).iterencode(
+                    cached_heatmap_json
+                ):
+                    yield chunk
 
-        #     return Response(
-        #         stream_with_context(cached_generate()), mimetype="application/json"
-        #     )
+            return Response(
+                stream_with_context(cached_generate()), mimetype="application/json"
+            )
 
         # Not cached, we must compute
         csv_file = StringIO(heatmap_settings.csvFile)

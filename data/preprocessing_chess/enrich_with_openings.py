@@ -23,7 +23,7 @@ eco_books_mapping = {
     'A': 'Flank Openings',
     'B': 'Semi-Open Games',
     'C': 'Open Games',
-    'D': 'Closed Semi-Closed Games',
+    'D': 'Closed and Semi-Closed Games',
     'E': 'Indian Defences',
 }
 

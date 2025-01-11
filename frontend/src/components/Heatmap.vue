@@ -605,18 +605,38 @@ onMounted(async () => {
   <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md max-w-[400px]" :style="tooltipStyle"
     v-show="mainStore.hoveredPixiHeatmapCell" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
     @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
-    <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet1 }}</span>
-    <span class="font-bold mx-[3px]">{{ mainStore.highlightedRow?.getName() }}</span>
-    <span class="mx-[3px]" v-if="(mainStore.highlightedRow instanceof ItemRow)">{{
-      mainStore.getActiveDataTable?.cellHoverTextSnippet2.single }}</span>
-    <span class="mx-[3px]" v-else>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet2.plural }}</span>
-    <span class="font-bold mx-[3px]">
-      {{ mainStore.hoveredPixiHeatmapCell?.value }}
-    </span>
-    <span class="mx-[3px]" v-if="(mainStore.highlightedColumn instanceof AttributeColumn)">{{
-      mainStore.getActiveDataTable?.cellHoverTextSnippet3.single }}</span>
-    <span class="mx-[3px]" v-else>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3.plural }}</span>
-    <span class="font-bold mx-[3px]">{{ mainStore.highlightedColumn?.getName() }}</span>
+
+    <!-- The item [itemName] [.. has verb ..] -->
+    <div class="inline" v-if="(mainStore.highlightedRow instanceof ItemRow)">
+      <span class="mx-[3px]">The {{ mainStore.getActiveDataTable?.itemNameSingular }}</span>
+      <span class="font-bold mx-[3px]">{{ mainStore.highlightedRow?.getName() }}</span>
+      <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet2.single }}</span>
+    </div>
+    <!-- The group of items ([itemGroupName]) [.. have verb ..] -->
+    <div class="inline" v-else>
+      <span class="mx-[3px]">This group of {{ mainStore.getActiveDataTable?.itemNamePlural }}</span>
+      <span class="font-bold mx-[3px]">({{ mainStore.highlightedRow?.getName() }})</span>
+      <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet2.plural }}</span>
+    </div>
+
+    <!-- [value] [%] -->
+    <div class="inline">
+      <span class="font-bold mx-[3px]">
+        {{ mainStore.hoveredPixiHeatmapCell?.value }}
+      </span>
+      <span>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3 }}</span>
+    </div>
+
+    <!-- single attribute -->
+    <div class="inline" v-if="(mainStore.highlightedColumn instanceof AttributeColumn)">
+      <span class="mx-[3px]">the {{ mainStore.getActiveDataTable?.attributeNameSingular }}</span>
+      <span class="font-bold mx-[3px]">{{ mainStore.highlightedColumn?.getName() }}</span>
+    </div>
+    <!-- attribute aggregate  -->
+    <div class="inline" v-else>
+      <span class="mx-[3px]">this group of {{ mainStore.getActiveDataTable?.attributeNamePlural }}</span>
+      <span class="font-bold mx-[3px]">({{ mainStore.highlightedColumn?.getName() }})</span>
+    </div>
   </div>
 
   <!-- Attribute Tooltip -->

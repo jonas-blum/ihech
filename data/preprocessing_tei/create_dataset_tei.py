@@ -53,15 +53,11 @@ dic = {
     "itemNamePlural": "documents",
     "attributeNameSingular": "tag",
     "attributeNamePlural": "tags",
-    "cellHoverTextSnippet1": "",
     "cellHoverTextSnippet2": {
-        "single": "",
-        "plural": ""
+        "single": "does use (",
+        "plural": "do use ("
     },
-    "cellHoverTextSnippet3": {
-        "single": "",
-        "plural": ""
-    },
+    "cellHoverTextSnippet3": ")",
     "defaultSettings": {
         "clusterItemsByCollections": True,
         "clusterAttributesByCollections": True,

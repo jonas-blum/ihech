@@ -144,7 +144,15 @@ export class PixiRow extends PixiContainer {
 
     // this.filters = highlighted ? [new OutlineFilter()] : []
     // this.filters = highlighted ? [new DropShadowFilter()] : []
-    this.filters = highlighted ? [new GlowFilter()] : []
+    this.filters = highlighted ? [new GlowFilter(
+      {
+        // distance: 15,
+        // outerStrength: 2,
+        // innerStrength: 0,
+        color: 0x000000,
+        // quality: 0.1,
+      }
+    )] : []
   }
 }
 

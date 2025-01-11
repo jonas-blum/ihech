@@ -193,7 +193,8 @@ export class PixiBubble extends PixiContainer {
       this.parent.setChildIndex(this, this.parent.children.length - 1)
     }
 
-    this.filters = highlighted ? [new GlowFilter()] : []
+    this.bubbleGraphic.filters = highlighted ? [new OutlineFilter()] : []
+    
     this.updateOpacity(highlighted ? 1 : 0.5)
   }
 }

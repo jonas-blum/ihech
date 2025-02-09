@@ -73,8 +73,8 @@ def cluster_items_recursively(
     if cluster_by_collections and len(collection_column_names) > 0:
         new_collection_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
         collection_column_name = collection_column_names[0]
-        for collection, original_group_df in original_df.groupby(
-            collection_column_name
+        for collection, original_group_df in sorted(
+            original_df.groupby(collection_column_name), key=lambda x: x[0].lower()
         ):
             remaining_collection_column_names = collection_column_names[1:]
 
@@ -97,7 +97,9 @@ def cluster_items_recursively(
                 and len(remaining_collection_column_names) == 0
             ):
                 solo_child_name = str(original_group_df.iloc[0][item_names_column_name])
-                solo_child_data = np.round(original_temp_df_dropped.iloc[0],rounding_precision).tolist()
+                solo_child_data = np.round(
+                    original_temp_df_dropped.iloc[0], rounding_precision
+                ).tolist()
                 new_children = [
                     ItemNameAndData(
                         index=original_group_df.index[0],
@@ -145,9 +147,6 @@ def cluster_items_recursively(
                 (new_item_name_and_data, scaled_temp_df_mean)
             )
 
-        new_collection_item_names_and_data = sorted(
-            new_collection_item_names_and_data, key=lambda x: x[1], reverse=True
-        )
         new_collection_item_names_and_data_to_return = [
             x[0] for x in new_collection_item_names_and_data
         ]

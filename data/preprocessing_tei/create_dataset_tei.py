@@ -34,6 +34,13 @@ for index, document in documents.iterrows():
     tag_string = document['attributes']
     for tag_index, tag in tags.iterrows():
         value = len(re.findall(f'<{tag["tag"]}>', tag_string))
+        
+        # BINARY MODE !!!
+        if value > 0:
+            value = 1
+        else:
+            value = 0
+        
         # print(f'Document: {document["name"]}, Tag: {tag["tag"]}, Value: {value}')
         row.append(value)
 
@@ -54,10 +61,10 @@ dic = {
     "attributeNameSingular": "tag",
     "attributeNamePlural": "tags",
     "cellHoverTextSnippet2": {
-        "single": "does use (",
-        "plural": "do use ("
+        "single": "does use",
+        "plural": "do use"
     },
-    "cellHoverTextSnippet3": ")",
+    "cellHoverTextSnippet3": "tags of",
     "defaultSettings": {
         "clusterItemsByCollections": True,
         "clusterAttributesByCollections": True,
@@ -65,17 +72,21 @@ dic = {
         "attributesClusterSize": -1,
         "dimReductionAlgo": "UMAP",
         "clusterAfterDimRed": False,
-        "itemAggregateMethod": "mean",
-        "attributeAggregateMethod": "binary", 
+        "itemAggregateMethod": "binary",
+        "attributeAggregateMethod": "sum",
         "colorMapBreakpoints": {
-            "0.01": "#eeeeee",
-            "1": "#000000"
+            "1": "#eeeeee",
+            "20": "#666666"
         },
         "colorMapZeroColor": "#ffffff",
         "colorMapLogarithmic": False,
-        "groupAttributesBy": ["Module"],
-        "groupItemsBy": ["Digital Edition"],
-        "scaling": "BINARY",
+        "groupAttributesBy": [
+            "Module"
+        ],
+        "groupItemsBy": [
+            "Digital Edition"
+        ],
+        "scaling": "BINARY"
     },
     "csvFile": df.to_csv(index=False, header=False),
 }

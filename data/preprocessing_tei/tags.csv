@@ -587,4 +587,7 @@ metDecl,verse,"(metrical notation declaration) documents the notation employed t
 metSym,verse,"(metrical notation symbol) documents the intended significance of a particular character or character sequence within a metrical notation, either explicitly or in terms of other metSym elements in the same metDecl."
 rhyme,verse,marks the rhyming part of a metrical line.
 blackening,custom,
+qv,custom,
+zfn,custom,
+zzl,custom,
 comment,custom,

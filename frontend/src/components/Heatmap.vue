@@ -505,7 +505,6 @@ function startRenderer() {
 }
 
 function reloadHeatmap() {
-  mainStore.setJsonUploadOpen(false)
   mainStore.fetchData()
 }
 

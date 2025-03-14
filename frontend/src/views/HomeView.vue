@@ -11,11 +11,6 @@ const mainStore = useMainStore()
 const heatmapLayoutStore = useHeatmapLayoutStore()
 const dimredLayoutStore = useDimredLayoutStore()
 
-function reloadHeatmap() {
-  mainStore.setJsonUploadOpen(false)
-  mainStore.fetchData()
-}
-
 // global click event listener to close all kinds of menus
 document.addEventListener('click', (event) => {
   mainStore.closeMenus()

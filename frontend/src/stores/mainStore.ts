@@ -1,16 +1,11 @@
 import { defineStore } from 'pinia'
 import {
-  type HeatmapJSON,
   type ItemNameAndData,
-  findRowByIndex,
   type JsonDataTableProfile,
-  ScalingEnum,
   DimReductionAlgoEnum,
   SortOrderAttributes,
   type HeatmapSettings,
   ColoringHeatmapEnum,
-  getDistinctColor,
-  interpolateColor,
   type HierarchicalAttribute,
 } from '@/helpers/helpers'
 import { ItemTree } from '@/classes/ItemTree'
@@ -74,15 +69,8 @@ export const useMainStore = defineStore('mainStore', {
       minAttributeValues: [] as number[],
     },
 
-    attributeMap: new Map(),
-
-    rowCollectionsMap: new Map(),
-
-    allItems: [],
-
     dataChanging: 1,
     loading: false,
-    timer: 0,
 
     outOfSync: false,
     reloadingScheduled: false,
@@ -207,31 +195,6 @@ export const useMainStore = defineStore('mainStore', {
       }
       this.colorMap.setZeroColor(defaultSettings.colorMapZeroColor)
       this.colorMap.setLogarithmic(defaultSettings.colorMapLogarithmic)
-    },
-    setJsonUploadOpen(open: boolean) {
-      nextTick(() => {
-        this.csvUploadOpen = open
-      })
-    },
-
-    getInitialAttrIdx(newAttrIdx: number): number {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return newAttrIdx
-      }
-      return this.attributeMap.get(newAttrIdx) ?? newAttrIdx
-    },
-
-    getAttrDissFromNewIdx(newAttrIdx: number): number {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return 0
-      }
-      const initialIdx = this.attributeMap.get(newAttrIdx)
-      if (initialIdx === undefined) {
-        return 0
-      }
-      return this.heatmap.attributeDissimilarities[initialIdx]
     },
 
     async fetchData() {

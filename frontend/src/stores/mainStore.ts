@@ -135,65 +135,14 @@ export const useMainStore = defineStore('mainStore', {
     getMaxAttributeValues: (state) => state.heatmap.maxAttributeValues,
     getMinAttributeValues: (state) => state.heatmap.minAttributeValues,
 
-    getAmountOfStickyItems: (state) =>
-      state.activeDataTable ? state.activeDataTable.stickyItemIndexes.length : 0,
-    getAmountOfStickyAttributes: (state) =>
-      state.activeDataTable ? state.activeDataTable.stickyAttributes.length : 0,
-
-    isStickyItemsGapVisible: (state) => {
-      if (!state.activeDataTable) {
-        return false
-      }
-      return state.activeDataTable.stickyItemIndexes.length > 0
-    },
-
-    isStickyAttributesGapVisible: (state) => {
-      if (!state.activeDataTable) {
-        return false
-      }
-      return state.activeDataTable.stickyAttributes.length > 0
-    },
-
-    getStickyItems: (state) => {
-      if (!state.activeDataTable) {
-        return []
-      }
-      return state.heatmap.itemNamesAndData.slice(0, state.activeDataTable.stickyItemIndexes.length)
-    },
-
-    getNonStickyItems: (state) => {
-      if (!state.activeDataTable) {
-        return []
-      }
-      return state.heatmap.itemNamesAndData.slice(state.activeDataTable.stickyItemIndexes.length)
-    },
-
     getHierarchicalRowsMetadataColumnNames: (state) =>
       state.activeDataTable?.hierarchicalRowsMetadataColumnNames ?? [],
     getHierarchicalColumnsMetadataRowIndexes: (state) =>
       state.activeDataTable?.hierarchicalColumnsMetadataRowIndexes ?? [],
 
-    getAllItems: (state) => state.allItems,
-
-    getLogShiftValue: (state) => state.heatmap.minHeatmapValue + 1,
-
-    getDataChanging: (state) => state.dataChanging,
     isLoading: (state) => state.loading,
-    getTimer: (state) => state.timer,
 
     isOutOfSync: (state) => state.outOfSync,
-
-    isJsonUploadOpen: (state) => state.csvUploadOpen,
-
-    isColorScaleNotShown: (state) => {
-      if (!state.activeDataTable) {
-        return false
-      }
-      return (
-        state.activeDataTable.coloringHeatmap === ColoringHeatmapEnum.ITEM_RELATIVE ||
-        state.activeDataTable.coloringHeatmap === ColoringHeatmapEnum.ATTRIBUTE_RELATIVE
-      )
-    },
   },
   actions: {
     saveDataTable(dataTable: JsonDataTableProfile, fetchData = true) {
@@ -430,9 +379,6 @@ export const useMainStore = defineStore('mainStore', {
     //   this.colorMap.addBreakpoint(b2)
     // },
 
-    setTimer(timer: number) {
-      this.timer = timer
-    },
     setScaling(scaling: ScalingEnum) {
       if (!this.activeDataTable) {
         console.error('No active data table')
@@ -606,215 +552,8 @@ export const useMainStore = defineStore('mainStore', {
       console.log('changing heatmap', this.dataChanging)
     },
 
-    buildRowCollectionsMapRecursively(item: ItemNameAndData): Set<string> {
-      let collectionOfItem = undefined
-      if (item.index !== null) {
-        collectionOfItem = this.activeDataTable?.itemCollectionMap[item.index]
-      }
-      const allCollections = new Set<string>()
-      if (collectionOfItem !== undefined) {
-        allCollections.add(collectionOfItem)
-      }
-      if (item.children) {
-        for (const child of item.children) {
-          this.buildRowCollectionsMapRecursively(child).forEach((collection) => {
-            allCollections.add(collection)
-          })
-        }
-      }
-      this.rowCollectionsMap.set(item, allCollections)
-      return allCollections
-    },
-    buildRowCollectionsMap(): void {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-      this.heatmap.itemNamesAndData.forEach((item) => {
-        this.buildRowCollectionsMapRecursively(item)
-      })
-    },
-
-    getCollectionNamesOfItem(item: ItemNameAndData): string[] {
-      return Array.from(this.rowCollectionsMap.get(item) ?? [])
-    },
-    updateSelectedItemIndexesBasedOnSelectedCollections(): void {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-      const newSelectedItemIndexes: number[] = []
-      if (
-        this.activeDataTable.hierarchicalRowsMetadataColumnNames.length === 0 ||
-        this.activeDataTable.selectedFirstLayerCollections.length === 0
-      ) {
-        this.activeDataTable.df.forEach((row, index) => {
-          newSelectedItemIndexes.push(index)
-        })
-      } else {
-        const selectedCollections = this.activeDataTable.selectedFirstLayerCollections
-        const collectionColumnName = this.activeDataTable.hierarchicalRowsMetadataColumnNames[0]
-
-        this.activeDataTable.df.forEach((row, index) => {
-          const rowCollection = row[collectionColumnName.label]
-          if (selectedCollections.includes(rowCollection)) {
-            newSelectedItemIndexes.push(index)
-          }
-        })
-      }
-      this.activeDataTable.allRowIndexes = newSelectedItemIndexes
-    },
-
-    isCollectionEnabled(collection: string): boolean {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return false
-      }
-      return this.activeDataTable.selectedFirstLayerCollections.includes(collection)
-    },
-    areAllCollectionsEnabled(): boolean {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return false
-      }
-
-      return (
-        this.activeDataTable.selectedFirstLayerCollections.length ===
-        this.activeDataTable.firstLayerCollectionNames.length
-      )
-    },
-    toggleAllCollectionsEnabled() {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-      if (this.areAllCollectionsEnabled()) {
-        this.activeDataTable.selectedFirstLayerCollections = []
-      } else {
-        this.activeDataTable.selectedFirstLayerCollections =
-          this.activeDataTable.firstLayerCollectionNames
-      }
-      this.updateSelectedItemIndexesBasedOnSelectedCollections()
-      this.changeHeatmap()
-      this.setIsOutOfSync(true)
-    },
-    toggleCollectionEnabled(collection: string) {
-      if (this.isCollectionEnabled(collection)) {
-        this.disabledCollection(collection)
-      } else {
-        this.enableCollection(collection)
-      }
-    },
-    enableCollection(collection: string) {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-      this.activeDataTable.selectedFirstLayerCollections.push(collection)
-      this.updateSelectedItemIndexesBasedOnSelectedCollections()
-      this.changeHeatmap()
-      this.setIsOutOfSync(true)
-    },
-    disabledCollection(collection: string) {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-      this.activeDataTable.selectedFirstLayerCollections =
-        this.activeDataTable.selectedFirstLayerCollections.filter((col) => col !== collection)
-      this.updateSelectedItemIndexesBasedOnSelectedCollections()
-      this.changeHeatmap()
-      this.setIsOutOfSync(true)
-    },
-
     setIsOutOfSync(outOfSync: boolean) {
       this.outOfSync = outOfSync
-    },
-
-    getColorsOfItem(item: ItemNameAndData): string[] {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return ['black']
-      }
-      if (this.activeDataTable.hierarchicalRowsMetadataColumnNames.length === 0) {
-        let topMostParent = item
-        while (topMostParent.parent !== null && topMostParent.parent.parent !== null) {
-          topMostParent = topMostParent.parent
-        }
-        const childrenOfTopmostItem = this.getNonStickyItems[0]?.children
-        if (childrenOfTopmostItem === null || childrenOfTopmostItem === undefined) {
-          return ['black']
-        }
-        const index = childrenOfTopmostItem.indexOf(topMostParent)
-        return [getDistinctColor(index)]
-      }
-
-      const collectionsOfItem = this.getCollectionNamesOfItem(item)
-      const colors: string[] = []
-      for (const collection of collectionsOfItem) {
-        const color = this.activeDataTable.collectionColorMap[collection]
-        if (color) {
-          colors.push(color)
-        }
-      }
-      return colors
-    },
-    getColorOfCollection(collection: string): string {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return 'black'
-      }
-      return this.activeDataTable.collectionColorMap[collection] || 'black'
-    },
-    setColorOfCollection(collection: string, color: string) {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-      this.activeDataTable.collectionColorMap[collection] = color
-      this.changeHeatmap()
-    },
-
-    toggleShowOnlyStickyItemsInDimReduction(showOnlyStickyItemsInDimRed: boolean) {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        return
-      }
-
-      this.activeDataTable.showOnlyStickyItemsInDimReduction = showOnlyStickyItemsInDimRed
-    },
-    toggleStickyItem(stickyItem: ItemNameAndData) {
-      if (!this.activeDataTable) {
-        console.error('No active data table')
-        throw new Error('No active data table')
-      }
-
-      if (stickyItem.children) {
-        return
-      }
-
-      const stickyItems = this.getStickyItems
-
-      const previousNonStickyItems = this.heatmap.itemNamesAndData.slice(
-        stickyItems.length,
-        undefined,
-      )
-
-      if (stickyItems.includes(stickyItem)) {
-        this.activeDataTable.stickyItemIndexes = this.activeDataTable.stickyItemIndexes.filter(
-          (item) => item !== stickyItem.index,
-        )
-        stickyItems.splice(stickyItems.indexOf(stickyItem), 1)
-        this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
-      } else {
-        if (stickyItem.index !== null) {
-          this.activeDataTable.stickyItemIndexes.push(stickyItem.index)
-          stickyItems.push(stickyItem)
-          this.heatmap.itemNamesAndData = [...stickyItems, ...previousNonStickyItems]
-        }
-      }
-
-      this.changeHeatmap()
     },
 
     // used as a trigger from the RowSorter to re-sort the rows

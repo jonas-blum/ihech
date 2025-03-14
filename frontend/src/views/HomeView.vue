@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Heatmap from '@/components/Heatmap.vue'
 import Dimred from '@/components/Dimred.vue'
-import HeatmapSettings from '@/components/HeatmapSettings.vue'
 import CsvUpload from '@/components/CsvUpload.vue'
 import InteractiveSettings from '@/components/InteractiveSettings.vue'
 import { useMainStore } from '@stores/mainStore'
@@ -90,5 +89,4 @@ document.addEventListener('keydown', (event) => {
     </div>
   </div>
   <CsvUpload />
-  <HeatmapSettings />
 </template>

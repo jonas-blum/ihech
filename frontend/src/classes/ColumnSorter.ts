@@ -88,6 +88,19 @@ export class ColumnSorterCriterionByName extends ColumnSorterCriterion {
   }
 }
 
+export class ColumnSorterCriterionByHasChildren extends ColumnSorterCriterion {
+  constructor(reverse: boolean = false) {
+    super('Has Children', 'hasChildren', reverse)
+  }
+
+  compare(column1: Column, column2: Column): number {
+    const result = 
+      column1.hasChildren() && !column2.hasChildren() ? -1 :
+      !column1.hasChildren() && column2.hasChildren() ? 1 : 0
+    return this.applyReverse(result)
+  }
+}
+
 export class ColumnSorterCriterionByStandardDeviation extends ColumnSorterCriterion {
   constructor(reverse: boolean = false) {
     super('Standard Deviation', 'standardDeviation', reverse)
@@ -98,6 +111,17 @@ export class ColumnSorterCriterionByStandardDeviation extends ColumnSorterCriter
     return this.applyReverse(result)
   }
 }
+
+// export class ColumnSorterCriterionByAmountOfChildren extends ColumnSorterCriterion {
+//   constructor(reverse: boolean = false) {
+//     super('Children Amount', 'amountOfChildren', reverse)
+//   }
+
+//   compare(column1: Column, column2: Column): number {
+//     const result = column1.totalChildrenCount - column2.totalChildrenCount
+//     return this.applyReverse(result)
+//   }
+// }
 
 export class ColumnSorterCriterionByOriginalAttributeOrder extends ColumnSorterCriterion {
   constructor(reverse: boolean = false) {

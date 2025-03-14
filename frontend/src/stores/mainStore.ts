@@ -30,6 +30,7 @@ import {
   ColumnSorterCriterionByName,
   ColumnSorterCriterionByOriginalAttributeOrder,
   ColumnSorterCriterionByStandardDeviation,
+  ColumnSorterCriterionByHasChildren,
 } from '@/classes/ColumnSorter'
 import { Container } from 'pixi.js'
 import { PixiRow } from '@/pixiComponents/PixiRow'
@@ -304,6 +305,7 @@ export const useMainStore = defineStore('mainStore', {
         this.loading = true
         const startTime = new Date().getTime()
         const settings: HeatmapSettings = this.getCurrentHeatmapSettings()
+        console.log('settings sent to backend:', settings)
 
         const requestInit: RequestInit = {
           method: 'POST',
@@ -362,13 +364,15 @@ export const useMainStore = defineStore('mainStore', {
         const criterion1 = new RowSorterCriterionByName()
         const criterion2 = new RowSorterCriterionByHasChildren()
         const criterion3 = new RowSorterCriterionByAmountOfChildren()
-        const rowSorter = new RowSorter([criterion1, criterion2, criterion3])
+        const rowSorter = new RowSorter([criterion2, criterion3, criterion1])
+        // criterion2.toggleReverse()
 
         // initialize columnSorter
         const criterionA = new ColumnSorterCriterionByOriginalAttributeOrder()
         const criterionB = new ColumnSorterCriterionByName()
         const criterionC = new ColumnSorterCriterionByStandardDeviation()
-        const columnSorter = new ColumnSorter([criterionA, criterionB, criterionC])
+        const criterionD = new ColumnSorterCriterionByHasChildren()
+        const columnSorter = new ColumnSorter([criterionA, criterionB, criterionC, criterionD])
 
         // initialize itemTree with the data received from the backend, starting at the root
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]

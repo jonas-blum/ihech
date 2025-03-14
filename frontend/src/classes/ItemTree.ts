@@ -325,6 +325,20 @@ export class ItemTree {
     // TODO: what about the case when there is no semantic and dynamic clustering?
     this.root.children.forEach((row, index) => {
       row.color = this.colorScheme(index / (this.root.children.length - 1))
+
+      // for screenshots
+      // if (index == 0) {
+      //   row.color = 0x000000
+      // }
+      // if (index == 1) {
+      //   row.color = 0x000000
+      // }
+      // if (index == 2) {
+      //   row.color = 0x0099FF
+      // }
+      // if (index == 3) {
+      //   row.color = 0x2BA12D
+      // }
     })
   }
 }

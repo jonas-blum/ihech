@@ -622,21 +622,21 @@ onMounted(async () => {
     <!-- [value] [%] -->
     <div class="inline">
       <span class="font-bold mx-[3px]">
-        {{ mainStore.hoveredPixiHeatmapCell?.value }}
+        {{ mainStore.hoveredPixiHeatmapCell?.value }} tags
       </span>
-      <span>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3 }}</span>
+      <!-- <span>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3 }}</span> -->
     </div>
 
     <!-- single attribute -->
-    <div class="inline" v-if="(mainStore.highlightedColumn instanceof AttributeColumn)">
+    <!-- <div class="inline" v-if="(mainStore.highlightedColumn instanceof AttributeColumn)">
       <span class="mx-[3px]">the {{ mainStore.getActiveDataTable?.attributeNameSingular }}</span>
       <span class="font-bold mx-[3px]">{{ mainStore.highlightedColumn?.getName() }}</span>
-    </div>
+    </div> -->
     <!-- attribute aggregate  -->
-    <div class="inline" v-else>
+    <!-- <div class="inline" v-else>
       <span class="mx-[3px]">this group of {{ mainStore.getActiveDataTable?.attributeNamePlural }}</span>
       <span class="font-bold mx-[3px]">({{ mainStore.highlightedColumn?.getName() }})</span>
-    </div>
+    </div> -->
   </div>
 
   <!-- Attribute Tooltip -->

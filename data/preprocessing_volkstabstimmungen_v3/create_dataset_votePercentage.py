@@ -112,7 +112,7 @@ dic = {
             "25": "#eeeeee",
             "75": "#000000"
         },
-        "colorMapZeroColor": "#ff0000",
+        "colorMapZeroColor": "#ffffff",
         "colorMapLogarithmic": False,
         "groupAttributesBy": [],
         "groupItemsBy": [],

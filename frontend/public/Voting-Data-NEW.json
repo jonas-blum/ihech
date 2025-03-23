@@ -24,7 +24,7 @@
             "25": "#eeeeee",
             "75": "#000000"
         },
-        "colorMapZeroColor": "#ff0000",
+        "colorMapZeroColor": "#ffffff",
         "colorMapLogarithmic": false,
         "groupAttributesBy": [],
         "groupItemsBy": [],

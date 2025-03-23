@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineProps, computed, ref, watch } from 'vue'
+import { Icon } from '@iconify/vue'
 import { ColorMap, Breakpoint } from '@/classes/ColorMap'
 import { ColoringHeatmapEnum, mapColoringHeatmapEnum } from '@/helpers/helpers'
 import { useMainStore } from '@/stores/mainStore'
@@ -10,10 +11,19 @@ const mainStore = useMainStore()
 const gradientStyle = ref('')
 
 const updateGradientStyle = () => {
-  const gradient = mainStore.colorMap.breakpoints
+  const breakpoints = mainStore.colorMap.breakpoints
+  if (breakpoints.length === 0) return
+
+  const minValue = breakpoints[0].value
+  const maxValue = breakpoints[breakpoints.length - 1].value
+  const range = maxValue - minValue
+
+  const gradient = breakpoints
     .map(
-      (breakpoint: Breakpoint) =>
-        `#${breakpoint.color.toString(16).padStart(6, '0')} ${breakpoint.value}%`,
+      (breakpoint: Breakpoint) => {
+        const percentage = ((breakpoint.value - minValue) / range) * 100
+        return `#${breakpoint.color.toString(16).padStart(6, '0')} ${percentage}%`
+      }
     )
     .join(', ')
   gradientStyle.value = `linear-gradient(to right, ${gradient})`
@@ -44,20 +54,23 @@ const onCreateBreakpoint = () => {
 </script>
 <template>
   <details class="collapse w-full p-2 rounded-none bg-white -translate-y-2">
-    <summary class="collapse-title p-0 rounded-none h-[30px] min-h-[20px]">
-      <div class="w-full h-[20px]" :style="{ background: gradientStyle }"></div>
-      <div class="w-full flex justify-between text-xs">
-        <span>{{ mainStore.colorMap.getLowestBreakpoint()?.value ?? '' }}</span>
-        <span>{{ mainStore.colorMap.getHighestBreakpoint()?.value ?? '' }}</span>
+    <summary class="collapse-title p-0 rounded-none h-[30px] min-h-[20px] !flex justify-between gap-1">
+      <div class="grow">
+        <div class="w-full h-[20px]" :style="{ background: gradientStyle }"></div>
+        <div class="w-full flex justify-between text-xs">
+          <span>{{ mainStore.colorMap.getLowestBreakpoint()?.value ?? '' }}</span>
+          <span>{{ mainStore.colorMap.getHighestBreakpoint()?.value ?? '' }}</span>
+        </div>
       </div>
+        <Icon icon="material-symbols:edit" class="p-0 w-4 h-4 text-opacity-50 cursor-pointer" />
     </summary>
 
     <!-- Dropdown content -->
     <div class="collapse-content rounded-sm w-full p-2 text-sm bg-white">
       <div class="flex gap-2 items-center justify-between mb-2">
         <span>use Log Scaling:</span>
-        <input type="checkbox" class="w-4 h-4" :checked="mainStore.colorMap.isLogarithmic"
-          @click.stop @change="(e) => mainStore.colorMap.setLogarithmic((e.target as HTMLInputElement).checked)" />
+        <input type="checkbox" class="w-4 h-4" :checked="mainStore.colorMap.isLogarithmic" @click.stop
+          @change="(e) => mainStore.colorMap.setLogarithmic((e.target as HTMLInputElement).checked)" />
       </div>
       <div class="flex gap-2 items-center justify-between mb-2">
         <span>Zero Color:</span>
@@ -69,16 +82,16 @@ const onCreateBreakpoint = () => {
         class="flex gap-2 items-center justify-between mb-2">
         <input type="number" class="input input-bordered input-xs w-16" :value="breakpoint.value" @click.stop @input="(payload: Event) =>
           breakpoint.setValue(parseFloat((payload.target as HTMLInputElement).value))
-          " />
+        " />
         <input type="color" class="w-8 h-[1rem]" :value="`#${breakpoint.color.toString(16).padStart(6, '0')}`"
           @click.stop @input="(payload: Event) =>
             breakpoint.setColor(parseInt((payload.target as HTMLInputElement).value.slice(1), 16))
-            " />
+          " />
         <button @click.stop="mainStore.colorMap.removeBreakpoint(breakpoint)" class="btn btn-xs">
           Remove
         </button>
       </div>
-      <button v-if="!breakpointFormOpen" @click.stop="toggleBreakpointForm" class="btn btn-xs btn-block">
+      <!-- <button v-if="!breakpointFormOpen" @click.stop="toggleBreakpointForm" class="btn btn-xs btn-block">
         New Breakpoint
       </button>
       <div v-else class="flex gap-2 items-center justify-between mb-2">
@@ -86,7 +99,7 @@ const onCreateBreakpoint = () => {
           @click.stop />
         <input type="color" class="w-8 h-[1rem]" v-model="templateBreakpoint.color" @click.stop />
         <button @click.stop="onCreateBreakpoint" class="btn btn-xs">Create</button>
-      </div>
+      </div> -->
       <!-- <div class="flex gap-2 justify-between mt-2">
         <button @click="mainStore.useDivergentColorMap" class="btn btn-xs flex-1">Divergent</button>
         <button @click="mainStore.useUniformColorMap" class="btn btn-xs flex-1">Uniform</button>

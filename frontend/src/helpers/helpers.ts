@@ -243,6 +243,7 @@ export interface UploadedJsonData {
   cellHoverTextSnippet1: string
   cellHoverTextSnippet2: { single: string; plural: string }
   cellHoverTextSnippet3: { single: string; plural: string }
+  originalAttributeOrderName: string
   defaultMinValue: number
   defaultMaxValue: number
   defaultColorBreakpoints: any

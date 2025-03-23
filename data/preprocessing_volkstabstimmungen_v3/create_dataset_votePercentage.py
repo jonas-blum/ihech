@@ -98,6 +98,7 @@ dic = {
         "plural": "have a participation rate of"
     },
     "cellHoverTextSnippet3": "% for",
+    "originalAttributeOrderName": "Datum",
     "defaultSettings": {
         "clusterItemsByCollections": True,
         "clusterAttributesByCollections": True,

@@ -10,6 +10,7 @@
         "plural": "have a participation rate of"
     },
     "cellHoverTextSnippet3": "% for",
+    "originalAttributeOrderName": "Datum",
     "defaultSettings": {
         "clusterItemsByCollections": true,
         "clusterAttributesByCollections": true,

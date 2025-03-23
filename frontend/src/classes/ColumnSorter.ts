@@ -125,7 +125,7 @@ export class ColumnSorterCriterionByStandardDeviation extends ColumnSorterCriter
 
 export class ColumnSorterCriterionByOriginalAttributeOrder extends ColumnSorterCriterion {
   constructor(reverse: boolean = false) {
-    super('Original Attribute Order', 'originalAttributeOrder', reverse)
+    super(`${useMainStore().getActiveDataTable?.originalAttributeOrderName ?? 'Original Attribute Order'}`, 'originalAttributeOrder', reverse)
   }
 
   compare(column1: Column, column2: Column): number {

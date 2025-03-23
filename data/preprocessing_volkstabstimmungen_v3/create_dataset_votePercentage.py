@@ -10,7 +10,7 @@ voting_results = pd.read_csv('voting_results.csv')
 item_metadata_columns = ['Gemeinde', 'Sprachgebiet', 'Kanton', 'Bezirk']
 
 # the metadata columns that can be used to semantically aggregate columns
-column_metadata_rows = ['Rechtsform', 'Bereich (1. Level)', 'Bereich (2. Level)', 'Bereich (3. Level)', 'Departement', 'Bundesrat', 'Parlament', 'Nationalrat', 'Ständerat']
+column_metadata_rows = ['Abstimmungsgrund', 'Politikbereich (1. Stufe)', 'Politikbereich (2. Stufe)', 'Federführendes Departement', 'Position Bundesrat', 'Position Parlament', 'Position Nationalrat', 'Position Ständerat']
 
 # NOTE: see this github issue for data structure explanation: https://github.com/jonas-blum/ihech/issues/17
 
@@ -113,8 +113,8 @@ dic = {
         },
         "colorMapZeroColor": "#ff0000",
         "colorMapLogarithmic": False,
-        "groupAttributesBy": ["Bereich (1. Level)", "Bereich (2. Level)", "Bereich (3. Level)"],
-        "groupItemsBy": ["Sprachgebiet", "Kanton"],
+        "groupAttributesBy": [],
+        "groupItemsBy": [],
         "scaling": "STANDARDIZING",
     },
     "csvFile": df.to_csv(index=False, header=False),

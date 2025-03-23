@@ -229,14 +229,14 @@ df['d1e3'] = df['d1e3'].map(politikbereich_mapping)
 
 # Departement mapping
 dep_mapping = {
-    '1': 'EDA',
-    '2': 'EDI',
-    '3': 'EJPD',
-    '4': 'VBS',
-    '5': 'EFD',
-    '6': 'WBF',
-    '7': 'UVEK',
-    '8': 'BK',
+    '1': 'EDA (auswärtige Angelegenheiten)',
+    '2': 'EDI (Departement des Innern)',
+    '3': 'EJPD (Justiz und Polizei)',
+    '4': 'VBS (Verteidigung, Bevölkerungsschutz und Sport)',
+    '5': 'EFD (Finanzdepartement)',
+    '6': 'WBF (Wirtschaft, Bildung und Forschung)',
+    '7': 'UVEK (Umwelt, Verkehr, Energie und Kommunikation)',
+    '8': 'BK (Bundeskanzlei)',
 }
 df['dep'] = df['dep'].map(dep_mapping)
 
@@ -267,16 +267,16 @@ df['datum'] = pd.to_datetime(df['datum'], format='%d.%m.%Y').dt.strftime('%Y-%m-
 df = df.rename(columns={
     'datum': 'Datum',
     'titel_kurz_d': 'Kurztitel',
-    'rechtsform': 'Rechtsform',
+    'rechtsform': 'Abstimmungsgrund',
     'anr': 'vorlage_id',
-    'd1e1': 'Bereich (1. Level)',
-    'd1e2': 'Bereich (2. Level)',
-    'd1e3': 'Bereich (3. Level)',
-    'dep': 'Departement',
-    'br-pos': 'Bundesrat',
-    'bv-pos': 'Parlament',
-    'nr-pos': 'Nationalrat',
-    'sr-pos': 'Ständerat',
+    'd1e1': 'Politikbereich (1. Stufe)',
+    'd1e2': 'Politikbereich (2. Stufe)',
+    'd1e3': 'Politikbereich (3. Stufe)',
+    'dep': 'Federführendes Departement',
+    'br-pos': 'Position Bundesrat',
+    'bv-pos': 'Position Parlament',
+    'nr-pos': 'Position Nationalrat',
+    'sr-pos': 'Position Ständerat',
 })
 
 # save new csv

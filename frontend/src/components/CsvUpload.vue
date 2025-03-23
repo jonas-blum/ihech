@@ -135,7 +135,7 @@ onMounted(async () => {
     await fetchJsonFileByFileName('DEBUG-Data.json', false)
     // await fetchJsonFileByFileName('Chess-Data-White.json', false)
     // await fetchJsonFileByFileName('TEI-Data.json', false)
-    // await fetchJsonFileByFileName('Voting-Data-NEW.json', false)
+    await fetchJsonFileByFileName('Voting-Data-NEW.json', false)
     await mainStore.fetchData()
   }
 })

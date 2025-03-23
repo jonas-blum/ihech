@@ -53,6 +53,9 @@ watch(
       <li>
         <a @click="column?.toggleSelected">{{ column?.selected ? 'Unselect' : 'Select' }}</a>
       </li>
+      <li v-if="column?.parent">
+        <a @click="mainStore.attributeTree?.closeColumn(column.parent)">Close</a>
+      </li>
       <!-- TODO: there are no sticky attributes yet.. -->
       <!-- <li v-if="!isAggregateColumn"> -->
       <!-- <a> -->

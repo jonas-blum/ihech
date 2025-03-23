@@ -55,6 +55,9 @@ watch(
       <li>
         <a @click="row?.toggleSelected">{{ row?.selected ? 'Unselect' : 'Select' }}</a>
       </li>
+      <li v-if="row?.parent">
+        <a @click="mainStore.itemTree?.closeRow(row.parent)">Close</a>
+      </li>
     </ul>
     <ul v-if="isAggregateRow" class="menu menu-xs w-full p-0 [&_li>*]:rounded-none">
       <li>
@@ -77,6 +80,9 @@ watch(
       </li>
       <li>
         <a @click="mainStore.itemTree?.expandAllRows(row)">Expand Deep</a>
+      </li>
+      <li v-if="row?.parent">
+        <a @click="mainStore.itemTree?.closeRow(row.parent)">Close</a>
       </li>
     </ul>
   </div>

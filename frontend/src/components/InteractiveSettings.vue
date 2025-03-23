@@ -113,7 +113,8 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
         selectClasses="select select-xs"
       >
       </ResizableSelect>
-      ) on the
+      ) 
+      <!-- on the
       <ResizableSelect
         class="inline-block"
         :options="clusterAfterDimRedOptions"
@@ -122,7 +123,8 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
         selectClasses="select select-xs"
       >
       </ResizableSelect>
-      data.
+      data -->
+      .
     </p>
 
     <!-- Attribute Settings -->

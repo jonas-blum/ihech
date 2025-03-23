@@ -111,7 +111,7 @@ const onAttributeClick = (attribute: AttributeColumn) => {
           @input="onSearchChange"
           type="text"
           class="grow"
-          :placeholder="`${mainStore.getActiveDataTable?.itemNamePlural} or ${mainStore.getActiveDataTable?.attributeNamePlural}`"
+          :placeholder="`search ${mainStore.getActiveDataTable?.itemNamePlural}`"
           @focus="onSearchChange"
           @click.stop
         />
@@ -119,10 +119,10 @@ const onAttributeClick = (attribute: AttributeColumn) => {
     </div>
     <div
       v-if="mainStore.searchResultBoxOpen"
-      class="flex gap-2 w-[500px] max-h-[600px] p-2 absolute z-10 bg-white -translate-x-[33%] translate-y-3 custom-shadow"
+      class="flex gap-2 w-[250px] max-h-[600px] p-2 absolute z-10 bg-white -translate-x-[35px] translate-y-3 custom-shadow"
       @click.stop
     >
-      <ul class="w-1/2 rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto">
+      <ul class="w-full rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto">
         <li class="font-bold border-b-2">
           <span
             >{{ mainStore.getActiveDataTable?.itemNamePlural }} ({{
@@ -156,7 +156,7 @@ const onAttributeClick = (attribute: AttributeColumn) => {
           /> -->
         </li>
       </ul>
-      <div class="divider divider-horizontal"></div>
+      <!-- <div class="divider divider-horizontal"></div>
       <ul class="w-1/2 rounded-none text-xs mt-2 flex flex-col gap-1 overflow-y-auto">
         <li class="font-bold border-b-2">
           <span
@@ -189,7 +189,7 @@ const onAttributeClick = (attribute: AttributeColumn) => {
             <div class="w-full">{{ attribute.name }}</div>
           </div>
         </li>
-      </ul>
+      </ul> -->
     </div>
   </div>
 </template>

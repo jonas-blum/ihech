@@ -303,7 +303,7 @@ function debug2() {
     </div>
   </div>
   <!-- Tooltip -->
-  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md" :style="tooltipStyle"
+  <div class="absolute z-[99] p-[2px] border-[1px] border-black bg-white shadow-md" :style="tooltipStyle"
     v-show="mainStore.hoveredPixiBubble">
     <!-- <span>{{ mainStore.highlightedRow?.name }}</span
       ><br />

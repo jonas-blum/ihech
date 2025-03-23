@@ -158,6 +158,7 @@ export class PixiAttributeColumnLabel extends PixiColumnLabel {
     super(column)
     this.column = column
     this.createIcon()
+    this.updateIcon(false)
     this.updateHighlightedDisplay(false)
     this.text.text = column.name
   }

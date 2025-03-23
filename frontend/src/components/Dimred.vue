@@ -298,7 +298,7 @@ function debug2() {
       top: `${dimredLayoutStore.tileMargin}px`,
       right: `${dimredLayoutStore.tileMargin}px`,
     }">
-      <span class="text-xs mr-1">Show Parent Bubbles?</span>
+      <span class="text-xs mr-1">Show aggregated {{ mainStore.getActiveDataTable?.itemNamePlural }}?</span>
       <input v-model="dimredLayoutStore.showParentBubbles" type="checkbox" class="toggle toggle-xs translate-y-[4px]" />
     </div>
   </div>

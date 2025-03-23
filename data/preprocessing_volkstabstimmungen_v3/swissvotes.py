@@ -279,5 +279,8 @@ df = df.rename(columns={
     'sr-pos': 'Position Ständerat',
 })
 
+# add datum to the title
+df['Kurztitel'] = df['Kurztitel'] + ' (' + df['Datum'] + ')'
+
 # save new csv
 df.to_csv('swissvotes.csv', index=False)

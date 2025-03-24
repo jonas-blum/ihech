@@ -9,6 +9,7 @@ import {
 } from 'd3'
 import { useHeatmapLayoutStore } from '@/stores/heatmapLayoutStore'
 import { useDimredLayoutStore } from '@/stores/dimredLayoutStore'
+import { useMainStore } from '@/stores/mainStore'
 
 export class ItemTree {
   root: AggregateRow
@@ -323,6 +324,22 @@ export class ItemTree {
 
   assignColorToTopLevelRows() {
     // TODO: what about the case when there is no semantic and dynamic clustering?
+    const isSemanticClusteringActive = useMainStore().getActiveDataTable?.hierarchicalRowsMetadataColumnNames.some(
+      (semanticGrouping: { selected: boolean }) => semanticGrouping.selected === true
+    )
+    const isDynamicClusteringActive = useMainStore().getActiveDataTable?.itemsClusterSize !== -1
+
+    // if neither semantic nor dynamic clustering is active, we color the top level rows in a default neutral color
+    if (!isSemanticClusteringActive && !isDynamicClusteringActive) {
+      this.root.children.forEach((row, index) => {
+        row.color = 0x222222
+        // row.color = this.colorScheme(0)
+      })
+
+      return
+    }
+
+
     this.root.children.forEach((row, index) => {
       row.color = this.colorScheme(index / (this.root.children.length - 1))
 

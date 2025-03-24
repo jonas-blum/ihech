@@ -132,9 +132,7 @@ export class PixiAggregateColumnLabel extends PixiColumnLabel {
     this.updateIcon(false)
   }
 
-  updateIcon(animate: boolean = true): void {
-    console.log('updateIcon')
-    
+  updateIcon(animate: boolean = true): void {  
     const maxIconSize = useHeatmapLayoutStore().maxIconSize
     this.icon.width = maxIconSize
     this.icon.height = maxIconSize

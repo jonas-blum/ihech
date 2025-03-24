@@ -533,6 +533,7 @@ export const useMainStore = defineStore('mainStore', {
       if (this.attributeTree) {
         this.attributeTree.sort()
         this.attributeTree.updatePositionsAndDepth()
+        this.attributeTree.updateHeatmapVisibilityOfColumns()
         this.updateCellPositionsOfCurrentlyDisplayedRows()
       }
     },

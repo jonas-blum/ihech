@@ -16,7 +16,7 @@ const datasetOptions = computed(() => {
 })
 
 const kOptions = [
-  { label: 'no clustering', value: '-1' },
+  { label: 'Add', value: '-1' },
   { label: 'k=2', value: '2' },
   { label: 'k=3', value: '3' },
   { label: 'k=4', value: '4' },
@@ -86,13 +86,10 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
 
 <template>
   <div class="text-md">
-    <ResizableSelect
-      class="inline-block"
-      :options="datasetOptions"
-      :selected="String(mainStore.getActiveDataTable?.datasetName || '')"
-      :callback="selectDataTable"
-      selectClasses="select select-sm text-md uppercase w-min mr-1 ml-0 pl-0 pb-0 mb-2 text-xl font-bold border-b-1 border-t-0 border-x-0 border-black rounded-none"
-    ></ResizableSelect>
+    <ResizableSelect class="inline-block" :options="datasetOptions"
+      :selected="String(mainStore.getActiveDataTable?.datasetName || '')" :callback="selectDataTable"
+      selectClasses="select select-sm text-md uppercase w-min mr-1 ml-0 pl-0 pb-0 mb-2 text-xl font-bold border-b-1 border-t-0 border-x-0 border-black rounded-none">
+    </ResizableSelect>
 
     <p>{{ mainStore.getActiveDataTable?.descriptionText }}</p>
 
@@ -103,17 +100,16 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
       <span v-if="!selectedHierarchicalRowsMetadataColumnNames.length">not</span>
       grouped
       <span>(</span>
-      <MultiSelect :options="mainStore.getHierarchicalRowsMetadataColumnNames"></MultiSelect
-      ><span>) and recursively clustered (</span>
-      <ResizableSelect
-        class="inline-block"
-        :options="kOptions"
-        :selected="String(mainStore.getActiveDataTable?.itemsClusterSize || '')"
-        :callback="updateItemsClusterSize"
-        selectClasses="select select-xs"
-      >
+      <MultiSelect :options="mainStore.getHierarchicalRowsMetadataColumnNames"></MultiSelect>
+      <span>)</span>
+      and
+      <span v-if="mainStore.getActiveDataTable?.itemsClusterSize == -1">not</span>
+      recursively clustered (
+      <ResizableSelect class="inline-block" :options="kOptions"
+        :selected="String(mainStore.getActiveDataTable?.itemsClusterSize || '')" :callback="updateItemsClusterSize"
+        selectClasses="select select-xs">
       </ResizableSelect>
-      ) 
+      )
       <!-- on the
       <ResizableSelect
         class="inline-block"
@@ -136,14 +132,12 @@ const selectedHierarchicalColumnsMetadataRowIndexes = computed<IndexLabelInterfa
       <span>(</span>
       <MultiSelect :options="mainStore.getHierarchicalColumnsMetadataRowIndexes"></MultiSelect>
       <span>)</span>
-      and recursively clustered (
-      <ResizableSelect
-        class="inline-block"
-        :options="kOptions"
+      and
+      <span v-if="mainStore.getActiveDataTable?.attributesClusterSize == -1">not</span>
+      recursively clustered (
+      <ResizableSelect class="inline-block" :options="kOptions"
         :selected="String(mainStore.getActiveDataTable?.attributesClusterSize || '')"
-        :callback="updateAttributesClusterSize"
-        selectClasses="select select-xs"
-      ></ResizableSelect>
+        :callback="updateAttributesClusterSize" selectClasses="select select-xs"></ResizableSelect>
       ).
 
       <!-- TODO: here I could add the k-means attribute clustering parameter. for now I "disabled" it by settings the parameter to -1 -->

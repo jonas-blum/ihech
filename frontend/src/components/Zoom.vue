@@ -21,6 +21,10 @@ const options = [
         label: '15',
         value: 15,
     },
+    {
+        label: '20',
+        value: 20,
+    },
 ]
 
 const selectedOption = ref<number | null>(null)

@@ -553,10 +553,12 @@ onMounted(async () => {
     }">
       <button @click="reloadHeatmap()" class="btn btn-sm btn-block text-sm rounded-none custom-shadow" :class="{
         'btn-ghost': !mainStore.isOutOfSync,
-        'btn-warning': mainStore.isOutOfSync,
+        'btn-neutral': mainStore.isOutOfSync,
       }">
-        Update
-        <span v-if="mainStore.isOutOfSync">(unsaved changes!)</span>
+      <div>
+        <span>Update</span>
+        <span v-if="mainStore.isOutOfSync" class="text-xs"> (settings changed)</span>
+      </div>
         <span v-if="mainStore.isLoading" class="loading loading-spinner"></span>
       </button>
       <Search class="custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"

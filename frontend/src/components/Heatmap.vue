@@ -30,7 +30,8 @@ import Search from '@/components/Search.vue'
 import ContextMenuColumnLabel from '@/components/ContextMenuColumnLabel.vue'
 import ContextMenuRowLabel from '@/components/ContextMenuRowLabel.vue'
 import { ColoringHeatmapEnum } from '@/helpers/helpers'
-import MiscSettings from './MiscSettings.vue'
+import MiscSettings from '@/components/MiscSettings.vue'
+import Zoom from '@/components/Zoom.vue'
 
 const { x: mouseX, y: mouseY } = useMouse()
 
@@ -338,16 +339,11 @@ watch(
   },
 )
 
-function shrinkCells() {
-  heatmapLayoutStore.setRowAndColumnSize(heatmapLayoutStore.rowHeight - 5, heatmapLayoutStore.columnWidth - 5)
-  stopRenderer()
-  setTimeout(() => {
-    startRenderer()
-  }, 1000)
-}
-
-function growCells() {
-  heatmapLayoutStore.setRowAndColumnSize(heatmapLayoutStore.rowHeight + 5, heatmapLayoutStore.columnWidth + 5)
+function adjustCellSize(cellSize: number) {
+  console.log('🔍 Heatmap.vue adjustCellSize', cellSize)
+  heatmapLayoutStore.setRowAndColumnSize(
+    cellSize, cellSize
+  )
   stopRenderer()
   setTimeout(() => {
     startRenderer()
@@ -573,11 +569,6 @@ onMounted(async () => {
         <ColumnSorterSettings class="w-full custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
           @mouseleave="mainStore.mouseOverMenuOrTooltip = false" />
       </div>
-      <!-- <ColorMap
-      class="custom-shadow"
-      @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-      @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
-      /> -->
     </div>
     <ColorMap class="absolute z-10 -translate-x-[100%] -translate-y-[100%] custom-shadow" :style="{
       top: `${heatmapLayoutStore.matrixTileFrame.y + heatmapLayoutStore.matrixTileFrame.height}px`,
@@ -586,7 +577,15 @@ onMounted(async () => {
     }" @mouseenter="mainStore.mouseOverMenuOrTooltip = true" @mouseleave="mainStore.mouseOverMenuOrTooltip = false" />
 
     <!-- zoom buttons -->
-    <div class="absolute z-10 -translate-y-[100%] flex gap-2 p-2" :style="{
+    <Zoom class="absolute z-10 -translate-y-[100%] flex gap-2 p-0.5 custom-shadow" :style="{
+      top: `${heatmapLayoutStore.matrixTileFrame.y + heatmapLayoutStore.matrixTileFrame.height}px`,
+      left: `${heatmapLayoutStore.matrixTileFrame.x}px`,
+    }" @mouseenter="mainStore.mouseOverMenuOrTooltip = true" 
+       @mouseleave="mainStore.mouseOverMenuOrTooltip = false"
+       @zoomchanged="adjustCellSize">
+    </Zoom>
+
+    <!-- <div class="absolute z-10 -translate-y-[100%] flex gap-2 p-2" :style="{
       top: `${heatmapLayoutStore.matrixTileFrame.y + heatmapLayoutStore.matrixTileFrame.height}px`,
       left: `${heatmapLayoutStore.matrixTileFrame.x}px`,
     }">
@@ -596,14 +595,14 @@ onMounted(async () => {
       <button @click="growCells" class="btn btn-xs bg-white rounded-none custom-shadow p-1">
         <Icon icon="ic:baseline-plus" class="p-0 w-4 h-4 text-opacity-50 cursor-pointer" />
       </button>
-    </div>
+    </div> -->
 
   </div>
 
   <!-- Heatmap cell Tooltip -->
-  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md max-w-[400px] -translate-x-[50%]" :style="tooltipStyle"
-    v-show="mainStore.hoveredPixiHeatmapCell" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-    @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
+  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md max-w-[400px] -translate-x-[50%]"
+    :style="tooltipStyle" v-show="mainStore.hoveredPixiHeatmapCell"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true" @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
 
     <!-- The item [itemName] [.. has verb ..] -->
     <div class="inline" v-if="(mainStore.highlightedRow instanceof ItemRow)">
@@ -621,7 +620,7 @@ onMounted(async () => {
     <!-- [value] [%] -->
     <div class="inline">
       <span class="font-bold mx-[3px]">
-        {{ mainStore.hoveredPixiHeatmapCell?.value }} 
+        {{ mainStore.hoveredPixiHeatmapCell?.value }}
       </span>
       <span>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3 }}</span>
     </div>
@@ -639,9 +638,9 @@ onMounted(async () => {
   </div>
 
   <!-- Attribute Tooltip -->
-  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md min-w-[200px] -translate-x-[50%] z-[9999]" :style="tooltipStyle"
-    v-show="mainStore.hoveredPixiColumnLabel" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
-    @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
+  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md min-w-[200px] -translate-x-[50%] z-[9999]"
+    :style="tooltipStyle" v-show="mainStore.hoveredPixiColumnLabel"
+    @mouseenter="mainStore.mouseOverMenuOrTooltip = true" @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
     <span>{{ mainStore.highlightedColumn?.getName() }}</span>
   </div>
 

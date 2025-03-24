@@ -102,7 +102,7 @@ dic = {
     "defaultSettings": {
         "clusterItemsByCollections": True,
         "clusterAttributesByCollections": True,
-        "itemsClusterSize": 6,
+        "itemsClusterSize": -1,
         "attributesClusterSize": -1,
         "dimReductionAlgo": "PCA",
         "clusterAfterDimRed": False,

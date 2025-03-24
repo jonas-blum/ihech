@@ -639,7 +639,7 @@ onMounted(async () => {
   </div>
 
   <!-- Attribute Tooltip -->
-  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md min-w-[200px] -translate-x-[50%]" :style="tooltipStyle"
+  <div class="absolute p-[2px] border-[1px] border-black bg-white shadow-md min-w-[200px] -translate-x-[50%] z-[9999]" :style="tooltipStyle"
     v-show="mainStore.hoveredPixiColumnLabel" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
     @mouseleave="mainStore.mouseOverMenuOrTooltip = false">
     <span>{{ mainStore.highlightedColumn?.getName() }}</span>

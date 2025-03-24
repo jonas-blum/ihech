@@ -45,7 +45,7 @@ watch(
 </script>
 <template>
   <div
-    class="w-36 p-1 rounded-sm absolute z-[99999999] text-sm"
+    class="w-36 p-1 rounded-sm absolute z-[9999] text-sm"
     :style="contextMenuStyle"
     @click.stop="mainStore.closeMenus"
   >

@@ -6,8 +6,8 @@ export const useHeatmapLayoutStore = defineStore('heatmapLayoutStore', {
   state: () => ({
     canvasWidth: 0, // width of the canvas
     canvasHeight: 0, // height of the canvas
-    rowHeight: 20, // height of a row in the heatmap
-    columnWidth: 20, // width of a column in the heatmap
+    rowHeight: 15, // height of a row in the heatmap
+    columnWidth: 15, // width of a column in the heatmap
     columnLabelHeight: 200, // top margin until the rows start
     columnLabelPaddingBottom: 5, // prevent column labels from touching the cells
     rowLabelWidth: 200, // left margin until the columns start

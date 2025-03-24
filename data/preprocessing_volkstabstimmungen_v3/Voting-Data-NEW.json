@@ -14,7 +14,7 @@
     "defaultSettings": {
         "clusterItemsByCollections": true,
         "clusterAttributesByCollections": true,
-        "itemsClusterSize": 6,
+        "itemsClusterSize": -1,
         "attributesClusterSize": -1,
         "dimReductionAlgo": "PCA",
         "clusterAfterDimRed": false,

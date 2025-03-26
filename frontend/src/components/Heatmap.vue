@@ -555,11 +555,12 @@ onMounted(async () => {
         'btn-ghost': !mainStore.isOutOfSync,
         'btn-neutral': mainStore.isOutOfSync,
       }">
-      <div>
+      <div class="flex items-center justify-center gap-2">
         <span>Update</span>
-        <span v-if="mainStore.isOutOfSync" class="text-xs"> (settings changed)</span>
-      </div>
         <span v-if="mainStore.isLoading" class="loading loading-spinner"></span>
+        <span v-else-if="mainStore.isOutOfSync" class="text-xs"> (settings changed)</span>
+
+      </div>
       </button>
       <Search class="custom-shadow" @mouseenter="mainStore.mouseOverMenuOrTooltip = true"
         @mouseleave="mainStore.mouseOverMenuOrTooltip = false"></Search>

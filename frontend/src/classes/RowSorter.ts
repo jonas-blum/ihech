@@ -93,7 +93,7 @@ export class RowSorterCriterionByName extends RowSorterCriterion {
 
 export class RowSorterCriterionByHasChildren extends RowSorterCriterion {
   constructor(reverse: boolean = false) {
-    super('Has Children', 'hasChildren', reverse)
+    super('Is Aggregation', 'hasChildren', reverse)
   }
 
   compare(row1: Row, row2: Row): number {

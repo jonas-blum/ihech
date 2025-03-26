@@ -276,7 +276,7 @@ export const useMainStore = defineStore('mainStore', {
         const criterion1 = new RowSorterCriterionByName()
         const criterion2 = new RowSorterCriterionByHasChildren()
         const criterion3 = new RowSorterCriterionByAmountOfChildren()
-        const rowSorter = new RowSorter([criterion2, criterion3, criterion1])
+        const rowSorter = new RowSorter([criterion2, criterion1])
         // criterion2.toggleReverse()
 
         // initialize columnSorter
@@ -284,7 +284,7 @@ export const useMainStore = defineStore('mainStore', {
         const criterionB = new ColumnSorterCriterionByName()
         const criterionC = new ColumnSorterCriterionByStandardDeviation()
         const criterionD = new ColumnSorterCriterionByHasChildren()
-        const columnSorter = new ColumnSorter([criterionA, criterionB, criterionC, criterionD])
+        const columnSorter = new ColumnSorter([criterionD, criterionA, criterionB, criterionC])
 
         // initialize itemTree with the data received from the backend, starting at the root
         const itemTreeRoot = this.heatmap.itemNamesAndData[0]

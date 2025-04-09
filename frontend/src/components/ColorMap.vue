@@ -67,17 +67,17 @@ const onCreateBreakpoint = () => {
 
     <!-- Dropdown content -->
     <div class="collapse-content rounded-sm w-full p-2 text-sm bg-white">
-      <div class="flex gap-2 items-center justify-between mb-2">
+      <!-- <div class="flex gap-2 items-center justify-between mb-2">
         <span>use Log Scaling:</span>
         <input type="checkbox" class="w-4 h-4" :checked="mainStore.colorMap.isLogarithmic" @click.stop
           @change="(e) => mainStore.colorMap.setLogarithmic((e.target as HTMLInputElement).checked)" />
-      </div>
-      <div class="flex gap-2 items-center justify-between mb-2">
+      </div> -->
+      <!-- <div class="flex gap-2 items-center justify-between mb-2">
         <span>Zero Color:</span>
         <input type="color" class="w-8 h-[1rem]"
           :value="`#${(mainStore.colorMap.zeroColor ?? 0).toString(16).padStart(6, '0')}`" @click.stop
           @input="(payload: Event) => mainStore.colorMap.setZeroColor(parseInt((payload.target as HTMLInputElement).value.slice(1), 16))" />
-      </div>
+      </div> -->
       <div v-for="(breakpoint, index) in mainStore.colorMap.breakpoints" :key="index"
         class="flex gap-2 items-center justify-between mb-2">
         <input type="number" class="input input-bordered input-xs w-16" :value="breakpoint.value" @click.stop @input="(payload: Event) =>

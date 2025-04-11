@@ -1,0 +1,9 @@
+PID,VisExpertise,Visualization,Understand,Layout,DataRead,DataFeat
+1,Expert,Matrix,6.67,6.33,5.67,6.0
+1,Expert,SimilarityView,5.67,6.67,7.0,6.0
+2,NonExpert,Matrix,6.67,6.67,5.67,6.0
+2,NonExpert,SimilarityView,6.0,5.33,6.33,5.0
+3,Expert,Matrix,7.0,5.67,5.0,6.0
+3,Expert,SimilarityView,7.0,6.0,5.0,6.0
+4,NonExpert,Matrix,6.0,6.67,6.33,6.0
+4,NonExpert,SimilarityView,3.67,6.33,4.67,6.0

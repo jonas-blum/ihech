@@ -1,13 +1,13 @@
-PID,VisExpertise,Visualization,Understand,Layout,DataRead,DataFeat
-1,Expert,Matrix,6.67,6.33,5.67,6.0
-1,Expert,SimilarityView,5.67,6.67,7.0,6.0
-2,NonExpert,Matrix,6.67,6.67,5.67,6.0
-2,NonExpert,SimilarityView,6.0,5.33,6.33,5.0
-3,Expert,Matrix,7.0,5.67,5.0,6.0
-3,Expert,SimilarityView,7.0,6.0,5.0,6.0
-4,NonExpert,Matrix,6.0,6.67,6.33,6.0
-4,NonExpert,SimilarityView,3.67,6.33,4.67,6.0
-5,Expert,Matrix,6.67,6.67,7.0,5.5
-5,Expert,SimilarityView,6.67,7.0,5.67,5.0
-6,NonExpert,Matrix,5.67,6.33,6.67,6.0
-6,NonExpert,SimilarityView,3.33,6.0,7.0,4.0
+PID,ParticipantLabel,VisExpertise,Visualization,Understand,Layout,DataRead,DataFeat
+1,Expert #1,Expert,Matrix,6.67,6.33,5.67,6.0
+1,Expert #1,Expert,SimilarityView,5.67,6.67,7.0,6.0
+3,Expert #2,Expert,Matrix,7.0,5.67,5.0,6.0
+3,Expert #2,Expert,SimilarityView,7.0,6.0,5.0,6.0
+5,Expert #3,Expert,Matrix,6.67,6.67,7.0,5.5
+5,Expert #3,Expert,SimilarityView,6.67,7.0,5.67,5.0
+2,Non-Expert #1,NonExpert,Matrix,6.67,6.67,5.67,6.0
+2,Non-Expert #1,NonExpert,SimilarityView,6.0,5.33,6.33,5.0
+4,Non-Expert #2,NonExpert,Matrix,6.0,6.67,6.33,6.0
+4,Non-Expert #2,NonExpert,SimilarityView,3.67,6.33,4.67,6.0
+6,Non-Expert #3,NonExpert,Matrix,5.67,6.33,6.67,6.0
+6,Non-Expert #3,NonExpert,SimilarityView,3.33,6.0,7.0,4.0

@@ -1,13 +1,13 @@
-PID,VisExpertise,Visualization,Understand.1,Understand.2,Understand.3,Layout.1,Layout.2,Layout.3,DataRead.1,DataRead.2,DataRead.3,DataFeat.1,DataFeat.2
-1,Expert,Matrix,7,7,6,7,5,7,6,6,5,6,6
-1,Expert,SimilarityView,5,6,6,7,6,7,7,7,7,6,6
-2,NonExpert,Matrix,6,7,7,7,7,6,6,6,5,6,6
-2,NonExpert,SimilarityView,6,6,6,6,5,5,6,6,7,5,5
-3,Expert,Matrix,7,7,7,6,5,6,7,2,6,6,6
-3,Expert,SimilarityView,7,7,7,5,7,6,6,3,6,6,6
-4,NonExpert,Matrix,6,7,5,6,7,7,7,5,7,6,6
-4,NonExpert,SimilarityView,4,3,4,6,6,7,3,4,7,6,6
-5,Expert,Matrix,7,6,7,7,6,7,7,7,7,6,5
-5,Expert,SimilarityView,6,7,7,7,7,7,7,7,3,6,4
-6,NonExpert,Matrix,6,6,5,7,6,6,7,7,6,6,6
-6,NonExpert,SimilarityView,5,2,3,5,6,7,7,7,7,4,4
+PID,ParticipantLabel,VisExpertise,Visualization,Understand.1,Understand.2,Understand.3,Layout.1,Layout.2,Layout.3,DataRead.1,DataRead.2,DataRead.3,DataFeat.1,DataFeat.2
+1,Expert #1,Expert,Matrix,7,7,6,7,5,7,6,6,5,6,6
+1,Expert #1,Expert,SimilarityView,5,6,6,7,6,7,7,7,7,6,6
+3,Expert #2,Expert,Matrix,7,7,7,6,5,6,7,2,6,6,6
+3,Expert #2,Expert,SimilarityView,7,7,7,5,7,6,6,3,6,6,6
+5,Expert #3,Expert,Matrix,7,6,7,7,6,7,7,7,7,6,5
+5,Expert #3,Expert,SimilarityView,6,7,7,7,7,7,7,7,3,6,4
+2,Non-Expert #1,NonExpert,Matrix,6,7,7,7,7,6,6,6,5,6,6
+2,Non-Expert #1,NonExpert,SimilarityView,6,6,6,6,5,5,6,6,7,5,5
+4,Non-Expert #2,NonExpert,Matrix,6,7,5,6,7,7,7,5,7,6,6
+4,Non-Expert #2,NonExpert,SimilarityView,4,3,4,6,6,7,3,4,7,6,6
+6,Non-Expert #3,NonExpert,Matrix,6,6,5,7,6,6,7,7,6,6,6
+6,Non-Expert #3,NonExpert,SimilarityView,5,2,3,5,6,7,7,7,7,4,4

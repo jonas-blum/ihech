@@ -7,3 +7,7 @@ PID,VisExpertise,Visualization,Understand.1,Understand.2,Understand.3,Layout.1,L
 3,Expert,SimilarityView,7,7,7,5,7,6,6,3,6,6,6
 4,NonExpert,Matrix,6,7,5,6,7,7,7,5,7,6,6
 4,NonExpert,SimilarityView,4,3,4,6,6,7,3,4,7,6,6
+5,Expert,Matrix,7,6,7,7,6,7,7,7,7,6,5
+5,Expert,SimilarityView,6,7,7,7,7,7,7,7,3,6,4
+6,NonExpert,Matrix,6,6,5,7,6,6,7,7,6,6,6
+6,NonExpert,SimilarityView,5,2,3,5,6,7,7,7,7,4,4

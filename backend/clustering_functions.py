@@ -87,6 +87,157 @@ def get_current_data_length(item_names_and_data: List[ItemNameAndData]):
     return len(item_names_and_data[0].data)
 
 
+# No hierarchy level should ever show more than this many children at once
+# (e.g. grouping publications by author can produce tens of thousands of
+# collections). Levels exceeding it are recursively clustered further.
+MAX_CHILDREN_PER_LEVEL = 20
+
+
+def split_positions_into_clusters(node_vectors: np.ndarray) -> List[np.ndarray]:
+    """Cluster sibling nodes (represented by one vector each) into at most
+    MAX_CHILDREN_PER_LEVEL groups. Returns positions into node_vectors.
+
+    Falls back to order-preserving even chunks when the vectors carry no
+    usable structure (all identical or degenerate clustering result)."""
+    number_of_nodes = node_vectors.shape[0]
+    positions = np.arange(number_of_nodes)
+
+    if (node_vectors == node_vectors[0]).all():
+        return list(np.array_split(positions, MAX_CHILDREN_PER_LEVEL))
+
+    if number_of_nodes > 5000:
+        kmeans = MiniBatchKMeans(
+            n_clusters=MAX_CHILDREN_PER_LEVEL, n_init=1, random_state=42
+        )
+        labels = kmeans.fit_predict(node_vectors)
+    else:
+        hierarchical = AgglomerativeClustering(
+            n_clusters=MAX_CHILDREN_PER_LEVEL, linkage="ward"
+        )
+        labels = hierarchical.fit_predict(node_vectors)
+
+    clusters = [positions[labels == cluster_id] for cluster_id in np.unique(labels)]
+    clusters = [cluster for cluster in clusters if len(cluster) > 0]
+    if len(clusters) <= 1:
+        return list(np.array_split(positions, MAX_CHILDREN_PER_LEVEL))
+    return clusters
+
+
+def group_item_nodes_recursively(
+    nodes: List[ItemNameAndData],
+    node_row_indexes: List[List[int]],
+    node_vectors: np.ndarray,
+    raw_data_df: pd.DataFrame,
+    dim_red_df: pd.DataFrame,
+    aggregate_method: str,
+) -> List[ItemNameAndData]:
+    """Cap sibling item nodes at MAX_CHILDREN_PER_LEVEL by recursively
+    wrapping them into unnamed aggregated cluster nodes."""
+    if len(nodes) <= MAX_CHILDREN_PER_LEVEL:
+        return nodes
+
+    grouped_nodes: List[ItemNameAndData] = []
+    for cluster_positions in split_positions_into_clusters(node_vectors):
+        if len(cluster_positions) == 1:
+            grouped_nodes.append(nodes[cluster_positions[0]])
+            continue
+
+        cluster_nodes = [nodes[position] for position in cluster_positions]
+        cluster_row_indexes = [node_row_indexes[position] for position in cluster_positions]
+        union_row_indexes = [
+            row_index for row_indexes in cluster_row_indexes for row_index in row_indexes
+        ]
+
+        tag_data_aggregated, dim_reduction_aggregated = (
+            compute_item_aggregated_statistics(
+                raw_data_df.loc[union_row_indexes],
+                dim_red_df.loc[union_row_indexes],
+                aggregate_method,
+            )
+        )
+
+        children = group_item_nodes_recursively(
+            cluster_nodes,
+            cluster_row_indexes,
+            node_vectors[cluster_positions],
+            raw_data_df,
+            dim_red_df,
+            aggregate_method,
+        )
+
+        grouped_nodes.append(
+            ItemNameAndData(
+                index=None,
+                itemName="",
+                isOpen=False,
+                data=tag_data_aggregated,
+                amountOfDataPoints=len(union_row_indexes),
+                dimReductionX=dim_reduction_aggregated[0],
+                dimReductionY=dim_reduction_aggregated[1],
+                children=children,
+            )
+        )
+    return grouped_nodes
+
+
+def group_attribute_nodes_recursively(
+    nodes: List[HierarchicalAttribute],
+    node_column_indexes: List[List[int]],
+    node_vectors: np.ndarray,
+    rotated_raw_data_df: pd.DataFrame,
+    item_names_and_data: List[ItemNameAndData],
+    attribute_aggregate_method: str,
+) -> List[HierarchicalAttribute]:
+    """Cap sibling attribute nodes at MAX_CHILDREN_PER_LEVEL by recursively
+    wrapping them into unnamed aggregated cluster attributes."""
+    if len(nodes) <= MAX_CHILDREN_PER_LEVEL:
+        return nodes
+
+    grouped_nodes: List[HierarchicalAttribute] = []
+    for cluster_positions in split_positions_into_clusters(node_vectors):
+        if len(cluster_positions) == 1:
+            grouped_nodes.append(nodes[cluster_positions[0]])
+            continue
+
+        cluster_nodes = [nodes[position] for position in cluster_positions]
+        cluster_column_indexes = [
+            node_column_indexes[position] for position in cluster_positions
+        ]
+        union_column_indexes = [
+            column_index
+            for column_indexes in cluster_column_indexes
+            for column_index in column_indexes
+        ]
+
+        new_attribute_index = get_current_data_length(item_names_and_data)
+        append_all_average_items_by_attribute_indexes(
+            union_column_indexes, item_names_and_data, attribute_aggregate_method
+        )
+        new_attribute_std = rotated_raw_data_df.loc[union_column_indexes].std(axis=1).mean()
+
+        children = group_attribute_nodes_recursively(
+            cluster_nodes,
+            cluster_column_indexes,
+            node_vectors[cluster_positions],
+            rotated_raw_data_df,
+            item_names_and_data,
+            attribute_aggregate_method,
+        )
+
+        grouped_nodes.append(
+            HierarchicalAttribute(
+                attributeName="",
+                dataAttributeIndex=new_attribute_index,
+                std=float(new_attribute_std),
+                originalAttributeOrder=float(np.mean(union_column_indexes)),
+                isOpen=False,
+                selected=True,
+                children=children,
+            )
+        )
+    return grouped_nodes
+
+
 def cluster_attributes_recursively(
     rotated_raw_data_df: pd.DataFrame,
     rotated_scaled_raw_data_df: pd.DataFrame,
@@ -138,6 +289,8 @@ def cluster_attributes_recursively(
     # Case: Cluster by collections
     if cluster_by_collections and len(hierarchical_column_metadata_row_indexes) > 0:
         new_collection_hierarchical_attributes: List[Tuple[ItemNameAndData, float]] = []
+        collection_column_indexes: List[List[int]] = []
+        collection_vectors: List[np.ndarray] = []
         collection_row_index = hierarchical_column_metadata_row_indexes[0]
 
         for (
@@ -168,6 +321,11 @@ def cluster_attributes_recursively(
             rotated_column_names_group_df = rotated_column_names_df.loc[
                 indexes_of_current_group
             ]
+
+            collection_column_indexes.append(list(indexes_of_current_group))
+            collection_vectors.append(
+                rotated_scaled_raw_data_group_df.mean(axis=0).to_numpy()
+            )
 
             new_hierarchical_attribute_std = rotated_raw_data_group_df.std(
                 axis=1
@@ -225,6 +383,16 @@ def cluster_attributes_recursively(
 
             new_collection_hierarchical_attributes.append(new_hierarchical_attribute)
 
+        if len(new_collection_hierarchical_attributes) > MAX_CHILDREN_PER_LEVEL:
+            return group_attribute_nodes_recursively(
+                new_collection_hierarchical_attributes,
+                collection_column_indexes,
+                np.vstack(collection_vectors),
+                rotated_raw_data_df,
+                item_names_and_data,
+                attribute_aggregate_method,
+            )
+
         return new_collection_hierarchical_attributes
 
     # Case: Only few items left or all items are the same or cluster size set to <= 1
@@ -256,6 +424,16 @@ def cluster_attributes_recursively(
             )
 
             new_attributes.append(new_attribute)
+
+        if len(new_attributes) > MAX_CHILDREN_PER_LEVEL:
+            return group_attribute_nodes_recursively(
+                new_attributes,
+                [[column_index] for column_index in new_attribute_indexes],
+                rotated_scaled_raw_data_df.to_numpy(),
+                rotated_raw_data_df,
+                item_names_and_data,
+                attribute_aggregate_method,
+            )
 
         return new_attributes
 
@@ -303,6 +481,7 @@ def cluster_attributes_recursively(
                     rotated_column_names_cluster_df.iloc[:, 0].astype(str).tolist()
                 )
 
+                degenerate_leaf_attributes: List[HierarchicalAttribute] = []
                 for i in range(rotated_scaled_raw_data_cluster_df.shape[0]):
                     new_attribute_std = rotated_raw_data_cluster_df.iloc[i, :].std()
                     new_attribute = HierarchicalAttribute(
@@ -319,7 +498,21 @@ def cluster_attributes_recursively(
                         children=None,
                     )
 
-                    new_clustered_hierarchical_attributes.append(new_attribute)
+                    degenerate_leaf_attributes.append(new_attribute)
+
+                if len(degenerate_leaf_attributes) > MAX_CHILDREN_PER_LEVEL:
+                    degenerate_leaf_attributes = group_attribute_nodes_recursively(
+                        degenerate_leaf_attributes,
+                        [
+                            [column_index]
+                            for column_index in rotated_scaled_raw_data_cluster_df.index
+                        ],
+                        rotated_scaled_raw_data_cluster_df.to_numpy(),
+                        rotated_raw_data_df,
+                        item_names_and_data,
+                        attribute_aggregate_method,
+                    )
+                new_clustered_hierarchical_attributes.extend(degenerate_leaf_attributes)
                 continue
 
             if rotated_scaled_raw_data_cluster_df.shape[0] == 1:
@@ -427,6 +620,8 @@ def cluster_items_recursively(
     # Case: Cluster by collections
     if cluster_by_collections and len(hierarchical_rows_metadata_column_names) > 0:
         new_collection_item_names_and_data: List[Tuple[ItemNameAndData, float]] = []
+        collection_row_indexes: List[List[int]] = []
+        collection_vectors: List[np.ndarray] = []
         collection_column_name = hierarchical_rows_metadata_column_names[0]
         for (
             collection,
@@ -441,6 +636,11 @@ def cluster_items_recursively(
             scaled_raw_data_group_df = scaled_raw_data_df.loc[indexes_of_current_group]
             dim_red_group_df = dim_red_df.loc[indexes_of_current_group]
             item_names_group_df = item_names_df.loc[indexes_of_current_group]
+
+            collection_row_indexes.append(list(indexes_of_current_group))
+            collection_vectors.append(
+                scaled_raw_data_group_df.mean(axis=0).to_numpy()
+            )
 
             tag_data_aggregated, dim_reduction_aggregated = (
                 compute_item_aggregated_statistics(
@@ -502,6 +702,16 @@ def cluster_items_recursively(
 
             new_collection_item_names_and_data.append(new_item_name_and_data)
 
+        if len(new_collection_item_names_and_data) > MAX_CHILDREN_PER_LEVEL:
+            return group_item_nodes_recursively(
+                new_collection_item_names_and_data,
+                collection_row_indexes,
+                np.vstack(collection_vectors),
+                raw_data_df,
+                dim_red_df,
+                aggregate_method,
+            )
+
         return new_collection_item_names_and_data
 
     # Case: Only few items left or all items are the same or cluster size set to <= 1
@@ -535,6 +745,16 @@ def cluster_items_recursively(
             )
 
             new_item_names_and_data.append(new_item_name_and_data)
+
+        if len(new_item_names_and_data) > MAX_CHILDREN_PER_LEVEL:
+            return group_item_nodes_recursively(
+                new_item_names_and_data,
+                [[row_index] for row_index in raw_data_df.index],
+                scaled_raw_data_df.to_numpy(),
+                raw_data_df,
+                dim_red_df,
+                aggregate_method,
+            )
 
         return new_item_names_and_data
 
@@ -586,6 +806,7 @@ def cluster_items_recursively(
                     raw_data_cluster_df.values, rounding_precision
                 ).tolist()
 
+                degenerate_leaf_nodes: List[ItemNameAndData] = []
                 for i in range(raw_data_cluster_df.shape[0]):
                     new_item_name_and_data = ItemNameAndData(
                         index=raw_data_cluster_df.index[i],
@@ -598,7 +819,18 @@ def cluster_items_recursively(
                         children=None,
                     )
 
-                    new_clustered_item_names_and_data.append(new_item_name_and_data)
+                    degenerate_leaf_nodes.append(new_item_name_and_data)
+
+                if len(degenerate_leaf_nodes) > MAX_CHILDREN_PER_LEVEL:
+                    degenerate_leaf_nodes = group_item_nodes_recursively(
+                        degenerate_leaf_nodes,
+                        [[row_index] for row_index in raw_data_cluster_df.index],
+                        scaled_raw_data_cluster_df.to_numpy(),
+                        raw_data_df,
+                        dim_red_df,
+                        aggregate_method,
+                    )
+                new_clustered_item_names_and_data.extend(degenerate_leaf_nodes)
                 continue
 
             if raw_data_cluster_df.shape[0] == 1:

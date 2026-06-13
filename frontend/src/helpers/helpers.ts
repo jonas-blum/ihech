@@ -242,10 +242,14 @@ export interface UploadedJsonData {
   attributeNamePlural: string
   cellHoverTextSnippet1: string
   cellHoverTextSnippet2: { single: string; plural: string }
-  cellHoverTextSnippet3: { single: string; plural: string }
+  // Newer datasets (e.g. SDG) use the {single, plural} form so the tooltip can
+  // pick the right wording by attribute count; legacy datasets store a plain
+  // string. The cell tooltip in Heatmap.vue handles both.
+  cellHoverTextSnippet3: string | { single: string; plural: string }
   defaultMinValue: number
   defaultMaxValue: number
   defaultColorBreakpoints: any
+  defaultSettings: Record<string, any>
 }
 export interface JsonDataTableProfile extends UploadedJsonData {
   df: dataForge.IDataFrame<any, any>
@@ -287,8 +291,6 @@ export interface JsonDataTableProfile extends UploadedJsonData {
   attributeAggregateMethod: string
 
   scaling: ScalingEnum
-
-  defaultSettings: Record<string, any>
 }
 
 export function findRowByIndex(row: ItemNameAndData, index: number): ItemNameAndData | null {

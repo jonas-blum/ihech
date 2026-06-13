@@ -13,6 +13,6 @@ services:
       args:
         VITE_API_URL: ${VITE_API_URL:-http://localhost:5001}
     ports:
-      - "5173:80"
+      - "5174:80"
     environment:
       - VITE_API_URL=${VITE_API_URL}

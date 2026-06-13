@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 
-import { onMounted, watch, ref } from 'vue'
+import { onMounted, watch, ref, computed } from 'vue'
 import { useMouse, watchThrottled } from '@vueuse/core'
 
 import { useMainStore } from '@stores/mainStore'
@@ -47,6 +47,23 @@ watch([mouseX, mouseY], ([x, y]) => {
 
 const mainStore = useMainStore()
 const heatmapLayoutStore = useHeatmapLayoutStore()
+
+// --- cell tooltip helpers ---
+// The hovered cell value, rounded to a whole number (scores are 0-100%).
+const roundedCellValue = computed(() => {
+  const value = mainStore.hoveredPixiHeatmapCell?.value
+  return typeof value === 'number' ? Math.round(value) : value
+})
+// snippet3 bridges the value and the attribute. Newer datasets store it as
+// { single, plural } (and the tooltip then names the hovered model/group);
+// legacy datasets store a plain string and the attribute name is omitted.
+const cellHoverSnippet3 = computed(() => mainStore.getActiveDataTable?.cellHoverTextSnippet3)
+const snippet3IsObject = computed(
+  () => typeof cellHoverSnippet3.value === 'object' && cellHoverSnippet3.value !== null,
+)
+const hoveredColumnIsSingleAttribute = computed(
+  () => mainStore.highlightedColumn instanceof AttributeColumn,
+)
 
 let pixiHeatmapApp: PixiHeatmapApp | null = null
 
@@ -619,24 +636,27 @@ onMounted(async () => {
       <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.cellHoverTextSnippet2.plural }}</span>
     </div>
 
-    <!-- [value] [%] -->
-    <div class="inline">
-      <span class="font-bold mx-[3px]">
-        {{ mainStore.hoveredPixiHeatmapCell?.value }} tags
-      </span>
-      <!-- <span>{{ mainStore.getActiveDataTable?.cellHoverTextSnippet3 }}</span> -->
-    </div>
+    <!-- [value] rounded to a whole number; "%" for percentage datasets -->
+    <span class="font-bold mx-[3px]">{{ roundedCellValue
+      }}<template v-if="snippet3IsObject">%</template></span>
 
-    <!-- single attribute -->
-    <!-- <div class="inline" v-if="(mainStore.highlightedColumn instanceof AttributeColumn)">
-      <span class="mx-[3px]">the {{ mainStore.getActiveDataTable?.attributeNameSingular }}</span>
-      <span class="font-bold mx-[3px]">{{ mainStore.highlightedColumn?.getName() }}</span>
-    </div> -->
-    <!-- attribute aggregate  -->
-    <!-- <div class="inline" v-else>
-      <span class="mx-[3px]">this group of {{ mainStore.getActiveDataTable?.attributeNamePlural }}</span>
-      <span class="font-bold mx-[3px]">({{ mainStore.highlightedColumn?.getName() }})</span>
-    </div> -->
+    <!-- Newer datasets: "<snippet3> <attribute name> <attribute noun>" -->
+    <template v-if="snippet3IsObject">
+      <!-- single attribute, e.g. one model -->
+      <span class="inline" v-if="hoveredColumnIsSingleAttribute">
+        <span class="mx-[3px]">{{ cellHoverSnippet3.single }}</span>
+        <span class="font-bold mx-[3px]">{{ mainStore.highlightedColumn?.getName() }}</span>
+        <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.attributeNameSingular }}</span>
+      </span>
+      <!-- attribute group, e.g. a model type -->
+      <span class="inline" v-else>
+        <span class="mx-[3px]">{{ cellHoverSnippet3.plural }}</span>
+        <span class="font-bold mx-[3px]">({{ mainStore.highlightedColumn?.getName() }})</span>
+        <span class="mx-[3px]">{{ mainStore.getActiveDataTable?.attributeNamePlural }}</span>
+      </span>
+    </template>
+    <!-- Legacy datasets: snippet3 is a plain trailing string -->
+    <span class="mx-[3px]" v-else-if="cellHoverSnippet3">{{ cellHoverSnippet3 }}</span>
   </div>
 
   <!-- Attribute Tooltip -->

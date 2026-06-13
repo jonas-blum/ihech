@@ -5,14 +5,23 @@ import { computed, ref, watch, watchEffect } from 'vue'
 import ResizableSelect from '@/components/ResizableSelect.vue'
 import MultiSelect from '@/components/MultiSelect.vue'
 import { type JsonDataTableProfile } from '@/helpers/helpers'
+import { LAZY_DATASETS, fetchJsonDatasetFile } from '@/helpers/datasetLoading'
 
 const mainStore = useMainStore()
 
 const datasetOptions = computed(() => {
-  return mainStore.getAllDataTables.map((dataTable) => ({
+  const loaded = mainStore.getAllDataTables.map((dataTable) => ({
     label: dataTable.datasetName,
     value: dataTable.datasetName,
   }))
+  // Lazy datasets are fetched + parsed on first selection
+  const notYetLoaded = LAZY_DATASETS.filter(
+    (entry) => !mainStore.getAllDatasetNames.includes(entry.datasetName),
+  ).map((entry) => ({
+    label: entry.datasetName,
+    value: entry.datasetName,
+  }))
+  return [...loaded, ...notYetLoaded]
 })
 
 const kOptions = [
@@ -38,12 +47,20 @@ const clusterAfterDimRedOptions = [
   { label: 'dimensionality reduced', value: 'true' },
 ]
 
-function selectDataTable(event: Event) {
+async function selectDataTable(event: Event) {
   if (!(event.target instanceof HTMLSelectElement)) {
     console.error('Event target is not an HTMLSelectElement:', event.target)
     return
   }
   const dataTableName = event.target.value
+
+  const lazyEntry = LAZY_DATASETS.find((entry) => entry.datasetName === dataTableName)
+  if (lazyEntry && !mainStore.getAllDatasetNames.includes(dataTableName)) {
+    // fetches + parses the dataset file, then registers, activates and fetches
+    await fetchJsonDatasetFile(mainStore, lazyEntry.fileName, true)
+    return
+  }
+
   const dataTable = mainStore.getAllDataTables.find((dt) => dt.datasetName === dataTableName)
   if (!dataTable) {
     console.error('Could not find data table with name:', dataTableName)

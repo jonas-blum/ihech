@@ -157,14 +157,9 @@ function updateItemNamesColumn(columName: string) {
 
 onMounted(async () => {
   if (mainStore.getAllDatasetNames.length === 0) {
-    // await fetchJsonDatasetFile(mainStore, 'Age-Groups.json', false)
-    // await fetchJsonDatasetFile(mainStore, 'Voting-Data.json', false)
-    // await fetchJsonDatasetFile(mainStore, 'Chess-Data.json', false)
-    // await fetchJsonDatasetFile(mainStore, 'Chess-Data-Black.json', false)
-    await fetchJsonDatasetFile(mainStore, 'DEBUG-Data.json', false)
-    await fetchJsonDatasetFile(mainStore, 'Chess-Data-White.json', false)
-    await fetchJsonDatasetFile(mainStore, 'TEI-Data.json', false)
-    await fetchJsonDatasetFile(mainStore, 'Voting-Data-NEW.json', false)
+    // The benchmark (validation data vs human labels) is the default dataset;
+    // the 17 per-SDG corpus datasets are lazy-loaded on selection (LAZY_DATASETS).
+    await fetchJsonDatasetFile(mainStore, 'Benchmark-Data.json', false)
     await mainStore.fetchData()
   }
 })
